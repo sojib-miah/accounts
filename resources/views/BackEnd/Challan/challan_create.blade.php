@@ -15,7 +15,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <form action="{{ route('income.receipt.store') }}" method="POST" id="receiptForm">
+            <form action="{{ route('challan.store') }}" method="POST" id="receiptForm">
                 @csrf
                 <input type="hidden" name="type" value="Income">
                 <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
@@ -105,7 +105,7 @@
                             <div class="card shadow-sm mt-3">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h4 class="mb-0">
-                                        Invoice Items
+                                        Challan Items
                                     </h4>
                                     <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                         <i class="fa fa-plus"></i>
@@ -129,10 +129,10 @@
                                                     <th width="120">
                                                         Qty
                                                     </th>
-                                                    <th width="120">
+                                                    <th width="120" class="d-none">
                                                         Unit Price
                                                     </th>
-                                                    <th width="130">
+                                                    <th width="130" class="d-none">
                                                         Total
                                                     </th>
                                                     <th>
@@ -152,7 +152,7 @@
                             {{-- ========================= --}}
                             {{-- Total --}}
                             {{-- ========================= --}}
-                            <div class="row mt-4">
+                            <div class="row mt-4 d-none">
                                 <div class="col-md-8">
                                 </div>
                                 <div class="col-md-4">
@@ -210,7 +210,7 @@
                         {{-- Right Sidebar --}}
                         {{-- ========================= --}}
                         <div class="col-lg-3">
-                            <div class="card shadow-sm mt-3">
+                            <div class="card shadow-sm">
                                 <div class="card-header">
                                     <strong>
                                         Receipt Notes
@@ -219,7 +219,7 @@
                                 <div class="card-body">
                                     <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
                                     <button class="btn btn-primary w-100 mt-3">
-                                        Save Receipt
+                                        Save Challan
                                     </button>
                                 </div>
                             </div>
@@ -249,8 +249,8 @@
                     <select class="form-select account select2"><option value="">Select Item</option></select>
                     </td>
                     <td><input type="number" class="form-control qty" value="1"></td>
-                    <td><input type="number" class="form-control rate" value="0"></td>
-                    <td><input type="number" class="form-control total" readonly></td>
+                    <td class="d-none"><input type="number" class="form-control rate" value="0"></td>
+                    <td class="d-none"><input type="number" class="form-control total" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>
@@ -395,27 +395,6 @@
                 addRow();
             }
         });
-        //    $(document).on('change', '.account', function() {
-        //         let current = $(this);
-        //         let value = current.val();
-        //         if (value == '') return;
-        //         let duplicate = false;
-        //         $('.account').not(current).each(function() {
-        //             if ($(this).val() == value) {
-        //                 duplicate = true;
-        //             }
-        //         });
-        //         if (duplicate) {
-        //             Swal.fire({
-        //                 icon: 'warning',
-        //                 title: 'Duplicate Expense',
-        //                 text: 'This expense has already been added.'
-        //             });
-        //             current.val('').trigger('change');
-        //             return;
-        //         }
-        //         calculate();
-        //     });
         $('form').submit(function(e) {
             let valid = true;
             $('#expenseBody tr').each(function() {

@@ -5,7 +5,7 @@
 @section('content')
     <div class="py-4">
         <div class="mx-5">
-            <form action="{{ route('income.receipt.update', $receipt->id) }}" method="POST" id="receiptForm">
+            <form action="{{ route('challan.update', $receipt->id) }}" method="POST" id="receiptForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="type" value="{{ $receipt->type }}">
@@ -140,7 +140,7 @@
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0">
-                                    Invoice Items
+                                    Challan Items
                                 </h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i>
@@ -164,10 +164,10 @@
                                                 <th width="120">
                                                     Qty
                                                 </th>
-                                                <th width="120">
+                                                <th width="120" class="d-none">
                                                     Unit Price
                                                 </th>
-                                                <th width="130">
+                                                <th width="130" class="d-none">
                                                     Total
                                                 </th>
                                                 <th>
@@ -187,7 +187,7 @@
                         {{-- ========================================= --}}
                         {{-- Total --}}
                         {{-- ========================================= --}}
-                        <div class="row mt-4">
+                        <div class="row mt-4 d-none">
                             <div class="col-md-8">
                             </div>
                             <div class="col-md-4">
@@ -255,7 +255,7 @@
                                 <textarea name="remarks" rows="6" class="form-control">{{ $receipt->remarks }}</textarea>
                                 <button type="submit" class="btn btn-success w-100 mt-3">
                                     <i class="fa fa-save me-2"></i>
-                                    Update Receipt
+                                    Update Challan
                                 </button>
                             </div>
                         </div>
@@ -284,8 +284,8 @@
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
                     <td><input type="number" class="form-control qty" value="1"></td>
-                    <td><input type="number" class="form-control rate" value="0"></td>
-                    <td><input type="number" class="form-control total" readonly></td>
+                    <td class="d-none"><input type="number" class="form-control rate" value="0"></td>
+                    <td class="d-none"><input type="number" class="form-control total" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>
@@ -303,41 +303,25 @@
             let lastRow = $('#expenseBody tr:last');
             lastRow.find('.category').select2('open');
             if (item) {
-
                 row.find('.qty').val(item.qty);
-
                 row.find('.rate').val(item.rate);
-
                 row.find('.details').val(item.details);
-
                 row.find('.category')
                     .val(item.category_id)
                     .trigger('change', [item]);
-
             }
         }
         $(function() {
-
             if (receiptItems.length) {
-
                 receiptItems.forEach(function(item) {
-
                     addRow(item);
-
                 });
-
             } else {
-
                 addRow();
-
             }
-
             $('#discount').val("{{ $receipt->discount }}");
-
             $('#vat').val("{{ $receipt->vat }}");
-
             calculate();
-
         });
         $('#addRow').click(function() {
             addRow();
@@ -480,27 +464,6 @@
                 addRow();
             }
         });
-        //    $(document).on('change', '.account', function() {
-        //         let current = $(this);
-        //         let value = current.val();
-        //         if (value == '') return;
-        //         let duplicate = false;
-        //         $('.account').not(current).each(function() {
-        //             if ($(this).val() == value) {
-        //                 duplicate = true;
-        //             }
-        //         });
-        //         if (duplicate) {
-        //             Swal.fire({
-        //                 icon: 'warning',
-        //                 title: 'Duplicate Expense',
-        //                 text: 'This expense has already been added.'
-        //             });
-        //             current.val('').trigger('change');
-        //             return;
-        //         }
-        //         calculate();
-        //     });
         $('form').submit(function(e) {
             let valid = true;
             $('#expenseBody tr').each(function() {

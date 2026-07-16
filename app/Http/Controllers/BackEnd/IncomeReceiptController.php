@@ -122,7 +122,7 @@ class IncomeReceiptController extends Controller
                 ]);
             }
             DB::commit();
-            return redirect()->route('income.receipt.show', $receipt->id)->with('success', 'Receipt Created Successfully.');
+            return redirect()->route('income.receipt.show', $receipt->id)->with('success', 'Invoice Created Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());

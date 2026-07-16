@@ -17,7 +17,7 @@
             body {
                 font-family: Calibri, Arial, sans-serif;
                 font-size: 15px;
-                background: #ececec;
+                /* background: #ececec; */
             }
 
             .receipt {

@@ -173,11 +173,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // income receipt route
     Route::get('/challan', [ChallanController::class, 'index'])->name('challan.index');
     Route::get('/challan/create', [ChallanController::class, 'createChallan'])->name('challan.create');
-    // Route::post('/income/receipt/store', [IncomeReceiptController::class, 'store'])->name('income.receipt.store');
-    // Route::get('/income/receipt/{receipt}', [IncomeReceiptController::class, 'show'])->name('income.receipt.show');
-    // Route::get('/income/receipt/{receipt}/edit', [IncomeReceiptController::class, 'edit'])->name('income.receipt.edit');
-    // Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
-    // Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
-    // Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
-    // Route::post('/income/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('income.party.due.payment');
+    Route::post('/challan/store', [ChallanController::class, 'store'])->name('challan.store');
+    Route::get('/challan/{receipt}', [ChallanController::class, 'show'])->name('challan.show');
+    Route::get('/challan/{receipt}/edit', [ChallanController::class, 'edit'])->name('challan.edit');
+    Route::put('/challan/{receipt}', [ChallanController::class, 'update'])->name('challan.update');
+    Route::post('/challan/{receipt}/cancel', [ChallanController::class, 'cancel'])->name('challan.cancel');
+    Route::get('/challan/{receipt}/print', [ChallanController::class, 'print'])->name('challan.print');
+    Route::get('/challan/{receipt}/pdf', [ChallanController::class, 'pdf'])->name('challan.pdf');
 });

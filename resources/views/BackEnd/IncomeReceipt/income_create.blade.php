@@ -210,7 +210,7 @@
                         {{-- Right Sidebar --}}
                         {{-- ========================= --}}
                         <div class="col-lg-3">
-                            <div class="card shadow-sm mt-3">
+                            <div class="card shadow-sm">
                                 <div class="card-header">
                                     <strong>
                                         Receipt Notes
@@ -219,7 +219,7 @@
                                 <div class="card-body">
                                     <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
                                     <button class="btn btn-primary w-100 mt-3">
-                                        Save Receipt
+                                        Save Invoice
                                     </button>
                                 </div>
                             </div>

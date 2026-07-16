@@ -8,51 +8,30 @@
         </title>
         <link href="{{ asset('backend/assets/css/bootstrap.min.css') }}" rel="stylesheet">
         <style>
-            @page {
-                size: A4 portrait;
-                margin: 12mm 10mm 12mm 10mm;
-            }
-
             * {
+                margin: 0;
+                padding: 0;
                 box-sizing: border-box;
             }
 
             body {
                 font-family: Calibri, Arial, sans-serif;
-                font-size: 12px;
+                font-size: 15px;
                 /* background: #ececec; */
             }
 
             .receipt {
-                width: 100%;
-                padding: 10px;
+                width: 210mm;
+                min-height: 297mm;
                 margin: 15px auto;
                 background: #fff;
+                padding: 20px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, .15);
             }
 
             table {
                 width: 100%;
                 border-collapse: collapse;
-                page-break-inside: auto;
-            }
-
-            tr {
-
-                page-break-inside: avoid;
-
-            }
-
-            thead {
-
-                display: table-header-group;
-
-            }
-
-            tfoot {
-
-                display: table-footer-group;
-
             }
 
             table th {
@@ -66,9 +45,8 @@
 
             table td {
                 border: 1px solid #7d52c4;
-                padding: 5px;
+                padding: 8px;
                 vertical-align: top;
-                word-wrap: break-word;
             }
 
             .logo {
@@ -76,14 +54,14 @@
             }
 
             .company {
-                font-size: 24px;
+                font-size: 34px;
                 font-weight: 700;
                 color: #333;
             }
 
             .phone {
                 text-align: right;
-                font-size: 13px;
+                font-size: 18px;
                 font-weight: bold;
                 color: #6b3fb5;
                 line-height: 30px;
@@ -92,7 +70,7 @@
             .section-title {
                 text-align: center;
                 color: #6b3fb5;
-                font-size: 20px;
+                font-size: 30px;
                 font-weight: 700;
                 margin: 18px 0 10px;
             }
@@ -141,6 +119,10 @@
     </head>
 
     <body>
+        <button onclick="window.print()" class="btn btn-primary print-btn">
+            <i class="fa fa-print"></i>
+            Print
+        </button>
         <div class="receipt">
             <table>
                 <tr style="border:none;">
@@ -269,18 +251,12 @@
                             Details
                         </th>
                         <th width="20%">
-                            Total
+                            Qty
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $grandTotal = 0;
-                    @endphp
                     @foreach ($receipt->items as $item)
-                        @php
-                            $grandTotal += $item->amount;
-                        @endphp
                         <tr>
                             <td class="text-center">
                                 {{ $loop->iteration }}
@@ -295,138 +271,12 @@
                                 {{ $item->details }}
                             </td>
                             <td class="text-right">
-                                {{ number_format($item->amount, 2) }}
+                                {{ number_format($item->qty) }}
                             </td>
                         </tr>
                     @endforeach
-                    <tr>
-                        <td colspan="4" class="text-right fw-bold" style="font-size:18px;">
-                            Total
-                        </td>
-                        <td class="text-right fw-bold" style="font-size:18px;background:#e8dcff;">
-                            {{ number_format($grandTotal, 2) }}
-                        </td>
-                    </tr>
                 </tbody>
             </table>
-            <!-- Payment Information -->
-            <div class="section-title">
-                Payment Information
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">
-                            #
-                        </th>
-                        <th width="18%">
-                            Payment ID
-                        </th>
-                        <th width="20%">
-                            Payment Type
-                        </th>
-                        <th width="20%">
-                            Account
-                        </th>
-                        <th width="17%">
-                            Amount
-                        </th>
-                        <th width="20%">
-                            Date
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($receipt->payments as $payment)
-                        <tr>
-                            <td class="text-center">
-                                {{ $loop->iteration }}
-                            </td>
-                            <td class="text-center">
-                                {{ $payment->id }}
-                            </td>
-                            <td>
-                                {{ $payment->paymentType->name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $payment->account->account_name ?? '' }}
-                            </td>
-                            <td class="text-right">
-                                {{ number_format($payment->amount, 2) }}
-                            </td>
-                            <td class="text-center">
-                                {{ \Carbon\Carbon::parse($payment->payment_date)->format('d-m-Y') }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center">
-                                No Payment Found
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <!-- Closing Calculation -->
-            <div class="section-title">
-                Closing Calculation
-            </div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td width="75%">
-                            <strong>Total Amount</strong>
-                        </td>
-                        <td class="text-right">
-                            {{ number_format($receipt->total_amount, 2) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Paid Amount</strong>
-                        </td>
-                        <td class="text-right text-success">
-                            {{ number_format($receipt->paid_amount, 2) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Due Amount</strong>
-                        </td>
-                        <td class="text-right text-danger">
-                            {{ number_format($receipt->due_amount, 2) }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Payment Status</strong>
-                        </td>
-                        <td class="text-right">
-                            <strong>
-                                {{ $receipt->payment_status }}
-                            </strong>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- Amount In Words -->
-            <div style="margin-top:20px;">
-                <strong>
-                    Amount In Words :
-                </strong>
-                {{ numberToWords($receipt->total_amount) }} Only.
-            </div>
-            <!-- Thanks Message -->
-            <div
-                style="margin-top:25px;
-                    padding:12px;
-                    text-align:center;
-                    font-size:18px;
-                    font-weight:bold;
-                    color:#6b3fb5;
-                    border:1px dashed #6b3fb5;">
-                Payment Received With Thanks
-            </div>
             <!-- Remarks -->
             @if ($receipt->remarks)
                 <div style="margin-top:20px;">
@@ -437,12 +287,9 @@
                 </div>
             @endif
             <!-- Signature Section -->
-            <table style="margin-top:70px;
-    border:none;">
+            <table style="margin-top:70px; border:none;">
                 <tr>
-                    <td style="border:none;
-           width:33%;
-            text-align:center;">
+                    <td style="border:none; width:33%; text-align:center;">
                         ______________________
                         <br>
                         <strong>
@@ -451,9 +298,7 @@
                         <br>
                         {{ $receipt->creator->name ?? '' }}
                     </td>
-                    <td style="border:none;
-           width:34%;
-            text-align:center;">
+                    <td style="border:none; width:34%; text-align:center;">
                         ______________________
                         <br>
                         <strong>
@@ -462,9 +307,7 @@
                         <br>
                         {{ $receipt->party->name ?? '' }}
                     </td>
-                    <td style="border:none;
-           width:33%;
-            text-align:center;">
+                    <td style="border:none; width:33%; text-align:center;">
                         ______________________
                         <br>
                         <strong>
@@ -476,11 +319,11 @@
             <!-- Footer -->
             <div
                 style="margin-top:50px;
-    border-top:2px solid #7d52c4;
-    padding-top:10px;
-    text-align:center;
-    font-size:12px;
-    color:#666;">
+                    border-top:2px solid #7d52c4;
+                    padding-top:10px;
+                    text-align:center;
+                    font-size:12px;
+                    color:#666;">
                 <div>
                     This is a computer generated receipt.
                 </div>
@@ -494,6 +337,11 @@
                 </div>
             </div>
         </div>
+        <script>
+            window.onload = function() {
+                window.print();
+            };
+        </script>
     </body>
 
 </html>

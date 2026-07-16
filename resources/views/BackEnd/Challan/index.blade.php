@@ -95,7 +95,7 @@
                                     <tr>
                                         {{-- Receipt ID --}}
                                         <td class="text-center">
-                                            <a href="{{ route('income.receipt.show', $receipt->id) }}"
+                                            <a href="{{ route('challan.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
                                                 {{ $receipt->receipt_no }}
                                             </a>
@@ -140,15 +140,14 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li>
                                                         <a class="dropdown-item"
-                                                            href="{{ route('income.receipt.show', $receipt->id) }}">
+                                                            href="{{ route('challan.show', $receipt->id) }}">
                                                             <i class="fa fa-eye text-primary me-2"></i>
                                                             View
                                                         </a>
                                                     </li>
                                                     @if ($receipt->status != 'Cancelled')
                                                         <li>
-                                                            <form
-                                                                action="{{ route('income.receipt.cancel', $receipt->id) }}"
+                                                            <form action="{{ route('challan.cancel', $receipt->id) }}"
                                                                 method="POST">
                                                                 @csrf
                                                                 <button onclick="return confirm('Cancel this receipt?')"
@@ -182,7 +181,7 @@
                                         <td colspan="6" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
-                                            No Income Receipt Found
+                                            No Challan Found
                                         </td>
                                     </tr>
                                 @endforelse
