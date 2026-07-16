@@ -9,7 +9,7 @@
             <div>
                 <h2 class="fw-bold mb-1">
                     <i class="fa fa-chart-line text-primary me-2"></i>
-                    Financial Dashboard
+                    Financial Dashboard with Sojib
                 </h2>
                 <small class="text-muted">
                     Income • Expense • Cash Flow • Reports

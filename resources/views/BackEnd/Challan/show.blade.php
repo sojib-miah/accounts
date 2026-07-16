@@ -191,7 +191,7 @@
                 </div>
                 {{-- Action Buttons --}}
                 @if ($receipt->status != 'Cancelled')
-                    @can('income-receipt-edit')
+                    @can('income-challan-edit')
                         <a href="{{ route('challan.edit', $receipt->id) }}"
                             class="btn btn-warning btn-lg d-block mb-2 text-white">
                             <i class="fa fa-edit me-2"></i>
@@ -200,7 +200,7 @@
                     @endcan
                 @endif
                 @if ($receipt->payment_status == 'Pending')
-                    @can('income-receipt-delete')
+                    @can('income-challan-delete')
                         <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
