@@ -58,10 +58,13 @@
                             <thead>
                                 <tr>
                                     <th width="60">
-                                        #
+                                        SN
                                     </th>
                                     <th>
                                         Account Name
+                                    </th>
+                                    <th>
+                                        Address
                                     </th>
                                     <th>
                                         Holder Name
@@ -98,6 +101,7 @@
                                                 {{ $account->account_name }}
                                             </a>
                                         </td>
+                                        <td></td>
                                         <td>
                                             {{ $account->account_holder_name }}
                                         </td>

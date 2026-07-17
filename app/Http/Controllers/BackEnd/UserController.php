@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')->when($request->filled('search'), function ($query) use ($request) {
+        $users = User::with('roles')->with('company')->when($request->filled('search'), function ($query) use ($request) {
 
             $search = $request->search;
 

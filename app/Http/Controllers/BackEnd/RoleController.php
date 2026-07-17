@@ -12,7 +12,13 @@ class RoleController extends Controller
 {
     public function index(Request $request)
     {
-        $roles = Role::with(['users', 'permissions'])->latest()->get();
+        if (auth()->user()->hasRole('Super-Admin')) {
+            $roles = Role::with(['users', 'permissions'])->latest()->get();
+        } elseif (auth()->user()->hasRole('Admin')) {
+            $roles = Role::with(['users', 'permissions'])->whereNotIn('name', ['Super-Admin'])->latest()->get();
+        } elseif (auth()->user()->hasRole('Manager')) {
+            $roles = Role::with(['users', 'permissions'])->whereNotIn('name', ['Super-Admin', 'Admin'])->latest()->get();
+        }
         $permissions = Permission::orderBy('name')->get();
         $users = User::with('roles')
             ->whereHas('roles')

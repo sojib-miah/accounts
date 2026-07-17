@@ -9,7 +9,7 @@
             <div>
                 <h2 class="fw-bold mb-1">
                     <i class="fa fa-chart-line text-primary me-2"></i>
-                    Financial Dashboard with Dhurobo
+                    Financial Dashboard
                 </h2>
                 <small class="text-muted">
                     Income • Expense • Cash Flow • Reports
@@ -133,78 +133,104 @@
                     </div>
                 </div>
             </div>
+            <!-- monthly income -->
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <small>
+                            MONTHLY INCOME
+                        </small>
+                        <h4 class="text-danger mt-2">
+                            {{ number_format($totalPayable, 2) }}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <!-- monthly expense -->
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <small>
+                            MONTHLY EXPENSE
+                        </small>
+                        <h4 class="text-danger mt-2">
+                            {{ number_format($totalPayable, 2) }}
+                        </h4>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- ============================================= -->
         <div class="row g-4 mt-1">
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalCustomer }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Customers
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalSupplier }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Suppliers
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalBranch }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Branches
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalAccount }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Accounts
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalReceipt }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Receipts
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
-                        <h3>
+                        <h3 class="mb-0">
                             {{ $totalPayment }}
                         </h3>
-                        <small>
+                        <h3 class="mb-0">
                             Payments
-                        </small>
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -214,7 +240,7 @@
         <!-- =============================================== -->
         <div class="row mt-4">
             <!-- Income vs Expense -->
-            <div class="col-lg-8">
+            {{-- <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="card-header">
                         <div class="d-flex justify-content-between">
@@ -230,7 +256,7 @@
                         <canvas id="incomeExpenseChart" height="110"></canvas>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <!-- Financial Summary -->
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
@@ -285,20 +311,73 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- =============================================== -->
-        <!-- Profit Trend -->
-        <!-- =============================================== -->
-        <div class="row mt-4">
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
-                            Monthly Profit Trend
+                            Payment Status
                         </h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="profitChart" height="95"></canvas>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td>
+                                    Paid
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-success">
+                                        {{ $paymentSummary['paid'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Partial
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-warning text-dark">
+                                        {{ $paymentSummary['partial'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Pending
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-danger">
+                                        {{ $paymentSummary['pending'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td>
+                                    Completed
+                                </td>
+                                <td class="text-end">
+                                    {{ $receiptSummary['completed'] }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Draft
+                                </td>
+                                <td class="text-end">
+                                    {{ $receiptSummary['draft'] }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Cancelled
+                                </td>
+                                <td class="text-end">
+                                    {{ $receiptSummary['cancelled'] }}
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -338,10 +417,28 @@
                 </div>
             </div>
         </div>
+        <!-- =============================================== -->
+        <!-- Profit Trend -->
+        <!-- =============================================== -->
+        <div class="row mt-4">
+            {{-- <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header">
+                        <h5 class="fw-bold mb-0">
+                            Monthly Profit Trend
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="profitChart" height="95"></canvas>
+                    </div>
+                </div>
+            </div> --}}
+
+        </div>
         <!-- ====================================================== -->
         <!-- Cash Flow -->
         <!-- ====================================================== -->
-        <div class="row mt-4">
+        {{-- <div class="row mt-4">
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="card-header">
@@ -429,11 +526,11 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- ====================================================== -->
         <!-- Category Analysis -->
         <!-- ====================================================== -->
-        <div class="row mt-4">
+        {{-- <div class="row mt-4">
             <div class="col-lg-6">
                 <div class="card shadow-sm border-0">
                     <div class="card-header">
@@ -458,7 +555,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- ====================================================== -->
         <!-- Top Analytics -->
         <!-- ====================================================== -->
@@ -783,7 +880,7 @@
         <!-- Quick Actions -->
         <!-- ====================================================== -->
         <div class="card shadow-sm border-0 mt-4">
-            <div class="card-header bg-white">
+            <div class="card-header">
                 <h5 class="fw-bold mb-0">
                     Quick Actions
                 </h5>

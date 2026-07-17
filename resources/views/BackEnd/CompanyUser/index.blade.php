@@ -49,12 +49,12 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="50">SL</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Company</th>
+                                <th width="50">SN</th>
+                                <th>Company Name</th>
                                 <th>Branch</th>
+                                <th>User Name</th>
+                                <th>Phone No</th>
+                                <th>E-mail</th>
                                 <th>Created By</th>
                                 <th width="150" class="text-center">Action</th>
                             </tr>
@@ -63,11 +63,11 @@
                             @forelse($users as $user)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->phone ?? '-' }}</td>
                                     <td>{{ $user->company->name ?? '-' }}</td>
                                     <td>{{ $user->branch->name ?? '-' }}</td>
+                                    <td>{{ $user->name }}</td>
+                                    <td>{{ $user->phone ?? '-' }}</td>
+                                    <td>{{ $user->email }}</td>
                                     <td>{{ $user->creator->name ?? '-' }}</td>
                                     <td class="text-center">
                                         @can('company-user-edit')

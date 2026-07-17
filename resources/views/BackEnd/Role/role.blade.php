@@ -149,7 +149,7 @@
 
     {{-- Add Role Modal --}}
     <div class="modal fade" id="addRoleModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-simple modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-simple modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body">
                     <button type="button" class="btn-close" data-bs-dismiss="modal">
@@ -180,7 +180,7 @@
                         </div>
                         <div class="row">
                             @foreach ($groupPermissions as $module => $modulePermissions)
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-3 mb-4">
                                     <div class="card border shadow-sm">
                                         <div class="card-header" style="padding: 5px !impotant">
                                             <div class="form-check">
@@ -211,7 +211,8 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="text-center mt-4">
+                        <hr>
+                        <div class="text-end mt-4">
                             <button type="submit" class="btn btn-primary me-2">
                                 Save Role
                             </button>
@@ -228,7 +229,7 @@
     {{-- Edit Role Modal --}}
     @foreach ($roles as $role)
         <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <form action="{{ route('roles.update', $role->id) }}" method="POST">
                         @csrf
@@ -258,7 +259,7 @@
                             </div>
                             <div class="row">
                                 @foreach ($groupPermissions as $module => $modulePermissions)
-                                    <div class="col-lg-6 col-md-6 mb-4">
+                                    <div class="col-md-3 mb-4">
                                         <div class="card border shadow-sm">
                                             <div class="card-header" style="padding: 5px !impotant">
                                                 <div class="form-check">
@@ -294,6 +295,7 @@
                                 @endforeach
                             </div>
                         </div>
+                        <hr>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">
                                 Update Role

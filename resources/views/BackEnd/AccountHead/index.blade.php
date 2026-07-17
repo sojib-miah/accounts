@@ -7,7 +7,7 @@
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="mb-0">
-                    Expense List
+                    Expense Description (Item Creation)
                 </h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('account-head.index') }}" method="GET"
@@ -52,9 +52,9 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Category</th>
-                                    <th>Name</th>
+                                    <th>Description</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Created By</th>

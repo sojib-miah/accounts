@@ -40,8 +40,8 @@ Route::get('/admin', function () {
     return redirect()->route('dashboard.index');
 });
 
-// Route::middleware(['auth', 'role:admin|super-admin'])->prefix('admin')->group(function () {
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
+    // Route::middleware(['auth'])->prefix('admin')->group(function () {
     // dashboard 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 

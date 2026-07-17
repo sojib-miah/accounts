@@ -48,13 +48,13 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Company</th>
+                                <th>SN</th>
+                                <th>Company Name</th>
                                 <th>Branch ID</th>
-                                <th>Name</th>
+                                <th>Branch Name</th>
                                 <th>Phone One</th>
                                 <th>Phone Two</th>
-                                <th>Email</th>
+                                <th>E-mail</th>
                                 <th>Address</th>
                                 <th width="170">Action</th>
                             </tr>

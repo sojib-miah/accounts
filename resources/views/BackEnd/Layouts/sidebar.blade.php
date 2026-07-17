@@ -79,46 +79,7 @@
             </ul>
         </li>
 
-        <!-- expense -->
-        <li
-            class="menu-item {{ request()->routeIs('party.*') || request()->routeIs('category.*') || request()->routeIs('account-head.*') || request()->routeIs('receipt.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="fa-solid fa-briefcase me-3"></i>
-                Expense
-            </a>
-            <ul class="menu-sub">
-                @can('payee-list-list')
-                    <li class="menu-item {{ request()->routeIs('party.index') ? 'active' : '' }}">
-                        <a href="{{ route('party.index') }}" class="menu-link">
-                            Payee List
-                        </a>
-                    </li>
-                @endcan
-                @can('expense-category-list-list')
-                    <li class="menu-item {{ request()->routeIs('category.index') ? 'active' : '' }}">
-                        <a href="{{ route('category.index') }}" class="menu-link">
-                            Category List
-                        </a>
-                    </li>
-                @endcan
-                @can('expense-list-list')
-                    <li class="menu-item {{ request()->routeIs('account-head.index') ? 'active' : '' }}">
-                        <a href="{{ route('account-head.index') }}" class="menu-link">
-                            Expense List
-                        </a>
-                    </li>
-                @endcan
-                @can('expense-receipt-list')
-                    <li class="menu-item {{ request()->routeIs('receipt.expense.index') ? 'active' : '' }}">
-                        <a href="{{ route('receipt.expense.index') }}" class="menu-link">
-                            Expense Receipt
-                        </a>
-                    </li>
-                @endcan
-            </ul>
-        </li>
-
-        <!-- Income -->
+        <!-- Income seals-->
         <li
             class="menu-item {{ request()->routeIs('receiver.*') || request()->routeIs('income.category.*') || request()->routeIs('income.*') || request()->routeIs('income.receipt.*') || request()->routeIs('challan.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -161,6 +122,55 @@
                         </a>
                     </li>
                 @endcan
+                <li class="menu-item {{ request()->routeIs('income.receipt.index') ? 'active' : '' }}">
+                    <a href="{{ route('income.receipt.index') }}" class="menu-link">
+                        Sales Details
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- expense -->
+        <li
+            class="menu-item {{ request()->routeIs('party.*') || request()->routeIs('category.*') || request()->routeIs('account-head.*') || request()->routeIs('receipt.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-solid fa-briefcase me-3"></i>
+                Expense
+            </a>
+            <ul class="menu-sub">
+                @can('payee-list-list')
+                    <li class="menu-item {{ request()->routeIs('party.index') ? 'active' : '' }}">
+                        <a href="{{ route('party.index') }}" class="menu-link">
+                            Payee List
+                        </a>
+                    </li>
+                @endcan
+                @can('expense-category-list-list')
+                    <li class="menu-item {{ request()->routeIs('category.index') ? 'active' : '' }}">
+                        <a href="{{ route('category.index') }}" class="menu-link">
+                            Category List
+                        </a>
+                    </li>
+                @endcan
+                @can('expense-list-list')
+                    <li class="menu-item {{ request()->routeIs('account-head.index') ? 'active' : '' }}">
+                        <a href="{{ route('account-head.index') }}" class="menu-link">
+                            Expense Description
+                        </a>
+                    </li>
+                @endcan
+                @can('expense-receipt-list')
+                    <li class="menu-item {{ request()->routeIs('receipt.expense.index') ? 'active' : '' }}">
+                        <a href="{{ route('receipt.expense.index') }}" class="menu-link">
+                            Expense Receipt
+                        </a>
+                    </li>
+                @endcan
+                <li class="menu-item {{ request()->routeIs('receipt.expense.index') ? 'active' : '' }}">
+                    <a href="{{ route('receipt.expense.index') }}" class="menu-link">
+                        Expense Details
+                    </a>
+                </li>
             </ul>
         </li>
 
@@ -185,7 +195,7 @@
         <li class="menu-item {{ request()->routeIs('users.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ti tabler-users"></i>
-                <div data-i18n="Users">Users</div>
+                <div data-i18n="Comits User">Comits User</div>
             </a>
             <ul class="menu-sub">
                 @can('user-list')

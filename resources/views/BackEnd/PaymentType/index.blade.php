@@ -50,8 +50,8 @@
                     <table class="table table-bordered align-middle">
                         <thead>
                             <tr>
-                                <th>SL</th>
-                                <th>Name</th>
+                                <th>SN</th>
+                                <th>Payment Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -122,12 +122,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Name</label>
+                            <label>Payment Type</label>
                             <input type="text" name="name" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label>Status</label>
-                            <select name="status" class="form-select">
+                            <select name="status" class="form-select select2">
                                 <option value="Active">
                                     Active
                                 </option>
@@ -163,12 +163,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Name</label>
+                            <label>Payment Type</label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label>Status</label>
-                            <select name="status" id="edit_status" class="form-select">
+                            <select name="status" id="edit_status" class="form-select select2">
                                 <option value="Active">
                                     Active
                                 </option>
@@ -195,7 +195,8 @@
             document.querySelectorAll('.editBtn').forEach(function(button) {
                 button.addEventListener('click', function() {
                     document.getElementById('edit_name').value = this.dataset.name;
-                    document.getElementById('edit_status').value = this.dataset.status;
+                    // document.getElementById('edit_status').value = this.dataset.status;
+                    $('#edit_status').val(this.dataset.status).trigger('change');
                     document.getElementById('editForm').action = '/admin/payment-type/update/' + this.dataset
                         .id;
                     new bootstrap.Modal(document.getElementById('editModal')).show();

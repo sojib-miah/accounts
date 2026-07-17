@@ -88,8 +88,10 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>User</th>
+                                <th>SN</th>
+                                <th>Company Name</th>
+                                <th>User Name</th>
+                                <th>Phone No</th>
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Created</th>
@@ -100,6 +102,7 @@
                             @foreach ($users as $user)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $user->company->name ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
 
@@ -111,6 +114,7 @@
                                             <span>{{ $user->name }}</span>
                                         </div>
                                     </td>
+                                    <td>{{ $user->phone }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>
                                         @foreach ($user->roles as $role)

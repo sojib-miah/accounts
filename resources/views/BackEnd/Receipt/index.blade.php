@@ -70,14 +70,15 @@
                         <table class="table table-bordered align-middle table-hover">
                             <thead>
                                 <tr>
+                                    <th width="60">SN</th>
                                     <th class="text-center">
                                         RECEIPT ID
                                     </th>
                                     <th class="text-center">
-                                        PAYEE
+                                        PAYEE Name
                                     </th>
                                     <th class="text-center">
-                                        RECEIPT BY
+                                        Created BY
                                     </th>
                                     <th class="text-center">
                                         DATE & TIME
@@ -93,6 +94,7 @@
                             <tbody>
                                 @forelse($receipts as $receipt)
                                     <tr>
+                                        <td>{{ $loop->iteration }}</td>
                                         {{-- Receipt ID --}}
                                         <td class="text-center">
                                             <a href="{{ route('receipt.show', $receipt->id) }}"

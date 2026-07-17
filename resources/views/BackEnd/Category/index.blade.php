@@ -51,7 +51,7 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Category Name</th>
                                     <th>Type</th>
                                     <th>Status</th>

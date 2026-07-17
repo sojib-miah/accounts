@@ -33,19 +33,7 @@
                     <li>
                         <a class="dropdown-item" href="javascript:void(0);" data-language="fr"
                             data-text-direction="ltr">
-                            <span>French</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0);" data-language="ar"
-                            data-text-direction="rtl">
-                            <span>Arabic</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="javascript:void(0);" data-language="de"
-                            data-text-direction="ltr">
-                            <span>German</span>
+                            <span>Bangla</span>
                         </a>
                     </li>
                 </ul>
@@ -85,7 +73,7 @@
             <!-- / Style Switcher-->
 
             <!-- Quick links  -->
-            <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown">
+            {{-- <li class="nav-item dropdown-shortcuts navbar-dropdown dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill"
                     href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                     aria-expanded="false">
@@ -170,11 +158,11 @@
                         </div>
                     </div>
                 </div>
-            </li>
+            </li> --}}
             <!-- Quick links -->
 
             <!-- Notification -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+            {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
                 <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill"
                     href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                     aria-expanded="false">
@@ -405,20 +393,17 @@
                         </div>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
             <!--/ Notification -->
 
             <!-- User -->
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"
-                    data-bs-toggle="dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
                         @if (Auth::user()->image)
-                            <img src="{{ asset('uploads/users/' . Auth::user()->image) }}" alt
-                                class="rounded-circle" />
+                            <img src="{{ asset('uploads/users/' . Auth::user()->image) }}" alt class="rounded-circle" />
                         @else
-                            <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}"
-                                class="rounded-circle">
+                            <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}" class="rounded-circle">
                         @endif
                     </div>
                 </a>

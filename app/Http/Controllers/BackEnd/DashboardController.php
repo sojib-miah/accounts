@@ -45,8 +45,8 @@ class DashboardController extends Controller
         $currentBalance = Account::sum('current_balance');
         $totalReceivable = Receipt::where('type', 'Income')->sum('due_amount');
         $totalPayable = Receipt::where('type', 'Expense')->sum('due_amount');
-        $totalCustomer = Party::whereIn('type', ['Customer', 'Both', 'Income'])->count();
-        $totalSupplier = Party::whereIn('type', ['Supplier', 'Both', 'Expense'])->count();
+        $totalCustomer = Party::whereIn('type', ['Income'])->count();
+        $totalSupplier = Party::whereIn('type', ['Expense'])->count();
         $totalBranch = Branch::count();
         $totalCategory = Category::count();
         $totalAccount = Account::count();

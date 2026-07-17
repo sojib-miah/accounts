@@ -50,11 +50,11 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Payee ID</th>
-                                    <th>Name</th>
+                                    <th>Payee Name</th>
                                     <th>Phone</th>
-                                    <th>Email</th>
+                                    <th>E-mail</th>
                                     <th>Address</th>
                                     <th>Type</th>
                                     <th>Status</th>

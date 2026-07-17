@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Receiver List</h4>
+                <h4 class="mb-0">Customer List</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('receiver.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -51,12 +51,12 @@
                             <thead>
                                 <tr>
                                     <th width="60">SL</th>
-                                    <th>Payee ID</th>
+                                    <th>Customer ID</th>
                                     <th>Name</th>
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Address</th>
-                                    <th>Type</th>
+                                    {{-- <th>Type</th> --}}
                                     <th>Status</th>
                                     <th>Created By</th>
                                     <th width="150">Action</th>
@@ -75,7 +75,7 @@
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
                                         <td>{{ $party->address ?? '-' }}</td>
-                                        <td>
+                                        {{-- <td>
                                             @if ($party->type == 'Income')
                                                 <span class="badge bg-success">Income</span>
                                             @elseif($party->type == 'Expense')
@@ -83,7 +83,7 @@
                                             @else
                                                 <span class="badge bg-primary">Both</span>
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             @if ($party->status == 'Active')
                                                 <span class="badge bg-success">Active</span>
