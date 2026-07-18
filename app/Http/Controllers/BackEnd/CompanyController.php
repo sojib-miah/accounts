@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class CompanyController extends Controller
@@ -13,6 +14,8 @@ class CompanyController extends Controller
     {
         $companies = Company::when($request->filled('search'), function ($query) use ($request) {
             $query->where('name', 'like', '%' . $request->search . '%');
+        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
         })->latest()->get();
         return view('BackEnd.Company.index', compact('companies'));
     }
@@ -28,6 +31,7 @@ class CompanyController extends Controller
         ]);
         $company = new Company();
         $company->name = $request->name;
+        $company->created_by = Auth::id();
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $name = time() . '_logo.' . $file->getClientOriginalExtension();

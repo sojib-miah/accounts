@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class CompanyUserController extends Controller
@@ -14,11 +15,8 @@ class CompanyUserController extends Controller
     public function index(Request $request)
     {
         $users = User::with(['company', 'branch', 'creator'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
@@ -29,6 +27,8 @@ class CompanyUserController extends Controller
                         $branch->where('name', 'like', "%{$search}%");
                     });
             });
+        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
         })->latest()->get();
 
         $companies = Company::orderBy('name')->get();

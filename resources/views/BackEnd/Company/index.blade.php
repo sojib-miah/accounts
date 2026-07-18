@@ -48,7 +48,7 @@
                     <table class="table table-bordered align-middle">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>SN</th>
                                 <th>Name</th>
                                 <th>Logo</th>
                                 <th>Hologram</th>
@@ -58,7 +58,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($companies as $company)
+                            @forelse ($companies as $company)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $company->name }}</td>
@@ -66,6 +66,8 @@
                                         @if ($company->logo)
                                             <img src="{{ asset($company->logo) }}" class="border rounded" width="60"
                                                 height="60">
+                                        @else
+                                            -
                                         @endif
                                     </td>
 
@@ -73,6 +75,8 @@
                                         @if ($company->hologram)
                                             <img src="{{ asset($company->hologram) }}" class="border rounded" width="60"
                                                 height="60">
+                                        @else
+                                            -
                                         @endif
                                     </td>
 
@@ -80,6 +84,8 @@
                                         @if ($company->seal)
                                             <img src="{{ asset($company->seal) }}" class="border rounded" width="60"
                                                 height="60">
+                                        @else
+                                            -
                                         @endif
                                     </td>
 
@@ -87,6 +93,8 @@
                                         @if ($company->signature)
                                             <img src="{{ asset($company->signature) }}" class="border rounded"
                                                 width="80" height="60">
+                                        @else
+                                            -
                                         @endif
                                     </td>
                                     <td>
@@ -112,7 +120,11 @@
                                         @endcan
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center">No data Found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

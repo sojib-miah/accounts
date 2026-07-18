@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentType;
 use App\Models\ReceiptPayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentTypeController extends Controller
 {
@@ -13,9 +14,9 @@ class PaymentTypeController extends Controller
     {
         $paymentTypes = PaymentType::when($request->filled('search'), function ($query) use ($request) {
             $query->where('name', 'like', '%' . $request->search . '%');
-        })
-            ->latest()
-            ->get();
+        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
 
         return view('BackEnd.PaymentType.index', compact('paymentTypes'));
     }
@@ -30,6 +31,7 @@ class PaymentTypeController extends Controller
         PaymentType::create([
             'name'   => $request->name,
             'status' => $request->status,
+            'created_by' => Auth::id(),
         ]);
 
         return redirect()->route('payment-type.index')

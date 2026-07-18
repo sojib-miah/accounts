@@ -18,6 +18,10 @@ return new class extends Migration
                 'Active',
                 'Inactive'
             ])->default('Active');
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -8,19 +8,16 @@ use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Receipt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BranchController extends Controller
 {
     public function index(Request $request)
     {
         $branches = Branch::with('company')
-
             ->when($request->filled('search'), function ($query) use ($request) {
-
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
-
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('branch_id', 'like', "%{$search}%")
                         ->orWhere('phone_one', 'like', "%{$search}%")
@@ -31,8 +28,14 @@ class BranchController extends Controller
                             $company->where('name', 'like', "%{$search}%");
                         });
                 });
+            })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', Auth::id());
             })->latest()->get();
-        $companies = Company::orderBy('name')->get();
+        $companies = Company::orderBy('name')
+            ->when(!Auth::user()->hasRole('super-admin'), function ($query) {
+                $query->where('created_by', Auth::id());
+            })
+            ->get();
         return view('BackEnd.Branch.index', compact('branches', 'companies'));
     }
 
@@ -67,6 +70,7 @@ class BranchController extends Controller
             'phone_two' => $request->phone_two,
             'email' => $request->email,
             'address' => $request->address,
+            'created_by' => Auth::id(),
         ]);
 
         return redirect()->route('branch.index')->with('success', 'Branch Created Successfully');

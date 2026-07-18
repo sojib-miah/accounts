@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\PaymentType;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AccountsController extends Controller
@@ -16,11 +17,8 @@ class AccountsController extends Controller
     public function index(Request $request)
     {
         $accounts = Account::with('paymentType')->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('account_name', 'like', "%{$search}%")
                     ->orWhere('account_holder_name', 'like', "%{$search}%")
                     ->orWhere('account_number', 'like', "%{$search}%")
@@ -29,6 +27,8 @@ class AccountsController extends Controller
                     ->orWhere('default_status', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%");
             });
+        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
         })->latest()->get();
         return view('BackEnd.Accounts.index', compact('accounts'));
     }
@@ -45,6 +45,9 @@ class AccountsController extends Controller
         ]);
         DB::beginTransaction();
         try {
+            if (!Account::where('default_status', 'Default')->exists()) {
+                $request->default_status = 'Default';
+            }
             if ($request->default_status == 'Default') {
                 Account::where('default_status', 'Default')
                     ->update([
@@ -109,6 +112,15 @@ class AccountsController extends Controller
         ]);
         DB::beginTransaction();
         try {
+            if (
+                $account->default_status == 'Default' &&
+                $request->default_status == 'Not Default'
+            ) {
+                $defaultCount = Account::where('default_status', 'Default')->count();
+                if ($defaultCount == 1) {
+                    return back()->withInput()->with('error', 'At least one account must remain as Default.');
+                }
+            }
             if ($request->default_status == 'Default') {
                 Account::where('id', '!=', $account->id)
                     ->update([

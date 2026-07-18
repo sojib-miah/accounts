@@ -60,7 +60,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($branches as $branch)
+                            @forelse ($branches as $branch)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $branch->company->name }}</td>
@@ -93,7 +93,11 @@
                                         @endcan
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center">No data Found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
