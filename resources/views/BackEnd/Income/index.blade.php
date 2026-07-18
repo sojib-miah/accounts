@@ -52,9 +52,9 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Category</th>
-                                    <th>Name</th>
+                                    <th>Item Description</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Created By</th>

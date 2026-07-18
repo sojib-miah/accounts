@@ -5,17 +5,15 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Party;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReceiverController extends Controller
 {
     public function index(Request $request)
     {
         $parties = Party::with(['creator', 'updater'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('party_id', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
@@ -24,7 +22,9 @@ class ReceiverController extends Controller
                     ->orWhere('type', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%");
             });
-        })->where('type', 'Income')->latest()->get();
+        })->where('type', 'Income')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
 
         return view('BackEnd.Receiver.index', compact('parties'));
     }
@@ -40,16 +40,9 @@ class ReceiverController extends Controller
         ]);
 
         // Generate Party ID
-        $lastParty = Party::latest('id')->first();
+        $lastParty = Party::orderByDesc('party_id')->first();
 
-        if ($lastParty) {
-            $number = (int) str_replace('PRT_', '', $lastParty->party_id);
-            $number++;
-        } else {
-            $number = 10001;
-        }
-
-        $partyId = 'PRT_' . $number;
+        $partyId = $lastParty ? ((int) $lastParty->party_id + 1) : 10001;
 
         Party::create([
             'party_id'   => $partyId,

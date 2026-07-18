@@ -50,9 +50,10 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Customer ID</th>
-                                    <th>Name</th>
+                                    <th>Customer Name</th>
+                                    <th>Designation</th>
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Address</th>
@@ -72,6 +73,7 @@
                                                 {{ $party->name }}
                                             </a>
                                         </td>
+                                        <td></td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
                                         <td>{{ $party->address ?? '-' }}</td>

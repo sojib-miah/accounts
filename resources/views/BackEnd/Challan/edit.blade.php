@@ -23,26 +23,32 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="row">
-                                            <div class="col-4 text-end">
-                                                <b>Receipt No :</b>
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end">
+                                                    <b>Challan No :</b>
+                                                </div>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->receipt_no }}">
+                                                </div>
                                             </div>
-                                            <div class="col-8">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->receipt_no }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>Date :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="date" name="receipt_date" class="form-control"
+                                                        value="{{ $receipt->receipt_date }}">
+                                                </div>
                                             </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>Date :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="date" name="receipt_date" class="form-control"
-                                                    value="{{ $receipt->receipt_date }}">
-                                            </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>By :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>By :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +58,7 @@
                                     <!-- Branch -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Billing Branch
+                                            Branch Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
@@ -64,8 +70,9 @@
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
+                                            <p><b>Company Name :</b> <span id=""></span></p>
                                             <p>
-                                                <b>Name :</b>
+                                                <b>Branch Name :</b>
                                                 <span id="branch_name">
                                                     {{ $receipt->branch->name ?? '' }}
                                                 </span>
@@ -77,7 +84,7 @@
                                                 </span>
                                             </p>
                                             <p>
-                                                <b>Email :</b>
+                                                <b>E-mail :</b>
                                                 <span id="branch_email">
                                                     {{ $receipt->branch->email ?? '' }}
                                                 </span>
@@ -93,7 +100,7 @@
                                     <!-- Party -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Invoice To
+                                            Customer Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="party_id" id="party_id" class="form-select select2" required>
@@ -106,17 +113,18 @@
                                         </select>
                                         <div class="mt-3">
                                             <p>
-                                                <b>ID :</b>
-                                                <span id="party_id_text">
-                                                    {{ $receipt->party->id ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p>
                                                 <b>Name :</b>
                                                 <span id="party_name">
                                                     {{ $receipt->party->name ?? '' }}
                                                 </span>
                                             </p>
+                                            <p>
+                                                <b>Designation :</b>
+                                                <span id="party_id_text">
+                                                    {{ $receipt->party->id ?? '' }}
+                                                </span>
+                                            </p>
+                                            <p><b>E-mail :</b> <span id="party_phone"></span></p>
                                             <p>
                                                 <b>Mobile :</b>
                                                 <span id="party_phone">
@@ -140,7 +148,7 @@
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="mb-0">
-                                    Challan Items
+                                    Delivery Items
                                 </h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i>
@@ -153,13 +161,13 @@
                                         <thead>
                                             <tr>
                                                 <th width="40">
-                                                    #
+                                                    SN
                                                 </th>
                                                 <th width="180">
                                                     Category
                                                 </th>
                                                 <th width="220">
-                                                    Invoice
+                                                    Item Description
                                                 </th>
                                                 <th width="120">
                                                     Qty
@@ -171,7 +179,7 @@
                                                     Total
                                                 </th>
                                                 <th>
-                                                    Details
+                                                    Remarks
                                                 </th>
                                                 <th width="70">
                                                     Action
@@ -248,7 +256,7 @@
                         <div class="card shadow-sm">
                             <div class="card-header">
                                 <strong>
-                                    Receipt Notes
+                                    Delivery Notes
                                 </strong>
                             </div>
                             <div class="card-body">

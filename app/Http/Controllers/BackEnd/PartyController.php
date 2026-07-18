@@ -40,16 +40,9 @@ class PartyController extends Controller
         ]);
 
         // Generate Party ID
-        $lastParty = Party::latest('id')->first();
+        $lastParty = Party::orderByDesc('party_id')->first();
 
-        if ($lastParty) {
-            $number = (int) str_replace('PRT_', '', $lastParty->party_id);
-            $number++;
-        } else {
-            $number = 10001;
-        }
-
-        $partyId = 'PRT_' . $number;
+        $partyId = $lastParty ? ((int) $lastParty->party_id + 1) : 10001;
 
         Party::create([
             'party_id'   => $partyId,
@@ -91,10 +84,7 @@ class PartyController extends Controller
     public function destroy(Party $party)
     {
         if ($party->receipts()->exists()) {
-
-            return redirect()
-                ->back()
-                ->with('error', 'This party has receipts and cannot be deleted.');
+            return redirect()->back()->with('error', 'This party has receipts and cannot be deleted.');
         }
         $party->delete();
 

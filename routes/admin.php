@@ -110,7 +110,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::put('/category/{category}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
 
-    // expense list route account head route
+    // expense list route account head route description
     Route::get('/account-head', [AccountHeadController::class, 'index'])->name('account-head.index');
     Route::post('/account-head', [AccountHeadController::class, 'store'])->name('account-head.store');
     Route::put('/account-head/{accountHead}', [AccountHeadController::class, 'update'])->name('account-head.update');

@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Income Category List</h4>
+                <h4 class="mb-0">Sales Category List</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('income.category.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -51,7 +51,7 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Category Name</th>
                                     <th>Type</th>
                                     <th>Status</th>

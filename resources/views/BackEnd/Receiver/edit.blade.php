@@ -7,7 +7,7 @@
                 @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Edit Receiver
+                        Edit Customer Details
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -16,7 +16,7 @@
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Receiver Name <span class="text-danger">*</span>
+                                Customer Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                         </div>
@@ -59,7 +59,7 @@
                     </button>
                     <button type="submit" class="btn btn-success">
                         <i class="fa fa-save me-1"></i>
-                        Update Receiver
+                        Update Customer
                     </button>
                 </div>
             </form>

@@ -5,22 +5,22 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IncomeCategoryController extends Controller
 {
     public function index(Request $request)
     {
         $categories = Category::with(['creator', 'updater'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%");
             });
-        })->where('type', 'Income')->latest()->get();
+        })->where('type', 'Income')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
         return view('BackEnd.IncomeCategory.index', compact('categories'));
     }
 

@@ -22,14 +22,18 @@ class ReceiptController extends Controller
 {
     public function expenseIndex(Request $request)
     {
-        $query = Receipt::with([
-            'party',
-            'branch',
-            'creator'
-        ])->where('type', 'Expense');
+        $user = auth()->user();
+
+        $query = Receipt::with(['party', 'branch', 'creator'])
+            ->where('type', 'Expense')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            });
+
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
                 $q->where('receipt_no', 'like', "%{$search}%")
                     ->orWhereHas('party', function ($party) use ($search) {
@@ -40,11 +44,14 @@ class ReceiptController extends Controller
                     });
             });
         }
+
         // Payment Status
         if ($request->filled('status')) {
             $query->where('payment_status', $request->status);
         }
+
         $perPage = $request->per_page ?? 24;
+
         $receipts = $query->latest()->paginate($perPage)->withQueryString();
 
         return view('BackEnd.Receipt.index', compact('receipts'));
@@ -52,15 +59,21 @@ class ReceiptController extends Controller
 
     public function expenseCreate()
     {
-        $branches = Branch::latest()->get();
-        $parties = Party::where('type', 'Expense')->where('status', 'Active')->get();
-        $categories = Category::where('type', 'Expense')->where('status', 'Active')->get();
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
+        $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+        $categories = Category::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
         return view('BackEnd.Receipt.expense_create', compact('branches', 'parties', 'categories'));
     }
 
     private function generateReceiptNo($type)
     {
-        $prefix = $type == 'Income' ? 'INC' : 'EXP';
+        $prefix = $type == 'Income' ? '' : '';
         $last = Receipt::where('type', $type)->latest('id')->first();
         $number = $last ? ((int) substr($last->receipt_no, 3)) + 1 : 10001;
         return $prefix . $number;

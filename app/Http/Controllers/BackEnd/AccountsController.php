@@ -56,6 +56,7 @@ class AccountsController extends Controller
             }
             Account::create([
                 'account_name'        => $request->account_name,
+                'address'        => $request->address,
                 'account_holder_name' => $request->account_holder_name,
                 'account_number'      => $request->account_number,
                 'opening_balance'     => $request->opening_balance,
@@ -132,6 +133,7 @@ class AccountsController extends Controller
             $account->update([
                 'payment_type_id'     => $request->payment_type_id,
                 'account_name'        => $request->account_name,
+                'address'        => $request->address,
                 'account_holder_name' => $request->account_holder_name,
                 'account_number'      => $request->account_number,
                 'opening_balance'     => $request->opening_balance,

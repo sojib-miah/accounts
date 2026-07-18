@@ -6,17 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountHead;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
 {
     public function index(Request $request)
     {
         $accountHeads = AccountHead::with(['category', 'creator'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
@@ -24,8 +22,13 @@ class IncomeController extends Controller
                         $category->where('name', 'like', "%{$search}%");
                     });
             });
-        })->where('type', 'Income')->latest()->get();
-        $categories = Category::where('status', 'Active')->where('type', 'Income')->orderBy('name')->get();
+        })->where('type', 'Income')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
+
+        $categories = Category::where('status', 'Active')->where('type', 'Income')->orderBy('name')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
         return view('BackEnd.Income.index', compact('accountHeads', 'categories'));
     }

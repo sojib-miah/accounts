@@ -6,22 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\ReceiptItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
         $categories = Category::with(['creator', 'updater'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%");
             });
-        })->where('type', 'Expense')->latest()->get();
+        })->where('type', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
         return view('BackEnd.Category.index', compact('categories'));
     }
 

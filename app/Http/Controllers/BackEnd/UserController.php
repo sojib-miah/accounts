@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -14,11 +17,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = User::with('roles')->with('company')->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
@@ -39,21 +39,52 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'required'
+            'role'     => 'required',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        DB::beginTransaction();
 
-        $user->assignRole($request->role);
+        try {
 
-        return back()->with('success', 'User Created Successfully');
+            $company = Company::create([
+                'name'       => $request->name,
+                'created_by' => Auth::id(),
+            ]);
+
+            $lastBranch = Branch::orderByDesc('branch_id')->first();
+            $branchId = $lastBranch ? $lastBranch->branch_id + 1 : 10001;
+
+            $branch = Branch::create([
+                'company_id' => $company->id,
+                'branch_id'  => $branchId,
+                'name'       => $request->name,
+                'phone_one'  => '01',
+                'created_by' => Auth::id(),
+            ]);
+
+            $user = User::create([
+                'name'       => $request->name,
+                'email'      => $request->email,
+                'password'   => Hash::make($request->password),
+                'company_id' => $company->id,
+                'branch_id'  => $branch->id,
+                'created_by' => Auth::id(),
+            ]);
+
+            $user->assignRole($request->role);
+
+            DB::commit();
+
+            return back()->with('success', 'User Created Successfully');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(Request $request, User $user)

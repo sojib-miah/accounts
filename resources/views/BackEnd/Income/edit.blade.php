@@ -7,7 +7,7 @@
                 @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Edit Income
+                        Edit Items
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -30,7 +30,7 @@
                         <!-- Income Name -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
-                                Income Name <span class="text-danger">*</span>
+                                Item Description <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                         </div>
@@ -52,7 +52,7 @@
                     </button>
                     <button type="submit" class="btn btn-success">
                         <i class="fa fa-save me-1"></i>
-                        Update Income
+                        Update Item
                     </button>
                 </div>
             </form>

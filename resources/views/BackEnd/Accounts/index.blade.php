@@ -101,7 +101,7 @@
                                                 {{ $account->account_name }}
                                             </a>
                                         </td>
-                                        <td></td>
+                                        <td>{{ $account->address ?? '-' }}</td>
                                         <td>
                                             {{ $account->account_holder_name }}
                                         </td>
@@ -142,6 +142,7 @@
                                             @can('account-edit')
                                                 <button class="btn btn-warning btn-sm editBtn" data-id="{{ $account->id }}"
                                                     data-account_name="{{ $account->account_name }}"
+                                                    data-address="{{ $account->address }}"
                                                     data-holder="{{ $account->account_holder_name }}"
                                                     data-number="{{ $account->account_number }}"
                                                     data-opening="{{ $account->opening_balance }}"
@@ -201,6 +202,13 @@
                                 </label>
                                 <input type="text" name="account_name" class="form-control" required>
                             </div>
+                            {{-- Account address --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Account Address
+                                </label>
+                                <input type="text" name="address" class="form-control">
+                            </div>
                             {{-- Holder Name --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
@@ -222,8 +230,8 @@
                                 <label class="form-label">
                                     Opening Balance
                                 </label>
-                                <input type="number" step="0.01" min="0" value="0" name="opening_balance"
-                                    class="form-control">
+                                <input type="number" step="0.01" min="0" value="0"
+                                    name="opening_balance" class="form-control">
                             </div>
                             {{-- Default Status --}}
                             <div class="col-md-6 mb-3">
@@ -297,6 +305,13 @@
                                 </label>
                                 <input type="text" name="account_name" id="edit_account_name" class="form-control"
                                     required>
+                            </div>
+                            {{-- Account address --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Account Address
+                                </label>
+                                <input type="text" name="address" id="edit_address" class="form-control">
                             </div>
                             {{-- Account Holder --}}
                             <div class="col-md-6 mb-3">
@@ -378,6 +393,7 @@
                         document.getElementById('editAccountForm').action =
                             "{{ url('/admin/accounts') }}/" + id;
                         document.getElementById('edit_account_name').value = this.dataset.account_name;
+                        document.getElementById('edit_address').value = this.dataset.address;
                         document.getElementById('edit_account_holder_name').value = this.dataset.holder;
                         document.getElementById('edit_account_number').value = this.dataset.number;
                         document.getElementById('edit_opening_balance').value = this.dataset.opening;

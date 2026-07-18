@@ -6,15 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountHead;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AccountHeadController extends Controller
 {
     public function index(Request $request)
     {
         $accountHeads = AccountHead::with(['category', 'creator'])->when($request->filled('search'), function ($query) use ($request) {
-
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
 
                 $q->where('name', 'like', "%{$search}%")
@@ -24,8 +23,13 @@ class AccountHeadController extends Controller
                         $category->where('name', 'like', "%{$search}%");
                     });
             });
-        })->where('type', 'Expense')->latest()->get();
-        $categories = Category::where('status', 'Active')->where('type', 'Expense')->orderBy('name')->get();
+        })->where('type', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
+
+        $categories = Category::where('status', 'Active')->where('type', 'Expense')->orderBy('name')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
         return view('BackEnd.AccountHead.index', compact('accountHeads', 'categories'));
     }

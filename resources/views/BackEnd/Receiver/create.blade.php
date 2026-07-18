@@ -6,7 +6,7 @@
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Add Receiver
+                        Add Customer Details
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -15,7 +15,7 @@
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Receiver Name <span class="text-danger">*</span>
+                                Customer Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Receiver Name"
                                 required>
@@ -63,7 +63,7 @@
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save me-1"></i>
-                        Save Receiver
+                        Save Customer
                     </button>
                 </div>
             </form>

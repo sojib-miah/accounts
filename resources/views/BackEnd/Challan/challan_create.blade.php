@@ -33,19 +33,23 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="row">
-                                                <div class="col-4 text-end">
-                                                    <b>Date :</b>
+                                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                                    <div class="col-4 text-end">
+                                                        <b>Date :</b>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="date" name="receipt_date" class="form-control"
+                                                            value="{{ date('Y-m-d') }}">
+                                                    </div>
                                                 </div>
-                                                <div class="col-8">
-                                                    <input type="date" name="receipt_date" class="form-control"
-                                                        value="{{ date('Y-m-d') }}">
-                                                </div>
-                                                <div class="col-4 text-end mt-2">
-                                                    <b>By :</b>
-                                                </div>
-                                                <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
-                                                        value="{{ auth()->user()->name }}">
+                                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                                    <div class="col-4 text-end mt-2">
+                                                        <b>By :</b>
+                                                    </div>
+                                                    <div class="col-8 mt-2">
+                                                        <input type="text" class="form-control" readonly
+                                                            value="{{ auth()->user()->name }}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -55,7 +59,7 @@
                                         <!-- Branch -->
                                         <div class="col-md-6">
                                             <label class="form-label">
-                                                Billing Branch <span class="text-danger">*</span>
+                                                Branch Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="branch_id" id="branch_id" class="form-select select2" required>
                                                 <option value="">
@@ -68,16 +72,17 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>Name :</b> <span id="branch_name"></span></p>
+                                                <p><b>Company Name :</b> <span id=""></span></p>
+                                                <p><b>Branch Name :</b> <span id="branch_name"></span></p>
                                                 <p><b>Mobile :</b> <span id="branch_phone"></span></p>
-                                                <p><b>Email :</b> <span id="branch_email"></span></p>
+                                                <p><b>E-mail :</b> <span id="branch_email"></span></p>
                                                 <p><b>Address :</b> <span id="branch_address"></span></p>
                                             </div>
                                         </div>
                                         <!-- Party -->
                                         <div class="col-md-6">
                                             <label class="form-label">
-                                                Invoice To <span class="text-danger">*</span>
+                                                Customer Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="party_id" id="party_id" class="form-select select2" required>
                                                 <option value="">
@@ -90,9 +95,10 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>ID :</b> <span id="party_id_text"></span></p>
                                                 <p><b>Name :</b> <span id="party_name"></span></p>
+                                                <p><b>Designation :</b> <span id="party_id_text"></span></p>
                                                 <p><b>Mobile :</b> <span id="party_phone"></span></p>
+                                                <p><b>E-mail :</b> <span id="party_phone"></span></p>
                                                 <p><b>Address :</b> <span id="party_address"></span></p>
                                             </div>
                                         </div>
@@ -105,7 +111,7 @@
                             <div class="card shadow-sm mt-3">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h4 class="mb-0">
-                                        Challan Items
+                                        Delivery Items
                                     </h4>
                                     <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                         <i class="fa fa-plus"></i>
@@ -118,13 +124,13 @@
                                             <thead>
                                                 <tr>
                                                     <th width="40">
-                                                        #
+                                                        SN
                                                     </th>
                                                     <th width="180">
                                                         Category
                                                     </th>
                                                     <th width="220">
-                                                        Item
+                                                        Item Description
                                                     </th>
                                                     <th width="120">
                                                         Qty
@@ -136,7 +142,7 @@
                                                         Total
                                                     </th>
                                                     <th>
-                                                        Details
+                                                        Remarks
                                                     </th>
                                                     <th width="70">
                                                         Action
@@ -171,8 +177,8 @@
                                                 Sub Total
                                             </th>
                                             <td>
-                                                <input type="text" id="sub_total" class="form-control text-end" readonly
-                                                    value="0.00">
+                                                <input type="text" id="sub_total" class="form-control text-end"
+                                                    readonly value="0.00">
                                             </td>
                                         </tr>
                                         <tr>
@@ -213,7 +219,7 @@
                             <div class="card shadow-sm">
                                 <div class="card-header">
                                     <strong>
-                                        Receipt Notes
+                                        Delivery Notes
                                     </strong>
                                 </div>
                                 <div class="card-body">
@@ -433,27 +439,34 @@
         $(document).on('blur', '.qty,.rate', function() {
             $(this).off('wheel.disableScroll');
         });
-        $(document).on('click', '.remove', function() {
-            if ($('#expenseBody tr').length == 1) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'At least one item is required.'
-                });
-                return;
-            }
+        $(document).on('click', '.remove', function(e) {
+            e.preventDefault();
+
             let row = $(this).closest('tr');
+
             Swal.fire({
                 title: 'Delete Item?',
                 text: 'This row will be removed.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete'
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    row.remove();
-                    serial();
-                    calculate();
+
+                if (!result.isConfirmed) return;
+
+                // Count only visible rows
+                if ($('#expenseBody tr:visible').length <= 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'At least one item is required.'
+                    });
+                    return;
                 }
+
+                row.remove();
+                serial();
+                calculate();
             });
         });
         $('#branch_id').change(function() {

@@ -14,25 +14,51 @@ class CompanyUserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with(['company', 'branch', 'creator'])->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhereHas('company', function ($company) use ($search) {
-                        $company->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('branch', function ($branch) use ($search) {
-                        $branch->where('name', 'like', "%{$search}%");
-                    });
-            });
-        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->latest()->get();
+        $user = Auth::user();
 
-        $companies = Company::orderBy('name')->get();
-        $branches = Branch::orderBy('name')->get();
+        $users = User::with(['company', 'branch', 'creator'])
+            ->when($request->filled('search'), function ($query) use ($request) {
+
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhereHas('company', function ($company) use ($search) {
+                            $company->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('branch', function ($branch) use ($search) {
+                            $branch->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
+            })
+            ->latest()
+            ->get();
+
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
+            })
+            ->get();
+
+        $branches = Branch::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
+            })
+            ->get();
 
         return view('BackEnd.CompanyUser.index', compact('users', 'companies', 'branches'));
     }
@@ -47,7 +73,7 @@ class CompanyUserController extends Controller
             'branch_id' => 'required|exists:branches,id',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -56,6 +82,7 @@ class CompanyUserController extends Controller
             'created_by' => auth()->id(),
             'password' => Hash::make($request->password),
         ]);
+        $user->assignRole('User');
 
         return redirect()->route('user.index')->with('success', 'User Created Successfully');
     }

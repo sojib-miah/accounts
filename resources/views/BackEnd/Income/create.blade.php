@@ -7,7 +7,7 @@
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="addAccountHeadModalLabel">
-                        Add Income
+                        Add Item
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -30,7 +30,7 @@
                         <!-- Income Name -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
-                                Income Name <span class="text-danger">*</span>
+                                Item Description <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Income Name"
                                 required>
@@ -57,7 +57,7 @@
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save me-1"></i>
-                        Save Income
+                        Save Item
                     </button>
                 </div>
             </form>

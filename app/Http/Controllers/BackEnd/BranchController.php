@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
-use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Receipt;
@@ -14,9 +13,12 @@ class BranchController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $branches = Branch::with('company')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
+
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('branch_id', 'like', "%{$search}%")
@@ -28,14 +30,25 @@ class BranchController extends Controller
                             $company->where('name', 'like', "%{$search}%");
                         });
                 });
-            })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-                $query->where('created_by', Auth::id());
-            })->latest()->get();
+            })
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
+            })
+            ->latest()
+            ->get();
+
         $companies = Company::orderBy('name')
-            ->when(!Auth::user()->hasRole('super-admin'), function ($query) {
-                $query->where('created_by', Auth::id());
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
             })
             ->get();
+
         return view('BackEnd.Branch.index', compact('branches', 'companies'));
     }
 
@@ -51,16 +64,9 @@ class BranchController extends Controller
         ]);
 
         // Generate Branch ID
-        $lastBranch = Branch::latest('id')->first();
+        $lastBranch = Branch::orderByDesc('branch_id')->first();
 
-        if ($lastBranch) {
-            $number = (int) str_replace('BR_', '', $lastBranch->branch_id);
-            $number++;
-        } else {
-            $number = 10001;
-        }
-
-        $branchId = 'BR_' . $number;
+        $branchId = $lastBranch ? ((int) $lastBranch->branch_id + 1) : 10001;
 
         Branch::create([
             'company_id' => $request->company_id,

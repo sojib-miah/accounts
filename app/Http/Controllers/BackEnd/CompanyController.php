@@ -12,11 +12,20 @@ class CompanyController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $companies = Company::when($request->filled('search'), function ($query) use ($request) {
             $query->where('name', 'like', '%' . $request->search . '%');
-        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->latest()->get();
+        })
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)
+                        ->orWhere('created_by', $user->id);
+                });
+            })
+            ->latest()
+            ->get();
+
         return view('BackEnd.Company.index', compact('companies'));
     }
 

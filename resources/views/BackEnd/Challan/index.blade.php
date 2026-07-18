@@ -8,7 +8,7 @@
             {{-- Page Header --}}
             <div class="mb-3">
                 <h2 class="fw-bold mb-0">
-                    Challan
+                    Challan List
                 </h2>
             </div>
             {{-- Card --}}
@@ -70,20 +70,20 @@
                         <table class="table table-bordered align-middle table-hover">
                             <thead>
                                 <tr>
-                                    <th class="text-center">
-                                        RECEIPT ID
+                                    <th>
+                                        SN
                                     </th>
                                     <th class="text-center">
-                                        RECEiVER
+                                        CHALLAN ID
                                     </th>
                                     <th class="text-center">
-                                        RECEIPT BY
+                                        CUstomer Name
+                                    </th>
+                                    <th class="text-center">
+                                        Created BY
                                     </th>
                                     <th class="text-center">
                                         DATE & TIME
-                                    </th>
-                                    <th class="text-center">
-                                        STATUS
                                     </th>
                                     <th class="text-center" width="90">
                                         ACTION
@@ -93,6 +93,7 @@
                             <tbody>
                                 @forelse($receipts as $receipt)
                                     <tr>
+                                        <td>{{ $loop->iteration }}</td>
                                         {{-- Receipt ID --}}
                                         <td class="text-center">
                                             <a href="{{ route('challan.show', $receipt->id) }}"
@@ -114,22 +115,6 @@
                                         {{-- Date Time --}}
                                         <td class="text-center">
                                             {{ $receipt->created_at->format('d-m-Y h:i A') }}
-                                        </td>
-                                        {{-- Payment Status --}}
-                                        <td class="text-center">
-                                            @if ($receipt->payment_status == 'Paid')
-                                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
-                                                    Paid
-                                                </span>
-                                            @elseif($receipt->payment_status == 'Partial')
-                                                <span class="badge rounded-pill bg-info-subtle text-info px-3 py-2">
-                                                    Partial
-                                                </span>
-                                            @else
-                                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
-                                                    Unpaid
-                                                </span>
-                                            @endif
                                         </td>
                                         {{-- Action --}}
                                         <td class="text-center">

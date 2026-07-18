@@ -20,11 +20,10 @@ class IncomeReceiptController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Receipt::with([
-            'party',
-            'branch',
-            'creator'
-        ])->where('type', 'Income');
+        $user = auth()->user();
+        $query = Receipt::with(['party', 'branch', 'creator'])->where('type', 'Income')->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+            $query->where('created_by', $user->id);
+        });
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
@@ -49,16 +48,22 @@ class IncomeReceiptController extends Controller
 
     public function createIncome()
     {
-        $branches = Branch::latest()->get();
-        $parties = Party::where('type', 'Income')->where('status', 'Active')->get();
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->latest()->get();
+        $parties = Party::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
-        $categories = Category::where('type', 'Income')->where('status', 'Active')->get();
+        $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
         return view('BackEnd.IncomeReceipt.income_create', compact('branches', 'parties', 'categories'));
     }
 
     private function generateReceiptNo($type)
     {
-        $prefix = $type == 'Income' ? 'INC' : 'EXP';
+        $prefix = $type == 'Income' ? '' : '';
         $last = Receipt::where('type', $type)->latest('id')->first();
         $number = $last ? ((int) substr($last->receipt_no, 3)) + 1 : 10001;
         return $prefix . $number;
