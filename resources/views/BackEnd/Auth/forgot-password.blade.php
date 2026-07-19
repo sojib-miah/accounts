@@ -66,7 +66,7 @@
     <body>
         <!-- Content -->
 
-        <div class="authentication-wrapper authentication-cover">
+        <div class="authentication-wrapper authentication-cover" style="position: relative;">
             <!-- Logo -->
             <a href="{{ route('dashboard.index') }}" class="app-brand auth-cover-brand">
                 <span class="app-brand-text demo text-heading fw-bold">ComitsBD</span>
@@ -76,20 +76,21 @@
                 <!-- /Left Text -->
                 <div class="d-none d-xl-flex col-xl-8 p-0">
                     <div class="auth-cover-bg d-flex justify-content-center align-items-center">
-                        <img src="{{ asset('/assets/img/illustrations/auth-forgot-password-illustration-light.png') }}"
+                        {{-- <img src="{{ asset('/assets/img/illustrations/auth-forgot-password-illustration-light.png') }}"
                             alt="auth-forgot-password-cover" class="my-5 auth-illustration d-lg-block d-none"
                             data-app-light-img="illustrations/auth-forgot-password-illustration-light.png"
                             data-app-dark-img="illustrations/auth-forgot-password-illustration-dark.png" />
                         <img src="{{ asset('/assets/img/illustrations/bg-shape-image-light.png') }}"
                             alt="auth-forgot-password-cover" class="platform-bg"
                             data-app-light-img="illustrations/bg-shape-image-light.png"
-                            data-app-dark-img="illustrations/bg-shape-image-dark.png" />
+                            data-app-dark-img="illustrations/bg-shape-image-dark.png" /> --}}
                     </div>
                 </div>
                 <!-- /Left Text -->
 
                 <!-- Forgot Password -->
-                <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6">
+                <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6"
+                    style="position: absolute; top: 0; height:100%; left: 50%; transform: translateX(-50%);">
                     <div class="w-px-400 mx-auto mt-12 mt-5">
                         <h4 class="mb-1">Forgot Password? 🔒</h4>
                         <p class="mb-6">Enter your email and we'll send you instructions to reset your password</p>

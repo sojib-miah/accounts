@@ -47,7 +47,7 @@
                                         </option>
                                     </select>
                                     <button class="btn btn-primary">
-                                        <i class="fa fa-search"></i>
+                                        <i class="fa fa-search me-2"></i>
                                         Search
                                     </button>
                                     @if (request('search'))
@@ -57,8 +57,8 @@
                                     @endif
                                     @can('expense-receipt-create')
                                         <a href="{{ route('receipt.expense.create') }}" class="btn btn-success">
-                                            <i class="fa fa-plus"></i>
-                                            Add
+                                            <i class="fa fa-plus me-2"></i>
+                                            Add Expense
                                         </a>
                                     @endcan
                                 </div>

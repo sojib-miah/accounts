@@ -20,6 +20,14 @@
                             <input type="text" name="name" class="form-control" placeholder="Enter Receiver Name"
                                 required>
                         </div>
+                        <!-- Designation -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Designation
+                            </label>
+                            <input type="text" name="designation" class="form-control"
+                                placeholder="Enter designation">
+                        </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">

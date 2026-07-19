@@ -23,26 +23,32 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="row">
-                                            <div class="col-4 text-end">
-                                                <b>Receipt No :</b>
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end">
+                                                    <b>Receipt No :</b>
+                                                </div>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->receipt_no }}">
+                                                </div>
                                             </div>
-                                            <div class="col-8">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->receipt_no }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>Date :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="date" name="receipt_date" class="form-control"
+                                                        value="{{ $receipt->receipt_date }}">
+                                                </div>
                                             </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>Date :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="date" name="receipt_date" class="form-control"
-                                                    value="{{ $receipt->receipt_date }}">
-                                            </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>By :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>By :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +58,7 @@
                                     <!-- Branch -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Billing Branch
+                                            Branch Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
@@ -64,25 +70,30 @@
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
-                                            <p>
-                                                <b>Name :</b>
+                                            <p class="mb-1"><b>Company Name :</b>
+                                                <span id="company_name">
+                                                    {{ $receipt->branch->company->name ?? '' }}
+                                                </span>
+                                            </p>
+                                            <p class="mb-1">
+                                                <b>Branch Name :</b>
                                                 <span id="branch_name">
                                                     {{ $receipt->branch->name ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Mobile :</b>
                                                 <span id="branch_phone">
                                                     {{ $receipt->branch->phone_one ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
-                                                <b>Email :</b>
+                                            <p class="mb-1">
+                                                <b>E-mail :</b>
                                                 <span id="branch_email">
                                                     {{ $receipt->branch->email ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Address :</b>
                                                 <span id="branch_address">
                                                     {{ $receipt->branch->address ?? '' }}
@@ -93,7 +104,7 @@
                                     <!-- Party -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Invoice To
+                                            Customer Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="party_id" id="party_id" class="form-select select2" required>
@@ -105,25 +116,27 @@
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
-                                            <p>
-                                                <b>ID :</b>
-                                                <span id="party_id_text">
-                                                    {{ $receipt->party->id ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Name :</b>
                                                 <span id="party_name">
                                                     {{ $receipt->party->name ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
+                                                <b>Designation :</b>
+                                                <span id="party_designation">
+                                                    {{ $receipt->party->designation ?? '' }}
+                                                </span>
+                                            </p>
+                                            <p class="mb-1">
                                                 <b>Mobile :</b>
                                                 <span id="party_phone">
                                                     {{ $receipt->party->phone ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1"><b>E-mail :</b> <span
+                                                    id="party_email">{{ $receipt->party->email ?? '' }}</span></p>
+                                            <p class="mb-1">
                                                 <b>Address :</b>
                                                 <span id="party_address">
                                                     {{ $receipt->party->address ?? '' }}
@@ -143,7 +156,7 @@
                                     Invoice Items
                                 </h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fa fa-plus me-2"></i>
                                     Add Row
                                 </button>
                             </div>
@@ -153,7 +166,7 @@
                                         <thead>
                                             <tr>
                                                 <th width="40">
-                                                    #
+                                                    SN
                                                 </th>
                                                 <th width="180">
                                                     Category
@@ -171,7 +184,7 @@
                                                     Total
                                                 </th>
                                                 <th>
-                                                    Details
+                                                    Remarks
                                                 </th>
                                                 <th width="70">
                                                     Action
@@ -220,8 +233,9 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>
-                                            VAT
+                                        <th class="d-flex align-items-center gap-2">
+                                            <span>VAT</span>
+                                            <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                         </th>
                                         <td>
                                             <input type="number" name="vat" id="vat" value="0"
@@ -248,14 +262,14 @@
                         <div class="card shadow-sm">
                             <div class="card-header">
                                 <strong>
-                                    Receipt Notes
+                                    Invoice Notes
                                 </strong>
                             </div>
                             <div class="card-body">
                                 <textarea name="remarks" rows="6" class="form-control">{{ $receipt->remarks }}</textarea>
                                 <button type="submit" class="btn btn-success w-100 mt-3">
                                     <i class="fa fa-save me-2"></i>
-                                    Update Receipt
+                                    Update Invoice
                                 </button>
                             </div>
                         </div>
@@ -283,9 +297,9 @@
                     <td>
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
-                    <td><input type="number" class="form-control qty" value="1"></td>
-                    <td><input type="number" class="form-control rate" value="0"></td>
-                    <td><input type="number" class="form-control total" readonly></td>
+                    <td><input type="number" class="form-control qty" value="1" min="1"></td>
+                    <td><input type="number" class="form-control rate" value="0" min="1"></td>
+                    <td><input type="number" class="form-control total" readonly min="1"></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>
@@ -303,49 +317,28 @@
             let lastRow = $('#expenseBody tr:last');
             lastRow.find('.category').select2('open');
             if (item) {
-
-                row.find('.qty').val(item.qty);
-
+                row.find('.qty').val(parseFloat(item.qty));
                 row.find('.rate').val(item.rate);
-
                 row.find('.details').val(item.details);
-
                 row.find('.category')
                     .val(item.category_id)
                     .trigger('change', [item]);
-
             }
         }
         $(function() {
-
             if (receiptItems.length) {
-
                 receiptItems.forEach(function(item) {
-
                     addRow(item);
-
                 });
-
             } else {
-
                 addRow();
-
             }
-
             $('#discount').val("{{ $receipt->discount }}");
-
             $('#vat').val("{{ $receipt->vat }}");
-
             calculate();
-
         });
         $('#addRow').click(function() {
             addRow();
-        });
-        $(document).on('click', '.remove', function() {
-            $(this).closest('tr').remove();
-            serial();
-            calculate();
         });
 
         function serial() {
@@ -369,29 +362,16 @@
                 url: "{{ route('ajax.account-head', ':id') }}".replace(':id', categoryId),
                 type: 'GET',
                 success: function(response) {
-
                     let option = '<option value="">Select Expense</option>';
-
                     $.each(response.data, function(i, expense) {
-
-                        option += `
-            <option value="${expense.id}">
-                ${expense.name}
-            </option>
-        `;
-
+                        option += `<option value="${expense.id}">${expense.name}</option>`;
                     });
-
                     account.html(option);
-
                     if (item) {
-
                         account
                             .val(item.account_head_id)
                             .trigger('change');
-
                     }
-
                 },
                 error: function() {
                     alert('Failed to load Expense Head.');
@@ -403,14 +383,21 @@
             let qtyTotal = 0;
             let subTotal = 0;
             let items = [];
+
             $('#expenseBody tr').each(function() {
+
                 let row = $(this);
+
                 let qty = parseFloat(row.find('.qty').val()) || 0;
                 let rate = parseFloat(row.find('.rate').val()) || 0;
+
                 let amount = qty * rate;
+
                 row.find('.total').val(amount.toFixed(2));
+
                 qtyTotal += qty;
                 subTotal += amount;
+
                 items.push({
                     category_id: row.find('.category').val(),
                     category_name: row.find('.category option:selected').text(),
@@ -422,9 +409,19 @@
                     details: row.find('.details').val()
                 });
             });
+
             let discount = parseFloat($('#discount').val()) || 0;
-            let vat = parseFloat($('#vat').val()) || 0;
-            let grandTotal = subTotal + vat - discount;
+            let vatPercent = parseFloat($('#vat').val()) || 0;
+
+            if (discount > subTotal) {
+                discount = subTotal;
+                $('#discount').val(discount.toFixed(2));
+            }
+
+            let afterDiscount = subTotal - discount;
+            let vatAmount = (afterDiscount * vatPercent) / 100;
+            let grandTotal = afterDiscount + vatAmount;
+
             $('#total_qty').val(qtyTotal);
             $('#sub_total').val(subTotal.toFixed(2));
             $('#grand_total').val(grandTotal.toFixed(2));
@@ -480,27 +477,6 @@
                 addRow();
             }
         });
-        //    $(document).on('change', '.account', function() {
-        //         let current = $(this);
-        //         let value = current.val();
-        //         if (value == '') return;
-        //         let duplicate = false;
-        //         $('.account').not(current).each(function() {
-        //             if ($(this).val() == value) {
-        //                 duplicate = true;
-        //             }
-        //         });
-        //         if (duplicate) {
-        //             Swal.fire({
-        //                 icon: 'warning',
-        //                 title: 'Duplicate Expense',
-        //                 text: 'This expense has already been added.'
-        //             });
-        //             current.val('').trigger('change');
-        //             return;
-        //         }
-        //         calculate();
-        //     });
         $('form').submit(function(e) {
             let valid = true;
             $('#expenseBody tr').each(function() {
@@ -539,21 +515,25 @@
         $(document).on('blur', '.qty,.rate', function() {
             $(this).off('wheel.disableScroll');
         });
-        $(document).on('click', '.remove', function() {
-            if ($('#expenseBody tr').length == 1) {
+        $(document).on('click', '.remove', function(e) {
+            e.preventDefault();
+            // Check BEFORE showing delete confirmation
+            if ($('#expenseBody tr').length <= 1) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'At least one item is required.'
                 });
                 return;
             }
+
             let row = $(this).closest('tr');
             Swal.fire({
                 title: 'Delete Item?',
                 text: 'This row will be removed.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete'
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     row.remove();
@@ -562,9 +542,12 @@
                 }
             });
         });
+
+
         $('#branch_id').change(function() {
             let id = $(this).val();
             if (id == '') {
+                $('#company_name').text('');
                 $('#branch_name').text('');
                 $('#branch_phone').text('');
                 $('#branch_email').text('');
@@ -572,6 +555,7 @@
                 return;
             }
             $.get('/admin/ajax/branch/' + id, function(res) {
+                $('#company_name').text(res.data.company_name ?? '');
                 $('#branch_name').text(res.data.name);
                 $('#branch_phone').text(res.data.phone);
                 $('#branch_email').text(res.data.email);
@@ -586,11 +570,15 @@
                 $('#party_name').text('');
                 $('#party_phone').text('');
                 $('#party_address').text('');
+                $('#party_email').text('');
+                $('#party_designation').text('');
                 return;
             }
             $.get('/admin/ajax/party/' + id, function(res) {
                 $('#party_id_text').text(res.data.id);
                 $('#party_name').text(res.data.name);
+                $('#party_email').text(res.data.email);
+                $('#party_designation').text(res.data.designation);
                 $('#party_phone').text(res.data.phone);
                 $('#party_address').text(res.data.address);
             });

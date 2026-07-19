@@ -8,7 +8,7 @@
             {{-- Page Header --}}
             <div class="mb-3">
                 <h2 class="fw-bold mb-0">
-                    Invoice Receipt
+                    Invoice List
                 </h2>
             </div>
             {{-- Card --}}
@@ -47,7 +47,7 @@
                                         </option>
                                     </select>
                                     <button class="btn btn-primary">
-                                        <i class="fa fa-search"></i>
+                                        <i class="fa fa-search me-2"></i>
                                         Search
                                     </button>
                                     @if (request('search'))
@@ -70,14 +70,15 @@
                         <table class="table table-bordered align-middle table-hover">
                             <thead>
                                 <tr>
+                                    <th>SN</th>
                                     <th class="text-center">
-                                        RECEIPT ID
+                                        Invoice No
                                     </th>
                                     <th class="text-center">
-                                        RECEiVER
+                                        Customer
                                     </th>
                                     <th class="text-center">
-                                        RECEIPT BY
+                                        Created BY
                                     </th>
                                     <th class="text-center">
                                         DATE & TIME
@@ -93,6 +94,7 @@
                             <tbody>
                                 @forelse($receipts as $receipt)
                                     <tr>
+                                        <td>{{ $loop->iteration }}</td>
                                         {{-- Receipt ID --}}
                                         <td class="text-center">
                                             <a href="{{ route('income.receipt.show', $receipt->id) }}"

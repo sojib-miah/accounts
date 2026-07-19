@@ -72,11 +72,11 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>Company Name :</b> <span id=""></span></p>
-                                                <p><b>Branch Name :</b> <span id="branch_name"></span></p>
-                                                <p><b>Mobile :</b> <span id="branch_phone"></span></p>
-                                                <p><b>E-mail :</b> <span id="branch_email"></span></p>
-                                                <p><b>Address :</b> <span id="branch_address"></span></p>
+                                                <p class="mb-1"><b>Company Name :</b> <span id="company_name"></span></p>
+                                                <p class="mb-1"><b>Branch Name :</b> <span id="branch_name"></span></p>
+                                                <p class="mb-1"><b>Mobile :</b> <span id="branch_phone"></span></p>
+                                                <p class="mb-1"><b>E-mail :</b> <span id="branch_email"></span></p>
+                                                <p class="mb-1"><b>Address :</b> <span id="branch_address"></span></p>
                                             </div>
                                         </div>
                                         <!-- Party -->
@@ -95,11 +95,12 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>Name :</b> <span id="party_name"></span></p>
-                                                <p><b>Designation :</b> <span id="party_id_text"></span></p>
-                                                <p><b>Mobile :</b> <span id="party_phone"></span></p>
-                                                <p><b>E-mail :</b> <span id="party_phone"></span></p>
-                                                <p><b>Address :</b> <span id="party_address"></span></p>
+                                                <p class="mb-1"><b>Name :</b> <span id="party_name"></span></p>
+                                                <p class="mb-1"><b>Designation :</b> <span id="party_designation"></span>
+                                                </p>
+                                                <p class="mb-1"><b>Mobile :</b> <span id="party_phone"></span></p>
+                                                <p class="mb-1"><b>E-mail :</b> <span id="party_email"></span></p>
+                                                <p class="mb-1"><b>Address :</b> <span id="party_address"></span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -114,7 +115,7 @@
                                         Delivery Items
                                     </h4>
                                     <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-plus"></i>
+                                        <i class="fa fa-plus me-2"></i>
                                         Add Row
                                     </button>
                                 </div>
@@ -126,13 +127,13 @@
                                                     <th width="40">
                                                         SN
                                                     </th>
-                                                    <th width="180">
+                                                    <th width="220">
                                                         Category
                                                     </th>
-                                                    <th width="220">
+                                                    <th width="250">
                                                         Item Description
                                                     </th>
-                                                    <th width="120">
+                                                    <th width="140">
                                                         Qty
                                                     </th>
                                                     <th width="120" class="d-none">
@@ -168,8 +169,8 @@
                                                 Total Qty
                                             </th>
                                             <td>
-                                                <input type="text" id="total_qty" class="form-control text-end" readonly
-                                                    value="0">
+                                                <input type="text" id="total_qty" class="form-control text-end"
+                                                    readonly value="0">
                                             </td>
                                         </tr>
                                         <tr>
@@ -254,9 +255,9 @@
                     <td>
                     <select class="form-select account select2"><option value="">Select Item</option></select>
                     </td>
-                    <td><input type="number" class="form-control qty" value="1"></td>
-                    <td class="d-none"><input type="number" class="form-control rate" value="0"></td>
-                    <td class="d-none"><input type="number" class="form-control total" readonly></td>
+                    <td><input type="number" class="form-control qty" value="1" min="1"></td>
+                    <td class="d-none"><input type="number" class="form-control rate" min="1" value="0"></td>
+                    <td class="d-none"><input type="number" class="form-control total" min="1" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>
@@ -279,11 +280,6 @@
         });
         $('#addRow').click(function() {
             addRow();
-        });
-        $(document).on('click', '.remove', function() {
-            $(this).closest('tr').remove();
-            serial();
-            calculate();
         });
 
         function serial() {
@@ -324,14 +320,21 @@
             let qtyTotal = 0;
             let subTotal = 0;
             let items = [];
+
             $('#expenseBody tr').each(function() {
+
                 let row = $(this);
+
                 let qty = parseFloat(row.find('.qty').val()) || 0;
                 let rate = parseFloat(row.find('.rate').val()) || 0;
+
                 let amount = qty * rate;
+
                 row.find('.total').val(amount.toFixed(2));
+
                 qtyTotal += qty;
                 subTotal += amount;
+
                 items.push({
                     category_id: row.find('.category').val(),
                     category_name: row.find('.category option:selected').text(),
@@ -343,9 +346,19 @@
                     details: row.find('.details').val()
                 });
             });
+
             let discount = parseFloat($('#discount').val()) || 0;
-            let vat = parseFloat($('#vat').val()) || 0;
-            let grandTotal = subTotal + vat - discount;
+            let vatPercent = parseFloat($('#vat').val()) || 0;
+
+            if (discount > subTotal) {
+                discount = subTotal;
+                $('#discount').val(discount.toFixed(2));
+            }
+
+            let afterDiscount = subTotal - discount;
+            let vatAmount = (afterDiscount * vatPercent) / 100;
+            let grandTotal = afterDiscount + vatAmount;
+
             $('#total_qty').val(qtyTotal);
             $('#sub_total').val(subTotal.toFixed(2));
             $('#grand_total').val(grandTotal.toFixed(2));
@@ -441,9 +454,16 @@
         });
         $(document).on('click', '.remove', function(e) {
             e.preventDefault();
+            // Check BEFORE showing delete confirmation
+            if ($('#expenseBody tr').length <= 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'At least one item is required.'
+                });
+                return;
+            }
 
             let row = $(this).closest('tr');
-
             Swal.fire({
                 title: 'Delete Item?',
                 text: 'This row will be removed.',
@@ -452,26 +472,18 @@
                 confirmButtonText: 'Delete',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
-
-                if (!result.isConfirmed) return;
-
-                // Count only visible rows
-                if ($('#expenseBody tr:visible').length <= 1) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'At least one item is required.'
-                    });
-                    return;
+                if (result.isConfirmed) {
+                    row.remove();
+                    serial();
+                    calculate();
                 }
-
-                row.remove();
-                serial();
-                calculate();
             });
         });
+
         $('#branch_id').change(function() {
             let id = $(this).val();
             if (id == '') {
+                $('#company_name').text('');
                 $('#branch_name').text('');
                 $('#branch_phone').text('');
                 $('#branch_email').text('');
@@ -479,6 +491,7 @@
                 return;
             }
             $.get('/admin/ajax/branch/' + id, function(res) {
+                $('#company_name').text(res.data.company_name ?? '');
                 $('#branch_name').text(res.data.name);
                 $('#branch_phone').text(res.data.phone);
                 $('#branch_email').text(res.data.email);
@@ -493,11 +506,15 @@
                 $('#party_name').text('');
                 $('#party_phone').text('');
                 $('#party_address').text('');
+                $('#party_email').text('');
+                $('#party_designation').text('');
                 return;
             }
             $.get('/admin/ajax/party/' + id, function(res) {
                 $('#party_id_text').text(res.data.id);
                 $('#party_name').text(res.data.name);
+                $('#party_email').text(res.data.email);
+                $('#party_designation').text(res.data.designation);
                 $('#party_phone').text(res.data.phone);
                 $('#party_address').text(res.data.address);
             });

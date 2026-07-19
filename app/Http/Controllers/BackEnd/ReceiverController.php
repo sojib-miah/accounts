@@ -36,6 +36,7 @@ class ReceiverController extends Controller
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
 
@@ -47,6 +48,7 @@ class ReceiverController extends Controller
         Party::create([
             'party_id'   => $partyId,
             'name'       => $request->name,
+            'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,
             'address'    => $request->address,
@@ -65,11 +67,13 @@ class ReceiverController extends Controller
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
 
         $party->update([
             'name'       => $request->name,
+            'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,
             'address'    => $request->address,

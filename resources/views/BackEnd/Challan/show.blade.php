@@ -69,7 +69,7 @@
                                 <input type="text" class="form-control" readonly
                                     value="{{ $receipt->branch->name ?? '' }}">
                                 <div class="mt-3">
-                                    <p class="mb-1"><b>Company Name :</b> <span id=""></span></p>
+                                    <p class="mb-1"><b>Company Name :</b> {{ $receipt->branch->company->name ?? '' }}</p>
                                     <p class="mb-1">
                                         <b>Branch Name:</b>
                                         {{ $receipt->branch->name ?? '' }}
@@ -103,7 +103,7 @@
                                     </p>
                                     <p class="mb-1">
                                         <b>Designation:</b>
-                                        {{ $receipt->party->id ?? '' }}
+                                        {{ $receipt->party->designation ?? '' }}
                                     </p>
                                     <p class="mb-1">
                                         <b>Mobile:</b>
@@ -163,7 +163,7 @@
                                                 {{ $item->accountHead->name ?? '-' }}
                                             </td>
                                             <td class="text-center">
-                                                {{ number_format($item->qty, 2) }}
+                                                {{ number_format($item->qty) }}
                                             </td>
                                             <td>
                                                 {{ $item->details }}

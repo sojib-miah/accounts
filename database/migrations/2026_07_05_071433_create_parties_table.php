@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('party_id')->unique();
             $table->string('name');
+            $table->string('designation')->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('email')->nullable();
             $table->text('address')->nullable();

@@ -24,7 +24,7 @@ class PaymentTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'   => 'required|max:255|unique:payment_types,name',
+            'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
 
@@ -34,14 +34,13 @@ class PaymentTypeController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        return redirect()->route('payment-type.index')
-            ->with('success', 'Payment Type Added Successfully.');
+        return redirect()->route('payment-type.index')->with('success', 'Payment Type Added Successfully.');
     }
 
     public function update(Request $request, PaymentType $paymentType)
     {
         $request->validate([
-            'name'   => 'required|max:255|unique:payment_types,name,' . $paymentType->id,
+            'name'   => 'required|max:255' . $paymentType->id,
             'status' => 'required|in:Active,Inactive',
         ]);
 
@@ -50,22 +49,17 @@ class PaymentTypeController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('payment-type.index')
-            ->with('success', 'Payment Type Updated Successfully.');
+        return redirect()->route('payment-type.index')->with('success', 'Payment Type Updated Successfully.');
     }
 
     public function destroy(PaymentType $paymentType)
     {
         if (ReceiptPayment::where('payment_type_id', $paymentType->id)->exists()) {
 
-            return back()->with(
-                'error',
-                'This payment type has already been used in transactions and cannot be deleted.'
-            );
+            return back()->with('error', 'This payment type has already been used in transactions and cannot be deleted.');
         }
         $paymentType->delete();
 
-        return redirect()->route('payment-type.index')
-            ->with('success', 'Payment Type Deleted Successfully.');
+        return redirect()->route('payment-type.index')->with('success', 'Payment Type Deleted Successfully.');
     }
 }

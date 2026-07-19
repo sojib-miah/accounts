@@ -421,11 +421,13 @@ class ReceiptController extends Controller
 
     public function branchInfo(Branch $branch)
     {
+        $branch->load('company');
         return response()->json([
             'success' => true,
             'data' => [
                 'id' => $branch->id,
                 'name' => $branch->name,
+                'company_name' => optional($branch->company)->name,
                 'phone' => $branch->phone_one,
                 'email' => $branch->email,
                 'address' => $branch->address,
@@ -440,6 +442,7 @@ class ReceiptController extends Controller
             'data' => [
                 'id' => $party->id,
                 'name' => $party->name,
+                'designation' => $party->designation,
                 'phone' => $party->phone,
                 'email' => $party->email,
                 'address' => $party->address,

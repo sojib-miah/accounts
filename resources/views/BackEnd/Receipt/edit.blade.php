@@ -303,41 +303,25 @@
             let lastRow = $('#expenseBody tr:last');
             lastRow.find('.category').select2('open');
             if (item) {
-
-                row.find('.qty').val(item.qty);
-
+                row.find('.qty').val(parseFloat(item.qty));
                 row.find('.rate').val(item.rate);
-
                 row.find('.details').val(item.details);
-
                 row.find('.category')
                     .val(item.category_id)
                     .trigger('change', [item]);
-
             }
         }
         $(function() {
-
             if (receiptItems.length) {
-
                 receiptItems.forEach(function(item) {
-
                     addRow(item);
-
                 });
-
             } else {
-
                 addRow();
-
             }
-
             $('#discount').val("{{ $receipt->discount }}");
-
             $('#vat').val("{{ $receipt->vat }}");
-
             calculate();
-
         });
         $('#addRow').click(function() {
             addRow();
@@ -369,29 +353,17 @@
                 url: "{{ route('ajax.account-head', ':id') }}".replace(':id', categoryId),
                 type: 'GET',
                 success: function(response) {
-
                     let option = '<option value="">Select Expense</option>';
-
                     $.each(response.data, function(i, expense) {
-
-                        option += `
-            <option value="${expense.id}">
-                ${expense.name}
-            </option>
-        `;
-
+                        option += `<option value="${expense.id}">${expense.name}</option>`;
                     });
-
                     account.html(option);
-
                     if (item) {
-
                         account
                             .val(item.account_head_id)
                             .trigger('change');
 
                     }
-
                 },
                 error: function() {
                     alert('Failed to load Expense Head.');
@@ -403,14 +375,21 @@
             let qtyTotal = 0;
             let subTotal = 0;
             let items = [];
+
             $('#expenseBody tr').each(function() {
+
                 let row = $(this);
+
                 let qty = parseFloat(row.find('.qty').val()) || 0;
                 let rate = parseFloat(row.find('.rate').val()) || 0;
+
                 let amount = qty * rate;
+
                 row.find('.total').val(amount.toFixed(2));
+
                 qtyTotal += qty;
                 subTotal += amount;
+
                 items.push({
                     category_id: row.find('.category').val(),
                     category_name: row.find('.category option:selected').text(),
@@ -422,9 +401,19 @@
                     details: row.find('.details').val()
                 });
             });
+
             let discount = parseFloat($('#discount').val()) || 0;
-            let vat = parseFloat($('#vat').val()) || 0;
-            let grandTotal = subTotal + vat - discount;
+            let vatPercent = parseFloat($('#vat').val()) || 0;
+
+            if (discount > subTotal) {
+                discount = subTotal;
+                $('#discount').val(discount.toFixed(2));
+            }
+
+            let afterDiscount = subTotal - discount;
+            let vatAmount = (afterDiscount * vatPercent) / 100;
+            let grandTotal = afterDiscount + vatAmount;
+
             $('#total_qty').val(qtyTotal);
             $('#sub_total').val(subTotal.toFixed(2));
             $('#grand_total').val(grandTotal.toFixed(2));
@@ -480,27 +469,6 @@
                 addRow();
             }
         });
-        //    $(document).on('change', '.account', function() {
-        //         let current = $(this);
-        //         let value = current.val();
-        //         if (value == '') return;
-        //         let duplicate = false;
-        //         $('.account').not(current).each(function() {
-        //             if ($(this).val() == value) {
-        //                 duplicate = true;
-        //             }
-        //         });
-        //         if (duplicate) {
-        //             Swal.fire({
-        //                 icon: 'warning',
-        //                 title: 'Duplicate Expense',
-        //                 text: 'This expense has already been added.'
-        //             });
-        //             current.val('').trigger('change');
-        //             return;
-        //         }
-        //         calculate();
-        //     });
         $('form').submit(function(e) {
             let valid = true;
             $('#expenseBody tr').each(function() {
@@ -539,21 +507,25 @@
         $(document).on('blur', '.qty,.rate', function() {
             $(this).off('wheel.disableScroll');
         });
-        $(document).on('click', '.remove', function() {
-            if ($('#expenseBody tr').length == 1) {
+        $(document).on('click', '.remove', function(e) {
+            e.preventDefault();
+            // Check BEFORE showing delete confirmation
+            if ($('#expenseBody tr').length <= 1) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'At least one item is required.'
                 });
                 return;
             }
+
             let row = $(this).closest('tr');
             Swal.fire({
                 title: 'Delete Item?',
                 text: 'This row will be removed.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Delete'
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     row.remove();
@@ -562,6 +534,7 @@
                 }
             });
         });
+
         $('#branch_id').change(function() {
             let id = $(this).val();
             if (id == '') {
