@@ -71,12 +71,13 @@ class ReceiptController extends Controller
         return view('BackEnd.Receipt.expense_create', compact('branches', 'parties', 'categories'));
     }
 
-    private function generateReceiptNo($type)
+    private function generateReceiptNo()
     {
-        $prefix = $type == 'Income' ? '' : '';
-        $last = Receipt::where('type', $type)->latest('id')->first();
-        $number = $last ? ((int) substr($last->receipt_no, 3)) + 1 : 10001;
-        return $prefix . $number;
+        $last = Receipt::orderByDesc('receipt_no')->first();
+
+        return $last
+            ? ((int) $last->receipt_no + 1)
+            : 10001;
     }
 
     public function store(Request $request)
@@ -107,7 +108,7 @@ class ReceiptController extends Controller
             $vat = $request->vat ?? 0;
             $grandTotal = $subTotal + $vat - $discount;
             $receipt = Receipt::create([
-                'receipt_no' => $this->generateReceiptNo($request->type),
+                'receipt_no' => $this->generateReceiptNo(),
                 'type' => $request->type,
                 'company_id' => $request->company_id,
                 'branch_id' => $request->branch_id,

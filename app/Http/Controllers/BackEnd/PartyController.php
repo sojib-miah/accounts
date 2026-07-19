@@ -36,6 +36,7 @@ class PartyController extends Controller
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
 
@@ -47,6 +48,7 @@ class PartyController extends Controller
         Party::create([
             'party_id'   => $partyId,
             'name'       => $request->name,
+            'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,
             'address'    => $request->address,
@@ -55,8 +57,7 @@ class PartyController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('party.index')
-            ->with('success', 'Party Created Successfully.');
+        return redirect()->route('party.index')->with('success', 'Party Created Successfully.');
     }
 
     public function update(Request $request, Party $party)
@@ -66,11 +67,13 @@ class PartyController extends Controller
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
 
         $party->update([
             'name'       => $request->name,
+            'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,
             'address'    => $request->address,

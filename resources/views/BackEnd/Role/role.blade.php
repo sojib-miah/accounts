@@ -180,7 +180,7 @@
                         </div>
                         <div class="row">
                             @foreach ($groupPermissions as $module => $modulePermissions)
-                                <div class="col-md-3 mb-4">
+                                <div class="col-md-4 mb-4">
                                     <div class="card border shadow-sm">
                                         <div class="card-header" style="padding: 5px !impotant">
                                             <div class="form-check">
@@ -202,7 +202,7 @@
                                                         id="permission{{ $permission->id }}">
                                                     <label class="form-check-label"
                                                         for="permission{{ $permission->id }}">
-                                                        {{ ucfirst(last(explode('-', $permission->name))) }}
+                                                        {{ $permission->name }}
                                                     </label>
                                                 </div>
                                             @endforeach
@@ -259,7 +259,7 @@
                             </div>
                             <div class="row">
                                 @foreach ($groupPermissions as $module => $modulePermissions)
-                                    <div class="col-md-3 mb-4">
+                                    <div class="col-md-4 mb-4">
                                         <div class="card border shadow-sm">
                                             <div class="card-header" style="padding: 5px !impotant">
                                                 <div class="form-check">
@@ -285,7 +285,8 @@
 
                                                         <label class="form-check-label"
                                                             for="edit_permission_{{ $role->id }}_{{ $permission->id }}">
-                                                            {{ ucfirst(last(explode('-', $permission->name))) }}
+                                                            {{-- {{ ucfirst(last(explode('-', $permission->name))) }} --}}
+                                                            {{ $permission->name }}
                                                         </label>
                                                     </div>
                                                 @endforeach

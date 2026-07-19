@@ -229,7 +229,7 @@
                                         </th>
                                         <td>
                                             <input type="number" name="discount" id="discount" value="0"
-                                                class="form-control text-end">
+                                                class="form-control text-end" min="0">
                                         </td>
                                     </tr>
                                     <tr>
@@ -239,7 +239,7 @@
                                         </th>
                                         <td>
                                             <input type="number" name="vat" id="vat" value="0"
-                                                class="form-control text-end">
+                                                class="form-control text-end" min="0">
                                         </td>
                                     </tr>
                                     <tr class="table-primary">
@@ -297,9 +297,9 @@
                     <td>
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
-                    <td><input type="number" class="form-control qty" value="1"></td>
-                    <td class="d-none"><input type="number" class="form-control rate" value="0"></td>
-                    <td class="d-none"><input type="number" class="form-control total" readonly></td>
+                    <td><input type="number" class="form-control qty" value="1" min="1"></td>
+                    <td class="d-none"><input type="number" class="form-control rate" value="0" min="0"></td>
+                    <td class="d-none"><input type="number" class="form-control total" readonly min="1"></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>

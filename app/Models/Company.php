@@ -22,4 +22,9 @@ class Company extends Model
     {
         return $this->hasMany(Account::class);
     }
+
+    public function package()
+    {
+        return $this->hasOne(CompanyPackage::class)->latestOfMany();
+    }
 }

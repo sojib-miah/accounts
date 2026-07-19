@@ -62,14 +62,14 @@
                         <tbody>
                             @forelse ($branches as $branch)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $branch->company->name }}</td>
-                                    <td>{{ $branch->branch_id }}</td>
-                                    <td>{{ $branch->name }}</td>
-                                    <td>{{ $branch->phone_one }}</td>
-                                    <td>{{ $branch->phone_two }}</td>
-                                    <td>{{ $branch->email }}</td>
-                                    <td>{{ $branch->address }}</td>
+                                    <td>{{ $loop->iteration ?? '-' }}</td>
+                                    <td>{{ $branch->company->name ?? '-' }}</td>
+                                    <td>{{ $branch->branch_id ?? '-' }}</td>
+                                    <td>{{ $branch->name ?? '-' }}</td>
+                                    <td>{{ $branch->phone_one ?? '-' }}</td>
+                                    <td>{{ $branch->phone_two ?? '-' }}</td>
+                                    <td>{{ $branch->email ?? '-' }}</td>
+                                    <td>{{ $branch->address ?? '-' }}</td>
                                     <td>
                                         @can('branch-edit')
                                             <button class="btn btn-warning btn-sm editBtn" data-id="{{ $branch->id }}"

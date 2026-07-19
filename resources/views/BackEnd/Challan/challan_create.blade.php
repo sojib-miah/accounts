@@ -86,7 +86,7 @@
                                             </label>
                                             <select name="party_id" id="party_id" class="form-select select2" required>
                                                 <option value="">
-                                                    Select Receiver
+                                                    Select Customer
                                                 </option>
                                                 @foreach ($parties as $party)
                                                     <option value="{{ $party->id }}">
@@ -188,16 +188,17 @@
                                             </th>
                                             <td>
                                                 <input type="number" name="discount" id="discount" value="0"
-                                                    class="form-control text-end">
+                                                    class="form-control text-end" min="0">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>
-                                                VAT
+                                            <th class="d-flex align-items-center gap-2">
+                                                <span>VAT</span>
+                                                <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                             </th>
                                             <td>
                                                 <input type="number" name="vat" id="vat" value="0"
-                                                    class="form-control text-end">
+                                                    class="form-control text-end" min="0">
                                             </td>
                                         </tr>
                                         <tr class="table-primary">
@@ -256,7 +257,7 @@
                     <select class="form-select account select2"><option value="">Select Item</option></select>
                     </td>
                     <td><input type="number" class="form-control qty" value="1" min="1"></td>
-                    <td class="d-none"><input type="number" class="form-control rate" min="1" value="0"></td>
+                    <td class="d-none"><input type="number" class="form-control rate" min="0" value="0"></td>
                     <td class="d-none"><input type="number" class="form-control total" min="1" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>

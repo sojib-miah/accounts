@@ -23,26 +23,32 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="row">
-                                            <div class="col-4 text-end">
-                                                <b>Receipt No :</b>
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end">
+                                                    <b>Receipt No :</b>
+                                                </div>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->receipt_no }}">
+                                                </div>
                                             </div>
-                                            <div class="col-8">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->receipt_no }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>Date :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="date" name="receipt_date" class="form-control"
+                                                        value="{{ $receipt->receipt_date }}">
+                                                </div>
                                             </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>Date :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="date" name="receipt_date" class="form-control"
-                                                    value="{{ $receipt->receipt_date }}">
-                                            </div>
-                                            <div class="col-4 text-end mt-2">
-                                                <b>By :</b>
-                                            </div>
-                                            <div class="col-8 mt-2">
-                                                <input type="text" class="form-control" readonly
-                                                    value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <div class="col-4 text-end mt-2">
+                                                    <b>By :</b>
+                                                </div>
+                                                <div class="col-8 mt-2">
+                                                    <input type="text" class="form-control" readonly
+                                                        value="{{ $receipt->creator->name ?? auth()->user()->name }}">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +58,7 @@
                                     <!-- Branch -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Billing Branch
+                                            Branch Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
@@ -64,25 +70,30 @@
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
-                                            <p>
-                                                <b>Name :</b>
+                                            <p class="mb-1"><b>Company Name :</b>
+                                                <span id="company_name">
+                                                    {{ $receipt->branch->company->name ?? '' }}
+                                                </span>
+                                            </p>
+                                            <p class="mb-1">
+                                                <b>Branch Name :</b>
                                                 <span id="branch_name">
                                                     {{ $receipt->branch->name ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Mobile :</b>
                                                 <span id="branch_phone">
                                                     {{ $receipt->branch->phone_one ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
-                                                <b>Email :</b>
+                                            <p class="mb-1">
+                                                <b>E-mail :</b>
                                                 <span id="branch_email">
                                                     {{ $receipt->branch->email ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Address :</b>
                                                 <span id="branch_address">
                                                     {{ $receipt->branch->address ?? '' }}
@@ -93,7 +104,7 @@
                                     <!-- Party -->
                                     <div class="col-md-6">
                                         <label class="form-label">
-                                            Invoice To
+                                            Customer Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="party_id" id="party_id" class="form-select select2" required>
@@ -105,25 +116,27 @@
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
-                                            <p>
-                                                <b>ID :</b>
-                                                <span id="party_id_text">
-                                                    {{ $receipt->party->id ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p>
+                                            <p class="mb-1">
                                                 <b>Name :</b>
                                                 <span id="party_name">
                                                     {{ $receipt->party->name ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1">
+                                                <b>Designation :</b>
+                                                <span id="party_designation">
+                                                    {{ $receipt->party->designation ?? '' }}
+                                                </span>
+                                            </p>
+                                            <p class="mb-1">
                                                 <b>Mobile :</b>
                                                 <span id="party_phone">
                                                     {{ $receipt->party->phone ?? '' }}
                                                 </span>
                                             </p>
-                                            <p>
+                                            <p class="mb-1"><b>E-mail :</b> <span
+                                                    id="party_email">{{ $receipt->party->email ?? '' }}</span></p>
+                                            <p class="mb-1">
                                                 <b>Address :</b>
                                                 <span id="party_address">
                                                     {{ $receipt->party->address ?? '' }}
@@ -143,7 +156,7 @@
                                     Expense Items
                                 </h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fa fa-plus me-2"></i>
                                     Add Row
                                 </button>
                             </div>
@@ -153,7 +166,7 @@
                                         <thead>
                                             <tr>
                                                 <th width="40">
-                                                    #
+                                                    SN
                                                 </th>
                                                 <th width="180">
                                                     Category
@@ -171,7 +184,7 @@
                                                     Total
                                                 </th>
                                                 <th>
-                                                    Details
+                                                    Remarks
                                                 </th>
                                                 <th width="70">
                                                     Action
@@ -216,16 +229,17 @@
                                         </th>
                                         <td>
                                             <input type="number" name="discount" id="discount" value="0"
-                                                class="form-control text-end">
+                                                class="form-control text-end" min="0">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>
-                                            VAT
+                                        <th class="d-flex align-items-center gap-2">
+                                            <span>VAT</span>
+                                            <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                         </th>
                                         <td>
                                             <input type="number" name="vat" id="vat" value="0"
-                                                class="form-control text-end">
+                                                class="form-control text-end" min="0">
                                         </td>
                                     </tr>
                                     <tr class="table-primary">
@@ -283,8 +297,8 @@
                     <td>
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
-                    <td><input type="number" class="form-control qty" value="1"></td>
-                    <td><input type="number" class="form-control rate" value="0"></td>
+                    <td><input type="number" class="form-control qty" value="1" min="1"></td>
+                    <td><input type="number" class="form-control rate" value="0" min="0"></td>
                     <td><input type="number" class="form-control total" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
@@ -538,6 +552,7 @@
         $('#branch_id').change(function() {
             let id = $(this).val();
             if (id == '') {
+                $('#company_name').text('');
                 $('#branch_name').text('');
                 $('#branch_phone').text('');
                 $('#branch_email').text('');
@@ -545,6 +560,7 @@
                 return;
             }
             $.get('/admin/ajax/branch/' + id, function(res) {
+                $('#company_name').text(res.data.company_name ?? '');
                 $('#branch_name').text(res.data.name);
                 $('#branch_phone').text(res.data.phone);
                 $('#branch_email').text(res.data.email);
@@ -559,11 +575,15 @@
                 $('#party_name').text('');
                 $('#party_phone').text('');
                 $('#party_address').text('');
+                $('#party_email').text('');
+                $('#party_designation').text('');
                 return;
             }
             $.get('/admin/ajax/party/' + id, function(res) {
                 $('#party_id_text').text(res.data.id);
                 $('#party_name').text(res.data.name);
+                $('#party_email').text(res.data.email);
+                $('#party_designation').text(res.data.designation);
                 $('#party_phone').text(res.data.phone);
                 $('#party_address').text(res.data.address);
             });

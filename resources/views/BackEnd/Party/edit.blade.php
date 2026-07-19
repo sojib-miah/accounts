@@ -20,6 +20,13 @@
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                         </div>
+                        <!-- designation -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Designation
+                            </label>
+                            <input type="text" name="designation" id="edit_designation" class="form-control">
+                        </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">

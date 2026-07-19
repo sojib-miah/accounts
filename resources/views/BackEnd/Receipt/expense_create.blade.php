@@ -33,19 +33,23 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="row">
-                                                <div class="col-4 text-end">
-                                                    <b>Date :</b>
+                                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                                    <div class="col-4 text-end">
+                                                        <b>Date :</b>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="date" name="receipt_date" class="form-control"
+                                                            value="{{ date('Y-m-d') }}">
+                                                    </div>
                                                 </div>
-                                                <div class="col-8">
-                                                    <input type="date" name="receipt_date" class="form-control"
-                                                        value="{{ date('Y-m-d') }}">
-                                                </div>
-                                                <div class="col-4 text-end mt-2">
-                                                    <b>By :</b>
-                                                </div>
-                                                <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
-                                                        value="{{ auth()->user()->name }}">
+                                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                                    <div class="col-4 text-end mt-2">
+                                                        <b>By :</b>
+                                                    </div>
+                                                    <div class="col-8 mt-2">
+                                                        <input type="text" class="form-control" readonly
+                                                            value="{{ auth()->user()->name }}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -55,7 +59,7 @@
                                         <!-- Branch -->
                                         <div class="col-md-6">
                                             <label class="form-label">
-                                                Billing Branch <span class="text-danger">*</span>
+                                                Branch Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="branch_id" id="branch_id" class="form-select select2" required
                                                 data-allow-clear="true">
@@ -69,21 +73,22 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>Name :</b> <span id="branch_name"></span></p>
-                                                <p><b>Mobile :</b> <span id="branch_phone"></span></p>
-                                                <p><b>Email :</b> <span id="branch_email"></span></p>
-                                                <p><b>Address :</b> <span id="branch_address"></span></p>
+                                                <p class="mb-1"><b>Company Name :</b> <span id="company_name"></span></p>
+                                                <p class="mb-1"><b>Branch Name :</b> <span id="branch_name"></span></p>
+                                                <p class="mb-1"><b>Mobile :</b> <span id="branch_phone"></span></p>
+                                                <p class="mb-1"><b>E-mail :</b> <span id="branch_email"></span></p>
+                                                <p class="mb-1"><b>Address :</b> <span id="branch_address"></span></p>
                                             </div>
                                         </div>
                                         <!-- Party -->
                                         <div class="col-md-6">
                                             <label class="form-label">
-                                                Invoice To <span class="text-danger">*</span>
+                                                Customer Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="party_id" id="party_id" class="form-select select2"
                                                 data-allow-clear="true" required>
                                                 <option value="">
-                                                    Select Receiver
+                                                    Select Customer
                                                 </option>
                                                 @foreach ($parties as $party)
                                                     <option value="{{ $party->id }}">
@@ -92,10 +97,12 @@
                                                 @endforeach
                                             </select>
                                             <div class="mt-3">
-                                                <p><b>ID :</b> <span id="party_id_text"></span></p>
-                                                <p><b>Name :</b> <span id="party_name"></span></p>
-                                                <p><b>Mobile :</b> <span id="party_phone"></span></p>
-                                                <p><b>Address :</b> <span id="party_address"></span></p>
+                                                <p class="mb-1"><b>Name :</b> <span id="party_name"></span></p>
+                                                <p class="mb-1"><b>Designation :</b> <span id="party_designation"></span>
+                                                </p>
+                                                <p class="mb-1"><b>Mobile :</b> <span id="party_phone"></span></p>
+                                                <p class="mb-1"><b>E-mail :</b> <span id="party_email"></span></p>
+                                                <p class="mb-1"><b>Address :</b> <span id="party_address"></span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -110,7 +117,7 @@
                                         Expense Items
                                     </h4>
                                     <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-plus"></i>
+                                        <i class="fa fa-plus me-2"></i>
                                         Add Row
                                     </button>
                                 </div>
@@ -120,7 +127,7 @@
                                             <thead>
                                                 <tr>
                                                     <th width="40">
-                                                        #
+                                                        SN
                                                     </th>
                                                     <th width="180">
                                                         Category
@@ -138,7 +145,7 @@
                                                         Total
                                                     </th>
                                                     <th>
-                                                        Details
+                                                        Remarks
                                                     </th>
                                                     <th width="70">
                                                         Action
@@ -164,8 +171,8 @@
                                                 Total Qty
                                             </th>
                                             <td>
-                                                <input type="text" id="total_qty" class="form-control text-end" readonly
-                                                    value="0">
+                                                <input type="text" id="total_qty" class="form-control text-end"
+                                                    readonly value="0">
                                             </td>
                                         </tr>
                                         <tr>
@@ -173,8 +180,8 @@
                                                 Sub Total
                                             </th>
                                             <td>
-                                                <input type="text" id="sub_total" class="form-control text-end" readonly
-                                                    value="0.00">
+                                                <input type="text" id="sub_total" class="form-control text-end"
+                                                    readonly value="0.00">
                                             </td>
                                         </tr>
                                         <tr>
@@ -187,8 +194,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>
-                                                VAT
+                                            <th class="d-flex align-items-center gap-2">
+                                                <span>VAT</span>
+                                                <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                             </th>
                                             <td>
                                                 <input type="number" name="vat" id="vat" value="0"
@@ -499,6 +507,7 @@
         $('#branch_id').change(function() {
             let id = $(this).val();
             if (id == '') {
+                $('#company_name').text('');
                 $('#branch_name').text('');
                 $('#branch_phone').text('');
                 $('#branch_email').text('');
@@ -506,6 +515,7 @@
                 return;
             }
             $.get('/admin/ajax/branch/' + id, function(res) {
+                $('#company_name').text(res.data.company_name ?? '');
                 $('#branch_name').text(res.data.name);
                 $('#branch_phone').text(res.data.phone);
                 $('#branch_email').text(res.data.email);
@@ -520,11 +530,15 @@
                 $('#party_name').text('');
                 $('#party_phone').text('');
                 $('#party_address').text('');
+                $('#party_email').text('');
+                $('#party_designation').text('');
                 return;
             }
             $.get('/admin/ajax/party/' + id, function(res) {
                 $('#party_id_text').text(res.data.id);
                 $('#party_name').text(res.data.name);
+                $('#party_email').text(res.data.email);
+                $('#party_designation').text(res.data.designation);
                 $('#party_phone').text(res.data.phone);
                 $('#party_address').text(res.data.address);
             });

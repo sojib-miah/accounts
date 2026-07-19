@@ -13,7 +13,9 @@ use App\Http\Controllers\BackEnd\DashboardController;
 use App\Http\Controllers\BackEnd\IncomeCategoryController;
 use App\Http\Controllers\BackEnd\IncomeController;
 use App\Http\Controllers\BackEnd\IncomeReceiptController;
+use App\Http\Controllers\BackEnd\PackageController;
 use App\Http\Controllers\BackEnd\PartyController;
+use App\Http\Controllers\BackEnd\PaymentDetailesController;
 use App\Http\Controllers\BackEnd\PaymentTypeController;
 use App\Http\Controllers\BackEnd\PermissionController;
 use App\Http\Controllers\BackEnd\ReceiptController;
@@ -180,4 +182,26 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/challan/{receipt}/cancel', [ChallanController::class, 'cancel'])->name('challan.cancel');
     Route::get('/challan/{receipt}/print', [ChallanController::class, 'print'])->name('challan.print');
     Route::get('/challan/{receipt}/pdf', [ChallanController::class, 'pdf'])->name('challan.pdf');
+
+    // payment detailes 
+    Route::get('/expense/details', [PaymentDetailesController::class, 'expenseDetails'])->name('expense.details');
+    Route::get('/income/invoice', [PaymentDetailesController::class, 'incomeInvoice'])->name('income.invoice');
+
+    // package route 
+    Route::resource('package', PackageController::class);
 });
+
+
+
+// $package = CompanyPackage::where('company_id', auth()->user()->company_id)
+//     ->first();
+
+// $limit = $package->package->user_limit;
+
+// $current = User::where('company_id', auth()->user()->company_id)
+//     ->count();
+
+// if ($limit != -1 && $current >= $limit) {
+
+//     return back()->with('error', 'User limit exceeded.');
+// }

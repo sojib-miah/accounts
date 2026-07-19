@@ -100,4 +100,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Receipt::class);
     }
+
+    public function package()
+    {
+        return $this->hasOne(CompanyPackage::class)->latestOfMany();
+    }
 }

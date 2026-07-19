@@ -141,7 +141,6 @@
                                         <th>Category</th>
                                         <th>Invoice</th>
                                         <th width="90" class="text-center">Qty</th>
-                                        <th width="120" class="text-end">Rate</th>
                                         <th width="120" class="text-end">Amount</th>
                                         <th>Remarks</th>
                                     </tr>
@@ -166,9 +165,6 @@
                                             </td>
                                             <td class="text-center">
                                                 {{ number_format($item->qty) }}
-                                            </td>
-                                            <td class="text-end">
-                                                {{ number_format($item->rate, 2) }}
                                             </td>
                                             <td class="text-end fw-bold">
                                                 {{ number_format($item->amount, 2) }}

@@ -53,6 +53,7 @@
                                     <th width="60">SN</th>
                                     <th>Payee ID</th>
                                     <th>Payee Name</th>
+                                    <th>Designation</th>
                                     <th>Phone</th>
                                     <th>E-mail</th>
                                     <th>Address</th>
@@ -72,6 +73,7 @@
                                                 {{ $party->name }}
                                             </a>
                                         </td>
+                                        <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
                                         <td>{{ $party->address ?? '-' }}</td>
@@ -97,7 +99,8 @@
                                                 <button class="btn btn-warning btn-sm editBtn" data-id="{{ $party->id }}"
                                                     data-name="{{ $party->name }}" data-phone="{{ $party->phone }}"
                                                     data-email="{{ $party->email }}" data-address="{{ $party->address }}"
-                                                    data-status="{{ $party->status }}">
+                                                    data-status="{{ $party->status }}"
+                                                    data-designation="{{ $party->designation }}">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
                                             @endcan
@@ -137,6 +140,7 @@
         document.querySelectorAll('.editBtn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.getElementById('edit_name').value = this.dataset.name;
+                document.getElementById('edit_designation').value = this.dataset.designation;
                 document.getElementById('edit_phone').value = this.dataset.phone;
                 document.getElementById('edit_email').value = this.dataset.email;
                 document.getElementById('edit_address').value = this.dataset.address;
