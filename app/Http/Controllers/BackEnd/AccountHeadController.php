@@ -36,7 +36,7 @@ class AccountHeadController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
@@ -53,7 +53,7 @@ class AccountHeadController extends Controller
 
     public function update(Request $request, AccountHead $accountHead)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
             'status' => 'required|in:Active,Inactive',

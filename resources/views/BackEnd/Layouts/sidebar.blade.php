@@ -186,25 +186,6 @@
             </li>
         @endcan
 
-        <!-- contact -->
-        @can('menu-contact-list')
-            <li class="menu-item {{ request()->routeIs('contact.*') ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="fa fa-users me-3"></i>
-                    Contact
-                </a>
-                <ul class="menu-sub">
-                    @can('contact-list')
-                        <li class="menu-item {{ request()->routeIs('contact.index') ? 'active' : '' }}">
-                            <a href="{{ route('contact.index') }}" class="menu-link">
-                                Contact
-                            </a>
-                        </li>
-                    @endcan
-                </ul>
-            </li>
-        @endcan
-
         <!-- users -->
         @can('menu-comits-user-list')
             <li class="menu-item {{ request()->routeIs('users.*') ? 'active open' : '' }}">

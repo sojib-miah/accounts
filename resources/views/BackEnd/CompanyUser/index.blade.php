@@ -34,16 +34,7 @@
                     @endcan
                 </div>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="card-datatable table-responsive">
                     <table class="table table-bordered table-hover align-middle">
@@ -133,6 +124,9 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('company_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Branch -->
                             <div class="col-md-6 mb-3">
@@ -147,22 +141,31 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('branch_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Name -->
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Name <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="name" class="form-control" placeholder="Enter Full Name"
-                                    required>
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}"
+                                    placeholder="Enter Full Name" required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Email <span class="text-danger">*</span>
                                 </label>
-                                <input type="email" name="email" class="form-control" placeholder="Enter Email"
-                                    required>
+                                <input type="email" name="email" value="{{ old('email') }}" class="form-control"
+                                    placeholder="Enter Email" required>
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Phone -->
                             <div class="col-md-6 mb-3">
@@ -170,7 +173,10 @@
                                     Phone <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="phone" class="form-control"
-                                    placeholder="Enter Phone Number" required>
+                                    placeholder="Enter Phone Number" value="{{ old('phone') }}" required>
+                                @error('phone')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Password -->
                             <div class="col-md-6 mb-3">
@@ -179,6 +185,9 @@
                                 </label>
                                 <input type="password" name="password" class="form-control" placeholder="Enter Password"
                                     required>
+                                @error('password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -225,6 +234,9 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('company_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Branch -->
                             <div class="col-md-6 mb-3">
@@ -239,6 +251,9 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('branch_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Name -->
                             <div class="col-md-6 mb-3">
@@ -246,6 +261,9 @@
                                     Name <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="name" id="edit_name" class="form-control" required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
@@ -253,6 +271,9 @@
                                     Email <span class="text-danger">*</span>
                                 </label>
                                 <input type="email" name="email" id="edit_email" class="form-control" required>
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Phone -->
                             <div class="col-md-6 mb-3">
@@ -260,6 +281,9 @@
                                     Phone <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="phone" id="edit_phone" class="form-control" required>
+                                @error('phone')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Password -->
                             {{-- <div class="col-md-6 mb-3">
@@ -267,7 +291,10 @@
                                     Password <span class="text-danger">*</span>
                                 </label>
                                 <input type="password" name="password" id="edit_password" class="form-control" required>
-                            </div> --}}
+                            </div>
+                            @error('password')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror --}}
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -306,4 +333,20 @@
 
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addCompanyUserModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editCompanyUserModal')).show();
+            });
+        </script>
+    @endif
 @endpush

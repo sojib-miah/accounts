@@ -155,8 +155,9 @@
         </div>
     </div>
 
+    {{-- add modal  --}}
     <div class="modal fade" id="addUserModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-simple">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body">
                     <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal">
@@ -166,55 +167,61 @@
                     </div>
                     <form action="{{ route('users.store') }}" method="POST">
                         @csrf
-                        <div class="mb-4">
-                            <label class="form-label">Name</label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
-                            @error('name')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
-                            @error('email')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required>
-                            @error('password')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Role</label>
-                            <select name="role" class="form-select select2" required>
-                                <option value="">
-                                    Select Role
-                                </option>
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->name }}">
-                                        {{ $role->name }}
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Name</label>
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}"
+                                    required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required
+                                    value="{{ old('email') }}">
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" required>
+                                @error('password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Role</label>
+                                <select name="role" class="form-select select2" required>
+                                    <option value="">
+                                        Select Role
                                     </option>
-                                @endforeach
-                            </select>
-                            @error('role')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+                                    @foreach ($roles as $role)
+                                        <option value="{{ $role->name }}">
+                                            {{ $role->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('role')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary me-2">
-                            Create User
-                        </button>
-                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
+                        <hr>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                Create User
+                            </button>
+                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 
     {{-- edit modal  --}}
     @foreach ($users as $user)
@@ -273,3 +280,13 @@
         </div>
     @endforeach
 @endsection
+
+@push('scripts')
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addUserModal')).show();
+            });
+        </script>
+    @endif
+@endpush

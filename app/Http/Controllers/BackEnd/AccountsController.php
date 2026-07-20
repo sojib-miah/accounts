@@ -35,7 +35,7 @@ class AccountsController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'account_name'        => 'required|string|max:255|unique:accounts,account_name',
             'account_holder_name' => 'required|string|max:255',
             'account_number'      => 'required|string|max:255|unique:accounts,account_number',
@@ -103,7 +103,7 @@ class AccountsController extends Controller
 
     public function update(Request $request, Account $account)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'account_name'        => 'required|max:255|unique:accounts,account_name,' . $account->id,
             'account_holder_name' => 'required|max:255',
             'account_number'      => 'required|max:255|unique:accounts,account_number,' . $account->id,

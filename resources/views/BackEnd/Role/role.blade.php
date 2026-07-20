@@ -401,4 +401,12 @@
             }
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addRoleModal')).show();
+            });
+        </script>
+    @endif
 @endpush

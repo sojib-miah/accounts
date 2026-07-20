@@ -33,16 +33,7 @@
                     @endcan
                 </div>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="card-datatable table-responsive">
                     <table class="table table-bordered">
@@ -127,26 +118,46 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('company_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Branch Name</label>
-                                <input type="text" name="name" class="form-control" required>
+                                <input type="text" name="name" value="{{ old('name') }}" class="form-control"
+                                    required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Phone One</label>
-                                <input type="text" name="phone_one" class="form-control" required>
+                                <input type="text" name="phone_one" value="{{ old('phone_one') }}" class="form-control"
+                                    required>
+                                @error('phone_one')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Phone Two</label>
-                                <input type="text" name="phone_two" class="form-control">
+                                <input type="text" name="phone_two" value="{{ old('phone_two') }}" class="form-control">
+                                @error('phone_two')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Email</label>
-                                <input type="email" name="email" class="form-control">
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label>Address</label>
-                                <textarea name="address" class="form-control" rows="3"></textarea>
+                                <textarea name="address" class="form-control" rows="3">{{ old('address') }}</textarea>
+                                @error('address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -186,27 +197,45 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('company_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Branch Name <span class="text-danger">*</span></label>
                                 <input type="text" name="name" id="edit_name" class="form-control" required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone One <span class="text-danger">*</span></label>
                                 <input type="text" name="phone_one" id="edit_phone_one" class="form-control"
                                     required>
+                                @error('phone_one')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone Two</label>
                                 <input type="text" name="phone_two" id="edit_phone_two" class="form-control">
+                                @error('phone_two')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" id="edit_email" class="form-control">
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" id="edit_address" class="form-control" rows="3"></textarea>
+                                @error('address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -243,4 +272,20 @@
             });
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addBranchModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editBranchModal')).show();
+            });
+        </script>
+    @endif
 @endpush

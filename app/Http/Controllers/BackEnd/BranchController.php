@@ -54,7 +54,7 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'company_id' => 'required|exists:companies,id',
             'name' => 'required|max:255',
             'phone_one' => 'required|max:30',
@@ -84,7 +84,7 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'company_id' => 'required|exists:companies,id',
             'name' => 'required|max:255',
             'phone_one' => 'required|max:30',

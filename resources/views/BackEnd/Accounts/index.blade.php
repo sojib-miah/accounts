@@ -41,16 +41,7 @@
                     @endcan
                 </div>
             </div>
-            {{-- Validation Error --}}
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -200,14 +191,21 @@
                                     Account Name
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="account_name" class="form-control" required>
+                                <input type="text" name="account_name" class="form-control"
+                                    value="{{ old('account_name') }}" required>
+                                @error('account_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Account Address
                                 </label>
-                                <input type="text" name="address" class="form-control">
+                                <input type="text" name="address" class="form-control" value="{{ old('address') }}">
+                                @error('address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Holder Name --}}
                             <div class="col-md-6 mb-3">
@@ -215,7 +213,11 @@
                                     Account Holder Name
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="account_holder_name" class="form-control" required>
+                                <input type="text" value="{{ old('account_holder_name') }}" name="account_holder_name"
+                                    class="form-control" required>
+                                @error('account_holder_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Account Number --}}
                             <div class="col-md-6 mb-3">
@@ -223,7 +225,11 @@
                                     Account Number
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="account_number" class="form-control" required>
+                                <input type="text" name="account_number" class="form-control"
+                                    value="{{ old('account_number') }}" required>
+                                @error('account_number')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
@@ -232,6 +238,9 @@
                                 </label>
                                 <input type="number" step="0.01" min="0" value="0"
                                     name="opening_balance" class="form-control">
+                                @error('opening_balance')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Default Status --}}
                             <div class="col-md-6 mb-3">
@@ -246,6 +255,9 @@
                                         Default
                                     </option>
                                 </select>
+                                @error('default_status')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
@@ -260,6 +272,9 @@
                                         Inactive
                                     </option>
                                 </select>
+                                @error('status')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -278,10 +293,7 @@
         </div>
     </div>
 
-    {{-- ========================= --}}
     {{-- Edit Account Modal --}}
-    {{-- ========================= --}}
-
     <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -305,6 +317,9 @@
                                 </label>
                                 <input type="text" name="account_name" id="edit_account_name" class="form-control"
                                     required>
+                                @error('account_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
@@ -312,6 +327,9 @@
                                     Account Address
                                 </label>
                                 <input type="text" name="address" id="edit_address" class="form-control">
+                                @error('address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Account Holder --}}
                             <div class="col-md-6 mb-3">
@@ -321,6 +339,9 @@
                                 </label>
                                 <input type="text" name="account_holder_name" id="edit_account_holder_name"
                                     class="form-control" required>
+                                @error('account_holder_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Account Number --}}
                             <div class="col-md-6 mb-3">
@@ -330,6 +351,9 @@
                                 </label>
                                 <input type="text" name="account_number" id="edit_account_number"
                                     class="form-control" required>
+                                @error('account_number')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
@@ -338,6 +362,9 @@
                                 </label>
                                 <input type="number" step="0.01" min="0" name="opening_balance"
                                     id="edit_opening_balance" class="form-control">
+                                @error('opening_balance')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Default Status --}}
                             <div class="col-md-6 mb-3">
@@ -352,6 +379,9 @@
                                         Not Default
                                     </option>
                                 </select>
+                                @error('default_status')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
@@ -366,6 +396,9 @@
                                         Inactive
                                     </option>
                                 </select>
+                                @error('status')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -407,5 +440,21 @@
                 });
             });
         </script>
+
+        @if ($errors->add->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    new bootstrap.Modal(document.getElementById('addAccountModal')).show();
+                });
+            </script>
+        @endif
+
+        @if ($errors->edit->any())
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    new bootstrap.Modal(document.getElementById('editAccountModal')).show();
+                });
+            </script>
+        @endif
     @endpush
 @endsection

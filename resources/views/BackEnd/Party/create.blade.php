@@ -18,7 +18,10 @@
                                 Payee Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Payee Name"
-                                required>
+                                required value="{{ old('name') }}">
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- designation -->
                         <div class="col-md-6 mb-3">
@@ -26,21 +29,32 @@
                                 Designation
                             </label>
                             <input type="text" name="designation" class="form-control"
-                                placeholder="Enter designation">
+                                placeholder="Enter designation" value="{{ old('designation') }}">
+                            @error('designation')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Phone
                             </label>
-                            <input type="text" name="phone" class="form-control" placeholder="Enter Phone Number">
+                            <input type="text" name="phone" class="form-control" placeholder="Enter Phone Number"
+                                value="{{ old('phone') }}">
+                            @error('phone')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Email -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 Email
                             </label>
-                            <input type="email" name="email" class="form-control" placeholder="Enter Email Address">
+                            <input type="email" name="email" class="form-control" placeholder="Enter Email Address"
+                                value="{{ old('email') }}">
+                            @error('email')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Status -->
                         <div class="col-md-6 mb-3">
@@ -55,13 +69,19 @@
                                     Inactive
                                 </option>
                             </select>
+                            @error('status')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
                                 Address
                             </label>
-                            <textarea name="address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
+                            <textarea name="address" class="form-control" rows="3" placeholder="Enter Address">{{ old('address') }}</textarea>
+                            @error('address')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                 </div>

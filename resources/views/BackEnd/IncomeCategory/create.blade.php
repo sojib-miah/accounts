@@ -18,7 +18,10 @@
                                 Category Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Category Name"
-                                required>
+                                required value="{{ old('name') }}">
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Status -->
                         <div class="col-md-12 mb-3">
@@ -33,6 +36,9 @@
                                     Inactive
                                 </option>
                             </select>
+                            @error('status')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                 </div>

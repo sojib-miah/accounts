@@ -98,6 +98,7 @@
                     </div>
                 </div>
             </div>
+
             {{-- ADD MODAL --}}
             <div class="modal fade" id="addPermissionModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered modal-simple">
@@ -168,6 +169,7 @@
                     </div>
                 </div>
             </div>
+
             {{-- EDIT MODALS --}}
             @foreach ($permissions as $permission)
                 <div class="modal fade" id="editPermissionModal{{ $permission->id }}" tabindex="-1">
@@ -227,4 +229,12 @@
 
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addPermissionModal')).show();
+            });
+        </script>
+    @endif
 @endpush

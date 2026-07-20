@@ -31,7 +31,7 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'name' => 'required|max:255|unique:companies,name',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -71,7 +71,7 @@ class CompanyController extends Controller
 
     public function update(Request $request, Company $company)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'name' => 'required|max:255|unique:companies,name,' . $company->id,
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

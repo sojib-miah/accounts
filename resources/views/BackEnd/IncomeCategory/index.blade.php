@@ -35,16 +35,7 @@
                     @endcan
                 </div>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -149,4 +140,20 @@
             });
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+            });
+        </script>
+    @endif
 @endpush

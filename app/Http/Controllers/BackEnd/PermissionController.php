@@ -11,46 +11,34 @@ class PermissionController extends Controller
     public function index(Request $request)
     {
         $permissions = Permission::with('roles')
-
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->search . '%');
-            })
-
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+            })->latest()->paginate(20)->withQueryString();
 
         return view('BackEnd.Permission.permission', compact('permissions'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'name' => 'required|string|max:100',
             'actions' => 'required|array|min:1',
         ]);
-
         $module = strtolower(trim($request->name));
-
         foreach ($request->actions as $action) {
-
             $permission = $module . '-' . $action;
-
             Permission::firstOrCreate([
                 'name' => $permission,
                 'guard_name' => 'web',
             ]);
         }
 
-        return back()->with(
-            'success',
-            'Permissions created successfully.'
-        );
+        return back()->with('success', 'Permissions created successfully.');
     }
 
     public function update(Request $request, Permission $permission)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'name' => 'required|unique:permissions,name,' . $permission->id
         ]);
 

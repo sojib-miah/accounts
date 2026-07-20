@@ -35,7 +35,7 @@ class IncomeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
@@ -52,7 +52,7 @@ class IncomeController extends Controller
 
     public function update(Request $request, AccountHead $accountHead)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
@@ -71,15 +71,10 @@ class IncomeController extends Controller
     public function destroy(AccountHead $income)
     {
         if ($income->receiptItems()->exists()) {
-
-            return back()->with(
-                'error',
-                'This Account Head has already been used in transactions and cannot be deleted.'
-            );
+            return back()->with('error', 'This Account Head has already been used in transactions and cannot be deleted.');
         }
         $income->delete();
 
-        return redirect()->route('income.index')
-            ->with('success', 'Income Deleted Successfully');
+        return redirect()->route('income.index')->with('success', 'Income Deleted Successfully');
     }
 }

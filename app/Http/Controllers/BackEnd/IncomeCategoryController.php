@@ -26,7 +26,7 @@ class IncomeCategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
@@ -43,7 +43,7 @@ class IncomeCategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
@@ -60,11 +60,7 @@ class IncomeCategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->accountHeads()->exists()) {
-
-            return back()->with(
-                'error',
-                'This category is already used by Income List. Delete those Account Income List.'
-            );
+            return back()->with('error', 'This category is already used by Income List. Delete those Account Income List.');
         }
         $category->delete();
         return redirect()->route('income.category.index')->with('success', 'Category Deleted Successfully.');

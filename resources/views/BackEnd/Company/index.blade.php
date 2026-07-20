@@ -33,16 +33,7 @@
                     @endcan
                 </div>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="card-datatable table-responsive">
                     <table class="table table-bordered align-middle">
@@ -145,23 +136,38 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label>Company Name</label>
-                            <input type="text" name="name" class="form-control" required>
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Logo</label>
                             <input type="file" name="logo" class="form-control">
+                            @error('logo')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Hologram</label>
                             <input type="file" name="hologram" class="form-control">
+                            @error('hologram')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Seal</label>
                             <input type="file" name="seal" class="form-control">
+                            @error('seal')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Signature</label>
                             <input type="file" name="signature" class="form-control">
+                            @error('signature')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -198,6 +204,9 @@
                                     Company Name
                                 </label>
                                 <input type="text" name="name" id="edit_name" class="form-control" required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <!-- Logo -->
                             <div class="col-md-6 mb-3">
@@ -205,6 +214,9 @@
                                     Logo
                                 </label>
                                 <input type="file" name="logo" class="form-control">
+                                @error('logo')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                                 <img id="edit_logo_preview" src="" class="mt-2 border rounded" width="100"
                                     height="100">
                             </div>
@@ -214,6 +226,9 @@
                                     Hologram
                                 </label>
                                 <input type="file" name="hologram" class="form-control">
+                                @error('hologram')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                                 <img id="edit_hologram_preview" src="" class="mt-2 border rounded"
                                     width="100" height="100">
                             </div>
@@ -223,6 +238,9 @@
                                     Seal
                                 </label>
                                 <input type="file" name="seal" class="form-control">
+                                @error('seal')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                                 <img id="edit_seal_preview" src="" class="mt-2 border rounded" width="100"
                                     height="100">
                             </div>
@@ -232,6 +250,9 @@
                                     Signature
                                 </label>
                                 <input type="file" name="signature" class="form-control">
+                                @error('signature')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                                 <img id="edit_signature_preview" src="" class="mt-2 border rounded"
                                     width="150" height="100">
                             </div>
@@ -273,4 +294,20 @@
             });
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addCompanyModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editCompanyModal')).show();
+            });
+        </script>
+    @endif
 @endpush

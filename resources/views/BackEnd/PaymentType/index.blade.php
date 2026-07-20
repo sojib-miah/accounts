@@ -36,15 +36,7 @@
                     @endcan
                 </div>
             </div>
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+
             <div class="card">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle">
@@ -123,7 +115,10 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label>Payment Type</label>
-                            <input type="text" name="name" class="form-control" required>
+                            <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Status</label>
@@ -135,6 +130,9 @@
                                     Inactive
                                 </option>
                             </select>
+                            @error('status')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -165,6 +163,9 @@
                         <div class="mb-3">
                             <label>Payment Type</label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label>Status</label>
@@ -176,6 +177,9 @@
                                     Inactive
                                 </option>
                             </select>
+                            @error('status')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -190,18 +194,34 @@
             </div>
         </div>
     </div>
-    @push('scripts')
+@endsection
+
+@push('scripts')
+    <script>
+        document.querySelectorAll('.editBtn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                document.getElementById('edit_name').value = this.dataset.name;
+                $('#edit_status').val(this.dataset.status).trigger('change');
+                document.getElementById('editForm').action = '/admin/payment-type/update/' + this.dataset
+                    .id;
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+        });
+    </script>
+
+    @if ($errors->add->any())
         <script>
-            document.querySelectorAll('.editBtn').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    document.getElementById('edit_name').value = this.dataset.name;
-                    // document.getElementById('edit_status').value = this.dataset.status;
-                    $('#edit_status').val(this.dataset.status).trigger('change');
-                    document.getElementById('editForm').action = '/admin/payment-type/update/' + this.dataset
-                        .id;
-                    new bootstrap.Modal(document.getElementById('editModal')).show();
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addModal')).show();
             });
         </script>
-    @endpush
-@endsection
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+        </script>
+    @endif
+@endpush

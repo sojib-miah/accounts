@@ -47,7 +47,7 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'name' => 'required|unique:roles,name'
         ]);
 
@@ -60,13 +60,12 @@ class RoleController extends Controller
             $request->permissions ?? []
         );
 
-        return redirect()->back()
-            ->with('success', 'Role Created Successfully');
+        return redirect()->back()->with('success', 'Role Created Successfully');
     }
 
     public function update(Request $request, Role $role)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'name' => 'required|unique:roles,name,' . $role->id
         ]);
 
@@ -78,15 +77,13 @@ class RoleController extends Controller
             $request->permissions ?? []
         );
 
-        return redirect()->back()
-            ->with('success', 'Role Updated Successfully');
+        return redirect()->back()->with('success', 'Role Updated Successfully');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
 
-        return redirect()->back()
-            ->with('success', 'Role Deleted Successfully');
+        return redirect()->back()->with('success', 'Role Deleted Successfully');
     }
 }

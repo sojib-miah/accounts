@@ -27,7 +27,7 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
@@ -44,7 +44,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $request->validate([
+        $request->validateWithBag('edit', [
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);

@@ -63,12 +63,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [UserController::class, 'changePassword'])->name('profile.password');
 
-    // contact route 
-    Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
-    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-    Route::put('/contact/{contact}', [ContactController::class, 'update'])->name('contact.update');
-    Route::delete('/contact/{contact}', [ContactController::class, 'destroy'])->name('contact.destroy');
-
     // company route 
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
     Route::post('/company/store', [CompanyController::class, 'store'])->name('company.store');
@@ -138,7 +132,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('party.due.payment');
 
     // income,sales or invoice route start 
-    // party routes income receiver route customer
+    // party routes income receiver route customer list
     Route::get('/receiver', [ReceiverController::class, 'index'])->name('receiver.index');
     Route::post('/receiver', [ReceiverController::class, 'store'])->name('receiver.store');
     Route::put('/receiver/{party}', [ReceiverController::class, 'update'])->name('receiver.update');

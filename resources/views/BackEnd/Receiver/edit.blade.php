@@ -19,6 +19,9 @@
                                 Customer Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- designation -->
                         <div class="col-md-6 mb-3">
@@ -26,6 +29,9 @@
                                 Designation
                             </label>
                             <input type="text" name="designation" id="edit_designation" class="form-control">
+                            @error('designation')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
@@ -33,6 +39,9 @@
                                 Phone
                             </label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
+                            @error('phone')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Email -->
                         <div class="col-md-6 mb-3">
@@ -40,6 +49,9 @@
                                 Email
                             </label>
                             <input type="email" name="email" id="edit_email" class="form-control">
+                            @error('email')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Status -->
                         <div class="col-md-6 mb-3">
@@ -50,6 +62,9 @@
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
+                            @error('status')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
@@ -57,6 +72,9 @@
                                 Address
                             </label>
                             <textarea name="address" id="edit_address" rows="3" class="form-control"></textarea>
+                            @error('address')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                 </div>
