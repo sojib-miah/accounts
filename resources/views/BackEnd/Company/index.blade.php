@@ -137,35 +137,35 @@
                         <div class="mb-3">
                             <label>Company Name</label>
                             <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
-                            @error('name')
+                            @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Logo</label>
                             <input type="file" name="logo" class="form-control">
-                            @error('logo')
+                            @error('logo', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Hologram</label>
                             <input type="file" name="hologram" class="form-control">
-                            @error('hologram')
+                            @error('hologram', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Seal</label>
                             <input type="file" name="seal" class="form-control">
-                            @error('seal')
+                            @error('seal', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Signature</label>
                             <input type="file" name="signature" class="form-control">
-                            @error('signature')
+                            @error('signature', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -204,7 +204,7 @@
                                     Company Name
                                 </label>
                                 <input type="text" name="name" id="edit_name" class="form-control" required>
-                                @error('name')
+                                @error('name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -214,7 +214,7 @@
                                     Logo
                                 </label>
                                 <input type="file" name="logo" class="form-control">
-                                @error('logo')
+                                @error('logo', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <img id="edit_logo_preview" src="" class="mt-2 border rounded" width="100"
@@ -226,7 +226,7 @@
                                     Hologram
                                 </label>
                                 <input type="file" name="hologram" class="form-control">
-                                @error('hologram')
+                                @error('hologram', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <img id="edit_hologram_preview" src="" class="mt-2 border rounded"
@@ -238,7 +238,7 @@
                                     Seal
                                 </label>
                                 <input type="file" name="seal" class="form-control">
-                                @error('seal')
+                                @error('seal', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <img id="edit_seal_preview" src="" class="mt-2 border rounded" width="100"
@@ -250,7 +250,7 @@
                                     Signature
                                 </label>
                                 <input type="file" name="signature" class="form-control">
-                                @error('signature')
+                                @error('signature', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <img id="edit_signature_preview" src="" class="mt-2 border rounded"

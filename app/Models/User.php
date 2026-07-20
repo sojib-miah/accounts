@@ -101,8 +101,8 @@ class User extends Authenticatable
         return $this->hasMany(Receipt::class);
     }
 
-    public function package()
+    public function companyPackage()
     {
-        return $this->hasOne(CompanyPackage::class)->latestOfMany();
+        return $this->hasOne(CompanyPackage::class);
     }
 }

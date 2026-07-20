@@ -25,6 +25,6 @@ class Company extends Model
 
     public function package()
     {
-        return $this->hasOne(CompanyPackage::class)->latestOfMany();
+        return $this->hasOne(CompanyPackage::class)->where('status', 'Active');
     }
 }

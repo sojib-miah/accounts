@@ -120,7 +120,7 @@
                                     </label>
                                     <input type="text" name="name" class="form-control" placeholder="Permission Name"
                                         value="{{ old('name') }}">
-                                    @error('name')
+                                    @error('name', 'add')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                     <div class="my-2">
@@ -201,7 +201,7 @@
                                         </label>
                                         <input type="text" name="name" value="{{ $permission->name }}"
                                             class="form-control">
-                                        @error('name')
+                                        @error('name', 'edit')
                                             <small class="text-danger">{{ $message }}</small>
                                         @enderror
                                     </div>

@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Receipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class BranchController extends Controller
 {
@@ -62,6 +63,22 @@ class BranchController extends Controller
             'email' => 'nullable|email',
             'address' => 'nullable'
         ]);
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $branchPackage = PackageHelper::package();
+
+            if (!$branchPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+
+            $limit = $branchPackage->package->branch_limit;
+
+            $totalBranch = Branch::where('company_id', Auth::user()->company_id)->count();
+
+            if ($limit != -1 && $totalBranch >= $limit) {
+                return back()->with('error', 'Your branch limit has been exceeded.');
+            }
+        }
 
         // Generate Branch ID
         $lastBranch = Branch::orderByDesc('branch_id')->first();

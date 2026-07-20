@@ -193,7 +193,7 @@
                                 </label>
                                 <input type="text" name="account_name" class="form-control"
                                     value="{{ old('account_name') }}" required>
-                                @error('account_name')
+                                @error('account_name', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -203,7 +203,7 @@
                                     Account Address
                                 </label>
                                 <input type="text" name="address" class="form-control" value="{{ old('address') }}">
-                                @error('address')
+                                @error('address', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -215,7 +215,7 @@
                                 </label>
                                 <input type="text" value="{{ old('account_holder_name') }}" name="account_holder_name"
                                     class="form-control" required>
-                                @error('account_holder_name')
+                                @error('account_holder_name', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -227,7 +227,7 @@
                                 </label>
                                 <input type="text" name="account_number" class="form-control"
                                     value="{{ old('account_number') }}" required>
-                                @error('account_number')
+                                @error('account_number', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -238,7 +238,7 @@
                                 </label>
                                 <input type="number" step="0.01" min="0" value="0"
                                     name="opening_balance" class="form-control">
-                                @error('opening_balance')
+                                @error('opening_balance', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -255,7 +255,7 @@
                                         Default
                                     </option>
                                 </select>
-                                @error('default_status')
+                                @error('default_status', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -272,7 +272,7 @@
                                         Inactive
                                     </option>
                                 </select>
-                                @error('status')
+                                @error('status', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -317,7 +317,7 @@
                                 </label>
                                 <input type="text" name="account_name" id="edit_account_name" class="form-control"
                                     required>
-                                @error('account_name')
+                                @error('account_name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -327,7 +327,7 @@
                                     Account Address
                                 </label>
                                 <input type="text" name="address" id="edit_address" class="form-control">
-                                @error('address')
+                                @error('address', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -339,7 +339,7 @@
                                 </label>
                                 <input type="text" name="account_holder_name" id="edit_account_holder_name"
                                     class="form-control" required>
-                                @error('account_holder_name')
+                                @error('account_holder_name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -351,7 +351,7 @@
                                 </label>
                                 <input type="text" name="account_number" id="edit_account_number"
                                     class="form-control" required>
-                                @error('account_number')
+                                @error('account_number', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -362,7 +362,7 @@
                                 </label>
                                 <input type="number" step="0.01" min="0" name="opening_balance"
                                     id="edit_opening_balance" class="form-control">
-                                @error('opening_balance')
+                                @error('opening_balance', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -379,7 +379,7 @@
                                         Not Default
                                     </option>
                                 </select>
-                                @error('default_status')
+                                @error('default_status', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -396,7 +396,7 @@
                                         Inactive
                                     </option>
                                 </select>
-                                @error('status')
+                                @error('status', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>

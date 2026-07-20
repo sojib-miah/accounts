@@ -165,7 +165,7 @@
                                 Role Name
                             </label>
                             <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
-                            @error('name')
+                            @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -243,7 +243,7 @@
                             <div class="mb-4">
                                 <label>Role Name</label>
                                 <input type="text" name="name" value="{{ $role->name }}" class="form-control">
-                                @error('name')
+                                @error('name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>

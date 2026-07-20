@@ -19,7 +19,7 @@
                                 Payee Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
-                            @error('name')
+                            @error('name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -29,7 +29,7 @@
                                 Designation
                             </label>
                             <input type="text" name="designation" id="edit_designation" class="form-control">
-                            @error('designation')
+                            @error('designation', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -39,7 +39,7 @@
                                 Phone
                             </label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
-                            @error('phone')
+                            @error('phone', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -49,7 +49,7 @@
                                 Email
                             </label>
                             <input type="email" name="email" id="edit_email" class="form-control">
-                            @error('email')
+                            @error('email', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -62,7 +62,7 @@
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
-                            @error('status')
+                            @error('status', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -72,7 +72,7 @@
                                 Address
                             </label>
                             <textarea name="address" id="edit_address" rows="3" class="form-control"></textarea>
-                            @error('address')
+                            @error('address', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

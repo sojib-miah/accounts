@@ -73,6 +73,13 @@
         <script src="{{ asset('/assets/js/config.js') }}"></script>
 
         @stack('styles')
+
+        <style>
+            .select2-container--default .select2-results__option--selected {
+                background-color: #393C64 !important;
+                color: #ddd !important;
+            }
+        </style>
     </head>
 
     <body>

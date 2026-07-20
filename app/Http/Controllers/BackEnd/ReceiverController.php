@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class ReceiverController extends Controller
 {
@@ -39,6 +40,22 @@ class ReceiverController extends Controller
             'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $companyPackage = PackageHelper::package();
+
+            if (!$companyPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+
+            $limit = $companyPackage->package->party_limit;
+
+            $current = Party::where('created_by', Auth::id())->count();
+
+            if ($limit != -1 && $current >= $limit) {
+                return back()->with('error', 'Your Customer Create limit has been exceeded.');
+            }
+        }
 
         // Generate Party ID
         $lastParty = Party::orderByDesc('party_id')->first();

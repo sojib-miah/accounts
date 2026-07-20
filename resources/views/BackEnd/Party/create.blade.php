@@ -19,7 +19,7 @@
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Payee Name"
                                 required value="{{ old('name') }}">
-                            @error('name')
+                            @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -30,7 +30,7 @@
                             </label>
                             <input type="text" name="designation" class="form-control"
                                 placeholder="Enter designation" value="{{ old('designation') }}">
-                            @error('designation')
+                            @error('designation', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -41,7 +41,7 @@
                             </label>
                             <input type="text" name="phone" class="form-control" placeholder="Enter Phone Number"
                                 value="{{ old('phone') }}">
-                            @error('phone')
+                            @error('phone', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -52,7 +52,7 @@
                             </label>
                             <input type="email" name="email" class="form-control" placeholder="Enter Email Address"
                                 value="{{ old('email') }}">
-                            @error('email')
+                            @error('email', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -69,7 +69,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -79,7 +79,7 @@
                                 Address
                             </label>
                             <textarea name="address" class="form-control" rows="3" placeholder="Enter Address">{{ old('address') }}</textarea>
-                            @error('address')
+                            @error('address', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

@@ -184,18 +184,3 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     // package route 
     Route::resource('package', PackageController::class);
 });
-
-
-
-// $package = CompanyPackage::where('company_id', auth()->user()->company_id)
-//     ->first();
-
-// $limit = $package->package->user_limit;
-
-// $current = User::where('company_id', auth()->user()->company_id)
-//     ->count();
-
-// if ($limit != -1 && $current >= $limit) {
-
-//     return back()->with('error', 'User limit exceeded.');
-// }

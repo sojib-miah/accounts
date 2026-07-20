@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Models\CompanyPackage;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,7 +18,11 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')->with('company')->when($request->filled('search'), function ($query) use ($request) {
+        $users = User::with([
+            'roles',
+            'company',
+            'companyPackage.package'
+        ])->when($request->filled('search'), function ($query) use ($request) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -42,6 +47,7 @@ class UserController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role'     => 'required',
+            'package_id' => 'required|exists:packages,id'
         ]);
 
         DB::beginTransaction();
@@ -73,6 +79,15 @@ class UserController extends Controller
                 'created_by' => Auth::id(),
             ]);
 
+            CompanyPackage::create([
+                'company_id' => $company->id,
+                'user_id' => $user->id,
+                'package_id' => $request->package_id,
+                'start_date' => today(),
+                'expire_date' => today()->addYear(),
+                'status' => 'Active',
+            ]);
+
             $user->assignRole($request->role);
             DB::commit();
             return back()->with('success', 'User Created Successfully');
@@ -85,26 +100,55 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validateWithBag('edit', [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required'
+            'name'       => 'required',
+            'email'      => 'required|email|unique:users,email,' . $user->id,
+            'role'       => 'required',
+            'package_id' => 'required|exists:packages,id',
         ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email
-        ]);
-
-        $user->syncRoles([$request->role]);
-
-        return back()->with('success', 'User Updated Successfully');
+        DB::beginTransaction();
+        try {
+            $user->update([
+                'name'  => $request->name,
+                'email' => $request->email,
+            ]);
+            $user->syncRoles([$request->role]);
+            CompanyPackage::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                ],
+                [
+                    'company_id' => $user->company_id,
+                    'package_id' => $request->package_id,
+                    'start_date' => now(),
+                    'expire_date' => now()->addYear(),
+                    'status' => 'Active',
+                ]
+            );
+            DB::commit();
+            return back()->with('success', 'User Updated Successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function destroy(User $user)
     {
-        $user->delete();
-
-        return back()->with('success', 'User Deleted Successfully');
+        DB::beginTransaction();
+        try {
+            CompanyPackage::where('user_id', $user->id)->delete();
+            $companyId = $user->company_id;
+            $branchId  = $user->branch_id;
+            $user->syncRoles([]);
+            $user->delete();
+            Branch::where('id', $branchId)->delete();
+            Company::where('id', $companyId)->delete();
+            DB::commit();
+            return back()->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     // update profile 

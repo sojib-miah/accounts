@@ -27,7 +27,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('category_id')
+                            @error('category_id', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -38,7 +38,7 @@
                             </label>
                             <input type="text" name="name" class="form-control" placeholder="Enter Expense Name"
                                 required value="{{ old('name') }}">
-                            @error('name')
+                            @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -55,7 +55,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

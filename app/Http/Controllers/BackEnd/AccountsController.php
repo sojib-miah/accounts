@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PackageHelper;
 
 class AccountsController extends Controller
 {
@@ -43,6 +44,22 @@ class AccountsController extends Controller
             'default_status'      => 'required|in:Default,Not Default',
             'status'              => 'required|in:Active,Inactive',
         ]);
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $companyPackage = PackageHelper::package();
+
+            if (!$companyPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+
+            $limit = $companyPackage->package->account_limit;
+
+            $current = Account::where('created_by', Auth::id())->count();
+
+            if ($limit != -1 && $current >= $limit) {
+                return back()->with('error', 'Your Account Create limit has been exceeded.');
+            }
+        }
         DB::beginTransaction();
         try {
             if (!Account::where('default_status', 'Default')->exists()) {

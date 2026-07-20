@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PackageHelper;
 
 class ChallanController extends Controller
 {
@@ -74,12 +75,30 @@ class ChallanController extends Controller
     {
         $request->validate([
             'type' => 'required|in:Income,Expense',
-            // 'company_id' => 'required|exists:companies,id',
+            'company_id' => 'nullable',
             'branch_id' => 'required|exists:branches,id',
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
             'items' => 'required',
         ]);
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $companyPackage = PackageHelper::package();
+
+            if (!$companyPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+
+            $limit = $companyPackage->package->challan_limit;
+
+            $current = Receipt::where('company_id', Auth::user()->company_id)
+                ->where('type', 'Income')
+                ->count();
+
+            if ($limit != -1 && $current >= $limit) {
+                return back()->with('error', 'Your Challan limit has been exceeded.');
+            }
+        }
         DB::beginTransaction();
         try {
             $items = json_decode($request->items, true);

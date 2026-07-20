@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PackageHelper;
 
 class CompanyUserController extends Controller
 {
@@ -71,7 +72,21 @@ class CompanyUserController extends Controller
             'phone' => 'required|max:30',
             'company_id' => 'required|exists:companies,id',
             'branch_id' => 'required|exists:branches,id',
+            'password' => 'required|min:6'
         ]);
+
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $companyPackage = PackageHelper::package();
+            if (!$companyPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+            $limit = $companyPackage->package->user_limit;
+
+            $current = User::where('company_id', Auth::user()->company_id)->count();
+            if ($limit != -1 && $current >= $limit) {
+                return back()->with('error', 'Your company limit has been exceeded.');
+            }
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -95,6 +110,7 @@ class CompanyUserController extends Controller
             'phone' => 'required|max:30',
             'company_id' => 'required|exists:companies,id',
             'branch_id' => 'required|exists:branches,id',
+            'password' => 'required|min:6'
         ]);
 
         $user->update([

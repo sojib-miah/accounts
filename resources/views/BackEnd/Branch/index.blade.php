@@ -118,7 +118,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('company_id')
+                                @error('company_id', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -126,7 +126,7 @@
                                 <label>Branch Name</label>
                                 <input type="text" name="name" value="{{ old('name') }}" class="form-control"
                                     required>
-                                @error('name')
+                                @error('name', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -134,28 +134,28 @@
                                 <label>Phone One</label>
                                 <input type="text" name="phone_one" value="{{ old('phone_one') }}" class="form-control"
                                     required>
-                                @error('phone_one')
+                                @error('phone_one', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Phone Two</label>
                                 <input type="text" name="phone_two" value="{{ old('phone_two') }}" class="form-control">
-                                @error('phone_two')
+                                @error('phone_two', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Email</label>
                                 <input type="email" name="email" class="form-control" value="{{ old('email') }}">
-                                @error('email')
+                                @error('email', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label>Address</label>
                                 <textarea name="address" class="form-control" rows="3">{{ old('address') }}</textarea>
-                                @error('address')
+                                @error('address', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -197,14 +197,14 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('company_id')
+                                @error('company_id', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Branch Name <span class="text-danger">*</span></label>
                                 <input type="text" name="name" id="edit_name" class="form-control" required>
-                                @error('name')
+                                @error('name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -212,28 +212,28 @@
                                 <label class="form-label">Phone One <span class="text-danger">*</span></label>
                                 <input type="text" name="phone_one" id="edit_phone_one" class="form-control"
                                     required>
-                                @error('phone_one')
+                                @error('phone_one', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone Two</label>
                                 <input type="text" name="phone_two" id="edit_phone_two" class="form-control">
-                                @error('phone_two')
+                                @error('phone_two', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" id="edit_email" class="form-control">
-                                @error('email')
+                                @error('email', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" id="edit_address" class="form-control" rows="3"></textarea>
-                                @error('address')
+                                @error('address', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>

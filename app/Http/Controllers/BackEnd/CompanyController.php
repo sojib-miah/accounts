@@ -7,6 +7,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use PackageHelper;
 
 class CompanyController extends Controller
 {
@@ -32,12 +33,26 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'name' => 'required|max:255|unique:companies,name',
+            'name' => 'required|max:255',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $companyPackage = PackageHelper::package();
+            if (!$companyPackage) {
+                return back()->with('error', 'No active package assigned.');
+            }
+            $limit = $companyPackage->package->company_limit;
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+            if ($limit != -1 && $totalCompany >= $limit) {
+                return back()->with('error', 'Your company limit has been exceeded.');
+            }
+        }
         $company = new Company();
         $company->name = $request->name;
         $company->created_by = Auth::id();
@@ -72,7 +87,7 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company)
     {
         $request->validateWithBag('edit', [
-            'name' => 'required|max:255|unique:companies,name,' . $company->id,
+            'name' => 'required|max:255',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

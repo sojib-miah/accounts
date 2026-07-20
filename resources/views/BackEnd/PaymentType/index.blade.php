@@ -116,7 +116,7 @@
                         <div class="mb-3">
                             <label>Payment Type</label>
                             <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
-                            @error('name')
+                            @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -130,7 +130,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -163,7 +163,7 @@
                         <div class="mb-3">
                             <label>Payment Type</label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
-                            @error('name')
+                            @error('name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -177,7 +177,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

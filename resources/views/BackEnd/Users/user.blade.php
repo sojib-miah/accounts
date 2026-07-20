@@ -94,6 +94,7 @@
                                 <th>Phone No</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Package</th>
                                 <th>Created</th>
                                 <th width="180">Action</th>
                             </tr>
@@ -122,6 +123,17 @@
                                                 {{ $role->name }}
                                             </span>
                                         @endforeach
+                                    </td>
+                                    <td>
+                                        @if ($user->companyPackage)
+                                            <span class="badge bg-primary">
+                                                {{ $user->companyPackage->package->name }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger">
+                                                No Package
+                                            </span>
+                                        @endif
                                     </td>
                                     <td>{{ $user->created_at->format('d M Y') }}</td>
                                     <td>
@@ -172,7 +184,7 @@
                                 <label class="form-label">Name</label>
                                 <input type="text" name="name" class="form-control" value="{{ old('name') }}"
                                     required>
-                                @error('name')
+                                @error('name', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -180,14 +192,14 @@
                                 <label class="form-label">Email</label>
                                 <input type="email" name="email" class="form-control" required
                                     value="{{ old('email') }}">
-                                @error('email')
+                                @error('email', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Password</label>
                                 <input type="password" name="password" class="form-control" required>
-                                @error('password')
+                                @error('password', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -203,7 +215,22 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('role')
+                                @error('role', 'add')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label>Package</label>
+                                <select name="package_id" class="form-select select2" required>
+                                    <option value="">Select Package</option>
+                                    @foreach ($packages as $package)
+                                        <option value="{{ $package->id }}">
+                                            {{ $package->name }}
+                                            ({{ number_format($package->price, 2) }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('package_id', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -226,7 +253,7 @@
     {{-- edit modal  --}}
     @foreach ($users as $user)
         <div class="modal fade" id="editUser{{ $user->id }}" tabindex="-1">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <form action="{{ route('users.update', $user->id) }}" method="POST">
                         @csrf
@@ -237,38 +264,60 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="mb-3">
-                                <label>Name</label>
-                                <input type="text" name="name" value="{{ $user->name }}" class="form-control">
-                                @error('name')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label>Email</label>
-                                <input type="email" name="email" value="{{ $user->email }}" class="form-control">
-                                @error('email')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label>Role</label>
-                                <select name="role" class="form-select select2">
-                                    <option value="">
-                                        Select Role
-                                    </option>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->name }}"
-                                            {{ $user->hasRole($role->name) ? 'selected' : '' }}>
-                                            {{ $role->name }}
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label>Name</label>
+                                    <input type="text" name="name" value="{{ $user->name }}"
+                                        class="form-control">
+                                    @error('name', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label>Email</label>
+                                    <input type="email" name="email" value="{{ $user->email }}"
+                                        class="form-control">
+                                    @error('email', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label>Role</label>
+                                    <select name="role" class="form-select select2">
+                                        <option value="">
+                                            Select Role
                                         </option>
-                                    @endforeach
-                                </select>
-                                @error('role')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->name }}"
+                                                {{ $user->hasRole($role->name) ? 'selected' : '' }}>
+                                                {{ $role->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('role', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label>Package</label>
+                                    <select name="package_id" class="form-select select2" required>
+                                        <option value="">Select Package</option>
+                                        @foreach ($packages as $package)
+                                            <option value="{{ $package->id }}"
+                                                {{ optional($user->companyPackage)->package_id == $package->id ? 'selected' : '' }}>
+                                                {{ $package->name }}
+                                                ({{ number_format($package->price, 2) }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('package_id', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
+                        <hr>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">
                                 Update User

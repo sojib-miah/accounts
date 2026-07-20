@@ -214,9 +214,8 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- ========================= --}}
+
                         {{-- Right Sidebar --}}
-                        {{-- ========================= --}}
                         <div class="col-lg-3">
                             <div class="card shadow-sm">
                                 <div class="card-header">

@@ -279,6 +279,7 @@
         </div>
     </div>
 @endsection
+
 @push('scripts')
     <script>
         let rowNo = 1;

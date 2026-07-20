@@ -19,7 +19,7 @@
                                 Category Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
-                            @error('name')
+                            @error('name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -32,7 +32,7 @@
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
-                            @error('status')
+                            @error('status', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
