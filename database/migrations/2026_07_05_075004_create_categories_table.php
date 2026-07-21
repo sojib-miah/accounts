@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->enum('type', ['Income', 'Expense']);
             $table->enum('status', ['Active', 'Inactive'])->default('Active');

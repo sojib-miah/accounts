@@ -12,12 +12,12 @@
                     <tr>
                     <td class="sl">${rowNo}</td>
                     <td><select class="form-select category select2">${options}</select></td>
-                    <td>
+                    <td class="custome">
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
                     <td><input type="number" class="form-control qty" value="1" min="1"></td>
                     <td><input type="number" class="form-control rate" value="0" min="0"></td>
-                    <td><input type="number" class="form-control total" readonly></td>
+                    <td><input type="text" class="form-control total" readonly></td>
                     <td><input type="text" class="form-control details"></td>
                     <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
                     </tr>

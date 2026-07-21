@@ -55,6 +55,13 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
 
     // user route 
     Route::resource('users', UserController::class);
+
+    // soft delete route
+    Route::get('/deleted-users', [UserController::class, 'deleted'])->name('users.deleted');
+    Route::put('/deleted-users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+    Route::delete('/deleted-users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
+
+    // setting route
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 

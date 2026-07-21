@@ -137,23 +137,25 @@
                                     </td>
                                     <td>{{ $user->created_at->format('d M Y') }}</td>
                                     <td>
-                                        @can('user-edit')
-                                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#editUser{{ $user->id }}">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                        @endcan
-                                        @can('user-delete')
-                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('Delete User?')">
-                                                    <i class="fa fa-trash"></i>
+                                        @if (!$user->hasRole('Super-Admin'))
+                                            @can('user-edit')
+                                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                    data-bs-target="#editUser{{ $user->id }}">
+                                                    <i class="fa fa-edit"></i>
                                                 </button>
-                                            </form>
-                                        @endcan
+                                            @endcan
+                                            @can('user-delete')
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Delete User?')">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -181,7 +183,7 @@
                         @csrf
                         <div class="row mb-4">
                             <div class="col-md-6 mb-4">
-                                <label class="form-label">Name</label>
+                                <label class="form-label">User Name</label>
                                 <input type="text" name="name" class="form-control" value="{{ old('name') }}"
                                     required>
                                 @error('name', 'add')
@@ -189,7 +191,23 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-4">
-                                <label class="form-label">Email</label>
+                                <label class="form-label">Company Name</label>
+                                <input type="text" name="company_name" class="form-control"
+                                    value="{{ old('company_name') }}" required>
+                                @error('company_name', 'add')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Branch Name</label>
+                                <input type="text" name="branch_name" class="form-control"
+                                    value="{{ old('branch_name') }}" required>
+                                @error('branch_name', 'add')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">User Email</label>
                                 <input type="email" name="email" class="form-control" required
                                     value="{{ old('email') }}">
                                 @error('email', 'add')
@@ -220,7 +238,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-4">
-                                <label>Package</label>
+                                <label class="form-label">Package</label>
                                 <select name="package_id" class="form-select select2" required>
                                     <option value="">Select Package</option>
                                     @foreach ($packages as $package)
@@ -266,15 +284,31 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="mb-3 col-md-6">
-                                    <label>Name</label>
+                                    <label>User Name</label>
                                     <input type="text" name="name" value="{{ $user->name }}"
                                         class="form-control">
                                     @error('name', 'edit')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label">Company Name</label>
+                                    <input type="text" name="company_name" class="form-control"
+                                        value="{{ $user->company->name ?? '' }}" required>
+                                    @error('company_name', 'add')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label">Branch Name</label>
+                                    <input type="text" name="branch_name" class="form-control"
+                                        value="{{ $user->branch->name ?? '' }}" required>
+                                    @error('branch_name', 'add')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
                                 <div class="mb-3 col-md-6">
-                                    <label>Email</label>
+                                    <label class="form-label">User Email</label>
                                     <input type="email" name="email" value="{{ $user->email }}"
                                         class="form-control">
                                     @error('email', 'edit')
@@ -282,7 +316,7 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3 col-md-6">
-                                    <label>Role</label>
+                                    <label class="form-label">Role</label>
                                     <select name="role" class="form-select select2">
                                         <option value="">
                                             Select Role
@@ -300,7 +334,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-4">
-                                    <label>Package</label>
+                                    <label class="form-label">Package</label>
                                     <select name="package_id" class="form-select select2" required>
                                         <option value="">Select Package</option>
                                         @foreach ($packages as $package)

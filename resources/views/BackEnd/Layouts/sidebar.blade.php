@@ -201,6 +201,13 @@
                             </a>
                         </li>
                     @endcan
+                    @can('user-list')
+                        <li class="menu-item {{ request()->routeIs('users.deleted') ? 'active' : '' }}">
+                            <a href="{{ route('users.deleted') }}" class="menu-link">
+                                <div data-i18n="Deleted User">Deleted User</div>
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
             </li>
         @endcan

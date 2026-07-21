@@ -61,25 +61,28 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->creator->name ?? '-' }}</td>
                                     <td class="text-center">
-                                        @can('company-user-edit')
-                                            <button type="button" class="btn btn-sm btn-warning editBtn"
-                                                data-id="{{ $user->id }}" data-name="{{ $user->name }}"
-                                                data-email="{{ $user->email }}" data-phone="{{ $user->phone }}"
-                                                data-company="{{ $user->company_id }}" data-branch="{{ $user->branch_id }}">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                        @endcan
-                                        @can('company-user-delete')
-                                            <form action="{{ route('user.destroy', $user->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('Are you sure you want to delete this user?')">
-                                                    <i class="fa fa-trash"></i>
+                                        @if (!$user->hasRole('Super-Admin'))
+                                            @can('company-user-edit')
+                                                <button type="button" class="btn btn-sm btn-warning editBtn"
+                                                    data-id="{{ $user->id }}" data-name="{{ $user->name }}"
+                                                    data-email="{{ $user->email }}" data-phone="{{ $user->phone }}"
+                                                    data-company="{{ $user->company_id }}"
+                                                    data-branch="{{ $user->branch_id }}">
+                                                    <i class="fa fa-edit"></i>
                                                 </button>
-                                            </form>
-                                        @endcan
+                                            @endcan
+                                            @can('company-user-delete')
+                                                <form action="{{ route('user.destroy', $user->id) }}" method="POST"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this user?')">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

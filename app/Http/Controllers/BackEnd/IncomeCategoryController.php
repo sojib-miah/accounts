@@ -32,6 +32,7 @@ class IncomeCategoryController extends Controller
         ]);
 
         Category::create([
+            'company_id' => auth()->user()->company_id,
             'name'        => $request->name,
             'type'        => 'Income',
             'status'      => $request->status,

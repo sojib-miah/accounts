@@ -85,7 +85,7 @@ class BranchController extends Controller
 
         $branchId = $lastBranch ? ((int) $lastBranch->branch_id + 1) : 10001;
 
-        Branch::create([
+        $branch = Branch::create([
             'company_id' => $request->company_id,
             'branch_id' => $branchId,
             'name' => $request->name,
@@ -95,6 +95,13 @@ class BranchController extends Controller
             'address' => $request->address,
             'created_by' => Auth::id(),
         ]);
+        $user = Auth::user();
+
+        if (is_null($user->branch_id)) {
+            $user->update([
+                'branch_id' => $branch->id,
+            ]);
+        }
 
         return redirect()->route('branch.index')->with('success', 'Branch Created Successfully');
     }

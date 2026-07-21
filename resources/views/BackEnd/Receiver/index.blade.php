@@ -51,7 +51,7 @@
                                     {{-- <th>Type</th> --}}
                                     <th>Status</th>
                                     <th>Created By</th>
-                                    <th width="150">Action</th>
+                                    <th width="160">Action</th>
                                 </tr>
                             </thead>
                             <tbody>

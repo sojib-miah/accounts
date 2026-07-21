@@ -50,7 +50,7 @@ class PartyController extends Controller
 
             $limit = $companyPackage->package->party_limit;
 
-            $current = Party::where('created_by', Auth::id())->count();
+            $current = Party::where('created_by', Auth::id())->where('type', 'Expense')->count();
 
             if ($limit != -1 && $current >= $limit) {
                 return back()->with('error', 'Your Payee Create limit has been exceeded.');
@@ -63,6 +63,7 @@ class PartyController extends Controller
         $partyId = $lastParty ? ((int) $lastParty->party_id + 1) : 10001;
 
         Party::create([
+            'company_id' => auth()->user()->company_id,
             'party_id'   => $partyId,
             'name'       => $request->name,
             'designation'       => $request->designation,

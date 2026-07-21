@@ -13,27 +13,17 @@ return new class extends Migration
     {
         Schema::create('account_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('account_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->date('transaction_date');
             $table->string('voucher_no');
-            $table->enum('transaction_type', [
-                'Income',
-                'Expense',
-            ]);
+            $table->enum('transaction_type', ['Income', 'Expense',]);
             $table->text('purpose')->nullable();
             $table->decimal('credit', 15, 2)->default(0);
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('balance', 15, 2);
-            $table->foreignId('receipt_id')
-                ->nullable()
-                ->constrained('receipts')
-                ->nullOnDelete();
-            $table->foreignId('created_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->foreignId('receipt_id')->nullable()->constrained('receipts')->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

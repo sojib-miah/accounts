@@ -44,6 +44,8 @@ class UserController extends Controller
     {
         $request->validateWithBag('add', [
             'name'     => 'required',
+            'company_name'     => 'required',
+            'branch_name'     => 'required',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role'     => 'required',
@@ -55,7 +57,7 @@ class UserController extends Controller
         try {
 
             $company = Company::create([
-                'name'       => $request->name,
+                'name'       => $request->company_name,
                 'created_by' => Auth::id(),
             ]);
 
@@ -65,8 +67,7 @@ class UserController extends Controller
             $branch = Branch::create([
                 'company_id' => $company->id,
                 'branch_id'  => $branchId,
-                'name'       => $request->name,
-                'phone_one'  => '01',
+                'name'       => $request->branch_name,
                 'created_by' => Auth::id(),
             ]);
 
@@ -101,12 +102,21 @@ class UserController extends Controller
     {
         $request->validateWithBag('edit', [
             'name'       => 'required',
+            'company_name'     => 'required',
+            'branch_name'     => 'required',
             'email'      => 'required|email|unique:users,email,' . $user->id,
             'role'       => 'required',
             'package_id' => 'required|exists:packages,id',
         ]);
         DB::beginTransaction();
         try {
+            $user->company->update([
+                'name' => $request->company_name,
+            ]);
+
+            $user->branch->update([
+                'name' => $request->branch_name,
+            ]);
             $user->update([
                 'name'  => $request->name,
                 'email' => $request->email,
@@ -136,13 +146,9 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            CompanyPackage::where('user_id', $user->id)->delete();
-            $companyId = $user->company_id;
-            $branchId  = $user->branch_id;
-            $user->syncRoles([]);
+            // $user->syncRoles([]);
             $user->delete();
-            Branch::where('id', $branchId)->delete();
-            Company::where('id', $companyId)->delete();
+            CompanyPackage::where('user_id', $user->id)->update(['status' => 'Cancelled',]);
             DB::commit();
             return back()->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
@@ -232,5 +238,34 @@ class UserController extends Controller
             'success',
             'Password Changed Successfully'
         );
+    }
+
+    // soft delete method 
+    public function deleted()
+    {
+        $users = User::onlyTrashed()->with(['company', 'branch'])->latest('deleted_at')->paginate(20);
+        return view('BackEnd.Users.deleted', compact('users'));
+    }
+
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return back()->with('success', 'User restored successfully.');
+    }
+
+    public function forceDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::onlyTrashed()->findOrFail($id);
+            CompanyPackage::where('user_id', $user->id)->delete();
+            $user->forceDelete();
+            DB::commit();
+            return back()->with('success', 'User permanently deleted.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

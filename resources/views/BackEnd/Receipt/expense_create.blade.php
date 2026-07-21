@@ -138,7 +138,7 @@
                                                     <th width="120">
                                                         Qty
                                                     </th>
-                                                    <th width="120">
+                                                    <th width="130">
                                                         Unit Price
                                                     </th>
                                                     <th width="130">

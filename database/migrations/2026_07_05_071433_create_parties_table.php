@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('party_id')->unique();
             $table->string('name');
             $table->string('designation')->nullable();

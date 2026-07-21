@@ -236,8 +236,8 @@
                                 <label class="form-label">
                                     Opening Balance
                                 </label>
-                                <input type="number" step="0.01" min="0" value="0"
-                                    name="opening_balance" class="form-control">
+                                <input type="number" step="0.01" min="0" name="opening_balance"
+                                    class="form-control">
                                 @error('opening_balance', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror

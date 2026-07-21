@@ -252,7 +252,7 @@
                     <tr>
                     <td class="sl">${rowNo}</td>
                     <td><select class="form-select category select2">${options}</select></td>
-                    <td>
+                    <td class="custome">
                     <select class="form-select account select2"><option value="">Select Item</option></select>
                     </td>
                     <td><input type="number" class="form-control qty" value="1" min="1"></td>

@@ -235,29 +235,8 @@
                 </div>
             </div>
         </div>
-        <!-- =============================================== -->
         <!-- Financial Analytics -->
-        <!-- =============================================== -->
         <div class="row mt-4">
-            <!-- Income vs Expense -->
-            {{-- <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold mb-0">
-                                Monthly Income vs Expense
-                            </h5>
-                            <span class="badge bg-primary">
-                                Last 12 Months
-                            </span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="incomeExpenseChart" height="110"></canvas>
-                    </div>
-                </div>
-            </div> --}}
-            <!-- Financial Summary -->
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-header">
@@ -417,148 +396,7 @@
                 </div>
             </div>
         </div>
-        <!-- =============================================== -->
-        <!-- Profit Trend -->
-        <!-- =============================================== -->
-        <div class="row mt-4">
-            {{-- <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header">
-                        <h5 class="fw-bold mb-0">
-                            Monthly Profit Trend
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="profitChart" height="95"></canvas>
-                    </div>
-                </div>
-            </div> --}}
-
-        </div>
-        <!-- ====================================================== -->
-        <!-- Cash Flow -->
-        <!-- ====================================================== -->
-        {{-- <div class="row mt-4">
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold mb-0">
-                                Cash Flow (Last 30 Days)
-                            </h5>
-                            <span class="badge bg-success">
-                                Daily
-                            </span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="cashFlowChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header">
-                        <h5 class="fw-bold mb-0">
-                            Payment Status
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-borderless">
-                            <tr>
-                                <td>
-                                    Paid
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge bg-success">
-                                        {{ $paymentSummary['paid'] }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Partial
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge bg-warning text-dark">
-                                        {{ $paymentSummary['partial'] }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Pending
-                                </td>
-                                <td class="text-end">
-                                    <span class="badge bg-danger">
-                                        {{ $paymentSummary['pending'] }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                        <hr>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td>
-                                    Completed
-                                </td>
-                                <td class="text-end">
-                                    {{ $receiptSummary['completed'] }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Draft
-                                </td>
-                                <td class="text-end">
-                                    {{ $receiptSummary['draft'] }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Cancelled
-                                </td>
-                                <td class="text-end">
-                                    {{ $receiptSummary['cancelled'] }}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-        <!-- ====================================================== -->
-        <!-- Category Analysis -->
-        <!-- ====================================================== -->
-        {{-- <div class="row mt-4">
-            <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header">
-                        <h5 class="fw-bold mb-0">
-                            Expense Category
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="expenseCategoryChart" height="230"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header">
-                        <h5 class="fw-bold mb-0">
-                            Income Category
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="incomeCategoryChart" height="230"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-        <!-- ====================================================== -->
         <!-- Top Analytics -->
-        <!-- ====================================================== -->
         <div class="row mt-4">
             <!-- ================= Top Customers ================= -->
             <div class="col-lg-6">
@@ -643,9 +481,7 @@
                 </div>
             </div>
         </div>
-        <!-- ====================================================== -->
         <!-- Top Receipts -->
-        <!-- ====================================================== -->
         <div class="row mt-4">
             <!-- Income -->
             <div class="col-lg-6">
@@ -728,20 +564,15 @@
                 </div>
             </div>
         </div>
-        <!-- ====================================================== -->
         <!-- Activity Center -->
-        <!-- ====================================================== -->
         <div class="row mt-4">
             <!-- ================= Recent Receipts ================= -->
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Recent Receipts
                         </h5>
-                        <a href="{{ route('receipt.expense.index') }}" class="btn btn-sm btn-primary">
-                            View All
-                        </a>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-hover mb-0">
@@ -876,9 +707,7 @@
                 </div>
             </div>
         </div>
-        <!-- ====================================================== -->
         <!-- Quick Actions -->
-        <!-- ====================================================== -->
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header">
                 <h5 class="fw-bold mb-0">

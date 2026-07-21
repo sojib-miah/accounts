@@ -79,6 +79,10 @@
                 background-color: #393C64 !important;
                 color: #ddd !important;
             }
+
+            .custome .select2-container--default {
+                width: 180px !important;
+            }
         </style>
     </head>
 

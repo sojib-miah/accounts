@@ -60,8 +60,9 @@ class ReceiptController extends Controller
 
     public function expenseCreate()
     {
-        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('created_by', Auth::id())
+                ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
         $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
@@ -190,12 +191,16 @@ class ReceiptController extends Controller
             'items.category',
             'items.accountHead'
         ]);
-
-        $branches = Branch::latest()->get();
-
-        $parties = Party::where('type', 'Expense')->where('status', 'Active')->get();
-
-        $categories = Category::where('type', 'Expense')->where('status', 'Active')->get();
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('created_by', Auth::id())
+                ->orWhere('id', Auth::user()->branch_id);
+        })->latest()->get();
+        $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+        $categories = Category::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
         $receiptItems = $receipt->items->map(function ($item) {
 
@@ -388,6 +393,7 @@ class ReceiptController extends Controller
             }
             $account->save();
             AccountTransaction::create([
+                'company_id' => auth()->user()->company_id,
                 'account_id'       => $account->id,
                 'transaction_date' => $request->payment_date,
                 'voucher_no'       => $receipt->receipt_no,

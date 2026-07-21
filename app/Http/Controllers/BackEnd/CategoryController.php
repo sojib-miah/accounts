@@ -33,6 +33,7 @@ class CategoryController extends Controller
         ]);
 
         Category::create([
+            'company_id' => auth()->user()->company_id,
             'name'        => $request->name,
             'type'        => 'Expense',
             'status'      => $request->status,

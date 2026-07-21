@@ -37,7 +37,7 @@ class AccountsController extends Controller
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'account_name'        => 'required|string|max:255|unique:accounts,account_name',
+            'account_name'        => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
             'account_number'      => 'required|string|max:255|unique:accounts,account_number',
             'opening_balance'     => 'required|numeric|min:0',
@@ -45,17 +45,12 @@ class AccountsController extends Controller
             'status'              => 'required|in:Active,Inactive',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             $companyPackage = PackageHelper::package();
-
             if (!$companyPackage) {
                 return back()->with('error', 'No active package assigned.');
             }
-
             $limit = $companyPackage->package->account_limit;
-
             $current = Account::where('created_by', Auth::id())->count();
-
             if ($limit != -1 && $current >= $limit) {
                 return back()->with('error', 'Your Account Create limit has been exceeded.');
             }
@@ -72,6 +67,7 @@ class AccountsController extends Controller
                     ]);
             }
             Account::create([
+                'company_id' => auth()->user()->company_id,
                 'account_name'        => $request->account_name,
                 'address'        => $request->address,
                 'account_holder_name' => $request->account_holder_name,
@@ -121,7 +117,7 @@ class AccountsController extends Controller
     public function update(Request $request, Account $account)
     {
         $request->validateWithBag('edit', [
-            'account_name'        => 'required|max:255|unique:accounts,account_name,' . $account->id,
+            'account_name'        => 'required|max:255',
             'account_holder_name' => 'required|max:255',
             'account_number'      => 'required|max:255|unique:accounts,account_number,' . $account->id,
             'opening_balance'     => 'required|numeric|min:0',

@@ -19,16 +19,16 @@ if (!function_exists('numberToWords')) {
 
 class PackageHelper
 {
-    protected static $package = null;
     public static function package()
     {
-        if (self::$package === null) {
-            self::$package = CompanyPackage::with('package')
-                ->where('company_id', Auth::user()->company_id)
-                ->where('status', 'Active')
-                ->first();
-        }
+        $user = Auth::user();
 
-        return self::$package;
+        return CompanyPackage::with('package')
+            ->where(function ($query) use ($user) {
+                $query->where('company_id', $user->company_id)
+                    ->orWhere('user_id', $user->id);
+            })
+            ->where('status', 'Active')
+            ->first();
     }
 }

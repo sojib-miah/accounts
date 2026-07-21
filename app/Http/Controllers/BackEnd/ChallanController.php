@@ -49,8 +49,9 @@ class ChallanController extends Controller
 
     public function createChallan()
     {
-        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('created_by', Auth::id())
+                ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
         $parties = Party::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
@@ -82,18 +83,12 @@ class ChallanController extends Controller
             'items' => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             $companyPackage = PackageHelper::package();
-
             if (!$companyPackage) {
                 return back()->with('error', 'No active package assigned.');
             }
-
             $limit = $companyPackage->package->challan_limit;
-
-            $current = Receipt::where('company_id', Auth::user()->company_id)
-                ->where('type', 'Income')
-                ->count();
+            $current = Receipt::where('company_id', Auth::user()->company_id)->where('type', 'Income')->count();
 
             if ($limit != -1 && $current >= $limit) {
                 return back()->with('error', 'Your Challan limit has been exceeded.');
@@ -180,9 +175,17 @@ class ChallanController extends Controller
             'items.category',
             'items.accountHead'
         ]);
-        $branches = Branch::latest()->get();
-        $parties = Party::where('type', 'Income')->where('status', 'Active')->get();
-        $categories = Category::where('type', 'Income')->where('status', 'Active')->get();
+        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('created_by', Auth::id())
+                ->orWhere('id', Auth::user()->branch_id);
+        })->latest()->get();
+        $parties = Party::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+
+        $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
         $receiptItems = $receipt->items->map(function ($item) {
             return [
                 'category_id'       => $item->category_id,

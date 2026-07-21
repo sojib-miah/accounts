@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\CompanyPackage;
+use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,11 +32,23 @@ class AdminAuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
+        $trialPackage = Package::where('name', 'Trial')->where('is_active', true)->first();
+        if ($trialPackage) {
+            CompanyPackage::create([
+                'company_id' => $request->company_id,
+                'user_id'    => $user->id,
+                'package_id' => $trialPackage->id,
+                'start_date' => now(),
+                'expire_date' => now()->addYear(), // or addDays(30) if your trial is 1 year
+                'status'     => 'Active',
+            ]);
+        }
+        $user->assignRole('User');
 
         return redirect()->route('admin.login')->with('success', 'Registration successful');
     }

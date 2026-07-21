@@ -5,9 +5,12 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Models\CompanyPackage;
+use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PackageHelper;
 
@@ -35,10 +38,11 @@ class CompanyUserController extends Controller
                 });
             })
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
-                $query->where(function ($q) use ($user) {
-                    $q->where('company_id', $user->company_id)
-                        ->orWhere('created_by', $user->id);
-                });
+                if ($user->company_id) {
+                    $query->where('company_id', $user->company_id)->orWhere('created_by', $user->id);
+                } else {
+                    $query->where('id', $user->id);
+                }
             })
             ->latest()
             ->get();
@@ -97,6 +101,17 @@ class CompanyUserController extends Controller
             'created_by' => auth()->id(),
             'password' => Hash::make($request->password),
         ]);
+        $trialPackage = Package::where('name', 'Trial')->where('is_active', true)->first();
+        if ($trialPackage) {
+            CompanyPackage::create([
+                'company_id' => $request->company_id,
+                'user_id'    => $user->id,
+                'package_id' => $trialPackage->id,
+                'start_date' => now(),
+                'expire_date' => now()->addYear(), // or addDays(30) if your trial is 1 year
+                'status'     => 'Active',
+            ]);
+        }
         $user->assignRole('User');
 
         return redirect()->route('user.index')->with('success', 'User Created Successfully');
@@ -110,7 +125,7 @@ class CompanyUserController extends Controller
             'phone' => 'required|max:30',
             'company_id' => 'required|exists:companies,id',
             'branch_id' => 'required|exists:branches,id',
-            'password' => 'required|min:6'
+            // 'password' => 'required|min:6'
         ]);
 
         $user->update([
@@ -127,8 +142,16 @@ class CompanyUserController extends Controller
 
     public function destroy(User $user)
     {
-        $user->delete();
-
-        return redirect()->route('user.index')->with('success', 'User Deleted Successfully');
+        DB::beginTransaction();
+        try {
+            // $user->syncRoles([]);
+            $user->delete();
+            CompanyPackage::where('user_id', $user->id)->update(['status' => 'Cancelled',]);
+            DB::commit();
+            return back()->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 }
