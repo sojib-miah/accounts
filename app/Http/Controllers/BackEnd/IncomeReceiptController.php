@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Party;
 use App\Models\PaymentType;
 use App\Models\Receipt;
@@ -49,6 +50,9 @@ class IncomeReceiptController extends Controller
 
     public function createIncome()
     {
+        $companies = Company::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('id', Auth::user()->company_id);
+        })->get();
         $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
             $q->where('created_by', Auth::id())
                 ->orWhere('id', Auth::user()->branch_id);
@@ -60,7 +64,7 @@ class IncomeReceiptController extends Controller
         $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        return view('BackEnd.IncomeReceipt.income_create', compact('branches', 'parties', 'categories'));
+        return view('BackEnd.IncomeReceipt.income_create', compact('branches', 'parties', 'categories', 'companies'));
     }
 
     private function generateReceiptNo()
@@ -75,7 +79,7 @@ class IncomeReceiptController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:Income,Expense',
+            'type' => 'required|in:Income,Expense,Challan',
             'company_id' => 'nullable',
             'branch_id' => 'required|exists:branches,id',
             'party_id' => 'required|exists:parties,id',
@@ -83,19 +87,14 @@ class IncomeReceiptController extends Controller
             'items' => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             $companyPackage = PackageHelper::package();
-
             if (!$companyPackage) {
                 return back()->with('error', 'No active package assigned.');
             }
-
             $limit = $companyPackage->package->income_limit;
-
             $current = Receipt::where('company_id', Auth::user()->company_id)
                 ->where('type', 'Income')
                 ->count();
-
             if ($limit != -1 && $current >= $limit) {
                 return back()->with('error', 'Your Invoice limit has been exceeded.');
             }
@@ -114,9 +113,11 @@ class IncomeReceiptController extends Controller
                 $totalQty += $qty;
                 $subTotal += $amount;
             }
-            $discount = $request->discount ?? 0;
-            $vat = $request->vat ?? 0;
-            $grandTotal = $subTotal + $vat - $discount;
+            $discount = (float) ($request->discount ?? 0);
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grandTotal = $afterDiscount + $vatAmount;
             $receipt = Receipt::create([
                 'receipt_no' => $this->generateReceiptNo(),
                 'type' => $request->type,
@@ -128,7 +129,7 @@ class IncomeReceiptController extends Controller
                 'total_qty' => $totalQty,
                 'sub_total' => $subTotal,
                 'discount' => $discount,
-                'vat' => $vat,
+                'vat' => $vatPercent,
                 'total_amount' => $grandTotal,
                 'paid_amount' => 0,
                 'due_amount' => $grandTotal,
@@ -181,6 +182,9 @@ class IncomeReceiptController extends Controller
             'items.category',
             'items.accountHead'
         ]);
+        $companies = Company::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+            $q->where('id', Auth::user()->company_id);
+        })->get();
         $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
             $q->where('created_by', Auth::id())
                 ->orWhere('id', Auth::user()->branch_id);
@@ -202,7 +206,7 @@ class IncomeReceiptController extends Controller
                 'details'           => $item->details,
             ];
         });
-        return view('BackEnd.IncomeReceipt.edit', compact('receipt', 'branches', 'parties', 'categories', 'receiptItems'));
+        return view('BackEnd.IncomeReceipt.edit', compact('receipt', 'branches', 'parties', 'categories', 'receiptItems', 'companies'));
     }
 
     public function update(Request $request, Receipt $receipt)
@@ -227,9 +231,11 @@ class IncomeReceiptController extends Controller
                 $totalQty += $qty;
                 $subTotal += $amount;
             }
-            $discount = $request->discount ?? 0;
-            $vat = $request->vat ?? 0;
-            $grandTotal = $subTotal + $vat - $discount;
+            $discount = (float) ($request->discount ?? 0);
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grandTotal = $afterDiscount + $vatAmount;
             $receipt->update([
                 'branch_id' => $request->branch_id,
                 'party_id' => $request->party_id,
@@ -238,7 +244,7 @@ class IncomeReceiptController extends Controller
                 'total_qty' => $totalQty,
                 'sub_total' => $subTotal,
                 'discount' => $discount,
-                'vat' => $vat,
+                'vat' => $vatPercent,
                 'total_amount' => $grandTotal,
                 'due_amount' => $grandTotal - $receipt->paid_amount,
                 'updated_by' => auth()->id(),

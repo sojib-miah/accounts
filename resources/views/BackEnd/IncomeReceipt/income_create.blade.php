@@ -18,7 +18,7 @@
             <form action="{{ route('income.receipt.store') }}" method="POST" id="receiptForm">
                 @csrf
                 <input type="hidden" name="type" value="Income">
-                <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
+                {{-- <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}"> --}}
                 <input type="hidden" name="items" id="items_json">
                 <div>
                     <div class="row">
@@ -56,8 +56,27 @@
                                     </div>
                                     <hr>
                                     <div class="row">
+                                        {{-- company --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Company Name <span class="text-danger">*</span>
+                                            </label>
+
+                                            <select name="company_id" id="company_id" class="form-select select2" required>
+                                                <option value="">Select Company</option>
+
+                                                @foreach ($companies as $company)
+                                                    <option value="{{ $company->id }}">
+                                                        {{ $company->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="mt-3">
+                                                <p><b>Company Name :</b> <span id="name"></span></p>
+                                            </div>
+                                        </div>
                                         <!-- Branch -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Branch Name <span class="text-danger">*</span>
                                             </label>
@@ -65,11 +84,11 @@
                                                 <option value="">
                                                     Select Branch
                                                 </option>
-                                                @foreach ($branches as $branch)
+                                                {{-- @foreach ($branches as $branch)
                                                     <option value="{{ $branch->id }}">
                                                         {{ $branch->name }}
                                                     </option>
-                                                @endforeach
+                                                @endforeach --}}
                                             </select>
                                             <div class="mt-3">
                                                 <p class="mb-1"><b>Company Name :</b> <span id="company_name"></span></p>
@@ -80,7 +99,7 @@
                                             </div>
                                         </div>
                                         <!-- Party -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Customer Name <span class="text-danger">*</span>
                                             </label>

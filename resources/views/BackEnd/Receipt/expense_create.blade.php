@@ -56,8 +56,27 @@
                                     </div>
                                     <hr>
                                     <div class="row">
+                                        {{-- company --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Company Name <span class="text-danger">*</span>
+                                            </label>
+
+                                            <select name="company_id" id="company_id" class="form-select select2" required>
+                                                <option value="">Select Company</option>
+
+                                                @foreach ($companies as $company)
+                                                    <option value="{{ $company->id }}">
+                                                        {{ $company->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="mt-3">
+                                                <p><b>Company Name :</b> <span id="name"></span></p>
+                                            </div>
+                                        </div>
                                         <!-- Branch -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Branch Name <span class="text-danger">*</span>
                                             </label>
@@ -81,7 +100,7 @@
                                             </div>
                                         </div>
                                         <!-- Party -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Customer Name <span class="text-danger">*</span>
                                             </label>

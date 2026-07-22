@@ -14,22 +14,10 @@ return new class extends Migration
         Schema::create('receipts', function (Blueprint $table) {
             $table->id();
             $table->string('receipt_no')->unique();
-            $table->enum('type', [
-                'Income',
-                'Expense'
-            ]);
-            $table->foreignId('company_id')->nullable()
-                ->constrained('companies')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
-            $table->foreignId('branch_id')
-                ->constrained('branches')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
-            $table->foreignId('party_id')
-                ->constrained('parties')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
+            $table->enum('type', ['Income', 'Expense', 'Challan']);
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('branch_id')->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('party_id')->constrained('parties')->cascadeOnUpdate()->restrictOnDelete();
             $table->date('receipt_date');
             $table->text('remarks')->nullable();
             $table->integer('total_qty')->default(0);
@@ -39,24 +27,10 @@ return new class extends Migration
             $table->decimal('total_amount', 15, 2)->default(0);
             $table->decimal('paid_amount', 15, 2)->default(0);
             $table->decimal('due_amount', 15, 2)->default(0);
-            $table->enum('payment_status', [
-                'Pending',
-                'Partial',
-                'Paid'
-            ])->default('Pending');
-            $table->enum('status', [
-                'Draft',
-                'Completed',
-                'Cancelled'
-            ])->default('Draft');
-            $table->foreignId('created_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
-            $table->foreignId('updated_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->enum('payment_status', ['Pending', 'Partial', 'Paid'])->default('Pending');
+            $table->enum('status', ['Draft', 'Completed', 'Cancelled'])->default('Draft');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

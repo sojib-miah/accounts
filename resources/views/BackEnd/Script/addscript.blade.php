@@ -10,7 +10,7 @@
          let html = `
                     <tr>
                     <td class="sl">${rowNo}</td>
-                    <td><select class="form-select category select2">${options}</select></td>
+                    <td class="custome"><select class="form-select category select2">${options}</select></td>
                     <td class="custome">
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
@@ -31,8 +31,8 @@
              width: '100%'
          });
          rowNo++;
-         let lastRow = $('#expenseBody tr:last');
-         lastRow.find('.category').select2('open');
+         //  let lastRow = $('#expenseBody tr:last');
+         //  lastRow.find('.category').select2('open');
      }
      $(function() {
          addRow();
@@ -236,6 +236,25 @@
                  serial();
                  calculate();
              }
+         });
+     });
+
+     $('#company_id').change(function() {
+         let company = $(this).val();
+         if (company == '') {
+             $('#branch_id').html('<option value="">Select Branch</option>');
+             $('#name').text('');
+             return;
+         }
+         $.get('/admin/ajax/company/' + company + '/branches', function(res) {
+             // Company Information
+             $('#name').text(res.company.name ?? '');
+             // Branch List
+             let html = '<option value="">Select Branch</option>';
+             $.each(res.branches, function(i, item) {
+                 html += '<option value="' + item.id + '">' + item.name + '</option>';
+             });
+             $('#branch_id').html(html).trigger('change');
          });
      });
 

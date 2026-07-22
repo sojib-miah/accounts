@@ -55,8 +55,28 @@
                                 </div>
                                 <hr>
                                 <div class="row">
+                                    {{-- company --}}
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            Company Name <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="company_id" id="company_id" class="form-select select2" required>
+                                            <option value="">Select Company</option>
+
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->id }}"
+                                                    {{ $receipt->company_id == $company->id ? 'selected' : '' }}>
+                                                    {{ $company->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="mt-3">
+                                            <p><b>Company Name :</b> <span
+                                                    id="name">{{ $receipt->company->name ?? '' }}</span></p>
+                                        </div>
+                                    </div>
                                     <!-- Branch -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label">
                                             Branch Name
                                             <span class="text-danger">*</span>
@@ -102,7 +122,7 @@
                                         </div>
                                     </div>
                                     <!-- Party -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label">
                                             Customer Name
                                             <span class="text-danger">*</span>
@@ -294,7 +314,7 @@
             let html = `
                     <tr>
                     <td class="sl">${rowNo}</td>
-                    <td><select class="form-select category select2">${options}</select></td>
+                    <td class="custome"><select class="form-select category select2">${options}</select></td>
                     <td class="custome">
                     <select class="form-select account select2"><option value="">Select Expense</option></select>
                     </td>
@@ -315,8 +335,8 @@
                 width: '100%'
             });
             rowNo++;
-            let lastRow = $('#expenseBody tr:last');
-            lastRow.find('.category').select2('open');
+            // let lastRow = $('#expenseBody tr:last');
+            // lastRow.find('.category').select2('open');
             if (item) {
                 row.find('.qty').val(parseFloat(item.qty));
                 row.find('.rate').val(item.rate);
@@ -561,6 +581,25 @@
                 $('#branch_phone').text(res.data.phone);
                 $('#branch_email').text(res.data.email);
                 $('#branch_address').text(res.data.address);
+            });
+        });
+
+        $('#company_id').change(function() {
+            let company = $(this).val();
+            if (company == '') {
+                $('#branch_id').html('<option value="">Select Branch</option>');
+                $('#name').text('');
+                return;
+            }
+            $.get('/admin/ajax/company/' + company + '/branches', function(res) {
+                // Company Information
+                $('#name').text(res.company.name ?? '');
+                // Branch List
+                let html = '<option value="">Select Branch</option>';
+                $.each(res.branches, function(i, item) {
+                    html += '<option value="' + item.id + '">' + item.name + '</option>';
+                });
+                $('#branch_id').html(html).trigger('change');
             });
         });
 

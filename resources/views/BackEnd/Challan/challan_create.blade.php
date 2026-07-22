@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Create Income Receipt')
+@section('title', 'Create Challan Receipt')
 
 @section('content')
     <div class="py-4">
@@ -17,7 +17,7 @@
             @endif
             <form action="{{ route('challan.store') }}" method="POST" id="receiptForm">
                 @csrf
-                <input type="hidden" name="type" value="Income">
+                <input type="hidden" name="type" value="Challan">
                 <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
                 <input type="hidden" name="items" id="items_json">
                 <div>
@@ -56,8 +56,27 @@
                                     </div>
                                     <hr>
                                     <div class="row">
+                                        {{-- company --}}
+                                        <div class="col-md-4">
+                                            <label class="form-label">
+                                                Company Name <span class="text-danger">*</span>
+                                            </label>
+
+                                            <select name="company_id" id="company_id" class="form-select select2" required>
+                                                <option value="">Select Company</option>
+
+                                                @foreach ($companies as $company)
+                                                    <option value="{{ $company->id }}">
+                                                        {{ $company->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="mt-3">
+                                                <p><b>Company Name :</b> <span id="name"></span></p>
+                                            </div>
+                                        </div>
                                         <!-- Branch -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Branch Name <span class="text-danger">*</span>
                                             </label>
@@ -80,7 +99,7 @@
                                             </div>
                                         </div>
                                         <!-- Party -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">
                                                 Customer Name <span class="text-danger">*</span>
                                             </label>
@@ -107,7 +126,7 @@
                                 </div>
                             </div>
                             {{-- ========================= --}}
-                            {{-- Income Item List --}}
+                            {{-- Challan Item List --}}
                             {{-- ========================= --}}
                             <div class="card shadow-sm mt-3">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -251,7 +270,7 @@
             let html = `
                     <tr>
                     <td class="sl">${rowNo}</td>
-                    <td><select class="form-select category select2">${options}</select></td>
+                    <td class="custome"><select class="form-select category select2">${options}</select></td>
                     <td class="custome">
                     <select class="form-select account select2"><option value="">Select Item</option></select>
                     </td>
@@ -272,8 +291,8 @@
                 width: '100%'
             });
             rowNo++;
-            let lastRow = $('#expenseBody tr:last');
-            lastRow.find('.category').select2('open');
+            // let lastRow = $('#expenseBody tr:last');
+            // lastRow.find('.category').select2('open');
         }
         $(function() {
             addRow();
@@ -477,6 +496,25 @@
                     serial();
                     calculate();
                 }
+            });
+        });
+
+        $('#company_id').change(function() {
+            let company = $(this).val();
+            if (company == '') {
+                $('#branch_id').html('<option value="">Select Branch</option>');
+                $('#name').text('');
+                return;
+            }
+            $.get('/admin/ajax/company/' + company + '/branches', function(res) {
+                // Company Information
+                $('#name').text(res.company.name ?? '');
+                // Branch List
+                let html = '<option value="">Select Branch</option>';
+                $.each(res.branches, function(i, item) {
+                    html += '<option value="' + item.id + '">' + item.name + '</option>';
+                });
+                $('#branch_id').html(html).trigger('change');
             });
         });
 

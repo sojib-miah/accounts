@@ -60,8 +60,20 @@
                         </div>
                         <hr>
                         <div class="row">
+                            <!-- Company -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    Company Name
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" readonly
+                                    value="{{ $receipt->company->name ?? '' }}">
+                                <div class="mt-3">
+                                    <p class="mb-1"><b>Company Name :</b> {{ $receipt->company->name ?? '' }}</p>
+                                </div>
+                            </div>
                             <!-- Branch -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold">
                                     Branch Name
                                     <span class="text-danger">*</span>
@@ -89,7 +101,7 @@
                                 </div>
                             </div>
                             <!-- Party -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold">
                                     Customer Name
                                     <span class="text-danger">*</span>

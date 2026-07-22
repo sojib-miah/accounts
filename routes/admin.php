@@ -134,6 +134,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/receipt/{receipt}/pdf', [ReceiptController::class, 'pdf'])->name('receipt.pdf');
     Route::get('/ajax/branch/{branch}', [ReceiptController::class, 'branchInfo'])->name('ajax.branch');
     Route::get('/ajax/party/{party}', [ReceiptController::class, 'partyInfo'])->name('ajax.party');
+    Route::get('/ajax/company/{company}/branches', [ReceiptController::class, 'getBranches']);
     Route::get('/ajax/account-head/{category}', [ReceiptController::class, 'accountHeads'])->name('ajax.account-head');
     Route::get('/party/{party}/profile', [ReceiptController::class, 'profile'])->name('party.profile');
     Route::post('/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('party.due.payment');
