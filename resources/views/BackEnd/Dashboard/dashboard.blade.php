@@ -141,7 +141,7 @@
                             MONTHLY INCOME
                         </small>
                         <h4 class="text-danger mt-2">
-                            {{ number_format($totalPayable, 2) }}
+                            {{ number_format($monthIncome, 2) }}
                         </h4>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                             MONTHLY EXPENSE
                         </small>
                         <h4 class="text-danger mt-2">
-                            {{ number_format($totalPayable, 2) }}
+                            {{ number_format($monthExpense, 2) }}
                         </h4>
                     </div>
                 </div>
@@ -168,9 +168,9 @@
                         <h3 class="mb-0">
                             {{ $totalCustomer }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Customers
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -180,9 +180,9 @@
                         <h3 class="mb-0">
                             {{ $totalSupplier }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Suppliers
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -192,9 +192,9 @@
                         <h3 class="mb-0">
                             {{ $totalBranch }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Branches
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -204,9 +204,9 @@
                         <h3 class="mb-0">
                             {{ $totalAccount }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Accounts
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -216,9 +216,9 @@
                         <h3 class="mb-0">
                             {{ $totalReceipt }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Receipts
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -228,9 +228,9 @@
                         <h3 class="mb-0">
                             {{ $totalPayment }}
                         </h3>
-                        <h3 class="mb-0">
+                        <h4 class="mb-0">
                             Payments
-                        </h3>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -238,7 +238,7 @@
         <!-- Financial Analytics -->
         <div class="row mt-4">
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Financial Summary
@@ -247,42 +247,42 @@
                     <div class="card-body">
                         <table class="table table-borderless mb-0">
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Total Income
                                 </td>
-                                <td class="text-end text-success fw-bold">
+                                <td class="text-end pb-0 text-success fw-bold">
                                     {{ number_format($totalIncome, 2) }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Total Expense
                                 </td>
-                                <td class="text-end text-danger fw-bold">
+                                <td class="text-end pb-0 text-danger fw-bold">
                                     {{ number_format($totalExpense, 2) }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Gross Profit
                                 </td>
-                                <td class="text-end text-primary fw-bold">
+                                <td class="text-end pb-0 text-primary fw-bold">
                                     {{ number_format($grossProfit, 2) }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Receivable
                                 </td>
-                                <td class="text-end text-warning">
+                                <td class="text-end pb-0 text-warning">
                                     {{ number_format($totalReceivable, 2) }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Payable
                                 </td>
-                                <td class="text-end text-danger">
+                                <td class="text-end pb-0 text-danger">
                                     {{ number_format($totalPayable, 2) }}
                                 </td>
                             </tr>
@@ -300,30 +300,30 @@
                     <div class="card-body">
                         <table class="table table-borderless">
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Paid
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end pb-0">
                                     <span class="badge bg-success">
                                         {{ $paymentSummary['paid'] }}
                                     </span>
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Partial
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end pb-0">
                                     <span class="badge bg-warning text-dark">
                                         {{ $paymentSummary['partial'] }}
                                     </span>
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Pending
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end pb-0">
                                     <span class="badge bg-danger">
                                         {{ $paymentSummary['pending'] }}
                                     </span>
@@ -333,26 +333,26 @@
                         <hr>
                         <table class="table table-borderless">
                             <tr>
-                                <td>
+                                <td class="py-0 ps-0">
                                     Completed
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end py-0">
                                     {{ $receiptSummary['completed'] }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Draft
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end pb-0">
                                     {{ $receiptSummary['draft'] }}
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td class="pb-0 ps-0">
                                     Cancelled
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end pb-0">
                                     {{ $receiptSummary['cancelled'] }}
                                 </td>
                             </tr>
@@ -396,11 +396,11 @@
                 </div>
             </div>
         </div>
-        <!-- Top Analytics -->
+
+        <!-- ================= Top Customers ================= -->
         <div class="row mt-4">
-            <!-- ================= Top Customers ================= -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <div class="d-flex justify-content-between">
                             <h5 class="fw-bold mb-0">
@@ -441,7 +441,7 @@
             </div>
             <!-- ================= Top Suppliers ================= -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <div class="d-flex justify-content-between">
                             <h5 class="fw-bold mb-0">
@@ -485,7 +485,7 @@
         <div class="row mt-4">
             <!-- Income -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Highest Income Receipts
@@ -525,7 +525,7 @@
             </div>
             <!-- Expense -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Highest Expense Receipts
@@ -564,11 +564,11 @@
                 </div>
             </div>
         </div>
-        <!-- Activity Center -->
+
         <div class="row mt-4">
             <!-- ================= Recent Receipts ================= -->
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Recent Receipts
@@ -612,7 +612,7 @@
             </div>
             <!-- ================= Recent Payments ================= -->
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="fw-bold mb-0">
                             Recent Payments
@@ -656,7 +656,7 @@
             </div>
             <!-- ================= Recent Transactions ================= -->
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header">
                         <h5 class="fw-bold mb-0">
                             Account Transactions
