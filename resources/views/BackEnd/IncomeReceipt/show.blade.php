@@ -433,7 +433,7 @@
                                 Payment Type
                                 <span class="text-danger">*</span>
                             </label>
-                            <select id="payment_type_id" name="payment_type_id" class="form-select" required>
+                            <select id="payment_type_id" name="payment_type_id" class="form-select select2" required>
                                 <option value="">
                                     Select Type
                                 </option>

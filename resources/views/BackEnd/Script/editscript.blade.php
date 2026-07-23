@@ -58,11 +58,6 @@
     $('#addRow').click(function() {
         addRow();
     });
-    $(document).on('click', '.remove', function() {
-        $(this).closest('tr').remove();
-        serial();
-        calculate();
-    });
 
     function serial() {
         let i = 1;
@@ -241,7 +236,6 @@
     });
     $(document).on('click', '.remove', function(e) {
         e.preventDefault();
-        // Check BEFORE showing delete confirmation
         if ($('#expenseBody tr').length <= 1) {
             Swal.fire({
                 icon: 'warning',
