@@ -74,16 +74,16 @@
             <div class="authentication-inner row m-0">
                 <!-- /Left Text -->
                 <div class="d-none d-xl-flex p-0">
-                    {{-- <div class="auth-cover-bg d-flex justify-content-center align-items-center">
-                        <img src="{{ asset('/assets/img/illustrations/auth-login-illustration-light.png') }}"
+                   <div class="auth-cover-bg d-flex justify-content-center align-items-center">
+                        <!-- <img src="{{ asset('/assets/img/illustrations/auth-login-illustration-light.png') }}"
                             alt="auth-login-cover" class="my-5 auth-illustration"
                             data-app-light-img="illustrations/auth-login-illustration-light.png"
                             data-app-dark-img="illustrations/auth-login-illustration-dark.png" />
                         <img src="{{ asset('/assets/img/illustrations/bg-shape-image-light.png') }}"
                             alt="auth-login-cover" class="platform-bg"
                             data-app-light-img="illustrations/bg-shape-image-light.png"
-                            data-app-dark-img="illustrations/bg-shape-image-dark.png" />
-                    </div> --}}
+                            data-app-dark-img="illustrations/bg-shape-image-dark.png" /> -->
+                    </div>
                 </div>
                 <!-- /Left Text -->
 
@@ -92,7 +92,7 @@
                     style="position: absolute; top: 0; height:100%; left: 50%; transform: translateX(-50%);">
 
                     <div class="w-px-400 mx-auto mt-12 pt-5">
-                        <h4 class="mb-1">Welcome to ComitsBD! 👋</h4>
+                        <h4 class="mb-1">Welcome to ComitsBD!</h4>
                         <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
                         <form id="formAuthentication" class="mb-6" method="POST"
