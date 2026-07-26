@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Receipt Details')
+@section('title', 'Sales Order Details')
 
 @section('content')
     <div class="mx-5 py-3">
@@ -30,7 +30,7 @@
                                 <div class="row">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                         <div class="col-4 text-end">
-                                            <b>Expense Id:</b>
+                                            <b>Id:</b>
                                         </div>
                                         <div class="col-8">
                                             <input type="text" class="form-control" readonly
@@ -136,12 +136,12 @@
                 </div>
 
                 {{-- ========================= --}}
-                {{-- Expense Receipt List --}}
+                {{-- Income Receipt List --}}
                 {{-- ========================= --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding: 8px !important;">
                         <h3 class="mb-0 fw-bold">
-                            {{ $receipt->type }} Item List
+                            Invoice Item List
                         </h3>
                     </div>
                     <div class="card-body p-0">
@@ -149,12 +149,12 @@
                             <table class="table table-bordered table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th width="60" class="text-center">Sn</th>
+                                        <th width="60" class="text-center">SN</th>
                                         <th>Category</th>
-                                        <th>{{ $receipt->type }}</th>
+                                        <th>Invoice</th>
                                         <th width="90" class="text-center">Qty</th>
                                         <th width="120" class="text-end">Unit Price</th>
-                                        <th width="120" class="text-end">Amount</th>
+                                        <th width="120" class="text-end">Total Amount</th>
                                         <th>Remarks</th>
                                     </tr>
                                 </thead>
@@ -177,7 +177,7 @@
                                                 {{ $item->accountHead->name ?? '-' }}
                                             </td>
                                             <td class="text-center">
-                                                {{ number_format($item->qty, 2) }}
+                                                {{ number_format($item->qty) }}
                                             </td>
                                             <td class="text-end fw-bold">
                                                 {{ number_format($item->rate, 2) }}
@@ -233,8 +233,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>
-                                    VAT
+                                <th class="d-flex align-items-center gap-2">
+                                    <span>VAT</span>
+                                    <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                 </th>
                                 <td class="text-end">
                                     {{ number_format($receipt->vat, 2) }}
@@ -299,7 +300,7 @@
                 <div class="card shadow-sm border-0 mb-3">
                     <div class="card-header">
                         <strong>
-                            Receipt Notes
+                            Invoice Notes
                         </strong>
                         <span class="text-danger">*</span>
                     </div>
@@ -309,6 +310,40 @@
                 </div>
                 {{-- Action Buttons --}}
                 <div class="d-grid gap-2">
+                    @if (!$receipt->is_challan)
+                        <form action="{{ route('sales.order.convert.challan', $receipt->id) }}" method="POST"
+                            class="d-inline">
+                            @csrf
+                            <button class="btn btn-success btn-lg w-100" onclick="return confirm('Convert to Challan?')">
+                                <i class="fa-solid fa-arrows-to-circle me-2"></i>
+                                Convert Challan
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('challan.print', $receipt->id) }}" target="_blank"
+                            class="btn btn-success btn-lg">
+                            <i class="fa fa-print me-2"></i>
+                            Print Challan
+                        </a>
+                    @endif
+
+                    @if (!$receipt->is_invoice)
+                        <form action="{{ route('sales.order.convert.income', $receipt->id) }}" method="POST"
+                            class="d-inline">
+                            @csrf
+                            <button class="btn btn-danger btn-lg w-100" onclick="return confirm('Convert to Invoice?')">
+                                <i class="fa-solid fa-arrows-to-circle me-2"></i>
+                                Convert Invoice
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank"
+                            class="btn btn-danger btn-lg">
+                            <i class="fa fa-print me-2"></i>
+                            Print Invoice
+                        </a>
+                    @endif
+
                     @if ($receipt->payment_status != 'Paid')
                         <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
                             <i class="fa fa-money-bill-wave me-2"></i>
@@ -316,15 +351,16 @@
                         </button>
                     @endif
                     @if ($receipt->status != 'Cancelled')
-                        @can('expense-receipt-edit')
-                            <a href="{{ route('receipt.edit', $receipt->id) }}" class="btn btn-warning btn-lg text-white">
+                        @can('income-receipt-edit')
+                            <a href="{{ route('sales.order.edit', $receipt->id) }}"
+                                class="btn btn-warning btn-lg text-white">
                                 <i class="fa fa-edit me-2"></i>
                                 Modify
                             </a>
                         @endcan
                     @endif
                     @if ($receipt->payment_status == 'Pending')
-                        @can('expense-receipt-delete')
+                        @can('income-receipt-delete')
                             <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')

@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Challan')
+@section('title', 'Invoice Receipt')
 
 @section('content')
     <div class="py-4">
@@ -8,14 +8,14 @@
             {{-- Page Header --}}
             <div class="mb-3">
                 <h2 class="fw-bold mb-0">
-                    Challan List
+                    Invoice List
                 </h2>
             </div>
             {{-- Card --}}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     {{-- Top Filter --}}
-                    <form method="GET" action="{{ route('challan.index') }}">
+                    <form method="GET" action="{{ route('income.receipt.index') }}">
                         <div class="row mb-3">
                             <div class="col-md-4">
                             </div>
@@ -47,20 +47,20 @@
                                         </option>
                                     </select>
                                     <button class="btn btn-primary">
-                                        <i class="fa fa-search"></i>
+                                        <i class="fa fa-search me-2"></i>
                                         Search
                                     </button>
                                     @if (request('search'))
-                                        <a href="{{ route('income.receipt.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('sales.order.index') }}" class="btn btn-secondary">
                                             Reset
                                         </a>
                                     @endif
-                                    {{-- @can('income-challan-create')
-                                        <a href="{{ route('challan.create') }}" class="btn btn-success">
+                                    @can('income-receipt-create')
+                                        <a href="{{ route('sales.order.create') }}" class="btn btn-success">
                                             <i class="fa fa-plus me-2"></i>
-                                            Create Challan
+                                            Create Sales Order
                                         </a>
-                                    @endcan --}}
+                                    @endcan
                                 </div>
                             </div>
                         </div>
@@ -70,23 +70,21 @@
                         <table class="table table-bordered align-middle table-hover">
                             <thead>
                                 <tr>
-                                    <th>
-                                        SN
+                                    <th>SN</th>
+                                    <th class="text-center">
+                                        Sales Order NO
                                     </th>
                                     <th class="text-center">
-                                        Sales Order No
-                                    </th>
-                                    <th class="text-center">
-                                        CHALLAN No
-                                    </th>
-                                    <th class="text-center">
-                                        CUstomer Name
+                                        Customer
                                     </th>
                                     <th class="text-center">
                                         Created BY
                                     </th>
                                     <th class="text-center">
                                         DATE & TIME
+                                    </th>
+                                    <th class="text-center">
+                                        STATUS
                                     </th>
                                     <th class="text-center" width="90">
                                         ACTION
@@ -99,20 +97,15 @@
                                         <td>{{ $loop->iteration }}</td>
                                         {{-- Receipt ID --}}
                                         <td class="text-center">
-                                            <a href="{{ route('challan.show', $receipt->id) }}"
+                                            <a href="{{ route('sales.order.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->so_no }}
-                                            </a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="{{ route('challan.show', $receipt->id) }}"
-                                                class="text-decoration-none fw-semibold">
-                                                {{ $receipt->dm_no }}
+                                                {{-- {{ $receipt->receipt_no }} --}}
+                                                {{ $receipt->so_no ?? '-' }}
                                             </a>
                                         </td>
                                         {{-- Payee --}}
                                         <td class="text-center">
-                                            <a href="{{ route('income.party.profile', $receipt->party_id) }}"
+                                            <a href="{{ route('sales.order.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
                                                 {{ $receipt->party->name }}
                                             </a>
@@ -125,6 +118,22 @@
                                         <td class="text-center">
                                             {{ $receipt->created_at->format('d-m-Y h:i A') }}
                                         </td>
+                                        {{-- Payment Status --}}
+                                        <td class="text-center">
+                                            @if ($receipt->payment_status == 'Paid')
+                                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
+                                                    Paid
+                                                </span>
+                                            @elseif($receipt->payment_status == 'Partial')
+                                                <span class="badge rounded-pill bg-info-subtle text-info px-3 py-2">
+                                                    Partial
+                                                </span>
+                                            @else
+                                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
+                                                    Unpaid
+                                                </span>
+                                            @endif
+                                        </td>
                                         {{-- Action --}}
                                         <td class="text-center">
                                             <div class="dropdown">
@@ -134,14 +143,14 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li>
                                                         <a class="dropdown-item"
-                                                            href="{{ route('challan.show', $receipt->id) }}">
+                                                            href="{{ route('sales.order.show', $receipt->id) }}">
                                                             <i class="fa fa-eye text-primary me-2"></i>
                                                             View
                                                         </a>
                                                     </li>
-                                                    {{-- @if ($receipt->status != 'Cancelled')
+                                                    @if ($receipt->status != 'Cancelled')
                                                         <li>
-                                                            <form action="{{ route('challan.cancel', $receipt->id) }}"
+                                                            <form action="{{ route('sales.order.cancel', $receipt->id) }}"
                                                                 method="POST">
                                                                 @csrf
                                                                 <button onclick="return confirm('Cancel this receipt?')"
@@ -151,8 +160,8 @@
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif --}}
-                                                    {{-- @if ($receipt->payment_status == 'Pending')
+                                                    @endif
+                                                    @if ($receipt->payment_status == 'Pending')
                                                         <li>
                                                             <form action="{{ route('receipt.destroy', $receipt->id) }}"
                                                                 method="POST">
@@ -165,7 +174,7 @@
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif --}}
+                                                    @endif
                                                 </ul>
                                             </div>
                                         </td>
@@ -175,7 +184,7 @@
                                         <td colspan="6" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
-                                            No Challan Found
+                                            No Income Receipt Found
                                         </td>
                                     </tr>
                                 @endforelse

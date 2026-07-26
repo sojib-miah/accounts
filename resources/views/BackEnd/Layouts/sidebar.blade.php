@@ -86,7 +86,7 @@
         <!-- Income seals-->
         @can('menu-sales-list')
             <li
-                class="menu-item {{ request()->routeIs('receiver.*') || request()->routeIs('income.category.*') || request()->routeIs('income.*') || request()->routeIs('income.receipt.*') || request()->routeIs('challan.*') || request()->routeIs('income.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('receiver.*') || request()->routeIs('income.category.*') || request()->routeIs('income.*') || request()->routeIs('income.receipt.*') || request()->routeIs('challan.*') || request()->routeIs('income.*') || request()->routeIs('sales.order.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-money-bill-trend-up me-3"></i>
                     Sales
@@ -110,6 +110,13 @@
                         <li class="menu-item {{ request()->routeIs('income.index') ? 'active' : '' }}">
                             <a href="{{ route('income.index') }}" class="menu-link">
                                 Item List
+                            </a>
+                        </li>
+                    @endcan
+                    @can('income-salesorder-list')
+                        <li class="menu-item {{ request()->routeIs('sales.order.index') ? 'active' : '' }}">
+                            <a href="{{ route('sales.order.index') }}" class="menu-link">
+                                Sales Order
                             </a>
                         </li>
                     @endcan

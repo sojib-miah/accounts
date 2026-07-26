@@ -22,6 +22,7 @@ use App\Http\Controllers\BackEnd\ReceiptController;
 use App\Http\Controllers\BackEnd\ReceiverController;
 use App\Http\Controllers\BackEnd\ReportController;
 use App\Http\Controllers\BackEnd\RoleController;
+use App\Http\Controllers\BackEnd\SalesOrderController;
 use App\Http\Controllers\BackEnd\SettingController;
 use App\Http\Controllers\BackEnd\UserController;
 use Illuminate\Support\Facades\Route;
@@ -158,6 +159,21 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::put('/income/{accountHead}', [IncomeController::class, 'update'])->name('income.update');
     Route::delete('/income/{income}', [IncomeController::class, 'destroy'])->name('income.destroy');
 
+    // sales order income 
+    Route::get('/sales/order', [SalesOrderController::class, 'index'])->name('sales.order.index');
+    Route::get('/sales/order/create', [SalesOrderController::class, 'createIncome'])->name('sales.order.create');
+    Route::post('/sales/order/store', [SalesOrderController::class, 'store'])->name('sales.order.store');
+    Route::get('/sales/order/{receipt}', [SalesOrderController::class, 'show'])->name('sales.order.show');
+    Route::get('/sales/order/{receipt}/edit', [SalesOrderController::class, 'edit'])->name('sales.order.edit');
+    Route::put('/sales/order/{receipt}', [SalesOrderController::class, 'update'])->name('sales.order.update');
+    Route::post('/sales/order/{receipt}/cancel', [SalesOrderController::class, 'cancel'])->name('sales.order.cancel');
+    Route::get('/sales/order/{party}/profile', [SalesOrderController::class, 'profile'])->name('sales.order.profile');
+    Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
+
+    Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
+
+    Route::post('/sales-order/{receipt}/convert-income', [SalesOrderController::class, 'convertIncome'])->name('sales.order.convert.income');
+
     // income receipt route
     Route::get('/income/receipt', [IncomeReceiptController::class, 'index'])->name('income.receipt.index');
     Route::get('/income/receipt/income/create', [IncomeReceiptController::class, 'createIncome'])->name('income.receipt.create');
@@ -167,7 +183,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
     Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
     Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
-    Route::post('/income/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('income.party.due.payment');
+    Route::post('/income/party/{party}/due-payment', [IncomeReceiptController::class, 'duePayment'])->name('income.party.due.payment');
 
     // report 
     Route::get('/dashboard/pdf', [ReportController::class, 'pdf'])->name('dashboard.pdf');

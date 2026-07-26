@@ -15,15 +15,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <form action="{{ route('income.receipt.store') }}" method="POST" id="receiptForm">
+            <form action="{{ route('sales.order.store') }}" method="POST" id="receiptForm">
                 @csrf
-                <input type="hidden" name="type" value="Income">
+                <input type="hidden" name="type" value="Sales-Order">
                 <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
                 <input type="hidden" name="items" id="items_json">
                 <div>
                     <div class="row">
                         <!-- LEFT -->
-                        <div class="col-lg-9">
+                        <div class="col-lg-12">
                             <div class="card shadow-sm">
                                 <div class="card-body">
                                     <div class="row">
@@ -84,11 +84,6 @@
                                                 <option value="">
                                                     Select Branch
                                                 </option>
-                                                {{-- @foreach ($branches as $branch)
-                                                    <option value="{{ $branch->id }}">
-                                                        {{ $branch->name }}
-                                                    </option>
-                                                @endforeach --}}
                                             </select>
                                             <div class="mt-3">
                                                 <p class="mb-1"><b>Company Name :</b> <span id="company_name"></span></p>
@@ -152,13 +147,13 @@
                                                     <th width="220">
                                                         Item
                                                     </th>
-                                                    <th width="120">
+                                                    <th width="160">
                                                         Qty
                                                     </th>
-                                                    <th width="130">
+                                                    <th width="160">
                                                         Unit Price
                                                     </th>
-                                                    <th width="130">
+                                                    <th width="160">
                                                         Total
                                                     </th>
                                                     <th>
@@ -180,8 +175,14 @@
                             {{-- ========================= --}}
                             <div class="row mt-4">
                                 <div class="col-md-8">
+                                    <div>
+                                        <label class="form-label"><strong>
+                                                Sales Order Notes
+                                            </strong></label>
+                                        <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 border">
                                     <table class="table table-bordered">
                                         <tr>
                                             <th width="180">
@@ -232,24 +233,9 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
-                        {{-- ========================= --}}
-                        {{-- Right Sidebar --}}
-                        {{-- ========================= --}}
-                        <div class="col-lg-3">
-                            <div class="card shadow-sm">
-                                <div class="card-header">
-                                    <strong>
-                                        Invoice Notes
-                                    </strong>
-                                </div>
-                                <div class="card-body">
-                                    <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
-                                    <button class="btn btn-primary w-100 mt-3">
-                                        Save Invoice
-                                    </button>
-                                </div>
-                            </div>
+                            <button class="btn btn-primary w-100 mt-3">
+                                Save Sales Order
+                            </button>
                         </div>
                     </div>
                 </div>

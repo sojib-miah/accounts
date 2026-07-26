@@ -153,6 +153,7 @@
                                         <th>Category</th>
                                         <th>Invoice</th>
                                         <th width="90" class="text-center">Qty</th>
+                                        <th width="120" class="text-end">Unit Price</th>
                                         <th width="120" class="text-end">Amount</th>
                                         <th>Remarks</th>
                                     </tr>
@@ -177,6 +178,9 @@
                                             </td>
                                             <td class="text-center">
                                                 {{ number_format($item->qty) }}
+                                            </td>
+                                            <td class="text-end fw-bold">
+                                                {{ number_format($item->rate, 2) }}
                                             </td>
                                             <td class="text-end fw-bold">
                                                 {{ number_format($item->amount, 2) }}
@@ -271,7 +275,7 @@
                 <div class="card shadow-sm border-0 mb-3">
                     <div class="card-header">
                         <i class="fa fa-chart-bar me-2"></i>
-                        <strong>Invoice Status</strong>
+                        <strong>Payment Status</strong>
                     </div>
                     <div class="card-body text-center">
                         @if ($receipt->payment_status == 'Paid')
@@ -312,7 +316,7 @@
                             Bill Pay
                         </button>
                     @endif
-                    @if ($receipt->status != 'Cancelled')
+                    {{-- @if ($receipt->status != 'Cancelled')
                         @can('income-receipt-edit')
                             <a href="{{ route('income.receipt.edit', $receipt->id) }}"
                                 class="btn btn-warning btn-lg text-white">
@@ -320,8 +324,8 @@
                                 Modify
                             </a>
                         @endcan
-                    @endif
-                    @if ($receipt->payment_status == 'Pending')
+                    @endif --}}
+                    {{-- @if ($receipt->payment_status == 'Pending')
                         @can('income-receipt-delete')
                             <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
                                 @csrf
@@ -332,7 +336,7 @@
                                 </button>
                             </form>
                         @endcan
-                    @endif
+                    @endif --}}
                     <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank" class="btn btn-primary btn-lg">
                         <i class="fa fa-print me-2"></i>
                         Print
