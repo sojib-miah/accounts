@@ -311,14 +311,22 @@ class ReceiptController extends Controller
     public function destroy(Receipt $receipt)
     {
         if ($receipt->payments()->exists()) {
-            return redirect()->route('receipt.show', $receipt->id)->with('error', 'This receipt has payment history. It cannot be deleted.');
+            return redirect()->route('receipt.show', $receipt->id)
+                ->with('error', 'This receipt has payment history. It cannot be deleted.');
         }
         DB::beginTransaction();
         try {
+            $type = $receipt->type;
             $receipt->items()->delete();
             $receipt->delete();
             DB::commit();
-            return redirect()->back()->with('success', 'Receipt Deleted Successfully.');
+            if ($type == 'Expense') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Receipt Deleted Successfully.');
+            } elseif ($type == 'Income') {
+                return redirect()->route('income.receipt.index')->with('success', 'Receipt Deleted Successfully.');
+            } elseif ($type == 'Challan') {
+                return redirect()->route('challan.index')->with('success', 'Receipt Deleted Successfully.');
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());

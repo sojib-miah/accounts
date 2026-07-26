@@ -55,12 +55,12 @@
                                             Reset
                                         </a>
                                     @endif
-                                    @can('income-receipt-create')
+                                    {{-- @can('income-receipt-create')
                                         <a href="{{ route('income.receipt.create') }}" class="btn btn-success">
                                             <i class="fa fa-plus me-2"></i>
                                             Create Invoice
                                         </a>
-                                    @endcan
+                                    @endcan --}}
                                 </div>
                             </div>
                         </div>
@@ -71,6 +71,12 @@
                             <thead>
                                 <tr>
                                     <th>SN</th>
+                                    <th class="text-center">
+                                        Sales Order No
+                                    </th>
+                                    <th class="text-center">
+                                        Challan No
+                                    </th>
                                     <th class="text-center">
                                         Invoice No
                                     </th>
@@ -99,7 +105,19 @@
                                         <td class="text-center">
                                             <a href="{{ route('income.receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->receipt_no }}
+                                                {{ $receipt->so_no }}
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('income.receipt.show', $receipt->id) }}"
+                                                class="text-decoration-none fw-semibold">
+                                                {{ $receipt->dm_no }}
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('income.receipt.show', $receipt->id) }}"
+                                                class="text-decoration-none fw-semibold">
+                                                {{ $receipt->inv_no }}
                                             </a>
                                         </td>
                                         {{-- Payee --}}
@@ -147,7 +165,7 @@
                                                             View
                                                         </a>
                                                     </li>
-                                                    @if ($receipt->status != 'Cancelled')
+                                                    {{-- @if ($receipt->status != 'Cancelled')
                                                         <li>
                                                             <form
                                                                 action="{{ route('income.receipt.cancel', $receipt->id) }}"
@@ -160,8 +178,8 @@
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif
-                                                    @if ($receipt->payment_status == 'Pending')
+                                                    @endif --}}
+                                                    {{-- @if ($receipt->payment_status == 'Pending')
                                                         <li>
                                                             <form action="{{ route('receipt.destroy', $receipt->id) }}"
                                                                 method="POST">
@@ -174,7 +192,7 @@
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif
+                                                    @endif --}}
                                                 </ul>
                                             </div>
                                         </td>

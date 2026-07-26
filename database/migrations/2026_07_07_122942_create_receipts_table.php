@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('receipts', function (Blueprint $table) {
             $table->id();
             $table->string('receipt_no')->unique();
-            $table->enum('type', ['Income', 'Expense', 'Challan']);
+            $table->string('so_no')->unique()->nullable();
+            $table->string('dm_no')->unique()->nullable();
+            $table->string('inv_no')->unique()->nullable();
+            $table->enum('type', ['Income', 'Expense', 'Challan', 'Sales-Order']);
+            $table->boolean('is_challan')->default(false);
+            $table->boolean('is_invoice')->default(false);
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('branch_id')->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('party_id')->constrained('parties')->cascadeOnUpdate()->restrictOnDelete();

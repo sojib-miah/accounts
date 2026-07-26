@@ -18,14 +18,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PackageHelper;
 
-class IncomeReceiptController extends Controller
+class SalesOrderController extends Controller
 {
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Receipt::with(['party', 'branch', 'creator'])->where('is_invoice', true)->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
-            $query->where('created_by', $user->id);
-        });
+        $query = Receipt::with(['party', 'branch', 'creator'])
+            ->whereIn('type', ['Sales-Order', 'Income', 'Challan'])
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            });
+
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
@@ -45,7 +48,7 @@ class IncomeReceiptController extends Controller
         }
         $perPage = $request->per_page ?? 24;
         $receipts = $query->latest()->paginate($perPage)->withQueryString();
-        return view('BackEnd.IncomeReceipt.index', compact('receipts'));
+        return view('BackEnd.SalesOrder.index', compact('receipts'));
     }
 
     public function createIncome()
@@ -64,7 +67,7 @@ class IncomeReceiptController extends Controller
         $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        return view('BackEnd.IncomeReceipt.income_create', compact('branches', 'parties', 'categories', 'companies'));
+        return view('BackEnd.SalesOrder.income_create', compact('branches', 'parties', 'categories', 'companies'));
     }
 
     private function generateReceiptNo()
@@ -76,10 +79,18 @@ class IncomeReceiptController extends Controller
             : 10001;
     }
 
+    private function generateSONo()
+    {
+        do {
+            $number = 'SO-' . date('Ymd') . rand(1000, 9999);
+        } while (Receipt::where('so_no', $number)->exists());
+        return $number;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:Income,Expense,Challan',
+            'type' => 'required|in:Income,Expense,Challan,Sales-Order',
             'company_id' => 'nullable',
             'branch_id' => 'required|exists:branches,id',
             'party_id' => 'required|exists:parties,id',
@@ -120,6 +131,7 @@ class IncomeReceiptController extends Controller
             $grandTotal = $afterDiscount + $vatAmount;
             $receipt = Receipt::create([
                 'receipt_no' => $this->generateReceiptNo(),
+                'so_no' => $this->generateSONo(),
                 'type' => $request->type,
                 'company_id' => $request->company_id,
                 'branch_id' => $request->branch_id,
@@ -149,7 +161,7 @@ class IncomeReceiptController extends Controller
                 ]);
             }
             DB::commit();
-            return redirect()->route('income.receipt.show', $receipt->id)->with('success', 'Invoice Created Successfully.');
+            return redirect()->route('sales.order.show', $receipt->id)->with('success', 'Sales Order Created Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -170,7 +182,7 @@ class IncomeReceiptController extends Controller
             'payments.user',
         ]);
         $paymentTypes = PaymentType::where('status', 'Active')->get();
-        return view('BackEnd.IncomeReceipt.show', compact('receipt', 'paymentTypes'));
+        return view('BackEnd.SalesOrder.show', compact('receipt', 'paymentTypes'));
     }
 
     public function edit(Receipt $receipt)
@@ -206,7 +218,7 @@ class IncomeReceiptController extends Controller
                 'details'           => $item->details,
             ];
         });
-        return view('BackEnd.IncomeReceipt.edit', compact('receipt', 'branches', 'parties', 'categories', 'receiptItems', 'companies'));
+        return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'categories', 'receiptItems', 'companies'));
     }
 
     public function update(Request $request, Receipt $receipt)
@@ -274,7 +286,7 @@ class IncomeReceiptController extends Controller
             }
             $receipt->save();
             DB::commit();
-            return redirect()->route('income.receipt.show', $receipt->id)->with('success', 'Receipt Updated Successfully.');
+            return redirect()->route('sales.order.show', $receipt->id)->with('success', 'Receipt Updated Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -309,7 +321,7 @@ class IncomeReceiptController extends Controller
                 'updated_by' => auth()->id(),
             ]);
             DB::commit();
-            return redirect()->route('income.receipt.show', $receipt->id);
+            return redirect()->route('sales.order.show', $receipt->id);
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
@@ -367,7 +379,7 @@ class IncomeReceiptController extends Controller
             'paid' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('paid_amount'),
             'due' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('due_amount'),
         ];
-        return view('BackEnd.IncomeReceipt.profile', compact('party', 'receipts', 'payments', 'summary', 'paymentTypes'));
+        return view('BackEnd.SalesOrder.profile', compact('party', 'receipts', 'payments', 'summary', 'paymentTypes'));
     }
 
     public function duePayment(Request $request, Party $party)
@@ -427,10 +439,50 @@ class IncomeReceiptController extends Controller
                 $amount -= $pay;
             }
             DB::commit();
-            return redirect()->route('income.party.profile', $party->id)->with('success', 'Due payment completed successfully.');
+            return redirect()->route('sales.order.profile', $party->id)->with('success', 'Due payment completed successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    private function generateDMNo()
+    {
+        do {
+            $number = 'DM-' . date('Ymd') . rand(1000, 9999);
+        } while (Receipt::where('dm_no', $number)->exists());
+        return $number;
+    }
+
+    private function generateInvoiceNo()
+    {
+        do {
+            $number = 'INV-' . date('Ymd') . rand(1000, 9999);
+        } while (Receipt::where('inv_no', $number)->exists());
+        return $number;
+    }
+
+    public function convertChallan(Receipt $receipt)
+    {
+        if ($receipt->is_challan) {
+            return back()->with('error', 'Already converted to Challan.');
+        }
+        $receipt->update([
+            'is_challan' => true,
+            'dm_no' => $this->generateDMNo(),
+        ]);
+        return back()->with('success', 'Converted to Challan Successfully.');
+    }
+
+    public function convertIncome(Receipt $receipt)
+    {
+        if ($receipt->is_invoice) {
+            return back()->with('error', 'Already converted to Invoice.');
+        }
+        $receipt->update([
+            'is_invoice' => true,
+            'inv_no' => $this->generateInvoiceNo(),
+        ]);
+        return back()->with('success', 'Converted to Invoice Successfully.');
     }
 }
