@@ -87,15 +87,10 @@ class ChallanController extends Controller
             'items' => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $companyPackage = PackageHelper::package();
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-            $limit = $companyPackage->package->challan_limit;
             $current = Receipt::where('company_id', Auth::user()->company_id)->where('type', 'Challan')->count();
 
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your Challan limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('challan_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
         DB::beginTransaction();

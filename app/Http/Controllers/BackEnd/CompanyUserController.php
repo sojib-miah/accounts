@@ -80,15 +80,10 @@ class CompanyUserController extends Controller
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $companyPackage = PackageHelper::package();
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-            $limit = $companyPackage->package->user_limit;
 
             $current = User::where('company_id', Auth::user()->company_id)->count();
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your company limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('user_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
 

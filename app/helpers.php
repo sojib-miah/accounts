@@ -29,6 +29,35 @@ class PackageHelper
                     ->orWhere('user_id', $user->id);
             })
             ->where('status', 'Active')
+            ->whereHas('package', function ($q) {
+                $q->where('is_active', 1)
+                    ->whereDate('end_date', '>=', now());
+            })
             ->first();
+    }
+
+    public static function checkLimit($field, $currentCount)
+    {
+        $companyPackage = self::package();
+
+        if (!$companyPackage) {
+            return 'No active package assigned.';
+        }
+
+        if (!$companyPackage->package->is_active) {
+            return 'Your package is inactive.';
+        }
+
+        if (now()->gt($companyPackage->package->end_date)) {
+            return 'Your package has expired.';
+        }
+
+        $limit = $companyPackage->package->{$field};
+
+        if ($limit != -1 && $currentCount >= $limit) {
+            return ucfirst(str_replace('_', ' ', $field)) . ' exceeded.';
+        }
+
+        return null;
     }
 }

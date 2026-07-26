@@ -73,6 +73,17 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
+                        <!-- company Name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Company Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="company_name" class="form-control"
+                                placeholder="Enter Company Name" required value="{{ old('company_name') }}">
+                            @error('company_name', 'add')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">

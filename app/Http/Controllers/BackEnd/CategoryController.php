@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ReceiptItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class CategoryController extends Controller
 {
@@ -31,6 +32,18 @@ class CategoryController extends Controller
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $totalCompany = Category::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('company_id', Auth::user()->company_id);
+            })->where('type', 'Expense')->count();
+
+            if ($message = PackageHelper::checkLimit('category_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
 
         Category::create([
             'company_id' => auth()->user()->company_id,

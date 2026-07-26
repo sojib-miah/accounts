@@ -8,6 +8,11 @@ class Package extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'end_date' => 'datetime',
+    ];
+
+
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_packages');

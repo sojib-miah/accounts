@@ -65,18 +65,10 @@ class BranchController extends Controller
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
 
-            $branchPackage = PackageHelper::package();
-
-            if (!$branchPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-
-            $limit = $branchPackage->package->branch_limit;
-
             $totalBranch = Branch::where('company_id', Auth::user()->company_id)->count();
 
-            if ($limit != -1 && $totalBranch >= $limit) {
-                return back()->with('error', 'Your branch limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('branch_limit', $totalBranch)) {
+                return back()->with('error', $message);
             }
         }
 

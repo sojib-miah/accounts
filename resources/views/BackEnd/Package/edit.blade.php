@@ -85,14 +85,51 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label>Payment Type Limit</label>
+                            <input type="number" name="payment_type_limit" class="form-control"
+                                id="edit_payment_type_limit">
+                            @error('payment_type_limit', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>Category Limit</label>
+                            <input type="number" name="category_limit" class="form-control" id="edit_category_limit">
+                            @error('category_limit', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>Item List Limit</label>
+                            <input type="number" name="item_list_limit" class="form-control" id="edit_item_list_limit">
+                            @error('item_list_limit', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>Sales Order Limit</label>
+                            <input type="number" name="sales_order_limit" class="form-control"
+                                id="edit_sales_order_limit">
+                            @error('sales_order_limit', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label>Ending Date</label>
+                            <input type="date" name="end_date" class="form-control" id="edit_end_date">
+                            @error('end_date', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <label>Storage Limit (MB)</label>
                             <input type="number" class="form-control" name="storage_limit" id="edit_storage_limit">
                             @error('storage_limit', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label>Status</label>
                             <select class="form-select" name="is_active" id="edit_status">
                                 <option value="1">

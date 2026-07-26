@@ -227,8 +227,9 @@
                             <table class="table table-bordered table-hover align-middle mb-0">
                                 <thead>
                                     <tr>
+                                        <th>sn</th>
                                         <th class="text-center">
-                                            RECEIPT ID
+                                            Invoice no
                                         </th>
                                         <th class="text-center">
                                             QTY
@@ -256,11 +257,9 @@
                                 <tbody>
                                     @forelse($receipts as $receipt)
                                         <tr>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('receipt.show', $receipt->id) }}"
-                                                    class="text-decoration-none text-primary">
-                                                    {{ $receipt->receipt_no }}
-                                                </a>
+                                                {{ $receipt->inv_no ?? $receipt->receipt_no }}
                                             </td>
                                             <td class="text-center">
                                                 {{ $receipt->total_qty }}
@@ -366,11 +365,9 @@
                             <table class="table table-bordered table-hover align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" width="80">
-                                            PAYMENT ID
-                                        </th>
+                                        <th>sn</th>
                                         <th class="text-center">
-                                            RECEIPT ID
+                                            Invoice no
                                         </th>
                                         <th class="text-center">
                                             PAID AMOUNT
@@ -392,14 +389,9 @@
                                 <tbody>
                                     @forelse($payments as $payment)
                                         <tr>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('receipt.show', $payment->receipt_id) }}"
-                                                    class="text-decoration-none text-primary">
-                                                    {{ $payment->id }}
-                                                </a>
-                                            </td>
-                                            <td class="text-center">
-                                                {{ $payment->receipt->receipt_no ?? '' }}
+                                                {{ $payment->receipt->inv_no ?? $payment->receipt->receipt_no }}
                                             </td>
                                             <td class="text-center fw-bold text-success">
                                                 {{ number_format($payment->amount, 2) }} TK

@@ -41,19 +41,17 @@ class CompanyController extends Controller
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $companyPackage = PackageHelper::package();
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-            $limit = $companyPackage->package->company_limit;
+
             $totalCompany = Company::where(function ($q) {
                 $q->where('created_by', Auth::id())
                     ->orWhere('id', Auth::user()->company_id);
             })->count();
-            if ($limit != -1 && $totalCompany >= $limit) {
-                return back()->with('error', 'Your company limit has been exceeded.');
+
+            if ($message = PackageHelper::checkLimit('company_limit', $totalCompany)) {
+                return back()->with('error', $message);
             }
         }
+
         $company = new Company();
         $company->name = $request->name;
         $company->created_by = Auth::id();

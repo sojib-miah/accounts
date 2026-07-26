@@ -44,7 +44,7 @@
                     <table class="table table-bordered table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th width="60">SL</th>
+                                <th>SL</th>
                                 <th>Package</th>
                                 <th>Price</th>
                                 <th>User</th>
@@ -55,9 +55,14 @@
                                 <th>Challan</th>
                                 <th>Party</th>
                                 <th>Account</th>
+                                <th>Payment Type</th>
+                                <th>Category</th>
+                                <th>Item list</th>
+                                <th>Sales Order</th>
+                                <th>End Date</th>
                                 <th>Storage</th>
                                 <th>Status</th>
-                                <th width="170">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +87,6 @@
 
                                     </td>
                                     <td>
-
                                         {{ $package->branch_limit }}
                                     </td>
                                     <td>
@@ -97,12 +101,14 @@
                                     <td>
                                         {{ $package->party_limit }}
                                     </td>
-                                    <td>
-                                        {{ $package->account_limit }}
-                                    </td>
+                                    <td>{{ $package->account_limit }}</td>
+                                    <td>{{ $package->payment_type_limit }}</td>
+                                    <td>{{ $package->category_limit }}</td>
+                                    <td>{{ $package->item_list_limit }}</td>
+                                    <td>{{ $package->sales_order_limit }}</td>
+                                    <td>{{ $package->end_date ?? '-' }}</td>
                                     <td>
                                         {{ $package->storage_limit }}
-
                                     </td>
                                     <td>
                                         @if ($package->is_active)
@@ -116,37 +122,52 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="btn-group">
-                                            <a href="{{ route('package.show', $package->id) }}"
-                                                class="btn btn-info btn-sm">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
-
-                                            <button class="btn btn-warning btn-sm editBtn" data-id="{{ $package->id }}"
-                                                data-name="{{ $package->name }}" data-price="{{ $package->price }}"
-                                                data-user="{{ $package->user_limit }}"
-                                                data-company="{{ $package->company_limit }}"
-                                                data-branch="{{ $package->branch_limit }}"
-                                                data-income="{{ $package->income_limit }}"
-                                                data-expense="{{ $package->expense_limit }}"
-                                                data-challan="{{ $package->challan_limit }}"
-                                                data-party="{{ $package->party_limit }}"
-                                                data-account="{{ $package->account_limit }}"
-                                                data-storage="{{ $package->storage_limit }}"
-                                                data-status="{{ $package->is_active }}"
-                                                data-remarks="{{ $package->remarks }}">
-                                                <i class="fa fa-edit"></i>
-
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
                                             </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li>
+                                                    <a href="{{ route('package.show', $package->id) }}"
+                                                        class="btn btn-info btn-sm w-100 mb-1">
+                                                        <i class="fa fa-eye"></i>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <button class="btn btn-warning btn-sm editBtn w-100 mb-1"
+                                                        data-id="{{ $package->id }}" data-name="{{ $package->name }}"
+                                                        data-price="{{ $package->price }}"
+                                                        data-user="{{ $package->user_limit }}"
+                                                        data-company="{{ $package->company_limit }}"
+                                                        data-branch="{{ $package->branch_limit }}"
+                                                        data-income="{{ $package->income_limit }}"
+                                                        data-expense="{{ $package->expense_limit }}"
+                                                        data-challan="{{ $package->challan_limit }}"
+                                                        data-party="{{ $package->party_limit }}"
+                                                        data-account="{{ $package->account_limit }}"
+                                                        data-payment="{{ $package->payment_type_limit }}"
+                                                        data-category="{{ $package->category_limit }}"
+                                                        data-item="{{ $package->item_list_limit }}"
+                                                        data-sales="{{ $package->sales_order_limit }}"
+                                                        data-end_date="{{ $package->end_date?->format('Y-m-d') }}"
+                                                        data-storage="{{ $package->storage_limit }}"
+                                                        data-status="{{ $package->is_active }}"
+                                                        data-remarks="{{ $package->remarks }}">
+                                                        <i class="fa fa-edit"></i>
 
-                                            <form action="{{ route('package.destroy', $package->id) }}" method="POST"
-                                                class="deleteForm d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger btn-sm">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('package.destroy', $package->id) }}"
+                                                        method="POST" class="deleteForm d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-danger btn-sm w-100 mb-1">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </td>
                                 </tr>
@@ -199,6 +220,11 @@
             $('#edit_challan_limit').val($(this).data('challan'));
             $('#edit_party_limit').val($(this).data('party'));
             $('#edit_account_limit').val($(this).data('account'));
+            $('#edit_payment_type_limit').val($(this).data('payment'));
+            $('#edit_category_limit').val($(this).data('category'));
+            $('#edit_item_list_limit').val($(this).data('item'));
+            $('#edit_sales_order_limit').val($(this).data('sales'));
+            $('#edit_end_date').val($(this).data('end_date'));
             $('#edit_storage_limit').val($(this).data('storage'));
             $('#edit_status').val($(this).data('status'));
             $('#edit_remarks').val($(this).data('remarks'));

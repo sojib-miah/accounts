@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('designation')->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('email')->nullable();
+            $table->string('company_name');
             $table->text('address')->nullable();
             $table->enum('type', ['Income', 'Expense']);
             $table->enum('status', ['Active', 'Inactive'])->default('Active');

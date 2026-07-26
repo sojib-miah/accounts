@@ -34,26 +34,19 @@ class PartyController extends Controller
     {
         $request->validateWithBag('add', [
             'name'    => 'required|max:255',
+            'company_name' => 'required|string|max:255',
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
         ]);
+
         if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $companyPackage = PackageHelper::package();
-
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-
-            $limit = $companyPackage->package->party_limit;
-
             $current = Party::where('created_by', Auth::id())->where('type', 'Expense')->count();
 
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your Payee Create limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('party_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
 
@@ -66,6 +59,7 @@ class PartyController extends Controller
             'company_id' => auth()->user()->company_id,
             'party_id'   => $partyId,
             'name'       => $request->name,
+            'company_name'       => $request->company_name,
             'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,
@@ -82,6 +76,7 @@ class PartyController extends Controller
     {
         $request->validateWithBag('edit', [
             'name'    => 'required|max:255',
+            'company_name' => 'required|string|max:255',
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -91,6 +86,7 @@ class PartyController extends Controller
 
         $party->update([
             'name'       => $request->name,
+            'company_name'       => $request->company_name,
             'designation'       => $request->designation,
             'phone'      => $request->phone,
             'email'      => $request->email,

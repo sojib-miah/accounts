@@ -112,10 +112,7 @@
                                         </td>
                                         {{-- Payee --}}
                                         <td class="text-center">
-                                            <a href="{{ route('income.party.profile', $receipt->party_id) }}"
-                                                class="text-decoration-none">
-                                                {{ $receipt->party->name }}
-                                            </a>
+                                            {{ $receipt->party->name }}
                                         </td>
                                         {{-- Receipt By --}}
                                         <td class="text-center">

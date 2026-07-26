@@ -97,21 +97,12 @@ class ReceiptController extends Controller
             'items' => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $companyPackage = PackageHelper::package();
-
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-
-            $limit = $companyPackage->package->expense_limit;
-
             $current = Receipt::where('company_id', Auth::user()->company_id)
                 ->where('type', 'Expense')
                 ->count();
 
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your Expense limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('expense_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
         DB::beginTransaction();
@@ -325,7 +316,9 @@ class ReceiptController extends Controller
             } elseif ($type == 'Income') {
                 return redirect()->route('income.receipt.index')->with('success', 'Receipt Deleted Successfully.');
             } elseif ($type == 'Challan') {
-                return redirect()->route('challan.index')->with('success', 'Receipt Deleted Successfully.');
+                return redirect()->route('challan.index')->with('success', 'Challan Deleted Successfully.');
+            } elseif ($type == 'Sales-Order') {
+                return redirect()->route('sales.order.index')->with('success', 'Sales Order Deleted Successfully.');
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -361,7 +354,13 @@ class ReceiptController extends Controller
                 'updated_by' => auth()->id(),
             ]);
             DB::commit();
-            return redirect()->route('receipt.show', $receipt->id);
+            if ($receipt->is_invoice) {
+                return redirect()->route('sales.order.show', $receipt->id);
+            } elseif ($receipt->type == 'Expense') {
+                return redirect()->route('receipt.show', $receipt->id);
+            } elseif ($receipt->is_challan) {
+                return redirect()->route('challan.show', $receipt->id);
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
@@ -406,27 +405,45 @@ class ReceiptController extends Controller
                 $receipt->payment_status = 'Pending';
             }
             $receipt->save();
-            if ($receipt->type == 'Income') {
+            if ($receipt->is_invoice) {
                 $account->current_balance += $request->amount;
-            } else {
+                $account->save();
+                AccountTransaction::create([
+                    'company_id'       => auth()->user()->company_id,
+                    'account_id'       => $account->id,
+                    'transaction_date' => $request->payment_date,
+                    'voucher_no'       => $receipt->inv_no ?? $receipt->receipt_no,
+                    'transaction_type' => 'Income',
+                    'purpose'          => 'Invoice Payment',
+                    'credit'           => $request->amount,
+                    'debit'            => 0,
+                    'balance'          => $account->current_balance,
+                    'receipt_id'       => $receipt->id,
+                    'created_by'       => Auth::id(),
+                ]);
+            } elseif ($receipt->type == 'Expense') {
                 $account->current_balance -= $request->amount;
+                $account->save();
+                AccountTransaction::create([
+                    'company_id'       => auth()->user()->company_id,
+                    'account_id'       => $account->id,
+                    'transaction_date' => $request->payment_date,
+                    'voucher_no'       => $receipt->receipt_no,
+                    'transaction_type' => 'Expense',
+                    'purpose'          => 'Expense Payment',
+                    'credit'           => 0,
+                    'debit'            => $request->amount,
+                    'balance'          => $account->current_balance,
+                    'receipt_id'       => $receipt->id,
+                    'created_by'       => Auth::id(),
+                ]);
             }
-            $account->save();
-            AccountTransaction::create([
-                'company_id' => auth()->user()->company_id,
-                'account_id'       => $account->id,
-                'transaction_date' => $request->payment_date,
-                'voucher_no'       => $receipt->receipt_no,
-                'transaction_type' => $receipt->type,
-                'purpose'          => $receipt->type == 'Income' ? 'Income Receipt Payment' : 'Expense Bill Payment',
-                'credit'           => $receipt->type == 'Income' ? $request->amount : 0,
-                'debit'            => $receipt->type == 'Expense' ? $request->amount : 0,
-                'balance'          => $account->current_balance,
-                'receipt_id'       => $receipt->id,
-                'created_by'       => Auth::id(),
-            ]);
             DB::commit();
-            return redirect()->route($receipt->type == 'Income' ? 'income.receipt.index' : 'receipt.expense.index')->with('success', 'Payment completed successfully.');
+            if ($receipt->is_invoice) {
+                return redirect()->route('income.receipt.index')->with('success', 'Payment completed successfully.');
+            } elseif ($receipt->type == 'Expense') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Payment completed successfully.');
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());

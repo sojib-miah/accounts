@@ -7,6 +7,7 @@ use App\Models\PaymentType;
 use App\Models\ReceiptPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class PaymentTypeController extends Controller
 {
@@ -27,6 +28,17 @@ class PaymentTypeController extends Controller
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $totalCompany = PaymentType::where(function ($q) {
+                $q->where('created_by', Auth::id());
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('payment_type_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
 
         PaymentType::create([
             'name'   => $request->name,

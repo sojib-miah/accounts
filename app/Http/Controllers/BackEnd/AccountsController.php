@@ -45,14 +45,9 @@ class AccountsController extends Controller
             'status'              => 'required|in:Active,Inactive',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $companyPackage = PackageHelper::package();
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-            $limit = $companyPackage->package->account_limit;
             $current = Account::where('created_by', Auth::id())->count();
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your Account Create limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('account_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
         DB::beginTransaction();

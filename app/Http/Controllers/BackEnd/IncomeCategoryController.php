@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class IncomeCategoryController extends Controller
 {
@@ -30,6 +31,18 @@ class IncomeCategoryController extends Controller
             'name'   => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if (!Auth::user()->hasRole('Super-Admin')) {
+
+            $totalCompany = Category::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('company_id', Auth::user()->company_id);
+            })->where('type', 'Income')->count();
+
+            if ($message = PackageHelper::checkLimit('category_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
 
         Category::create([
             'company_id' => auth()->user()->company_id,

@@ -87,16 +87,11 @@ class IncomeReceiptController extends Controller
             'items' => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $companyPackage = PackageHelper::package();
-            if (!$companyPackage) {
-                return back()->with('error', 'No active package assigned.');
-            }
-            $limit = $companyPackage->package->income_limit;
             $current = Receipt::where('company_id', Auth::user()->company_id)
                 ->where('type', 'Income')
                 ->count();
-            if ($limit != -1 && $current >= $limit) {
-                return back()->with('error', 'Your Invoice limit has been exceeded.');
+            if ($message = PackageHelper::checkLimit('income_limit', $current)) {
+                return back()->with('error', $message);
             }
         }
         DB::beginTransaction();
@@ -318,18 +313,23 @@ class IncomeReceiptController extends Controller
 
     public function profile(Request $request, Party $party)
     {
-        $receiptQuery = Receipt::with('creator')->where('party_id', $party->id)->where('type', 'Income');
+        $receiptQuery = Receipt::with([
+            'creator',
+            'branch',
+            'company'
+        ])
+            ->where('party_id', $party->id)
+            ->where('is_invoice', true);
 
-        // Receipt Search
         if ($request->filled('search')) {
             $search = $request->search;
             $receiptQuery->where(function ($q) use ($search) {
                 $q->where('receipt_no', 'like', "%{$search}%")
+                    ->orWhere('inv_no', 'like', "%{$search}%")
                     ->orWhere('remarks', 'like', "%{$search}%");
             });
         }
 
-        // Receipt Status Filter
         if ($request->filled('status')) {
             $receiptQuery->where(
                 'payment_status',
@@ -341,33 +341,50 @@ class IncomeReceiptController extends Controller
 
         $paymentQuery = ReceiptPayment::with([
             'receipt',
-            'paymentType'
+            'paymentType',
+            'account',
+            'user'
         ])
             ->whereHas('receipt', function ($q) use ($party) {
-                $q->where('party_id', $party->id);
+                $q->where('party_id', $party->id)
+                    ->where('is_invoice', true);
             });
 
-        // Payment Search
         if ($request->filled('payment_search')) {
             $search = $request->payment_search;
             $paymentQuery->where(function ($q) use ($search) {
                 $q->where('amount', 'like', "%{$search}%")
                     ->orWhere('note', 'like', "%{$search}%")
                     ->orWhereHas('receipt', function ($r) use ($search) {
-                        $r->where('receipt_no', 'like', "%{$search}%");
+                        $r->where('receipt_no', 'like', "%{$search}%")
+                            ->orWhere('inv_no', 'like', "%{$search}%");
                     });
             });
         }
+
         $payments = $paymentQuery->latest()->paginate(20, ['*'], 'payment_page')->withQueryString();
-        $paymentTypes = PaymentType::where('status', 'Active')->orderBy('name')->get();
+        $invoice = Receipt::where('party_id', $party->id)->where('is_invoice', true);
+
         $summary = [
-            'receipt_count' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->count(),
-            'qty' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('total_qty'),
-            'net' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('total_amount'),
-            'paid' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('paid_amount'),
-            'due' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('due_amount'),
+            'receipt_count' => (clone $invoice)->count(),
+            'qty' => (clone $invoice)->sum('total_qty'),
+            'net' => (clone $invoice)->sum('total_amount'),
+            'paid' => (clone $invoice)->sum('paid_amount'),
+            'due' => (clone $invoice)->sum('due_amount'),
         ];
-        return view('BackEnd.IncomeReceipt.profile', compact('party', 'receipts', 'payments', 'summary', 'paymentTypes'));
+
+        $paymentTypes = PaymentType::where('status', 'Active')->orderBy('name')->get();
+
+        return view(
+            'BackEnd.IncomeReceipt.profile',
+            compact(
+                'party',
+                'receipts',
+                'payments',
+                'summary',
+                'paymentTypes'
+            )
+        );
     }
 
     public function duePayment(Request $request, Party $party)

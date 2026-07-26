@@ -24,6 +24,11 @@ return new class extends Migration
             $table->integer('party_limit')->default(0);
             $table->integer('account_limit')->default(0);
             $table->integer('storage_limit')->default(0);
+            $table->integer('payment_type_limit')->default(0);
+            $table->integer('category_limit')->default(0);
+            $table->integer('item_list_limit')->default(0);
+            $table->integer('sales_order_limit')->default(0);
+            $table->timestamp('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('remarks')->nullable();
             $table->timestamps();

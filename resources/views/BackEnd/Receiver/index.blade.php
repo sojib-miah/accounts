@@ -44,6 +44,7 @@
                                     <th width="60">SN</th>
                                     <th>Customer ID</th>
                                     <th>Customer Name</th>
+                                    <th>Company Name</th>
                                     <th>Designation</th>
                                     <th>Phone</th>
                                     <th>Email</th>
@@ -64,6 +65,7 @@
                                                 {{ $party->name }}
                                             </a>
                                         </td>
+                                        <td>{{ $party->company_name }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
@@ -91,6 +93,7 @@
                                                     data-name="{{ $party->name }}" data-phone="{{ $party->phone }}"
                                                     data-email="{{ $party->email }}" data-address="{{ $party->address }}"
                                                     data-status="{{ $party->status }}"
+                                                    data-company_name="{{ $party->company_name }}"
                                                     data-designation="{{ $party->designation }}">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
@@ -111,7 +114,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="10" class="text-center">
-                                            No Receiver Found.
+                                            No Customer Found.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -135,6 +138,7 @@
                 document.getElementById('edit_phone').value = this.dataset.phone;
                 document.getElementById('edit_email').value = this.dataset.email;
                 document.getElementById('edit_address').value = this.dataset.address;
+                document.getElementById('edit_company_name').value = this.dataset.company_name;
                 $('#edit_status').val(this.dataset.status).trigger('change');
                 document.getElementById('editReceiverForm').action =
                     "{{ url('/admin/receiver') }}/" + this.dataset.id;
