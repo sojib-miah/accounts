@@ -116,17 +116,36 @@ class PermissionSeeder extends Seeder
             'contact-edit',
             'contact-delete',
 
-            // user list 
-            'user-list',
-            'user-create',
-            'user-edit',
-            'user-delete',
-
             // Settings
             'general-settings-list',
             'general-settings-create',
             'general-settings-edit',
             'general-settings-delete',
+
+            'income-challan-list',
+            'income-challan-edit',
+            'income-challan-delete',
+            'income-challan-create',
+            'menu-account-list',
+            'menu-company-list',
+            'menu-sales-list',
+            'menu-expense-list',
+            'menu-comits-user-list',
+            'menu-role-permission-list',
+            'menu-setting-list',
+            'expense-details-list',
+            'income-details-list',
+            'menu-package-list',
+            'package-edit',
+            'package-list',
+            'package-create',
+            'package-delete',
+            'income-salesorder-list',
+            'purchase-delete',
+            'purchase-list',
+            'purchase-edit',
+            'purchase-create',
+            'menu-purchase-list',
         ];
 
         foreach ($permissions as $permission) {

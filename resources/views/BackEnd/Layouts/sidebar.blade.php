@@ -83,6 +83,25 @@
             </li>
         @endcan
 
+        <!-- purchase -->
+        @can('menu-account-list')
+            <li class="menu-item {{ request()->routeIs('accounts.*') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="fa-solid fa-person-circle-check me-3"></i>
+                    Purchase
+                </a>
+                <ul class="menu-sub">
+                    @can('account-list')
+                        <li class="menu-item {{ request()->routeIs('accounts.index') ? 'active' : '' }}">
+                            <a href="{{ route('accounts.index') }}" class="menu-link">
+                                Account
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endcan
+
         <!-- Income seals-->
         @can('menu-sales-list')
             <li
