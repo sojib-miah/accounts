@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->date('transaction_date');
             $table->string('voucher_no');
-            $table->enum('transaction_type', ['Income', 'Expense', 'Sales-Order']);
+            $table->enum('transaction_type', ['Income', 'Expense', 'Sales-Order', 'Purchase-Order']);
             $table->text('purpose')->nullable();
             $table->decimal('credit', 15, 2)->default(0);
             $table->decimal('debit', 15, 2)->default(0);

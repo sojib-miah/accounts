@@ -1,224 +1,201 @@
-<!doctype html>
-
-<html lang="en" class=" layout-wide  customizer-hide" dir="ltr" data-skin="default" data-bs-theme="light"
-    data-assets-path="../../assets/" data-template="vertical-menu-template">
+<!DOCTYPE html>
+<html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-        <meta name="robots" content="noindex, nofollow" />
-        <title>Register Cover - Pages</title>
-
-        <meta name="description" content="" />
-
-        <!-- Favicon -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create An Account</title>
         <link rel="icon" type="image/x-icon"
             href="{{ optional(setting())->favaicon ? asset('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
-
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
-            rel="stylesheet" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/fonts/iconify-icons.css') }}" />
-
-        <script src="{{ asset('/assets/vendor/libs/@algolia/autocomplete-js.js') }}"></script>
-
-        <!-- Core CSS -->
-        <!-- build:css assets/vendor/css/theme.css  -->
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/node-waves/node-waves.css') }}" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/pickr/pickr-themes.css') }}" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/css/core.css') }}" />
-        <link rel="stylesheet" href="{{ asset('/assets/css/demo.css') }}" />
-
-        <!-- Vendors CSS -->
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-
-        <!-- endbuild -->
-
-        <!-- Vendor -->
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
-
-        <!-- Page CSS -->
-        <!-- Page -->
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/css/pages/page-auth.css') }}" />
-
-        <!-- Helpers -->
-        <script src="{{ asset('/assets/vendor/js/helpers.js') }}"></script>
-        <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-
-        <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-        <script src="{{ asset('/assets/vendor/js/template-customizer.js') }}"></script>
-
-        <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-
-        <script src="{{ asset('/assets/js/config.js') }}"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     </head>
 
     <body>
-        <!-- Content -->
-
-        <div class="authentication-wrapper authentication-cover" style="position: relative;">
-            <!-- Logo -->
-            <a href="{{ route('dashboard.index') }}" class="app-brand auth-cover-brand">
-                <span class="app-brand-text demo text-heading fw-bold">ComitsBD</span>
-            </a>
-            <!-- /Logo -->
-            <div class="authentication-inner row m-0">
-                <!-- /Left Text -->
-                <div class="d-none d-xl-flex col-xl-8 p-0">
-                    <div class="auth-cover-bg d-flex justify-content-center align-items-center">
-                        {{-- <img src="{{ asset('/assets/img/illustrations/auth-register-illustration-light.png') }}"
-                            alt="auth-register-cover" class="my-5 auth-illustration"
-                            data-app-light-img="illustrations/auth-register-illustration-light.png"
-                            data-app-dark-img="illustrations/auth-register-illustration-dark.png" />
-                        <img src="{{ asset('/assets/img/illustrations/bg-shape-image-light.png') }}"
-                            alt="auth-register-cover" class="platform-bg"
-                            data-app-light-img="illustrations/bg-shape-image-light.png"
-                            data-app-dark-img="illustrations/bg-shape-image-dark.png" /> --}}
+        <main class="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+            style="background-image:url('{{ asset('assets/img/bg.jpg') }}')">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <!-- Container -->
+            <div
+                class="relative z-10 w-full max-w-6xl mx-5 overflow-hidden rounded-3xl shadow-2xl bg-white/10 backdrop-blur-xl">
+                <div class="grid lg:grid-cols-2">
+                    <!-- ================= LEFT ================= -->
+                    <div class="hidden lg:flex flex-col justify-center p-12 text-white">
+                        <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
+                            class="w-52 mb-10 bg-white rounded-xl p-3">
+                        <h1 class="text-5xl font-bold leading-tight">
+                            Create <br> Your Account
+                        </h1>
+                        <p class="mt-6 text-white/80 text-lg leading-8">
+                            Join our secure digital banking platform and enjoy fast,
+                            safe and convenient financial services.
+                        </p>
+                        <div class="mt-12 space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">
+                                        Secure Registration
+                                    </h4>
+                                    <p class="text-sm text-white/70">
+                                        Your information is protected.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">
+                                        Fast Setup
+                                    </h4>
+                                    <p class="text-sm text-white/70">
+                                        Register within one minute.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">
+                                        Safe Banking
+                                    </h4>
+                                    <p class="text-sm text-white/70">
+                                        Modern security for your account.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <!-- /Left Text -->
-
-                <!-- Register -->
-                <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6"
-                    style="position: absolute; top: 0; height:100%; left: 50%; transform: translateX(-50%);">
-                    <div class="w-px-400 mx-auto mt-12 pt-5">
-                        <h4 class="mb-1">Adventure starts here 🚀</h4>
-                        <p class="mb-6">Make your app management easy and fun!</p>
-
+                    <!-- ================= RIGHT ================= -->
+                    <div class="p-8 lg:p-12 bg-white/10 backdrop-blur-2xl border-l border-white/20 text-white">
+                        <h2 class="text-3xl font-bold">
+                            Registration
+                        </h2>
+                        <p class="mt-2 text-white/70">
+                            Fill in your details to create an account.
+                        </p>
                         <form id="formAuthentication" class="mb-6" method="POST"
                             action="{{ route('admin.register.store') }}">
                             @csrf
-                            <div class="mb-6 form-control-validation">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="name"
-                                    placeholder="Enter your username" autofocus value="{{ old('name') }}" />
-                                @error('name')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                            <!-- Username -->
+                            <div class="mt-6">
+                                <label class="font-medium">
+                                    Username
+                                </label>
+                                <input id="name" type="text" name="name" value="{{ old('name') }}"
+                                    placeholder="Enter your username"
+                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-400/40">
                             </div>
-                            <div class="mb-6 form-control-validation">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="email" name="email"
-                                    placeholder="Enter your email" value="{{ old('email') }}" />
-                                @error('email')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                            @error('name')
+                                <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
+                            @enderror
+                            <!-- Email -->
+                            <div class="mt-5">
+                                <label class="font-medium">
+                                    Email Address
+                                </label>
+                                <input id="email" type="email" name="email" value="{{ old('email') }}"
+                                    placeholder="Enter your email"
+                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-400/40">
                             </div>
-                            <div class="mb-6 form-password-toggle form-control-validation">
-                                <label class="form-label" for="password">Password</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" name="password"
-                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="password" />
-                                    <span class="input-group-text cursor-pointer"><i
-                                            class="icon-base ti tabler-eye-off"></i></span>
+                            @error('email')
+                                <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
+                            @enderror
+                            <!-- Password -->
+                            <div class="mt-5">
+                                <label class="font-medium">
+                                    Password
+                                </label>
+                                <div
+                                    class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+                                    <input id="password" type="password" name="password" placeholder="Enter Password"
+                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 outline-none">
+                                    <button id="togglePassword" type="button"
+                                        class="px-4 text-white hover:text-red-300">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
                                 </div>
                                 @error('password')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="mb-6 form-password-toggle form-control-validation">
-                                <label class="form-label" for="confirm-password">Confirm Password</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="confirm-password" class="form-control"
-                                        name="password_confirmation"
-                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="password" />
-                                    <span class="input-group-text cursor-pointer"><i
-                                            class="icon-base ti tabler-eye-off"></i></span>
+                            <!-- Confirm Password -->
+                            <div class="mt-5">
+                                <label class="font-medium">
+                                    Confirm Password
+                                </label>
+                                <div
+                                    class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+                                    <input id="confirmPassword" name="password_confirmation" type="password"
+                                        placeholder="Confirm Password"
+                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 outline-none">
+                                    <button id="toggleConfirmPassword" type="button"
+                                        class="px-4 text-white hover:text-red-300">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="mb-6 mt-8">
-                                <div class="form-check mb-8 ms-2 form-control-validation">
-                                    <input class="form-check-input" type="checkbox" id="terms-conditions"
-                                        name="terms" />
-                                    <label class="form-check-label" for="terms-conditions">
-                                        I agree to
-                                        <a href="javascript:void(0);">privacy policy & terms</a>
-                                    </label>
-                                </div>
+                            <!-- Terms -->
+                            <div class="mt-6 flex items-center gap-3">
+                                <input type="checkbox" name="terms" class="h-4 w-4 rounded accent-red-500">
+                                <label class="text-sm text-white/80">
+                                    I agree to the
+                                    <a href="javascript:void(0);" class="font-semibold text-red-300 hover:text-red-200">
+                                        Terms & Conditions
+                                    </a>
+                                </label>
                             </div>
-                            <button type="submit" class="btn btn-primary d-grid w-100">Sign up</button>
+                            <!-- Register Button -->
+                            <button type="submit" id="registerBtn"
+                                class="mt-8 w-full rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-red-700 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/40">
+                                Create Account
+                            </button>
                         </form>
-
-                        <p class="text-center">
-                            <span>Already have an account?</span>
-                            <a href="{{ route('admin.login') }}">
-                                <span>Sign in instead</span>
+                        <!-- Login -->
+                        <p class="mt-6 text-center text-white/80">
+                            Already have an account?
+                            <a href="{{ route('admin.login') }}"
+                                class="font-semibold text-red-300 transition hover:text-red-200">
+                                Login
                             </a>
                         </p>
-
-                        <div class="divider my-6">
-                            <div class="divider-text">or</div>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-facebook me-1_5">
-                                <i class="icon-base ti tabler-brand-facebook-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-twitter me-1_5">
-                                <i class="icon-base ti tabler-brand-twitter-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-github me-1_5">
-                                <i class="icon-base ti tabler-brand-github-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
-                                <i class="icon-base ti tabler-brand-google-filled icon-20px"></i>
-                            </a>
-                        </div>
                     </div>
                 </div>
-                <!-- /Register -->
             </div>
-        </div>
-
-        <!-- / Content -->
-
-        <!-- Core JS -->
-        <!-- build:js assets/vendor/js/theme.js  -->
-
-        <script src="{{ asset('/assets/vendor/libs/jquery/jquery.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/popper/popper.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/js/bootstrap.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/node-waves/node-waves.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/pickr/pickr.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/hammer/hammer.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/i18n/i18n.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/js/menu.js') }}"></script>
-
-        <!-- endbuild -->
-
-        <!-- Vendors JS -->
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/popular.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
-
-        <!-- Main JS -->
-
-        <script src="{{ asset('/assets/js/main.js') }}"></script>
-
-        <!-- Page JS -->
-        <script src="{{ asset('/assets/js/pages-auth.js') }}"></script>
+        </main>
     </body>
+    <script>
+        function setupPasswordToggle(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            const icon = button.querySelector('i');
+
+            button.addEventListener('click', () => {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+
+                // toggle icon
+                if (type === 'text') {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        // initialize both toggles
+        setupPasswordToggle('password', 'togglePassword');
+        setupPasswordToggle('confirmPassword', 'toggleConfirmPassword');
+    </script>
+
 
 </html>

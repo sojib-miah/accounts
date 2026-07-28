@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Receipt Details')
+@section('title', 'Invoice Details')
 
 @section('content')
     <div class="mx-5 py-3">
@@ -30,11 +30,11 @@
                                 <div class="row">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                         <div class="col-4 text-end">
-                                            <b>Id:</b>
+                                            <b>INV No:</b>
                                         </div>
                                         <div class="col-8">
                                             <input type="text" class="form-control" readonly
-                                                value="{{ $receipt->receipt_no }}">
+                                                value="{{ $receipt->inv_no }}">
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center gap-2">

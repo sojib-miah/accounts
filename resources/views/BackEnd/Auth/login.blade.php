@@ -1,218 +1,138 @@
-<!doctype html>
-
-<html lang="en" class=" layout-wide  customizer-hide" dir="ltr" data-skin="default" data-bs-theme="light"
-    data-assets-path="../../assets/" data-template="vertical-menu-template">
+<!DOCTYPE html>
+<html lang="en">
 
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-        <meta name="robots" content="noindex, nofollow" />
-        <title>Login Cover - Pages</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login Page</title>
 
-        <meta name="description" content="" />
-
-        <!-- Favicon -->
         <link rel="icon" type="image/x-icon"
             href="{{ optional(setting())->favaicon ? asset('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
-
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
-            rel="stylesheet" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/fonts/iconify-icons.css') }}" />
-
-        <script src="{{ asset('/assets/vendor/libs/@algolia/autocomplete-js.js') }}"></script>
-
-        <!-- Core CSS -->
-        <!-- build:css assets/vendor/css/theme.css  -->
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/node-waves/node-waves.css') }}" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/pickr/pickr-themes.css') }}" />
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/css/core.css') }}" />
-        <link rel="stylesheet" href="{{ asset('/assets/css/demo.css') }}" />
-
-        <!-- Vendors CSS -->
-
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-
-        <!-- endbuild -->
-
-        <!-- Vendor -->
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
-
-        <!-- Page CSS -->
-        <!-- Page -->
-        <link rel="stylesheet" href="{{ asset('/assets/vendor/css/pages/page-auth.css') }}" />
-
-        <!-- Helpers -->
-        <script src="{{ asset('/assets/vendor/js/helpers.js') }}"></script>
-        <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-
-        <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-        <script src="{{ asset('/assets/vendor/js/template-customizer.js') }}"></script>
-
-        <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-
-        <script src="{{ asset('/assets/js/config.js') }}"></script>
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     </head>
 
     <body>
-        <!-- Content -->
-        <div class="authentication-wrapper authentication-cover" style="position: relative;">
-            <!-- Logo -->
-            <a href="{{ route('dashboard.index') }}" class="app-brand auth-cover-brand">
-                <span class="app-brand-text demo text-heading fw-bold">ComitsBD</span>
-            </a>
-            <!-- /Logo -->
-            <div class="authentication-inner row m-0">
-                <!-- /Left Text -->
-                <div class="d-none d-xl-flex p-0">
-                   <div class="auth-cover-bg d-flex justify-content-center align-items-center">
-                        <!-- <img src="{{ asset('/assets/img/illustrations/auth-login-illustration-light.png') }}"
-                            alt="auth-login-cover" class="my-5 auth-illustration"
-                            data-app-light-img="illustrations/auth-login-illustration-light.png"
-                            data-app-dark-img="illustrations/auth-login-illustration-dark.png" />
-                        <img src="{{ asset('/assets/img/illustrations/bg-shape-image-light.png') }}"
-                            alt="auth-login-cover" class="platform-bg"
-                            data-app-light-img="illustrations/bg-shape-image-light.png"
-                            data-app-dark-img="illustrations/bg-shape-image-dark.png" /> -->
+        <main class="relative flex min-h-screen items-center justify-center bg-cover bg-center"
+            style="background-image: url('{{ asset('assets/img/bg.jpg') }}');">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="relative z-10 w-full max-w-md px-5">
+                <div class="rounded-3xl border border-white/30 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
+                    <div class="mb-8 flex justify-center">
+                        <div class="rounded-2xl bg-white px-3 py-2 shadow-lg">
+                            <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
+                                alt="COMITS" class="h-auto w-44 object-contain">
+                        </div>
                     </div>
-                </div>
-                <!-- /Left Text -->
-
-                <!-- Login -->
-                <div class="d-flex col-12 col-xl-4 align-items-center justify-content-center authentication-bg p-sm-12 p-6"
-                    style="position: absolute; top: 0; height:100%; left: 50%; transform: translateX(-50%);">
-
-                    <div class="w-px-400 mx-auto mt-12 pt-5">
-                        <h4 class="mb-1">Welcome to ComitsBD!</h4>
-                        <p class="mb-6">Please sign-in to your account and start the adventure</p>
-
-                        <form id="formAuthentication" class="mb-6" method="POST"
-                            action="{{ route('admin.login.submit') }}">
-
-                            @if (session('error'))
-                                <div class="alert alert-danger">
-                                    {{ session('error') }}
-                                </div>
-                            @endif
-                            @if (session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-                            @csrf
-                            <div class="mb-6 form-control-validation">
-                                <label for="email" class="form-label">Email or Username</label>
-                                <input type="text" class="form-control" id="email" name="login"
-                                    placeholder="Enter your email or username" autofocus value="{{ old('login') }}" />
-                                @error('login')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="mb-6 form-password-toggle form-control-validation">
-                                <label class="form-label" for="password">Password</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" name="password"
-                                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                        aria-describedby="password" />
-                                    <span class="input-group-text cursor-pointer"><i
-                                            class="icon-base ti tabler-eye-off"></i></span>
-                                </div>
-                                @error('password')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="my-8">
-                                <div class="d-flex justify-content-between">
-                                    <div class="form-check mb-0 ms-2">
-                                        <input class="form-check-input" type="checkbox" id="remember-me"
-                                            name="remember" />
-                                        <label class="form-check-label" for="remember-me"> Remember Me </label>
-                                    </div>
-                                    <a href="{{ route('admin.password.request') }}">
-                                        <p class="mb-0">Forgot Password?</p>
-                                    </a>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary d-grid w-100">Sign in</button>
-                        </form>
-
-                        <p class="text-center">
-                            <span>New on our platform?</span>
-                            <a href="{{ route('admin.register') }}">
-                                <span>Create an account</span>
-                            </a>
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-white">
+                            Welcome Back
+                        </h2>
+                        <p class="mt-2 text-white/70">
+                            Sign in to access your account
                         </p>
-
-                        <div class="divider my-6">
-                            <div class="divider-text">or</div>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-facebook me-1_5">
-                                <i class="icon-base ti tabler-brand-facebook-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-twitter me-1_5">
-                                <i class="icon-base ti tabler-brand-twitter-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-github me-1_5">
-                                <i class="icon-base ti tabler-brand-github-filled icon-20px"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
-                                <i class="icon-base ti tabler-brand-google-filled icon-20px"></i>
-                            </a>
-                        </div>
                     </div>
+                    <form id="formAuthentication" class="mb-6" method="POST"
+                        action="{{ route('admin.login.submit') }}">
+
+                        @if (session('error'))
+                            <div class="my-2 rounded-lg bg-red-100 border border-red-400 text-red-700 px-4 py-3">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        @if (session('success'))
+                            <div class="my-2 rounded-lg bg-green-100 border border-green-400 text-green-700 px-4 py-3">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @csrf
+                        <div class="mt-8">
+                            <label class="text-sm text-white">
+                                Email or Username
+                            </label>
+                            <div
+                                class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+                                <div class="flex h-12 w-12 items-center justify-center text-white">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <input id="mobile" type="text" name="login" value="{{ old('login') }}"
+                                    placeholder="Enter your email or username"
+                                    class="flex-1 bg-transparent text-white placeholder:text-gray-300 outline-none">
+                            </div>
+                            @error('login')
+                                <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mt-5">
+                            <label class="text-sm text-white">
+                                Password
+                            </label>
+                            <div
+                                class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+                                <div class="flex h-12 w-12 items-center justify-center text-white">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                                <input id="password" type="password" placeholder="Password" name="password"
+                                    class="flex-1 bg-transparent text-white placeholder:text-gray-300 outline-none">
+                                <button type="button" id="togglePassword"
+                                    class="flex h-12 w-12 items-center justify-center text-white">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            @error('password')
+                                <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <label class="flex items-center gap-2 text-sm text-white">
+                                <input type="checkbox" name="remember">
+                                Remember me
+                            </label>
+                            <a href="{{ route('admin.password.request') }}"
+                                class="text-cyan-300 transition hover:text-cyan-200">
+                                Forgot Password?
+                            </a>
+                        </div>
+                        <!-- Button -->
+                        <button type="submit" id="loginBtn"
+                            class="mt-8 w-full rounded-xl bg-red-500 py-3 text-lg font-semibold text-white transition duration-300 hover:scale-[1.02]">
+                            Login
+                        </button>
+                    </form>
+                    <p class="mt-6 text-center text-white/80">
+                        Don't have an account?
+                        <a href="{{ route('admin.register') }}"
+                            class="font-semibold text-cyan-300 hover:text-cyan-200">
+                            Register
+                        </a>
+                    </p>
                 </div>
-                <!-- /Login -->
             </div>
-        </div>
-
-        <!-- / Content -->
-
-        <!-- Core JS -->
-        <!-- build:js assets/vendor/js/theme.js  -->
-
-        <script src="{{ asset('/assets/vendor/libs/jquery/jquery.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/popper/popper.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/js/bootstrap.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/node-waves/node-waves.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/pickr/pickr.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/hammer/hammer.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/libs/i18n/i18n.js') }}"></script>
-
-        <script src="{{ asset('/assets/vendor/js/menu.js') }}"></script>
-
-        <!-- endbuild -->
-
-        <!-- Vendors JS -->
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/popular.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
-        <script src="{{ asset('/assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
-
-        <!-- Main JS -->
-
-        <script src="{{ asset('/assets/js/main.js') }}"></script>
-
-        <!-- Page JS -->
-        <script src="{{ asset('/assets/js/pages-auth.js') }}"></script>
+        </main>
     </body>
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const icon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', function() {
+            // toggle type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+
+            // toggle icon
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 
 </html>

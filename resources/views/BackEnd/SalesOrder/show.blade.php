@@ -30,11 +30,11 @@
                                 <div class="row">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                         <div class="col-4 text-end">
-                                            <b>Id:</b>
+                                            <b>So No:</b>
                                         </div>
                                         <div class="col-8">
                                             <input type="text" class="form-control" readonly
-                                                value="{{ $receipt->receipt_no }}">
+                                                value="{{ $receipt->so_no }}">
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center gap-2">
@@ -141,7 +141,7 @@
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding: 8px !important;">
                         <h3 class="mb-0 fw-bold">
-                            Invoice Item List
+                            Sales Order Item List
                         </h3>
                     </div>
                     <div class="card-body p-0">
@@ -151,7 +151,7 @@
                                     <tr>
                                         <th width="60" class="text-center">SN</th>
                                         <th>Category</th>
-                                        <th>Invoice</th>
+                                        <th>Item Description</th>
                                         <th width="90" class="text-center">Qty</th>
                                         <th width="120" class="text-end">Unit Price</th>
                                         <th width="120" class="text-end">Total Amount</th>
@@ -300,7 +300,7 @@
                 <div class="card shadow-sm border-0 mb-3">
                     <div class="card-header">
                         <strong>
-                            Invoice Notes
+                            Sales Order Notes
                         </strong>
                         <span class="text-danger">*</span>
                     </div>
@@ -316,7 +316,7 @@
                             @csrf
                             <button class="btn btn-success btn-lg w-100" onclick="return confirm('Convert to Challan?')">
                                 <i class="fa-solid fa-arrows-to-circle me-2"></i>
-                                Convert Challan
+                                Create Challan
                             </button>
                         </form>
                     @else
@@ -333,7 +333,7 @@
                             @csrf
                             <button class="btn btn-danger btn-lg w-100" onclick="return confirm('Convert to Invoice?')">
                                 <i class="fa-solid fa-arrows-to-circle me-2"></i>
-                                Convert Invoice
+                                Create Invoice
                             </button>
                         </form>
                     @else

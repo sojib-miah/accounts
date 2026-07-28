@@ -34,7 +34,7 @@
                                         </div>
                                         <div class="col-8">
                                             <input type="text" class="form-control" readonly
-                                                value="{{ $receipt->receipt_no }}">
+                                                value="{{ $receipt->dm_no }}">
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center gap-2">

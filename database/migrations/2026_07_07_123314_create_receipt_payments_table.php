@@ -13,22 +13,13 @@ return new class extends Migration
     {
         Schema::create('receipt_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('receipt_id')
-                ->constrained()
-                ->cascadeOnDelete();
-            $table->foreignId('payment_type_id')
-                ->constrained('payment_types')
-                ->restrictOnDelete();
-            $table->foreignId('account_id')
-                ->constrained('accounts')
-                ->restrictOnDelete();
+            $table->foreignId('receipt_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('payment_type_id')->constrained('payment_types')->restrictOnDelete();
+            $table->foreignId('account_id')->constrained('accounts')->restrictOnDelete();
             $table->date('payment_date');
             $table->decimal('amount', 15, 2);
             $table->text('note')->nullable();
-            $table->foreignId('created_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

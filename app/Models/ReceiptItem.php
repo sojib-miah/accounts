@@ -22,4 +22,9 @@ class ReceiptItem extends Model
     {
         return $this->belongsTo(AccountHead::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
