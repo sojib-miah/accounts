@@ -18,6 +18,9 @@ use App\Http\Controllers\BackEnd\PartyController;
 use App\Http\Controllers\BackEnd\PaymentDetailesController;
 use App\Http\Controllers\BackEnd\PaymentTypeController;
 use App\Http\Controllers\BackEnd\PermissionController;
+use App\Http\Controllers\BackEnd\ProductCategoryController;
+use App\Http\Controllers\BackEnd\ProductController;
+use App\Http\Controllers\BackEnd\PurchaseController;
 use App\Http\Controllers\BackEnd\ReceiptController;
 use App\Http\Controllers\BackEnd\ReceiverController;
 use App\Http\Controllers\BackEnd\ReportController;
@@ -207,4 +210,14 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
 
     // package route 
     Route::resource('package', PackageController::class);
+
+    // product Route 
+    Route::resource('product', ProductController::class);
+
+    // purchase route 
+    Route::resource('purchase', PurchaseController::class);
+    Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+
+    // product category route 
+    Route::resource('product-category', ProductCategoryController::class);
 });

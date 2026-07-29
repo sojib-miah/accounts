@@ -99,7 +99,7 @@
                         </div>
                         <!-- Button -->
                         <button type="submit" id="loginBtn"
-                            class="mt-8 w-full rounded-xl bg-red-500 py-3 text-lg font-semibold text-white transition duration-300 hover:scale-[1.02]">
+                            class="mt-8 w-full rounded-xl bg-cyan-500 py-3 text-lg font-semibold text-white transition duration-300 hover:scale-[1.02]">
                             Login
                         </button>
                     </form>

@@ -31,13 +31,24 @@ class Product extends Model
         return $this->hasMany(ReceiptItem::class);
     }
 
-    public function stockTransactions()
-    {
-        return $this->hasMany(StockTransaction::class);
-    }
-
     public function items()
     {
         return $this->hasMany(ReceiptItem::class);
+    }
+
+    public function purchaseItems()
+    {
+        return $this->hasMany(ReceiptItem::class)
+            ->whereHas('receipt', function ($q) {
+                $q->where('type', 'Purchase-Order');
+            });
+    }
+
+    public function salesItems()
+    {
+        return $this->hasMany(ReceiptItem::class)
+            ->whereHas('receipt', function ($q) {
+                $q->where('type', 'Sales-Order');
+            });
     }
 }

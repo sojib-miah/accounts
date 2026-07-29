@@ -33,7 +33,7 @@
                         </p>
                         <div class="mt-12 space-y-6">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-user-shield"></i>
                                 </div>
                                 <div>
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-bolt"></i>
                                 </div>
                                 <div>
@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-lock"></i>
                                 </div>
                                 <div>
@@ -103,18 +103,18 @@
                                     Email Address
                                 </label>
                                 <input id="email" type="email" name="email" placeholder="Enter your email"
-                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-400/40">
+                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40">
                             </div>
                             @error('email')
                                 <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
                             @enderror
                             <div class="mt-8 flex gap-5">
                                 <a href="{{ route('admin.login') }}" id="backBtn"
-                                    class="w-1/2 rounded-xl text-center border border-red-600 bg-white py-4 font-semibold text-red-600 transition hover:bg-red-50">
+                                    class="w-1/2 rounded-xl text-center border border-cyan-600 bg-white py-4 font-semibold text-cyan-600 transition hover:bg-cyan-50">
                                     Back To Login
                                 </a>
                                 <button id="registerBtn" type="submit"
-                                    class="w-1/2 rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-red-700 py-4 font-semibold text-white transition">
+                                    class="w-1/2 rounded-xl bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-700 py-4 font-semibold text-white transition">
                                     Submit
                                 </button>
                             </div>
@@ -123,7 +123,7 @@
                         <p class="mt-6 text-center text-white/80">
                             Already have an account?
                             <a href="{{ route('admin.login') }}"
-                                class="font-semibold text-red-300 transition hover:text-red-200">
+                                class="font-semibold text-cyan-300 transition hover:text-cyan-200">
                                 Login
                             </a>
                         </p>

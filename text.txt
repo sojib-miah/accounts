@@ -1,12 +1,13 @@
 receipts table update 'type'=>'Purchase-Order'.
 account_transactions table update 'transaction_type'=>'Purchase-Order'.
+parties table update ['Customer', 'Supplier', 'Income', 'Expense', 'Both']
+recepitis table branch_id null.
+receipt_items table account_head_id, category_id null.
+categories table update type 'Product'.
+
 
 ALTER TABLE `receipts`
-ADD COLUMN `is_receive` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_invoice`,
-ADD COLUMN `is_bill` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_receive`,
-ADD COLUMN `po_no` VARCHAR(255) NULL UNIQUE AFTER `is_bill`,
-ADD COLUMN `grn_no` VARCHAR(255) NULL UNIQUE AFTER `po_no`,
-ADD COLUMN `purchase_bill_no` VARCHAR(255) NULL UNIQUE AFTER `grn_no`;
+ADD COLUMN `po_no` VARCHAR(255) NULL UNIQUE AFTER `is_invoice`;
 
 CREATE TABLE `products` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -45,49 +46,3 @@ ADD CONSTRAINT `receipt_items_product_id_foreign`
 FOREIGN KEY (`product_id`)
 REFERENCES `products`(`id`)
 ON DELETE SET NULL;
-
-CREATE TABLE `stock_transactions` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `company_id` BIGINT UNSIGNED NULL,
-    `branch_id` BIGINT UNSIGNED NULL,
-    `product_id` BIGINT UNSIGNED NOT NULL,
-    `receipt_item_id` BIGINT UNSIGNED NULL,
-    `transaction_type` ENUM('Purchase', 'Sale', 'Adjustment', 'Opening') NOT NULL,
-    `stock_in` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    `stock_out` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    `balance` DECIMAL(15,2) NOT NULL,
-    `transaction_date` DATE NOT NULL,
-    `created_by` BIGINT UNSIGNED NULL,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL,
-
-    PRIMARY KEY (`id`),
-
-    CONSTRAINT `stock_transactions_company_id_foreign`
-        FOREIGN KEY (`company_id`)
-        REFERENCES `companies`(`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `stock_transactions_branch_id_foreign`
-        FOREIGN KEY (`branch_id`)
-        REFERENCES `branches`(`id`)
-        ON DELETE SET NULL,
-
-    CONSTRAINT `stock_transactions_product_id_foreign`
-        FOREIGN KEY (`product_id`)
-        REFERENCES `products`(`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `stock_transactions_receipt_item_id_foreign`
-        FOREIGN KEY (`receipt_item_id`)
-        REFERENCES `receipt_items`(`id`)
-        ON DELETE SET NULL,
-
-    CONSTRAINT `stock_transactions_created_by_foreign`
-        FOREIGN KEY (`created_by`)
-        REFERENCES `users`(`id`)
-        ON DELETE SET NULL
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-

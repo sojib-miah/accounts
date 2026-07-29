@@ -13,12 +13,12 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <!-- Dashboards -->
+        <!-- Dashboard -->
         @can('dashboard-view')
             <li class="menu-item {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.index') }}" class="menu-link">
                     <i class="menu-icon icon-base ti tabler-smart-home"></i>
-                    <div data-i18n="Dashboards">Dashboards</div>
+                    <div data-i18n="Dashboards">Dashboard</div>
                 </a>
             </li>
         @endcan
@@ -83,24 +83,41 @@
             </li>
         @endcan
 
+        {{-- products  --}}
+        <li
+            class="menu-item {{ request()->routeIs('product.*') || request()->routeIs('product-category.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-brands fa-product-hunt me-3"></i>
+                Products
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('product-category.index') ? 'active' : '' }}">
+                    <a href="{{ route('product-category.index') }}" class="menu-link">
+                        Category
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('product.index') ? 'active' : '' }}">
+                    <a href="{{ route('product.index') }}" class="menu-link">
+                        Products
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- purchase -->
-        @can('menu-account-list')
-            <li class="menu-item {{ request()->routeIs('accounts.*') ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="fa-solid fa-person-circle-check me-3"></i>
-                    Purchase
-                </a>
-                <ul class="menu-sub">
-                    @can('account-list')
-                        <li class="menu-item {{ request()->routeIs('accounts.index') ? 'active' : '' }}">
-                            <a href="{{ route('accounts.index') }}" class="menu-link">
-                                Account
-                            </a>
-                        </li>
-                    @endcan
-                </ul>
-            </li>
-        @endcan
+        <li class="menu-item {{ request()->routeIs('purchase.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-solid fa-basket-shopping me-3"></i>
+                Purchase
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('purchase.index') ? 'active' : '' }}">
+                    <a href="{{ route('purchase.index') }}" class="menu-link">
+                        Purchase Order
+                    </a>
+                </li>
+            </ul>
+        </li>
 
         <!-- Income seals-->
         @can('menu-sales-list')
@@ -267,14 +284,14 @@
 
         {{-- package  --}}
         @can('menu-package-list')
-            <li class="menu-item {{ request()->routeIs('package*') ? 'active open' : '' }}">
+            <li class="menu-item {{ request()->routeIs('package.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-cubes me-3"></i>
                     Package
                 </a>
                 <ul class="menu-sub">
                     {{-- @can('') --}}
-                    <li class="menu-item {{ request()->routeIs('package.*') ? 'active' : '' }}">
+                    <li class="menu-item {{ request()->routeIs('package.index') ? 'active' : '' }}">
                         <a href="{{ route('package.index') }}" class="menu-link">
                             Package
                         </a>

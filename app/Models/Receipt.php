@@ -47,4 +47,14 @@ class Receipt extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Party::class, 'party_id');
+    }
+
+    public function grns()
+    {
+        return $this->hasMany(Grn::class);
+    }
 }

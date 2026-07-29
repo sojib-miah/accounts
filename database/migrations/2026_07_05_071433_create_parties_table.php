@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('company_name');
             $table->text('address')->nullable();
-            $table->enum('type', ['Income', 'Expense']);
+            $table->enum('type', ['Customer', 'Supplier', 'Income', 'Expense', 'Both']);
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

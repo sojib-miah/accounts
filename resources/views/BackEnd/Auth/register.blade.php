@@ -33,7 +33,7 @@
                         </p>
                         <div class="mt-12 space-y-6">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-user-shield"></i>
                                 </div>
                                 <div>
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-bolt"></i>
                                 </div>
                                 <div>
@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
                                     <i class="fa-solid fa-lock"></i>
                                 </div>
                                 <div>
@@ -91,7 +91,7 @@
                                 </label>
                                 <input id="name" type="text" name="name" value="{{ old('name') }}"
                                     placeholder="Enter your username"
-                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-400/40">
+                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40">
                             </div>
                             @error('name')
                                 <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
@@ -103,7 +103,7 @@
                                 </label>
                                 <input id="email" type="email" name="email" value="{{ old('email') }}"
                                     placeholder="Enter your email"
-                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-red-400 focus:ring-2 focus:ring-red-400/40">
+                                    class="mt-2 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40">
                             </div>
                             @error('email')
                                 <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
@@ -116,9 +116,9 @@
                                 <div
                                     class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
                                     <input id="password" type="password" name="password" placeholder="Enter Password"
-                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 outline-none">
+                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 rounded-s-xl">
                                     <button id="togglePassword" type="button"
-                                        class="px-4 text-white hover:text-red-300">
+                                        class="px-4 text-white hover:text-cyan-300">
                                         <i class="fa-solid fa-eye"></i>
                                     </button>
                                 </div>
@@ -135,26 +135,27 @@
                                     class="mt-2 flex items-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
                                     <input id="confirmPassword" name="password_confirmation" type="password"
                                         placeholder="Confirm Password"
-                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 outline-none">
+                                        class="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-gray-300 backdrop-blur-md outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 rounded-s-xl">
                                     <button id="toggleConfirmPassword" type="button"
-                                        class="px-4 text-white hover:text-red-300">
+                                        class="px-4 text-white hover:text-cyan-300">
                                         <i class="fa-solid fa-eye"></i>
                                     </button>
                                 </div>
                             </div>
                             <!-- Terms -->
                             <div class="mt-6 flex items-center gap-3">
-                                <input type="checkbox" name="terms" class="h-4 w-4 rounded accent-red-500">
+                                <input type="checkbox" name="terms" class="h-4 w-4 rounded accent-cyan-500">
                                 <label class="text-sm text-white/80">
                                     I agree to the
-                                    <a href="javascript:void(0);" class="font-semibold text-red-300 hover:text-red-200">
+                                    <a href="javascript:void(0);"
+                                        class="font-semibold text-cyan-300 hover:text-cyan-200">
                                         Terms & Conditions
                                     </a>
                                 </label>
                             </div>
                             <!-- Register Button -->
                             <button type="submit" id="registerBtn"
-                                class="mt-8 w-full rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-red-700 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/40">
+                                class="mt-8 w-full rounded-xl bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/40">
                                 Create Account
                             </button>
                         </form>
@@ -162,7 +163,7 @@
                         <p class="mt-6 text-center text-white/80">
                             Already have an account?
                             <a href="{{ route('admin.login') }}"
-                                class="font-semibold text-red-300 transition hover:text-red-200">
+                                class="font-semibold text-cyan-300 transition hover:text-red-200">
                                 Login
                             </a>
                         </p>
