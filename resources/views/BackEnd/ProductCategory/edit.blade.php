@@ -5,8 +5,11 @@
 @section('content')
     <div class="p-5">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h4>Edit Product Category</h4>
+                <div>
+                    <a href="{{ route('product-category.index') }}" class="btn btn-secondary">Back</a>
+                </div>
             </div>
             <div class="card-body">
                 <form action="{{ route('product-category.update', $category) }}" method="POST">

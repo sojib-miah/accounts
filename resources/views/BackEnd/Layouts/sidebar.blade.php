@@ -93,27 +93,58 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('product-category.index') ? 'active' : '' }}">
                     <a href="{{ route('product-category.index') }}" class="menu-link">
-                        Category
+                        Category List
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('product.index') ? 'active' : '' }}">
                     <a href="{{ route('product.index') }}" class="menu-link">
-                        Products
+                        Products List
                     </a>
                 </li>
             </ul>
         </li>
 
         <!-- purchase -->
-        <li class="menu-item {{ request()->routeIs('purchase.*') ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="fa-solid fa-basket-shopping me-3"></i>
                 Purchase
             </a>
             <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
+                    <a href="{{ route('supplier.index') }}" class="menu-link">
+                        Supplier List
+                    </a>
+                </li>
                 <li class="menu-item {{ request()->routeIs('purchase.index') ? 'active' : '' }}">
                     <a href="{{ route('purchase.index') }}" class="menu-link">
                         Purchase Order
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- inventory -->
+        <li class="menu-item {{ request()->routeIs('inventory.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa fa-boxes me-3"></i>
+                Inventory
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('inventory.index') ? 'active' : '' }}">
+                    <a href="{{ route('inventory.index') }}" class="menu-link">
+                        Inventory
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('inventory.lowStock') ? 'active' : '' }}">
+                    <a href="{{ route('inventory.lowStock') }}" class="menu-link">
+                        Low Stock
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('inventory.report') ? 'active' : '' }}">
+                    <a href="{{ route('inventory.report') }}" class="menu-link">
+                        Stock Report
                     </a>
                 </li>
             </ul>

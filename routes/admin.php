@@ -13,6 +13,7 @@ use App\Http\Controllers\BackEnd\DashboardController;
 use App\Http\Controllers\BackEnd\IncomeCategoryController;
 use App\Http\Controllers\BackEnd\IncomeController;
 use App\Http\Controllers\BackEnd\IncomeReceiptController;
+use App\Http\Controllers\BackEnd\InventoryController;
 use App\Http\Controllers\BackEnd\PackageController;
 use App\Http\Controllers\BackEnd\PartyController;
 use App\Http\Controllers\BackEnd\PaymentDetailesController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\BackEnd\ReportController;
 use App\Http\Controllers\BackEnd\RoleController;
 use App\Http\Controllers\BackEnd\SalesOrderController;
 use App\Http\Controllers\BackEnd\SettingController;
+use App\Http\Controllers\BackEnd\SupplierController;
 use App\Http\Controllers\BackEnd\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -220,4 +222,14 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
 
     // product category route 
     Route::resource('product-category', ProductCategoryController::class);
+
+    // create suplier route 
+    Route::resource('supplier', SupplierController::class);
+
+    // inventory route 
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.lowStock');
+    Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
+    Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
+    Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
 });
