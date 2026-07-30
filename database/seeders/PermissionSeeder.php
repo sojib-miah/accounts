@@ -146,6 +146,27 @@ class PermissionSeeder extends Seeder
             'purchase-edit',
             'purchase-create',
             'menu-purchase-list',
+
+            'supplier-list',
+            'supplier-delete',
+            'supplier-create',
+            'supplier-edit',
+
+            'menu-product-list',
+            'product-edit',
+            'product-create',
+            'product-list',
+            'product-delete',
+
+            'product-category-create',
+            'product-category-edit',
+            'product-category-list',
+            'product-category-delete',
+
+            'menu-inventory-list',
+            'inventory-list',
+            'inventory-lowstock-list',
+            'inventory-report-list',
         ];
 
         foreach ($permissions as $permission) {

@@ -28,28 +28,49 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Receipt::with('supplier')->where('type', 'Purchase-Order');
+        $query = Receipt::with('supplier')
+            ->where('type', 'Purchase-Order')
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', auth()->id());
+            });
 
         if ($request->filled('search')) {
-            $query->where('receipt_no', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('receipt_no', 'like', "%{$search}%")
+                    ->orWhere('po_no', 'like', "%{$search}%");
+            });
         }
-        if ($request->filled('search')) {
-            $query->where('po_no', 'like', '%' . $request->search . '%');
-        }
+
         if ($request->filled('supplier')) {
             $query->where('party_id', $request->supplier);
         }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+
         if ($request->filled('from_date')) {
             $query->whereDate('receipt_date', '>=', $request->from_date);
         }
+
         if ($request->filled('to_date')) {
             $query->whereDate('receipt_date', '<=', $request->to_date);
         }
-        $purchases = $query->latest()->paginate(20)->withQueryString();
-        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->orderBy('name')->get();
+
+        $purchases = $query->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])
+            ->where('status', 'Active')
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', auth()->id());
+            })
+            ->orderBy('name')
+            ->get();
+
         return view('BackEnd.Purchase.index', compact('purchases', 'suppliers'));
     }
 
@@ -59,8 +80,15 @@ class PurchaseController extends Controller
     public function create()
     {
         $receiptNo = $this->generateReceiptNo();
-        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->orderBy('name')->get();
-        $products = Product::where('company_id', auth()->user()->company_id)->where('status', 'Active')->orderBy('name')->get();
+        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', auth()->id());
+        })->orderBy('name')->get();
+        $products = Product::where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where(function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            });
+        })->orderBy('name')->get();
         return view('BackEnd.Purchase.create', compact('receiptNo', 'suppliers', 'products'));
     }
 
@@ -169,8 +197,15 @@ class PurchaseController extends Controller
             return redirect()->route('purchase.index')->with('error', 'Cancelled purchase cannot be edited.');
         }
         $purchase->load('items.product');
-        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->orderBy('name')->get();
-        $products = Product::where('company_id', auth()->user()->company_id)->where('status', 'Active')->orderBy('name')->get();
+        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', auth()->id());
+        })->orderBy('name')->get();
+        $products = Product::where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where(function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            });
+        })->orderBy('name')->get();
         return view('BackEnd.Purchase.edit', compact('purchase', 'suppliers', 'products'));
     }
 

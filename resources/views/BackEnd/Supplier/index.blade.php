@@ -8,10 +8,12 @@
             <div class="card-header d-flex justify-content-between">
                 <h4>Supplier List</h4>
                 <div>
-                    <a href="{{ route('supplier.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus me-2"></i>
-                        Add Supplier
-                    </a>
+                    @can('supplier-create')
+                        <a href="{{ route('supplier.create') }}" class="btn btn-primary">
+                            <i class="fa fa-plus me-2"></i>
+                            Add Supplier
+                        </a>
+                    @endcan
                 </div>
             </div>
             <div class="card-body table-responsive">
@@ -28,7 +30,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($suppliers as $supplier)
+                        @forelse ($suppliers as $supplier)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $supplier->party_id }}</td>
@@ -37,20 +39,28 @@
                                 <td>{{ $supplier->phone }}</td>
                                 <td>{{ $supplier->status }}</td>
                                 <td>
-                                    <a href="{{ route('supplier.edit', $supplier) }}" class="btn btn-warning btn-sm">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('supplier.destroy', $supplier) }}" method="POST"
-                                        style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @can('supplier-edit')
+                                        <a href="{{ route('supplier.edit', $supplier) }}" class="btn btn-warning btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    @endcan
+                                    @can('supplier-delete')
+                                        <form action="{{ route('supplier.destroy', $supplier) }}" method="POST"
+                                            style="display:inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center">No Supplier Found</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $suppliers->links() }}

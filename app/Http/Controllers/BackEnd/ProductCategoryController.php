@@ -14,7 +14,10 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::where('type', 'Product')->latest()->paginate(20);
+        $categories = Category::where('type', 'Product')
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', auth()->id());
+            })->latest()->paginate(20);
 
         return view('BackEnd.ProductCategory.index', compact('categories'));
     }

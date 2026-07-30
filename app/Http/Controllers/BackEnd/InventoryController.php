@@ -6,13 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InventoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category')
-            ->where('company_id', auth()->user()->company_id);
+        $query = Product::with('category')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where(function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            });
+        });
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -39,7 +44,12 @@ class InventoryController extends Controller
     public function lowStock()
     {
         $products = Product::with('category')
-            ->where('company_id', auth()->user()->company_id)
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_id', Auth::user()->company_id)
+                        ->where('created_by', Auth::id());
+                });
+            })
             ->whereColumn('current_stock', '<=', 'minimum_stock')
             ->paginate(20);
 
@@ -49,7 +59,12 @@ class InventoryController extends Controller
     public function report()
     {
         $products = Product::with('category')
-            ->where('company_id', auth()->user()->company_id)
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_id', Auth::user()->company_id)
+                        ->where('created_by', Auth::id());
+                });
+            })
             ->orderBy('name')
             ->get();
 
@@ -59,7 +74,12 @@ class InventoryController extends Controller
     public function print()
     {
         $products = Product::with('category')
-            ->where('company_id', auth()->user()->company_id)
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_id', Auth::user()->company_id)
+                        ->where('created_by', Auth::id());
+                });
+            })
             ->orderBy('name')
             ->get();
 
@@ -69,7 +89,12 @@ class InventoryController extends Controller
     public function pdf()
     {
         $products = Product::with('category')
-            ->where('company_id', auth()->user()->company_id)
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_id', Auth::user()->company_id)
+                        ->where('created_by', Auth::id());
+                });
+            })
             ->orderBy('name')
             ->get();
 

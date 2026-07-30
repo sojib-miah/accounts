@@ -24,7 +24,11 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->latest()->paginate(20);
+        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])
+            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', auth()->id());
+            })->latest()->paginate(20);
+
         return view('BackEnd.Supplier.index', compact('suppliers'));
     }
 

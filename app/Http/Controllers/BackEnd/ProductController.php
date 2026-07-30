@@ -26,9 +26,14 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::with('category');
+
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $query->where('company_id', Auth::user()->company_id);
+            $query->where(function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            });
         }
+
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
@@ -37,21 +42,43 @@ class ProductController extends Controller
                     ->orWhere('sku', 'like', "%{$request->search}%");
             });
         }
+
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        $products = $query->latest()->paginate(20)->withQueryString();
 
-        $categories = Category::where('type', 'Product')->where('status', 'Active')->orderBy('name')->get();
+        $products = $query->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $categories = Category::where('type', 'Product')
+            ->where('status', 'Active')
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+                $q->where('created_by', Auth::id());
+            })
+            ->orderBy('name')
+            ->get();
+
+        $statisticsQuery = Product::query();
+
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $statisticsQuery->where(function ($q) {
+                $q->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            });
+        }
 
         $statistics = [
-            'total' => Product::count(),
-            'active' => Product::where('status', 'Active')->count(),
-            'inactive' => Product::where('status', 'Inactive')->count(),
-            'low_stock' => Product::whereColumn('current_stock', '<=', 'minimum_stock')->count(),
+            'total' => (clone $statisticsQuery)->count(),
+            'active' => (clone $statisticsQuery)->where('status', 'Active')->count(),
+            'inactive' => (clone $statisticsQuery)->where('status', 'Inactive')->count(),
+            'low_stock' => (clone $statisticsQuery)
+                ->whereColumn('current_stock', '<=', 'minimum_stock')
+                ->count(),
         ];
 
         return view('BackEnd.Product.index', compact('products', 'categories', 'statistics'));
@@ -62,7 +89,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('type', 'Product')->where('status', 'Active')->orderBy('name')->get();
+        $categories = Category::where('type', 'Product')->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', auth()->id());
+        })->orderBy('name')->get();
 
         return view('BackEnd.Product.create', compact('categories'));
     }
@@ -115,7 +144,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $categories = Category::where('type', 'Product')->where('status', 'Active')->orderBy('name')->get();
+        $categories = Category::where('type', 'Product')->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', auth()->id());
+        })->orderBy('name')->get();
 
         return view('BackEnd.Product.edit', compact('product', 'categories'));
     }

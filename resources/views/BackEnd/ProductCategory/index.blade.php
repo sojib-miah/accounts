@@ -31,17 +31,21 @@
                                 <td>{{ $category->name }}</td>
                                 <td>{{ $category->status }}</td>
                                 <td>
-                                    <a href="{{ route('product-category.edit', $category) }}" class="btn btn-warning btn-sm">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('product-category.destroy', $category) }}" method="POST"
-                                        style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @can('product-category-edit')
+                                        <a href="{{ route('product-category.edit', $category) }}" class="btn btn-warning btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    @endcan
+                                    @can('product-category-delete')
+                                        <form action="{{ route('product-category.destroy', $category) }}" method="POST"
+                                            style="display:inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

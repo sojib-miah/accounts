@@ -99,7 +99,7 @@
     </head>
 
     <body>
-        <div class="text-center mb-20">
+        <div class="mb-20">
             {{-- Company Logo --}}
             {{-- <img src="{{ asset('logo.png') }}" height="70"> --}}
             <h2>{{ config('app.name') }}</h2>

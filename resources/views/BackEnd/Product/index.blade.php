@@ -9,10 +9,14 @@
             <h2 class="fw-bold">
                 Product List
             </h2>
-            <a href="{{ route('product.create') }}" class="btn btn-primary">
-                <i class="fa fa-plus me-2"></i>
-                Add Product
-            </a>
+            <div>
+                @can('product-create')
+                    <a href="{{ route('product.create') }}" class="btn btn-primary">
+                        <i class="fa fa-plus me-2"></i>
+                        Add Product
+                    </a>
+                @endcan
+            </div>
         </div>
         <div class="row mb-4">
             <div class="col-md-3">
@@ -174,20 +178,24 @@
                                                     View
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('product.edit', $product->id) }}">
-                                                    Edit
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('product.destroy', $product->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="dropdown-item text-danger delete-btn">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </li>
+                                            @can('product-edit')
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('product.edit', $product->id) }}">
+                                                        Edit
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('product-delete')
+                                                <li>
+                                                    <form action="{{ route('product.destroy', $product->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="dropdown-item text-danger delete-btn">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            @endcan
                                         </ul>
                                     </div>
                                 </td>

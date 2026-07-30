@@ -7,9 +7,13 @@
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Purchase List</h4>
-                <a href="{{ route('purchase.create') }}" class="btn btn-primary">
-                    <i class="fa fa-plus me-2"></i> Add Purchase
-                </a>
+                <div>
+                    @can('purchase-create')
+                        <a href="{{ route('purchase.create') }}" class="btn btn-primary">
+                            <i class="fa fa-plus me-2"></i> Add Purchase
+                        </a>
+                    @endcan
+                </div>
             </div>
             <div class="card mb-3">
                 <div class="card-body">
@@ -118,26 +122,30 @@
                                                         <i class="fa fa-eye"></i>
                                                     </a>
                                                 </li>
-                                                <li>
-                                                    <a href="{{ route('purchase.edit', $purchase->id) }}"
-                                                        class="btn btn-warning btn-sm w-100 mb-1" title="Edit Purchase">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    @if ($purchase->status != 'Cancelled')
-                                                        <form action="{{ route('purchase.cancel', $purchase->id) }}"
-                                                            method="POST" class="d-inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <button class="btn btn-danger btn-sm w-100 mb-1"
-                                                                onclick="return confirm('Cancel this Purchase?')"
-                                                                title="Cancle Purchase">
-                                                                <i class="fa fa-ban"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </li>
+                                                @can('purchase-edit')
+                                                    <li>
+                                                        <a href="{{ route('purchase.edit', $purchase->id) }}"
+                                                            class="btn btn-warning btn-sm w-100 mb-1" title="Edit Purchase">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    </li>
+                                                @endcan
+                                                @can('purchase-delete')
+                                                    <li>
+                                                        @if ($purchase->status != 'Cancelled')
+                                                            <form action="{{ route('purchase.cancel', $purchase->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <button class="btn btn-danger btn-sm w-100 mb-1"
+                                                                    onclick="return confirm('Cancel this Purchase?')"
+                                                                    title="Cancle Purchase">
+                                                                    <i class="fa fa-ban"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </li>
+                                                @endcan
                                             </ul>
                                         </div>
                                     </td>
