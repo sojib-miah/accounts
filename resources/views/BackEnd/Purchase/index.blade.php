@@ -10,7 +10,7 @@
                 <div>
                     @can('purchase-create')
                         <a href="{{ route('purchase.create') }}" class="btn btn-primary">
-                            <i class="fa fa-plus me-2"></i> Add Purchase
+                            <i class="fa fa-plus me-2"></i> Create Purchase
                         </a>
                     @endcan
                 </div>
@@ -20,13 +20,13 @@
                     <form method="GET">
                         <div class="row">
                             <div class="col-md-3">
-                                <label>Receipt No</label>
+                                <label>PO No</label>
                                 <input type="text" name="search" class="form-control" value="{{ request('search') }}"
-                                    placeholder="Receipt No">
+                                    placeholder="PO No">
                             </div>
                             <div class="col-md-3">
                                 <label>Supplier</label>
-                                <select name="supplier" class="form-select">
+                                <select name="supplier" class="form-select select2">
                                     <option value="">All Supplier</option>
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}"
@@ -78,9 +78,10 @@
                                 <th width="60">SN</th>
                                 <th>PO No</th>
                                 <th>Date</th>
-                                <th>Supplier</th>
+                                <th>Supplier name</th>
+                                <th>Item Name</th>
                                 <th class="text-end">Qty</th>
-                                <th class="text-end">Amount</th>
+                                <th class="text-end">Total Amount</th>
                                 <th>Status</th>
                                 <th width="150">Action</th>
                             </tr>
@@ -92,6 +93,15 @@
                                     <td>{{ $purchase->receipt_no }}</td>
                                     <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
                                     <td>{{ $purchase->supplier->name ?? '-' }}</td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->product->name }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
                                     <td class="text-end">{{ $purchase->total_qty }}</td>
                                     <td class="text-end">{{ number_format($purchase->total_amount, 2) }}</td>
                                     <td>
@@ -150,20 +160,20 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">
-                                        No Purchase Found
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{ $purchases->links() }}
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            No Purchase Found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        {{ $purchases->links() }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@endsection
+    @endsection

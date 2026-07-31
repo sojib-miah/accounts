@@ -21,9 +21,8 @@
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}" data-unit="{{ $product->unit }}"
                                 data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-                                {{ $product->product_code }}
-                                -
-                                {{ $product->name }}
+                                {{ $product->sku }}
+                                - {{ $product->name }}
                             </option>
                         @endforeach
                     </select>
@@ -62,7 +61,8 @@
     <option value="">Select Product</option>
     @foreach($products as $product)
         <option value="{{ $product->id }}" data-unit="{{ $product->unit }}" data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-            {{ $product->product_code }} - {{ $product->name }}
+           {{ $product->sku }}
+                                    - {{ $product->name }}
         </option>
     @endforeach
 </select>

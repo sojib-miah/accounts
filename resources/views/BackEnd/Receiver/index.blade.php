@@ -41,18 +41,19 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SN</th>
+                                    <th>SN</th>
                                     <th>Customer ID</th>
-                                    <th>Customer Name</th>
-                                    <th>Company Name</th>
+                                    <th>Company</th>
+                                    <th>Name</th>
                                     <th>Designation</th>
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Address</th>
                                     {{-- <th>Type</th> --}}
-                                    <th>Status</th>
                                     <th>Created By</th>
-                                    <th width="160">Action</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th width="150">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,12 +61,12 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $party->party_id }}</td>
+                                        <td>{{ $party->company_name }}</td>
                                         <td>
                                             <a href="{{ route('income.party.profile', $party->id) }}">
                                                 {{ $party->name }}
                                             </a>
                                         </td>
-                                        <td>{{ $party->company_name }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
@@ -79,6 +80,8 @@
                                                 <span class="badge bg-primary">Both</span>
                                             @endif
                                         </td> --}}
+                                        <td>{{ $party->creator->name ?? '-' }}</td>
+                                        <td>{{ $party->created_at ?? '-' }}</td>
                                         <td>
                                             @if ($party->status == 'Active')
                                                 <span class="badge bg-success">Active</span>
@@ -86,7 +89,6 @@
                                                 <span class="badge bg-secondary">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>{{ $party->creator->name ?? '-' }}</td>
                                         <td>
                                             @can('receiver-list-edit')
                                                 <button class="btn btn-warning btn-sm editBtn" data-id="{{ $party->id }}"

@@ -22,11 +22,18 @@
                         <tr>
                             <th>SL</th>
                             <th>Supplier ID</th>
-                            <th>Name</th>
                             <th>Company</th>
+                            <th>Name</th>
+                            <th>Designation</th>
                             <th>Phone</th>
+                            <th>
+                                E-mail
+                            </th>
+                            <th>Address</th>
+                            <th>Created By</th>
+                            <th>Create Date</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th width="150">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,9 +41,14 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $supplier->party_id }}</td>
-                                <td>{{ $supplier->name }}</td>
                                 <td>{{ $supplier->company_name }}</td>
-                                <td>{{ $supplier->phone }}</td>
+                                <td>{{ $supplier->name }}</td>
+                                <td>{{ $supplier->designation }}</td>
+                                <td>{{ $supplier->phone ?? '-' }}</td>
+                                <td>{{ $supplier->email ?? '-' }}</td>
+                                <td>{{ $supplier->address ?? '-' }}</td>
+                                <td>{{ $supplier->creator->name ?? '-' }}</td>
+                                <td>{{ $supplier->created_at }}</td>
                                 <td>{{ $supplier->status }}</td>
                                 <td>
                                     @can('supplier-edit')

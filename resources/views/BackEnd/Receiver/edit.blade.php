@@ -13,6 +13,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
+                        <!-- company name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Company Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" name="company_name" id="edit_company_name">
+                            @error('company_name', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
@@ -63,16 +73,6 @@
                                 <option value="Inactive">Inactive</option>
                             </select>
                             @error('status', 'edit')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <!-- company name -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Company Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" class="form-control" name="company_name" id="edit_company_name">
-                            @error('company_name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

@@ -18,7 +18,7 @@
             <li class="menu-item {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.index') }}" class="menu-link">
                     <i class="menu-icon icon-base ti tabler-smart-home"></i>
-                    <div data-i18n="Dashboards">Dashboard</div>
+                    <div data-i18n="Dashboard">Dashboard</div>
                 </a>
             </li>
         @endcan

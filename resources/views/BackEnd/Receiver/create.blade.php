@@ -12,6 +12,17 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
+                        <!-- company name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Company Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" name="company_name"
+                                placeholder="Enter Company Name.">
+                            @error('company_name', 'add')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
@@ -70,16 +81,6 @@
                                 </option>
                             </select>
                             @error('status', 'add')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <!-- company name -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Company Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" class="form-control" name="company_name">
-                            @error('company_name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

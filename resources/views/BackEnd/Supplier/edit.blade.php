@@ -20,6 +20,16 @@
                     @method('PUT')
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label>Company Name</label>
+                            <input type="text" name="company_name" class="form-control" required
+                                value="{{ old('company_name', $supplier->company_name) }}">
+                            @error('company_name')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label>Name</label>
                             <input type="text" name="name" class="form-control" required
                                 value="{{ old('name', $supplier->name) }}">
@@ -34,16 +44,6 @@
                             <input type="text" name="designation" class="form-control"
                                 value="{{ old('designation', $supplier->designation) }}">
                             @error('designation')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Company Name</label>
-                            <input type="text" name="company_name" class="form-control" required
-                                value="{{ old('company_name', $supplier->company_name) }}">
-                            @error('company_name')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

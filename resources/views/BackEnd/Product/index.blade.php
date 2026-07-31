@@ -5,18 +5,10 @@
 @section('content')
 
     <div class="p-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="mb-4">
             <h2 class="fw-bold">
                 Product List
             </h2>
-            <div>
-                @can('product-create')
-                    <a href="{{ route('product.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus me-2"></i>
-                        Add Product
-                    </a>
-                @endcan
-            </div>
         </div>
         <div class="row mb-4">
             <div class="col-md-3">
@@ -69,7 +61,7 @@
                                 value="{{ request('search') }}">
                         </div>
                         <div class="col-md-3">
-                            <select name="category" class="form-select">
+                            <select name="category" class="form-select select2">
                                 <option value="">
                                     All Category
                                 </option>
@@ -101,6 +93,12 @@
                             <a href="{{ route('product.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
+                            @can('product-create')
+                                <a href="{{ route('product.create') }}" class="ms-3 btn btn-primary">
+                                    <i class="fa fa-plus me-2"></i>
+                                    Add Product
+                                </a>
+                            @endcan
                         </div>
                     </div>
                 </form>
@@ -111,10 +109,12 @@
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>SL</th>
-                            <th>Code</th>
-                            <th>Name</th>
+                            <th>SN</th>
+                            <th>Product Code</th>
+                            <th>Part No</th>
                             <th>Category</th>
+                            <th>Item Name</th>
+                            <th>Description</th>
                             <th>Buy</th>
                             <th>Sale</th>
                             <th>Stock</th>
@@ -134,10 +134,16 @@
                                     {{ $product->product_code }}
                                 </td>
                                 <td>
-                                    {{ $product->name }}
+                                    {{ $product->sku }}
                                 </td>
                                 <td>
                                     {{ $product->category->name ?? '-' }}
+                                </td>
+                                <td>
+                                    {{ $product->name }}
+                                </td>
+                                <td>
+                                    {{ $product->description }}
                                 </td>
                                 <td>
                                     {{ number_format($product->purchase_price, 2) }}

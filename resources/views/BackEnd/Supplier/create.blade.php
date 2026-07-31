@@ -18,6 +18,16 @@
                 <form action="{{ route('supplier.store') }}" method="POST">
                     @csrf
                     <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label>Company Name</label>
+                            <input type="text" name="company_name" class="form-control" required>
+                            @error('company_name')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label>Name</label>
                             <input type="text" name="name" class="form-control" required>
@@ -31,15 +41,6 @@
                             <label>Designation</label>
                             <input type="text" name="designation" class="form-control">
                             @error('designation')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Company Name</label>
-                            <input type="text" name="company_name" class="form-control" required>
-                            @error('company_name')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
