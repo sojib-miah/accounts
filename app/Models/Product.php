@@ -51,4 +51,9 @@ class Product extends Model
                 $q->where('type', 'Sales-Order');
             });
     }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 }

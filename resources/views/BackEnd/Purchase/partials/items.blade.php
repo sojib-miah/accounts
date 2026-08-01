@@ -14,14 +14,14 @@
         <tbody id="purchaseBody">
             <tr>
                 <td>
-                    <select name="product_id[]" class="form-select product" required>
+                    <select name="product_id[]" class="form-select product select2" required>
                         <option value="">
                             Select Product
                         </option>
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}" data-unit="{{ $product->unit }}"
                                 data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-                                {{ $product->sku }}
+                                {{ $product->model_no }}
                                 - {{ $product->name }}
                             </option>
                         @endforeach
@@ -57,12 +57,11 @@
 <script type="text/template" id="purchaseRowTemplate">
 <tr>
 <td>
-<select name="product_id[]" class="form-select product" required>
+<select name="product_id[]" class="form-select product select2" required>
     <option value="">Select Product</option>
     @foreach($products as $product)
         <option value="{{ $product->id }}" data-unit="{{ $product->unit }}" data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-           {{ $product->sku }}
-                                    - {{ $product->name }}
+           {{ $product->model_no }} - {{ $product->name }}
         </option>
     @endforeach
 </select>

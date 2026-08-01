@@ -4,108 +4,198 @@ namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Receipt;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InventoryController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Product::with('category')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-            $query->where(function ($q) {
-                $q->where('company_id', Auth::user()->company_id)
-                    ->where('created_by', Auth::id());
-            });
-        });
+        $receipts = Receipt::with([
+            'supplier',
+            'items.product'
+        ])
+            ->where('type', 'Purchase-Order')
+            ->where('is_receive', true)
+            ->latest()
+            ->paginate(20);
 
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('product_code', 'like', "%{$request->search}%")
-                    ->orWhere('barcode', 'like', "%{$request->search}%")
-                    ->orWhere('sku', 'like', "%{$request->search}%");
-            });
-        }
+        return view('BackEnd.Inventory.index', compact('receipts'));
+    }
 
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
+    public function show(Receipt $receipt)
+    {
+        $receipt->load([
+            'supplier',
+            'items.product'
+        ]);
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $products = $query->orderBy('name')->paginate(20)->withQueryString();
-
-        return view('BackEnd.Inventory.index', compact('products'));
+        return view(
+            'BackEnd.Inventory.show',
+            compact('receipt')
+        );
     }
 
     public function lowStock()
     {
-        $products = Product::with('category')
+        $products = Product::with(['category', 'brand'])
+            ->whereHas('receiptItems.receipt', function ($query) {
+                $query->where('is_receive', true)
+                    ->where('type', 'Purchase-Order');
+            })
             ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where(function ($q) {
-                    $q->where('company_id', Auth::user()->company_id)
-                        ->where('created_by', Auth::id());
-                });
+                $query->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
             })
             ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->orderBy('current_stock')
             ->paginate(20);
 
         return view('BackEnd.Inventory.low-stock', compact('products'));
     }
 
-    public function report()
+    public function report(Request $request)
     {
-        $products = Product::with('category')
-            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where(function ($q) {
-                    $q->where('company_id', Auth::user()->company_id)
-                        ->where('created_by', Auth::id());
-                });
-            })
-            ->orderBy('name')
-            ->get();
+        $query = Receipt::with([
+            'supplier',
+            'items.product.category',
+            'items.product.brand'
+        ])
+            ->where('type', 'Purchase-Order')
+            ->where('is_receive', true);
 
-        return view('BackEnd.Inventory.report', compact('products'));
+        if (!auth()->user()->hasRole('Super-Admin')) {
+
+            $query->where(function ($q) {
+
+                $q->where('company_id', auth()->user()->company_id)
+                    ->where('created_by', auth()->id());
+            });
+        }
+
+        if ($request->filled('from_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '>=',
+                $request->from_date
+            );
+        }
+
+        if ($request->filled('to_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '<=',
+                $request->to_date
+            );
+        }
+
+        $receipts = $query
+            ->orderByDesc('received_date')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view(
+            'BackEnd.Inventory.report',
+            compact('receipts')
+        );
     }
 
-    public function print()
+    public function print(Request $request)
     {
-        $products = Product::with('category')
-            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where(function ($q) {
-                    $q->where('company_id', Auth::user()->company_id)
-                        ->where('created_by', Auth::id());
-                });
-            })
-            ->orderBy('name')
+        $query = Receipt::with([
+            'supplier',
+            'items.product.category',
+            'items.product.brand'
+        ])
+            ->where('type', 'Purchase-Order')
+            ->where('is_receive', true);
+
+        if (!auth()->user()->hasRole('Super-Admin')) {
+
+            $query->where(function ($q) {
+
+                $q->where('company_id', auth()->user()->company_id)
+                    ->where('created_by', auth()->id());
+            });
+        }
+
+        if ($request->filled('from_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '>=',
+                $request->from_date
+            );
+        }
+
+        if ($request->filled('to_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '<=',
+                $request->to_date
+            );
+        }
+
+        $receipts = $query
+            ->orderByDesc('received_date')
             ->get();
 
-        return view('BackEnd.Inventory.report-print', compact('products'));
+        return view('BackEnd.Inventory.report-print', compact('receipts'));
     }
 
-    public function pdf()
+    public function pdf(Request $request)
     {
-        $products = Product::with('category')
-            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where(function ($q) {
-                    $q->where('company_id', Auth::user()->company_id)
-                        ->where('created_by', Auth::id());
-                });
-            })
-            ->orderBy('name')
+        $query = Receipt::with([
+            'supplier',
+            'items.product.category',
+            'items.product.brand'
+        ])
+            ->where('type', 'Purchase-Order')
+            ->where('is_receive', true);
+
+        if (!auth()->user()->hasRole('Super-Admin')) {
+
+            $query->where(function ($q) {
+
+                $q->where('company_id', auth()->user()->company_id)
+                    ->where('created_by', auth()->id());
+            });
+        }
+
+        if ($request->filled('from_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '>=',
+                $request->from_date
+            );
+        }
+
+        if ($request->filled('to_date')) {
+
+            $query->whereDate(
+                'received_date',
+                '<=',
+                $request->to_date
+            );
+        }
+
+        $receipts = $query
+            ->orderBy('received_date')
             ->get();
 
         $pdf = Pdf::loadView(
             'BackEnd.Inventory.report-pdf',
-            compact('products')
+            compact('receipts')
         );
 
         $pdf->setPaper('A4', 'landscape');
 
         return $pdf->stream('Inventory_Report.pdf');
-        // return $pdf->download('Inventory_Report.pdf');
     }
 }

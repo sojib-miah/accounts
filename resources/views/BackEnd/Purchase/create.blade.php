@@ -3,7 +3,7 @@
 @section('title', 'Add Purchase')
 
 @section('content')
-    <div class="p-4">
+    <div class="p-5 mt-3">
         <form action="{{ route('purchase.store') }}" method="POST">
             @csrf
             @include('BackEnd.Purchase.partials.form')

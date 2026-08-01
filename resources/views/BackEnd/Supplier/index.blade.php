@@ -9,10 +9,10 @@
                 <h4>Supplier List</h4>
                 <div>
                     @can('supplier-create')
-                        <a href="{{ route('supplier.create') }}" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSupplierModal">
                             <i class="fa fa-plus me-2"></i>
                             Add Supplier
-                        </a>
+                        </button>
                     @endcan
                 </div>
             </div>
@@ -52,19 +52,15 @@
                                 <td>{{ $supplier->status }}</td>
                                 <td>
                                     @can('supplier-edit')
-                                        <a href="{{ route('supplier.edit', $supplier) }}" class="btn btn-warning btn-sm">
+                                        <button type="button" class="btn btn-warning btn-sm editSupplier"
+                                            data-id="{{ $supplier->id }}">
                                             <i class="fa fa-edit"></i>
-                                        </a>
+                                        </button>
                                     @endcan
                                     @can('supplier-delete')
-                                        <form action="{{ route('supplier.destroy', $supplier) }}" method="POST"
-                                            style="display:inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-danger btn-sm deleteSupplier" data-id="{{ $supplier->id }}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
                                     @endcan
                                 </td>
                             </tr>
@@ -79,4 +75,118 @@
             </div>
         </div>
     </div>
+
+    @include('BackEnd.Supplier.create')
+    @include('BackEnd.Supplier.edit')
 @endsection
+
+@push('scripts')
+    <script>
+        // EDIT LOAD
+        $(document).on('click', '.editSupplier', function() {
+            let id = $(this).data('id');
+            $.ajax({
+                url: '/admin/supplier/' + id + '/edit',
+                type: 'GET',
+                success: function(data) {
+                    $('#edit_supplier_id').val(data.id);
+                    $('#edit_company_name').val(data.company_name);
+                    $('#edit_name').val(data.name);
+                    $('#edit_designation').val(data.designation);
+                    $('#edit_phone').val(data.phone);
+                    $('#edit_email').val(data.email);
+                    $('#edit_status').val(data.status);
+                    $('#edit_address').val(data.address);
+                    $('#editSupplierModal').modal('show');
+                }
+            });
+        });
+        // UPDATE SUPPLIER
+        $('#editSupplierForm').submit(function(e) {
+            e.preventDefault();
+            let id = $('#edit_supplier_id').val();
+            $.ajax({
+                url: '/admin/supplier/' + id,
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(res) {
+                    $('#editSupplierModal').modal('hide');
+                    Swal.fire({
+                        title: 'Updated',
+                        text: res.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Update failed',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        });
+        // DELETE SUPPLIER
+        $(document).on('click', '.deleteSupplier', function() {
+            let id = $(this).data('id');
+            Swal.fire({
+                title: 'Delete Supplier?',
+                text: 'This action cannot be undone',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/supplier/' + id,
+                        type: 'POST',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            _method: 'DELETE'
+                        },
+                        success: function(res) {
+                            Swal.fire({
+                                title: 'Deleted',
+                                text: res.message,
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                title: 'Cannot Delete',
+                                text: xhr.responseJSON.message,
+                                icon: 'error',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
+                    });
+                }
+            });
+        });
+        // SELECT2 MODAL FIX
+        $('#createSupplierModal').on('shown.bs.modal', function() {
+            $(this).find('.select2').select2({
+                dropdownParent: '#createSupplierModal'
+            });
+        });
+        $('#editSupplierModal').on('shown.bs.modal', function() {
+            $(this).find('.select2').select2({
+                dropdownParent: '#editSupplierModal'
+            });
+        });
+    </script>
+@endpush

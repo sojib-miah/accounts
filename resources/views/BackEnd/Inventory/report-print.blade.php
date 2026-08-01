@@ -116,88 +116,149 @@
         @php
             $totalQty = 0;
             $purchaseValue = 0;
-            $saleValue = 0;
         @endphp
         <table>
             <thead>
                 <tr>
                     <th width="40">SL</th>
+                    <th>PO No</th>
+                    <th>Receive Date</th>
+                    <th>Supplier</th>
                     <th>Code</th>
                     <th>Product</th>
                     <th>Category</th>
                     <th width="60">Unit</th>
-                    <th width="80" class="text-end">Purchase</th>
-                    <th width="80" class="text-end">Sale</th>
-                    <th width="80" class="text-end">Stock</th>
-                    <th width="110" class="text-end">Stock Value</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($products as $product)
-                    @php
-                        $stockValue = $product->purchase_price * $product->current_stock;
-                        $saleStockValue = $product->sale_price * $product->current_stock;
-                        $totalQty += $product->current_stock;
-                        $purchaseValue += $stockValue;
-                        $saleValue += $saleStockValue;
-                    @endphp
-                    <tr>
-                        <td class="text-center">
-                            {{ $loop->iteration }}
-                        </td>
-                        <td>
-                            {{ $product->product_code }}
-                        </td>
-                        <td>
-                            {{ $product->name }}
-                        </td>
-                        <td>
-                            {{ $product->category->name ?? '-' }}
-                        </td>
-                        <td class="text-center">
-                            {{ $product->unit }}
-                        </td>
-                        <td class="text-end">
-                            {{ number_format($product->purchase_price, 2) }}
-                        </td>
-                        <td class="text-end">
-                            {{ number_format($product->sale_price, 2) }}
-                        </td>
-                        <td class="text-end">
-                            {{ number_format($product->current_stock, 2) }}
-                        </td>
-                        <td class="text-end">
-                            {{ number_format($stockValue, 2) }}
-                        </td>
-                    </tr>
+                @forelse($receipts as $receipt)
+
+                    @foreach ($receipt->items as $item)
+                        @php
+
+                            $stockValue = $item->product->current_stock * $item->product->purchase_price;
+
+                            $totalQty += $item->product->current_stock;
+
+                            $purchaseValue += $stockValue;
+
+                        @endphp
+
+                        <tr>
+
+                            <td>
+
+                                {{ $loop->parent->iteration }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $receipt->po_no }}
+
+                            </td>
+
+                            <td>
+
+                                {{ date('d-M-Y', strtotime($receipt->received_date)) }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $receipt->supplier->name }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $item->product->product_code }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $item->product->name }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $item->product->category->name ?? '-' }}
+
+                            </td>
+
+                            <td>
+
+                                {{ $item->product->unit }}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                {{ number_format($item->product->purchase_price, 2) }}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                {{ number_format($item->product->sale_price, 2) }}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                {{ number_format($item->product->current_stock, 2) }}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                {{ number_format($stockValue, 2) }}
+
+                            </td>
+
+                        </tr>
+                    @endforeach
+
                 @empty
+
                     <tr>
-                        <td colspan="9" class="text-center">
+
+                        <td colspan="12" class="text-center">
+
                             No Inventory Found
+
                         </td>
+
                     </tr>
+
                 @endforelse
             </tbody>
             <tfoot>
+
                 <tr class="summary">
-                    <td colspan="7" class="text-end">
-                        TOTAL
+
+                    <td colspan="10" class="text-end">
+
+                        Total Stock
+
                     </td>
+
                     <td class="text-end">
+
                         {{ number_format($totalQty, 2) }}
+
                     </td>
+
                     <td class="text-end">
+
                         {{ number_format($purchaseValue, 2) }}
+
                     </td>
+
                 </tr>
-                <tr class="summary">
-                    <td colspan="8" class="text-end">
-                        Estimated Sale Value
-                    </td>
-                    <td class="text-end">
-                        {{ number_format($saleValue, 2) }}
-                    </td>
-                </tr>
+
             </tfoot>
         </table>
         <div class="footer">

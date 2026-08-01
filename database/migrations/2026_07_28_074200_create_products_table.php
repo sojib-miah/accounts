@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
             $table->string('product_code')->unique();
             $table->string('name');
+            $table->string('model_no')->nullable();
             $table->string('barcode')->nullable();
             $table->string('sku')->nullable();
             $table->string('unit')->default('PCS');

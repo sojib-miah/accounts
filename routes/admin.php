@@ -4,6 +4,7 @@ use App\Http\Controllers\BackEnd\AccountHeadController;
 use App\Http\Controllers\BackEnd\AccountsController;
 use App\Http\Controllers\BackEnd\AdminAuthController;
 use App\Http\Controllers\BackEnd\BranchController;
+use App\Http\Controllers\BackEnd\BrandController;
 use App\Http\Controllers\BackEnd\CategoryController;
 use App\Http\Controllers\BackEnd\ChallanController;
 use App\Http\Controllers\BackEnd\CompanyController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\BackEnd\SalesOrderController;
 use App\Http\Controllers\BackEnd\SettingController;
 use App\Http\Controllers\BackEnd\SupplierController;
 use App\Http\Controllers\BackEnd\UserController;
+use App\Http\Controllers\BackEnd\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -232,4 +234,13 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
     Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
     Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
+    Route::get('/inventory/{receipt}', [InventoryController::class, 'show'])->name('inventory.show');
+
+    // brand route 
+    Route::resource('brand', BrandController::class);
+
+    // warehouse routs 
+    Route::get('/warehouse', [WarehouseController::class, 'index'])->name('warehouse.index');
+    Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
+    Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
 });

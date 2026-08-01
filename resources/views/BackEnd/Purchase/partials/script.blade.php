@@ -1,5 +1,12 @@
 <script>
+    function initSelect2() {
+        $('.select2').select2({
+            width: '100%'
+        });
+    }
     $(function() {
+        initSelect2();
+
         function calculateRow(row) {
             let qty = parseFloat(row.find('.qty').val()) || 0;
             let rate = parseFloat(row.find('.rate').val()) || 0;
@@ -68,7 +75,11 @@
         $('#addRow').click(function() {
             let html = $('#purchaseRowTemplate').html();
             $('#purchaseBody').append(html);
-            $('#purchaseBody tr:last .product').focus();
+            let newRow = $('#purchaseBody tr:last');
+            newRow.find('.select2').select2({
+                width: '100%'
+            });
+            newRow.find('.product').focus();
         });
         $(document).on('click', '.removeRow', function() {
             if ($('#purchaseBody tr').length == 1) {

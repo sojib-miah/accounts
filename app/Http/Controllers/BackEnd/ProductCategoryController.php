@@ -27,7 +27,7 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        return view('BackEnd.ProductCategory.create');
+        //
     }
 
     /**
@@ -66,9 +66,7 @@ class ProductCategoryController extends Controller
     {
         abort_if($product_category->type != 'Product', 404);
 
-        return view('BackEnd.ProductCategory.edit', [
-            'category' => $product_category
-        ]);
+        return response()->json($product_category);
     }
 
     /**

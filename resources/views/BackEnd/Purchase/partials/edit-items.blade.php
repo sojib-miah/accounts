@@ -24,7 +24,7 @@
                                     data-stock="{{ $product->current_stock }}"
                                     data-rate="{{ $product->purchase_price }}"
                                     {{ $item->product_id == $product->id ? 'selected' : '' }}>
-                                    {{ $product->sku }}
+                                    {{ $product->model_no }}
                                     - {{ $product->name }}
                                 </option>
                             @endforeach
@@ -77,8 +77,7 @@
                     data-unit="{{ $product->unit }}"
                     data-stock="{{ $product->current_stock }}"
                     data-rate="{{ $product->purchase_price }}">
-                    {{ $product->sku }}
-                                    - {{ $product->name }}
+                    {{ $product->model_no }} - {{ $product->name }}
                 </option>
             @endforeach
         </select>

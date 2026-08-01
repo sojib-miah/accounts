@@ -1,98 +1,67 @@
-@extends('BackEnd.Layouts.layout')
-
-@section('title', 'Add Supplier')
-
-@section('content')
-    <div class="p-5">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h4>Add Supplier</h4>
-                <div>
-                    <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
-                        <i class="fa-solid fa-left-long me-2"></i>
-                        Back
-                    </a>
-                </div>
+<div class="modal fade" id="editSupplierModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Edit Supplier
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
             </div>
-            <div class="card-body">
-                <form action="{{ route('supplier.update', $supplier) }}" method="POST">
-                    @csrf
-                    @method('PUT')
+            <form id="editSupplierForm">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="edit_supplier_id">
+                <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label>Company Name</label>
-                            <input type="text" name="company_name" class="form-control" required
-                                value="{{ old('company_name', $supplier->company_name) }}">
-                            @error('company_name')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <input type="text" id="edit_company_name" name="company_name" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Name</label>
-                            <input type="text" name="name" class="form-control" required
-                                value="{{ old('name', $supplier->name) }}">
-                            @error('name')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <input type="text" id="edit_name" name="name" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Designation</label>
-                            <input type="text" name="designation" class="form-control"
-                                value="{{ old('designation', $supplier->designation) }}">
-                            @error('designation')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <input type="text" id="edit_designation" name="designation" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Phone</label>
-                            <input type="text" name="phone" class="form-control"
-                                value="{{ old('phone', $supplier->phone) }}">
-                            @error('phone')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <input type="text" id="edit_phone" name="phone" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Email</label>
-                            <input type="email" name="email" class="form-control"
-                                value="{{ old('email', $supplier->email) }}">
-                            @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <input type="email" id="edit_email" name="email" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Status</label>
-                            <select name="status" class="form-select">
-                                <option value="Active" {{ $supplier->status == 'Active' ? 'selected' : '' }}>
+                            <select id="edit_status" name="status" class="form-select">
+                                <option value="Active">
                                     Active
                                 </option>
-                                <option value="Inactive" {{ $supplier->status == 'Inactive' ? 'selected' : '' }}>
+                                <option value="Inactive">
                                     Inactive
                                 </option>
                             </select>
                         </div>
                         <div class="col-md-12 mb-3">
-                            <label>Address</label>
-                            <textarea name="address" class="form-control">{{ old('address', $supplier->address) }}</textarea>
-                            @error('address')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <label>
+                                Address
+                            </label>
+                            <textarea id="edit_address" name="address" class="form-control"></textarea>
                         </div>
                     </div>
-                    <button class="btn btn-success">Save</button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button class="btn btn-success">
+                        Update
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-@endsection
+</div>

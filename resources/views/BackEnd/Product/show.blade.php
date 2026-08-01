@@ -68,10 +68,26 @@
                             </tr>
                             <tr>
                                 <th>
+                                    Brand Name
+                                </th>
+                                <td>
+                                    {{ $product->brand->name ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
                                     Category
                                 </th>
                                 <td>
                                     {{ $product->category->name ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Model Number
+                                </th>
+                                <td>
+                                    {{ $product->model_no ?: '-' }}
                                 </td>
                             </tr>
                             <tr>

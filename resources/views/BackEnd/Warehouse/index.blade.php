@@ -1,18 +1,17 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Inventory')
+@section('title', 'Warehouse')
 
 @section('content')
     <div class="p-5">
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">
-                    <i class="fa fa-boxes me-2"></i>
-                    Inventory
+                    <i class="fa fa-warehouse me-2"></i>
+                    Warehouse Receive List
                 </h4>
-                <span class="badge bg-success">
-                    Total Receive :
-                    {{ $receipts->total() }}
+                <span class="badge bg-warning fs-6">
+                    Pending : {{ $purchases->total() }}
                 </span>
             </div>
             <div class="card-body">
@@ -27,7 +26,7 @@
                                     PO No
                                 </th>
                                 <th>
-                                    Receive Date
+                                    Purchase Date
                                 </th>
                                 <th>
                                     Supplier
@@ -47,41 +46,41 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($receipts as $receipt)
+                            @forelse($purchases as $purchase)
                                 <tr>
                                     <td>
-                                        {{ $receipts->firstItem() + $loop->index }}
+                                        {{ $purchases->firstItem() + $loop->index }}
                                     </td>
                                     <td>
-                                        {{ $receipt->po_no }}
+                                        {{ $purchase->po_no }}
                                     </td>
                                     <td>
-                                        {{ date('d-M-Y', strtotime($receipt->received_date)) }}
+                                        {{ date('d-M-Y', strtotime($purchase->receipt_date)) }}
                                     </td>
                                     <td>
-                                        {{ $receipt->supplier->name }}
+                                        {{ $purchase->supplier->name ?? '' }}
                                     </td>
                                     <td class="text-end">
-                                        {{ number_format($receipt->total_qty, 2) }}
+                                        {{ number_format($purchase->total_qty, 2) }}
                                     </td>
                                     <td class="text-end">
-                                        {{ number_format($receipt->total_amount, 2) }}
+                                        {{ number_format($purchase->total_amount, 2) }}
                                     </td>
                                     <td>
-                                        <span class="badge bg-success">
-                                            Received
+                                        <span class="badge bg-warning">
+                                            Waiting Receive
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('inventory.show', $receipt) }}" class="btn btn-primary btn-sm">
+                                        <a href="{{ route('warehouse.show', $purchase) }}" class="btn btn-info btn-sm">
                                             <i class="fa fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center">
-                                        No Inventory Found
+                                    <td colspan="8" class="text-center text-danger">
+                                        No Pending Purchase Found
                                     </td>
                                 </tr>
                             @endforelse
@@ -89,7 +88,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $receipts->links() }}
+                    {{ $purchases->links() }}
                 </div>
             </div>
         </div>

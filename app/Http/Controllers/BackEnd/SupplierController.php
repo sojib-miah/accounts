@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
 use App\Models\Party;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,7 +38,9 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return view('BackEnd.Supplier.create');
+        return response()->json([
+            'supplier_id' => $this->generateSupplierId()
+        ]);
     }
 
     /**
@@ -84,7 +87,8 @@ class SupplierController extends Controller
     public function edit(Party $supplier)
     {
         abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
-        return view('BackEnd.Supplier.edit', compact('supplier'));
+
+        return response()->json($supplier);
     }
 
     /**
@@ -113,7 +117,11 @@ class SupplierController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->route('supplier.index')->with('success', 'Supplier updated successfully.');
+        // return redirect()->route('supplier.index')->with('success', 'Supplier updated successfully.');
+        return response()->json([
+            'status' => true,
+            'message' => 'Supplier updated successfully.'
+        ]);
     }
 
     /**
@@ -122,7 +130,17 @@ class SupplierController extends Controller
     public function destroy(Party $supplier)
     {
         abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
-        $supplier->delete();
-        return redirect()->route('supplier.index')->with('success', 'Supplier deleted successfully.');
+        try {
+            $supplier->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Supplier deleted successfully.'
+            ]);
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'This supplier is already used in transactions. You cannot delete it.'
+            ], 422);
+        }
     }
 }

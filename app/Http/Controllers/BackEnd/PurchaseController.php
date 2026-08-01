@@ -15,11 +15,12 @@ class PurchaseController extends Controller
 {
     protected function generateReceiptNo()
     {
-        $last = Receipt::where('type', 'Purchase-Order')->latest('id')->first();
+        $last = Receipt::where('type', 'Purchase-Order')->orderByDesc('id')->first();
         if (!$last) {
             return 'PO-10001';
         }
-        $number = (int) substr($last->receipt_no, 4);
+        preg_match('/(\d+)$/', $last->receipt_no, $matches);
+        $number = isset($matches[1]) ? (int)$matches[1] : 10000;
         return 'PO-' . ($number + 1);
     }
 
@@ -125,7 +126,8 @@ class PurchaseController extends Controller
                 'discount'        => $request->discount ?? 0,
                 'vat'             => $request->vat ?? 0,
                 'paid_amount'     => $request->paid_amount ?? 0,
-                'status'          => 'Completed',
+                'status'          => 'Draft',
+                'is_receive' => false,
                 'created_by'      => auth()->id(),
             ]);
 
@@ -142,8 +144,8 @@ class PurchaseController extends Controller
                     'rate'       => $rate,
                     'amount'     => $amount,
                 ]);
-                Product::where('id', $productId)->increment('current_stock', $qty);
-                Product::where('id', $productId)->update(['purchase_price' => $rate]);
+                // Product::where('id', $productId)->increment('current_stock', $qty);
+                // Product::where('id', $productId)->update(['purchase_price' => $rate]);
                 $totalQty += $qty;
                 $subTotal += $amount;
             }
@@ -253,8 +255,8 @@ class PurchaseController extends Controller
                     'rate' => $rate,
                     'amount' => $amount,
                 ]);
-                Product::where('id', $productId)->increment('current_stock', $qty);
-                Product::where('id', $productId)->update(['purchase_price' => $rate]);
+                // Product::where('id', $productId)->increment('current_stock', $qty);
+                // Product::where('id', $productId)->update(['purchase_price' => $rate]);
                 $totalQty += $qty;
                 $subTotal += $amount;
             }
@@ -301,9 +303,9 @@ class PurchaseController extends Controller
         }
         DB::beginTransaction();
         try {
-            foreach ($purchase->items as $item) {
-                Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
-            }
+            // foreach ($purchase->items as $item) {
+            //     Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
+            // }
             $purchase->update([
                 'status' => 'Cancelled',
                 'updated_by' => auth()->id(),

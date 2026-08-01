@@ -20,6 +20,9 @@ return new class extends Migration
             $table->enum('type', ['Income', 'Expense', 'Challan', 'Sales-Order', 'Purchase-Order']);
             $table->boolean('is_challan')->default(false);
             $table->boolean('is_invoice')->default(false);
+            $table->boolean('is_receive')->default(false);
+            $table->date('received_date')->nullable();
+            $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('po_no')->nullable()->unique();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('branch_id')->nullable()->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();

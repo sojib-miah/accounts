@@ -86,7 +86,7 @@
         {{-- products  --}}
         @can('menu-product-list')
             <li
-                class="menu-item {{ request()->routeIs('product.*') || request()->routeIs('product-category.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('product.*') || request()->routeIs('product-category.*') || request()->routeIs('brand.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-brands fa-product-hunt me-3"></i>
                     Products
@@ -99,6 +99,11 @@
                             </a>
                         </li>
                     @endcan
+                    <li class="menu-item {{ request()->routeIs('brand.index') ? 'active' : '' }}">
+                        <a href="{{ route('brand.index') }}" class="menu-link">
+                            Brand List
+                        </a>
+                    </li>
                     @can('product-list')
                         <li class="menu-item {{ request()->routeIs('product.index') ? 'active' : '' }}">
                             <a href="{{ route('product.index') }}" class="menu-link">
@@ -136,6 +141,21 @@
                 </ul>
             </li>
         @endcan
+
+        <!-- warehouse -->
+        <li class="menu-item {{ request()->routeIs('warehouse.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa fa-warehouse me-3"></i>
+                Warehouse
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('warehouse.index') ? 'active' : '' }}">
+                    <a href="{{ route('warehouse.index') }}" class="menu-link">
+                        Warehouse List
+                    </a>
+                </li>
+            </ul>
+        </li>
 
         <!-- inventory -->
         @can('menu-inventory-list')

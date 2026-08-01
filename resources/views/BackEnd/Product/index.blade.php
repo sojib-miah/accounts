@@ -94,10 +94,11 @@
                                 Reset
                             </a>
                             @can('product-create')
-                                <a href="{{ route('product.create') }}" class="ms-3 btn btn-primary">
+                                <button type="button" class="ms-3 btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#createProductModal">
                                     <i class="fa fa-plus me-2"></i>
-                                    Add Product
-                                </a>
+                                    Create Product
+                                </button>
                             @endcan
                         </div>
                     </div>
@@ -115,8 +116,6 @@
                             <th>Category</th>
                             <th>Item Name</th>
                             <th>Description</th>
-                            <th>Buy</th>
-                            <th>Sale</th>
                             <th>Stock</th>
                             <th>Status</th>
                             <th width="80">
@@ -144,12 +143,6 @@
                                 </td>
                                 <td>
                                     {{ $product->description }}
-                                </td>
-                                <td>
-                                    {{ number_format($product->purchase_price, 2) }}
-                                </td>
-                                <td>
-                                    {{ number_format($product->sale_price, 2) }}
                                 </td>
                                 <td>
                                     @if ($product->current_stock <= $product->minimum_stock)
@@ -186,9 +179,10 @@
                                             </li>
                                             @can('product-edit')
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('product.edit', $product->id) }}">
+                                                    <button type="button" class="dropdown-item editProduct"
+                                                        data-id="{{ $product->id }}">
                                                         Edit
-                                                    </a>
+                                                    </button>
                                                 </li>
                                             @endcan
                                             @can('product-delete')
@@ -196,7 +190,7 @@
                                                     <form action="{{ route('product.destroy', $product->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="dropdown-item text-danger delete-btn">
+                                                        <button type="submit" class="dropdown-item text-danger delete-btn">
                                                             Delete
                                                         </button>
                                                     </form>
@@ -221,10 +215,55 @@
             </div>
         </div>
     </div>
+
+    @include('BackEnd.Product.partials.create')
+    @include('BackEnd.Product.partials.edit')
 @endsection
 
 @push('scripts')
+    @if ($errors->any())
+        <script>
+            $(function() {
+                $('#createProductModal').modal('show');
+            });
+        </script>
+    @endif
     <script>
+        $('.editProduct').click(function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            $.ajax({
+                url: '/admin/product/' + id + '/edit',
+                type: 'GET',
+                success: function(res) {
+                    $('#edit_product_id').val(res.id);
+                    $('#edit_product_code').val(res.product_code);
+                    $('#edit_category_id').val(res.category_id).trigger('change');
+                    $('#edit_brand_id').val(res.brand_id).trigger('change');
+                    $('#edit_name').val(res.name);
+                    $('#edit_model_no').val(res.model_no);
+                    $('#edit_barcode').val(res.barcode);
+                    $('#edit_sku').val(res.sku);
+                    $('#edit_unit').val(res.unit).trigger('change');
+                    $('#edit_minimum_stock').val(res.minimum_stock);
+                    $('#edit_status').val(res.status).trigger('change');
+                    $('#edit_description').val(res.description);
+                    $('#editForm').attr('action', '/admin/product/' + res.id);
+                    $('#editProductModal').modal('show');
+                }
+            });
+        });
+        $('#createProductModal').on('shown.bs.modal', function() {
+            $(this).find('.select2').select2({
+                dropdownParent: $('#createProductModal')
+            });
+        });
+        $('#editProductModal').on('shown.bs.modal', function() {
+            $(this).find('.select2').select2({
+                dropdownParent: $('#editProductModal')
+            });
+        });
+
         $('.delete-btn').click(function(e) {
             e.preventDefault();
             let form = $(this).closest('form');

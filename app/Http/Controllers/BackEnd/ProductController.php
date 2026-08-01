@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -63,6 +64,13 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
+        $brands = Brand::where('status', 'Active')
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
+                $q->where('created_by', Auth::id());
+            })
+            ->orderBy('name')
+            ->get();
+
         $statisticsQuery = Product::query();
 
         if (!Auth::user()->hasRole('Super-Admin')) {
@@ -81,7 +89,7 @@ class ProductController extends Controller
                 ->count(),
         ];
 
-        return view('BackEnd.Product.index', compact('products', 'categories', 'statistics'));
+        return view('BackEnd.Product.index', compact('products', 'categories', 'brands', 'statistics'));
     }
 
     /**
@@ -89,11 +97,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('type', 'Product')->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', auth()->id());
-        })->orderBy('name')->get();
-
-        return view('BackEnd.Product.create', compact('categories'));
+        //
     }
 
     /**
@@ -102,23 +106,25 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'product_code' => 'required|unique:products,product_code',
             'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
             'name' => 'required|max:255',
-            'purchase_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0',
+            'model_no' => 'required|unique:products,model_no|max:255',
             'minimum_stock' => 'required|numeric|min:0',
-            'unit' => 'required'
+            'unit' => 'required',
+            'sku' => 'required|unique:products,sku|max:255',
         ]);
 
         Product::create([
             'company_id' => Auth::user()->company_id,
             'category_id' => $request->category_id,
-            'product_code' => $this->generateProductCode(),
+            'brand_id' => $request->brand_id,
+            'product_code' => $request->product_code,
+            'model_no' => $request->model_no,
             'barcode' => $request->barcode,
             'sku' => $request->sku,
             'name' => $request->name,
-            'purchase_price' => $request->purchase_price,
-            'sale_price' => $request->sale_price,
             'minimum_stock' => $request->minimum_stock,
             'unit' => $request->unit,
             'description' => $request->description,
@@ -144,11 +150,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $categories = Category::where('type', 'Product')->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', auth()->id());
-        })->orderBy('name')->get();
-
-        return view('BackEnd.Product.edit', compact('product', 'categories'));
+        return response()->json($product);
     }
 
     /**
@@ -157,21 +159,24 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
+            'product_code' => 'required|unique:products,product_code,' . $product->id,
             'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
             'name' => 'required|max:255',
-            'purchase_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0',
+            'model_no' => 'required|max:255|unique:products,model_no,' . $product->id,
             'minimum_stock' => 'required|numeric|min:0',
-            'unit' => 'required'
+            'unit' => 'required',
+            'sku' => 'required|max:255|unique:products,sku,' . $product->id,
         ]);
 
         $product->update([
             'category_id' => $request->category_id,
+            'brand_id' => $request->brand_id,
+            'product_code' => $request->product_code,
+            'model_no' => $request->model_no,
             'barcode' => $request->barcode,
             'sku' => $request->sku,
             'name' => $request->name,
-            'purchase_price' => $request->purchase_price,
-            'sale_price' => $request->sale_price,
             'minimum_stock' => $request->minimum_stock,
             'unit' => $request->unit,
             'status' => $request->status,
