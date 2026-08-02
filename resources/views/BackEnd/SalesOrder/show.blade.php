@@ -139,9 +139,9 @@
                 {{-- Income Receipt List --}}
                 {{-- ========================= --}}
                 <div class="card shadow-sm border-0 mt-3">
-                    <div class="card-header" style="padding: 8px !important;">
+                    <div class="card-header" style="padding:8px!important;">
                         <h3 class="mb-0 fw-bold">
-                            Sales Order Item List
+                            Sales Order Product List
                         </h3>
                     </div>
                     <div class="card-body p-0">
@@ -149,13 +149,36 @@
                             <table class="table table-bordered table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th width="60" class="text-center">SN</th>
-                                        <th>Category</th>
-                                        <th>Item Description</th>
-                                        <th width="90" class="text-center">Qty</th>
-                                        <th width="120" class="text-end">Unit Price</th>
-                                        <th width="120" class="text-end">Total Amount</th>
-                                        <th>Remarks</th>
+                                        <th width="60" class="text-center">
+                                            SN
+                                        </th>
+                                        <th>
+                                            Product Code
+                                        </th>
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            Category
+                                        </th>
+                                        <th>
+                                            Brand
+                                        </th>
+                                        <th class="text-center">
+                                            Unit
+                                        </th>
+                                        <th width="90" class="text-end">
+                                            Qty
+                                        </th>
+                                        <th width="120" class="text-end">
+                                            Unit Price
+                                        </th>
+                                        <th width="140" class="text-end">
+                                            Amount
+                                        </th>
+                                        <th>
+                                            Remarks
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -171,15 +194,26 @@
                                                 {{ $loop->iteration }}
                                             </td>
                                             <td>
-                                                {{ $item->category->name ?? '-' }}
+                                                {{ $item->product->product_code }}
                                             </td>
                                             <td>
-                                                {{ $item->accountHead->name ?? '-' }}
+                                                <strong>
+                                                    {{ $item->product->name }}
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                {{ $item->product->category->name ?? '-' }}
+                                            </td>
+                                            <td>
+                                                {{ $item->product->brand->name ?? '-' }}
                                             </td>
                                             <td class="text-center">
-                                                {{ number_format($item->qty) }}
+                                                {{ $item->product->unit }}
                                             </td>
-                                            <td class="text-end fw-bold">
+                                            <td class="text-end">
+                                                {{ number_format($item->qty, 2) }}
+                                            </td>
+                                            <td class="text-end">
                                                 {{ number_format($item->rate, 2) }}
                                             </td>
                                             <td class="text-end fw-bold">
@@ -191,8 +225,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                No Item Found
+                                            <td colspan="10" class="text-center text-muted py-4">
+                                                No Product Found
                                             </td>
                                         </tr>
                                     @endforelse
@@ -238,7 +272,7 @@
                                     <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
                                 </th>
                                 <td class="text-end">
-                                    {{ number_format($receipt->vat, 2) }}
+                                    {{ number_format($receipt->vat, 2) }} %
                                 </td>
                             </tr>
                             <tr class="table-primary">

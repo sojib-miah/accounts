@@ -17,7 +17,6 @@
             @endif
             <form action="{{ route('sales.order.store') }}" method="POST" id="receiptForm">
                 @csrf
-                <input type="hidden" name="type" value="Sales-Order">
                 <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
                 <input type="hidden" name="items" id="items_json">
                 <div>
@@ -124,47 +123,48 @@
                             {{-- Income Item List --}}
                             {{-- ========================= --}}
                             <div class="card shadow-sm mt-3">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h4 class="mb-0">
-                                        Invoice Items
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4>
+                                        Products
                                     </h4>
-                                    <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                        <i class="fa fa-plus me-2"></i>
-                                        Add Row
-                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" id="addRow">
+                                            Add Product
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered align-middle mb-0">
+                                        <table class="table table-bordered mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th width="40">
-                                                        Sn
+                                                    <th width="50">
+                                                        SL
                                                     </th>
-                                                    <th width="180">
-                                                        Category
+                                                    <th width="300">
+                                                        Product
                                                     </th>
-                                                    <th width="220">
-                                                        Item
+                                                    <th width="120">
+                                                        Stock
                                                     </th>
-                                                    <th width="160">
+                                                    <th width="120">
                                                         Qty
                                                     </th>
-                                                    <th width="160">
-                                                        Unit Price
+                                                    <th width="150">
+                                                        Sale Price
                                                     </th>
-                                                    <th width="160">
-                                                        Total
+                                                    <th width="150">
+                                                        Amount
                                                     </th>
                                                     <th>
                                                         Remarks
                                                     </th>
-                                                    <th width="70">
+                                                    <th width="60">
                                                         Action
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="expenseBody">
+                                            <tbody id="salesBody">
                                             </tbody>
                                         </table>
                                     </div>
@@ -175,22 +175,19 @@
                             {{-- ========================= --}}
                             <div class="row mt-4">
                                 <div class="col-md-8">
-                                    <div>
-                                        <label class="form-label"><strong>
-                                                Sales Order Notes
-                                            </strong></label>
-                                        <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
-                                    </div>
+                                    <label>
+                                        Remarks
+                                    </label>
+                                    <textarea name="remarks" rows="5" class="form-control"></textarea>
                                 </div>
-                                <div class="col-md-4 border">
+                                <div class="col-md-4">
                                     <table class="table table-bordered">
                                         <tr>
-                                            <th width="180">
+                                            <th>
                                                 Total Qty
                                             </th>
                                             <td>
-                                                <input type="text" id="total_qty" class="form-control text-end"
-                                                    readonly value="0">
+                                                <input id="total_qty" readonly class="form-control text-end">
                                             </td>
                                         </tr>
                                         <tr>
@@ -198,8 +195,7 @@
                                                 Sub Total
                                             </th>
                                             <td>
-                                                <input type="text" id="sub_total" class="form-control text-end"
-                                                    readonly value="0.00">
+                                                <input id="sub_total" readonly class="form-control text-end">
                                             </td>
                                         </tr>
                                         <tr>
@@ -208,26 +204,24 @@
                                             </th>
                                             <td>
                                                 <input type="number" name="discount" id="discount" value="0"
-                                                    class="form-control text-end" min="0">
+                                                    class="form-control text-end">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="d-flex align-items-center gap-2">
-                                                <span>VAT</span>
-                                                <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
+                                            <th>
+                                                VAT %
                                             </th>
                                             <td>
                                                 <input type="number" name="vat" id="vat" value="0"
-                                                    class="form-control text-end" min="0">
+                                                    class="form-control text-end">
                                             </td>
                                         </tr>
-                                        <tr class="table-primary">
+                                        <tr>
                                             <th>
                                                 Grand Total
                                             </th>
                                             <td>
-                                                <input type="text" id="grand_total"
-                                                    class="form-control text-end fw-bold" readonly value="0.00">
+                                                <input id="grand_total" readonly class="form-control text-end fw-bold">
                                             </td>
                                         </tr>
                                     </table>
@@ -242,6 +236,79 @@
             </form>
         </div>
     </div>
+
+    <script type="text/template" id="salesRowTemplate">
+        <tr>
+            <td class="sl text-center">
+                1
+            </td>
+            <td>
+                <select
+                    name="product_id[]"
+                    class="form-select product select2">
+                    <option value="">
+                        Select Product
+                    </option>
+                    @foreach($products as $product)
+                    <option
+                        value="{{ $product->id }}"
+                        data-stock="{{ $product->current_stock }}"
+                        data-price="{{ $product->sale_price }}"
+                        data-code="{{ $product->product_code }}"
+                        data-unit="{{ $product->unit }}">
+                        {{ $product->model_no }}
+                        -
+                        {{ $product->name }}
+                        (Stock :
+                        {{ number_format($product->current_stock,2) }})
+                    </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <input
+                    type="text"
+                    class="form-control stock text-end"
+                    readonly>
+            </td>
+            <td>
+                <input
+                    type="number"
+                    min="1"
+                    name="qty[]"
+                    class="form-control qty text-end"
+                    value="1">
+            </td>
+            <td>
+                <input
+                    type="number"
+                    step="0.01"
+                    name="rate[]"
+                    class="form-control rate text-end"
+                    value="0">
+            </td>
+            <td>
+                <input
+                    type="text"
+                    class="form-control total text-end"
+                    readonly>
+            </td>
+            <td>
+                <input
+                    type="text"
+                    name="details[]"
+                    class="form-control details"
+                    placeholder="Remarks">
+            </td>
+            <td class="text-center">
+                <button
+                    type="button"
+                    class="btn btn-danger remove">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    </script>
 @endsection
 
 @push('scripts')

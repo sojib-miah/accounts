@@ -1,16 +1,16 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Modify Income Receipt')
+@section('title', 'Modify Sales Order')
 
 @section('content')
     <div class="py-4">
         <div class="mx-5">
-            <form action="{{ route('income.receipt.update', $receipt->id) }}" method="POST" id="receiptForm">
+            <form action="{{ route('sales.order.update', $receipt->id) }}" method="POST" id="receiptForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="type" value="{{ $receipt->type }}">
                 {{-- <input type="hidden" name="company_id" value="{{ $receipt->company_id }}"> --}}
-                <input type="hidden" name="items" id="items_json">
+                {{-- <input type="hidden" name="items" id="items_json"> --}}
                 <div class="row">
                     <!-- LEFT -->
                     <div class="col-lg-12">
@@ -173,47 +173,48 @@
                         {{-- Income Item List --}}
                         {{-- ========================================= --}}
                         <div class="card shadow-sm mt-3">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">
-                                    Invoice Items
+                            <div class="card-header d-flex justify-content-between">
+                                <h4>
+                                    Products
                                 </h4>
-                                <button type="button" id="addRow" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-plus me-2"></i>
-                                    Add Row
-                                </button>
+                                <div>
+                                    <button type="button" id="addRow" class="btn btn-primary">
+                                        Add Product
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered align-middle mb-0">
+                                    <table class="table table-bordered mb-0">
                                         <thead>
                                             <tr>
-                                                <th width="40">
-                                                    SN
+                                                <th width="50">
+                                                    SL
                                                 </th>
-                                                <th width="180">
-                                                    Category
+                                                <th>
+                                                    Product
                                                 </th>
-                                                <th width="220">
-                                                    Invoice
+                                                <th width="120">
+                                                    Stock
                                                 </th>
                                                 <th width="120">
                                                     Qty
                                                 </th>
-                                                <th width="120">
-                                                    Unit Price
+                                                <th width="140">
+                                                    Sale Price
                                                 </th>
-                                                <th width="130">
-                                                    Total
+                                                <th width="140">
+                                                    Amount
                                                 </th>
                                                 <th>
                                                     Remarks
                                                 </th>
-                                                <th width="70">
+                                                <th width="60">
                                                     Action
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody id="expenseBody">
+                                        <tbody id="salesBody">
                                         </tbody>
                                     </table>
                                 </div>
@@ -224,59 +225,43 @@
                         {{-- ========================================= --}}
                         <div class="row mt-4">
                             <div class="col-md-8">
-                                <div>
-                                    <label class="form-label"><strong>
-                                            Invoice Notes
-                                        </strong></label>
-                                    <textarea name="remarks" rows="6" class="form-control">{{ $receipt->remarks }}</textarea>
-                                </div>
+                                <label>
+                                    Remarks
+                                </label>
+                                <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
                             </div>
                             <div class="col-md-4">
                                 <table class="table table-bordered">
                                     <tr>
-                                        <th width="180">
-                                            Total Qty
-                                        </th>
+                                        <th>Total Qty</th>
                                         <td>
-                                            <input type="text" id="total_qty" class="form-control text-end" readonly
-                                                value="0">
+                                            <input id="total_qty" readonly class="form-control text-end">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>
-                                            Sub Total
-                                        </th>
+                                        <th>Sub Total</th>
                                         <td>
-                                            <input type="text" id="sub_total" class="form-control text-end" readonly
-                                                value="0.00">
+                                            <input id="sub_total" readonly class="form-control text-end">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>
-                                            Discount
-                                        </th>
+                                        <th>Discount</th>
                                         <td>
-                                            <input type="number" name="discount" id="discount" value="0"
-                                                class="form-control text-end" min="0">
+                                            <input type="number" id="discount" name="discount"
+                                                value="{{ $receipt->discount }}" class="form-control text-end">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th class="d-flex align-items-center gap-2">
-                                            <span>VAT</span>
-                                            <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
-                                        </th>
+                                        <th>VAT %</th>
                                         <td>
-                                            <input type="number" name="vat" id="vat" value="0"
-                                                class="form-control text-end" min="0">
+                                            <input type="number" id="vat" name="vat"
+                                                value="{{ $receipt->vat }}" class="form-control text-end">
                                         </td>
                                     </tr>
                                     <tr class="table-primary">
-                                        <th>
-                                            Grand Total
-                                        </th>
+                                        <th>Grand Total</th>
                                         <td>
-                                            <input type="text" id="grand_total" class="form-control text-end fw-bold"
-                                                readonly value="0.00">
+                                            <input id="grand_total" readonly class="form-control text-end fw-bold">
                                         </td>
                                     </tr>
                                 </table>
@@ -284,14 +269,89 @@
                         </div>
                         <button type="submit" class="btn btn-success w-100 mt-3">
                             <i class="fa fa-save me-2"></i>
-                            Update Invoice
+                            Update Sales Order
                         </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <script type="text/template" id="salesRowTemplate">
+<tr>
+    <td class="sl text-center"></td>
+    <td>
+        <select
+            name="product_id[]"
+            class="form-select product select2">
+            <option value="">
+                Select Product
+            </option>
+            @foreach($products as $product)
+                <option
+                    value="{{ $product->id }}"
+                    data-stock="{{ $product->current_stock }}"
+                    data-price="{{ $product->sale_price }}"
+                    data-unit="{{ $product->unit }}"
+                    data-code="{{ $product->product_code }}">
+                    {{ $product->product_code }}
+                    -
+                    {{ $product->name }}
+                    (Stock :
+                    {{ number_format($product->current_stock,2) }})
+                </option>
+            @endforeach
+        </select>
+    </td>
+    <td>
+        <input
+            type="text"
+            class="form-control stock text-end"
+            readonly>
+    </td>
+    <td>
+        <input
+           type="number"
+            min="1"
+            step="0.01"
+            name="qty[]"
+            value="1"
+            class="form-control qty text-end">
+    </td>
+    <td>
+        <input
+            type="number"
+            step="0.01"
+            name="rate[]"
+            class="form-control rate text-end">
+    </td>
+    <td>
+        <input
+            type="text"
+            class="form-control total text-end"
+            readonly>
+    </td>
+    <td>
+        <input
+            type="text"
+            name="details[]"
+            class="form-control details">
+    </td>
+    <td class="text-center">
+        <button
+            type="button"
+            class="btn btn-danger remove">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>
+</script>
 @endsection
+
+<script>
+    const oldItems = @json($oldItems);
+</script>
+
 @push('scripts')
     @include('BackEnd.Script.editscript')
 @endpush

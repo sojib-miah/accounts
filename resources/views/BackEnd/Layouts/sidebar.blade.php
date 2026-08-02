@@ -206,7 +206,7 @@
                             </a>
                         </li>
                     @endcan
-                    @can('income-category-list-list')
+                    {{-- @can('income-category-list-list')
                         <li class="menu-item {{ request()->routeIs('income.category.index') ? 'active' : '' }}">
                             <a href="{{ route('income.category.index') }}" class="menu-link">
                                 Category List
@@ -219,7 +219,7 @@
                                 Item List
                             </a>
                         </li>
-                    @endcan
+                    @endcan --}}
                     @can('income-salesorder-list')
                         <li class="menu-item {{ request()->routeIs('sales.order.index') ? 'active' : '' }}">
                             <a href="{{ route('sales.order.index') }}" class="menu-link">

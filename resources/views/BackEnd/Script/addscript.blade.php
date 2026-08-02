@@ -1,38 +1,17 @@
  <script>
      let rowNo = 1;
-     let categories = @json($categories);
 
      function addRow() {
-         let options = '<option value="">Select Category</option>';
-         categories.forEach(function(category) {
-             options += `<option value="${category.id}">${category.name}</option>`;
-         });
-         let html = `
-                    <tr>
-                    <td class="sl">${rowNo}</td>
-                    <td class="custome"><select class="form-select category select2">${options}</select></td>
-                    <td class="custome">
-                    <select class="form-select account select2"><option value="">Select Expense</option></select>
-                    </td>
-                    <td><input type="number" class="form-control qty" value="1"></td>
-                    <td><input type="number" class="form-control rate" value="0"></td>
-                    <td><input type="text" class="form-control total" readonly></td>
-                    <td><input type="text" class="form-control details"></td>
-                    <td><button type="button" class="btn btn-danger remove"><i class='fa fa-trash'></i></button></td>
-                    </tr>
-                    `;
-         $('#expenseBody').append(html);
-         calculate();
-         let row = $('#expenseBody tr:last');
-         row.find('.category').select2({
-             width: '100%'
-         });
-         row.find('.account').select2({
+         let html = $('#salesRowTemplate').html();
+         $('#salesBody').append(html);
+         let row = $('#salesBody tr:last');
+         row.find('.sl').text(rowNo);
+         row.find('.product').select2({
              width: '100%'
          });
          rowNo++;
-         //  let lastRow = $('#expenseBody tr:last');
-         //  lastRow.find('.category').select2('open');
+         serial();
+         calculate();
      }
      $(function() {
          addRow();
@@ -43,112 +22,161 @@
 
      function serial() {
          let i = 1;
-         $('#expenseBody tr').each(function() {
+         $('#salesBody tr').each(function() {
              $(this).find('.sl').text(i);
              i++;
          });
      }
-     $(document).on('change', '.category', function() {
+     $(document).on('change', '.product', function() {
          let row = $(this).closest('tr');
-         let categoryId = $(this).val();
-         let account = row.find('.account');
-         account.empty();
-         account.append('<option value="">Loading...</option>');
-         if (categoryId == '') {
-             account.html('<option value="">Select Expense</option>');
+         let option = $(this).find(':selected');
+         let productId = $(this).val();
+         let duplicate = false;
+         $('.product').not(this).each(function() {
+             if ($(this).val() == productId && productId != '') {
+                 duplicate = true;
+             }
+         });
+         if (duplicate) {
+             Swal.fire({
+                 icon: 'warning',
+                 title: 'Duplicate Product',
+                 text: 'This product has already been added.'
+             });
+             $(this).val('').trigger('change');
              return;
          }
-         $.ajax({
-             url: "{{ route('ajax.account-head', ':id') }}".replace(':id', categoryId),
-             type: 'GET',
-             success: function(response) {
-                 let option = '<option value="">Select Expense</option>';
-                 $.each(response.data, function(index, item) {
-                     option += `<option value="${item.id}">${item.name}</option>`;
-                 });
-                 account.html(option);
-                 account.trigger('change.select2');
-             },
-             error: function() {
-                 alert('Failed to load Expense Head.');
+         row.find('.stock').val(
+             option.data('stock') ?? 0
+         );
+         row.find('.rate').val(
+             option.data('price') ?? 0
+         );
+         row.find('.qty').val(1);
+         calculate();
+         row.find('.qty').focus();
+     });
+
+     function calculate() {
+         let totalQty = 0;
+         let subTotal = 0;
+         $('#salesBody tr').each(function() {
+             let row = $(this);
+             let stock = parseFloat(row.find('.stock').val()) || 0;
+             let qty = parseFloat(row.find('.qty').val()) || 0;
+             let rate = parseFloat(row.find('.rate').val()) || 0;
+             let product = row.find('.product').val();
+             if (product) {
+                 if (qty > stock) {
+                     Swal.fire({
+                         icon: 'warning',
+                         title: 'Stock Not Available',
+                         text: 'Available Stock : ' + stock
+                     });
+                     qty = stock;
+                     row.find('.qty').val(stock);
+                 }
+             }
+             if (qty < 0) {
+                 qty = 0;
+                 row.find('.qty').val(0);
+             }
+             let amount = qty * rate;
+             row.find('.total').val(
+                 amount.toFixed(2)
+             );
+             totalQty += qty;
+             subTotal += amount;
+         });
+
+         let discount = parseFloat(
+             $('#discount').val()
+         ) || 0;
+         if (discount > subTotal) {
+             discount = subTotal;
+             $('#discount').val(
+                 discount.toFixed(2)
+             );
+         }
+         let vatPercent = parseFloat(
+             $('#vat').val()
+         ) || 0;
+         let afterDiscount = subTotal - discount;
+         let vatAmount =
+             (afterDiscount * vatPercent) / 100;
+         let grandTotal =
+             afterDiscount + vatAmount;
+         $('#total_qty').val(
+             totalQty.toFixed(2)
+         );
+         $('#sub_total').val(
+             subTotal.toFixed(2)
+         );
+         $('#grand_total').val(
+             grandTotal.toFixed(2)
+         );
+     }
+     $(document).on(
+         'keyup change',
+         '.qty',
+         function() {
+             calculate();
+         }
+     );
+     $(document).on(
+         'keyup change',
+         '.rate',
+         function() {
+             calculate();
+         }
+     );
+     $(document).on(
+         'keyup change',
+         '#discount',
+         function() {
+             calculate();
+         }
+     );
+     $(document).on(
+         'keyup change',
+         '#vat',
+         function() {
+             calculate();
+         }
+     );
+     $(document).on(
+         'keyup',
+         '.details',
+         function() {
+             calculate();
+         }
+     );
+     $(document).on('click', '.remove', function(e) {
+         e.preventDefault();
+         if ($('#salesBody tr').length <= 1) {
+             Swal.fire({
+                 icon: 'warning',
+                 title: 'At least one product is required.'
+             });
+             return;
+         }
+         let row = $(this).closest('tr');
+         Swal.fire({
+             title: 'Remove Product?',
+             text: 'This product will be removed.',
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonText: 'Yes',
+             cancelButtonText: 'Cancel'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 row.remove();
+                 serial();
+                 calculate();
              }
          });
      });
 
-     function calculate() {
-         let qtyTotal = 0;
-         let subTotal = 0;
-         let items = [];
-
-         $('#expenseBody tr').each(function() {
-
-             let row = $(this);
-
-             let qty = parseFloat(row.find('.qty').val()) || 0;
-             let rate = parseFloat(row.find('.rate').val()) || 0;
-
-             let amount = qty * rate;
-
-             row.find('.total').val(amount.toFixed(2));
-
-             qtyTotal += qty;
-             subTotal += amount;
-
-             items.push({
-                 category_id: row.find('.category').val(),
-                 category_name: row.find('.category option:selected').text(),
-                 account_head_id: row.find('.account').val(),
-                 account_head_name: row.find('.account option:selected').text(),
-                 qty: qty,
-                 rate: rate,
-                 amount: amount,
-                 details: row.find('.details').val()
-             });
-         });
-
-         let discount = parseFloat($('#discount').val()) || 0;
-         let vatPercent = parseFloat($('#vat').val()) || 0;
-
-         if (discount > subTotal) {
-             discount = subTotal;
-             $('#discount').val(discount.toFixed(2));
-         }
-
-         let afterDiscount = subTotal - discount;
-         let vatAmount = (afterDiscount * vatPercent) / 100;
-         let grandTotal = afterDiscount + vatAmount;
-
-         $('#total_qty').val(qtyTotal);
-         $('#sub_total').val(subTotal.toFixed(2));
-         $('#grand_total').val(grandTotal.toFixed(2));
-         $('#items_json').val(JSON.stringify(items));
-     }
-     $(document).on('keyup change', '.qty', function() {
-         calculate();
-     });
-     $(document).on('keyup change', '.rate', function() {
-         calculate();
-     });
-     $(document).on('keyup change', '#discount', function() {
-         calculate();
-     });
-     $(document).on('keyup change', '#vat', function() {
-         calculate();
-     });
-     $(document).on('keyup', '.details', function() {
-         calculate();
-     });
-     $(document).on('change', '.account', function() {
-         calculate();
-     });
-     $(document).on('change', '.account', function() {
-         $(this)
-             .closest('tr')
-             .find('.qty')
-             .focus();
-
-         calculate();
-     });
      $(document).on('keydown', '.qty', function(e) {
          if (e.key === 'Enter') {
              e.preventDefault();
@@ -171,16 +199,26 @@
          if (e.key === 'Enter') {
              e.preventDefault();
              addRow();
+             $('#salesBody tr:last')
+                 .find('.product')
+                 .focus();
          }
+     });
+     $(document).on('focus', '.qty,.rate,#discount,#vat', function() {
+         $(this).on('wheel.disableScroll', function(e) {
+             e.preventDefault();
+         });
+     });
+     $(document).on('blur', '.qty,.rate,#discount,#vat', function() {
+         $(this).off('wheel.disableScroll');
      });
      $('form').submit(function(e) {
          let valid = true;
-         $('#expenseBody tr').each(function() {
+         $('#salesBody tr').each(function() {
              let row = $(this);
              row.removeClass('table-danger');
              if (
-                 row.find('.category').val() == '' ||
-                 row.find('.account').val() == '' ||
+                 row.find('.product').val() == '' ||
                  row.find('.qty').val() == '' ||
                  row.find('.rate').val() == ''
              ) {
@@ -193,51 +231,19 @@
              Swal.fire({
                  icon: 'warning',
                  title: 'Incomplete Data',
-                 text: 'Please complete all rows before saving.'
+                 text: 'Please complete all product information.'
              });
+             return;
          }
      });
      $(document).keydown(function(e) {
-         if (e.ctrlKey && e.key === 's') {
+         if (e.ctrlKey && e.key.toLowerCase() === 's') {
              e.preventDefault();
              $('form').submit();
          }
      });
-     $(document).on('focus', '.qty,.rate', function() {
-         $(this).on('wheel.disableScroll', function(e) {
-             e.preventDefault();
-         });
-     });
-     $(document).on('blur', '.qty,.rate', function() {
-         $(this).off('wheel.disableScroll');
-     });
-     $(document).on('click', '.remove', function(e) {
-         e.preventDefault();
-         // Check BEFORE showing delete confirmation
-         if ($('#expenseBody tr').length <= 1) {
-             Swal.fire({
-                 icon: 'warning',
-                 title: 'At least one item is required.'
-             });
-             return;
-         }
 
-         let row = $(this).closest('tr');
-         Swal.fire({
-             title: 'Delete Item?',
-             text: 'This row will be removed.',
-             icon: 'warning',
-             showCancelButton: true,
-             confirmButtonText: 'Delete',
-             cancelButtonText: 'Cancel'
-         }).then((result) => {
-             if (result.isConfirmed) {
-                 row.remove();
-                 serial();
-                 calculate();
-             }
-         });
-     });
+     calculate();
 
      $('#company_id').change(function() {
          let company = $(this).val();

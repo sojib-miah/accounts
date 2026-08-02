@@ -23,7 +23,7 @@ class ReceiverController extends Controller
                     ->orWhere('type', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%");
             });
-        })->where('type', 'Income')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        })->where('type', 'Customer')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->latest()->get();
 
@@ -42,7 +42,7 @@ class ReceiverController extends Controller
             'status'  => 'required|in:Active,Inactive',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Party::where('created_by', Auth::id())->where('type', 'Income')->count();
+            $current = Party::where('created_by', Auth::id())->where('type', 'Customer')->count();
             if ($message = PackageHelper::checkLimit('party_limit', $current)) {
                 return back()->with('error', $message);
             }
@@ -62,7 +62,7 @@ class ReceiverController extends Controller
             'email'      => $request->email,
             'company_name'      => $request->company_name,
             'address'    => $request->address,
-            'type'       => 'Income',
+            'type'       => 'Customer',
             'status'     => $request->status,
             'created_by' => auth()->id(),
         ]);

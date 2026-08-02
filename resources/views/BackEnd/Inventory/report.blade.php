@@ -11,10 +11,10 @@
                     Stock Report
                 </h4>
                 <div>
-                    <a href="{{ route('inventory.print') }}" target="_blank" class="btn btn-success">
+                    {{-- <a href="{{ route('inventory.print') }}" target="_blank" class="btn btn-success">
                         <i class="fa fa-print me-2"></i>
                         Print
-                    </a>
+                    </a> --}}
                     <a href="{{ route('inventory.pdf') }}" target="_blank" class="btn btn-info">
                         <i class="fa-regular fa-file-pdf me"></i>
                         PDF

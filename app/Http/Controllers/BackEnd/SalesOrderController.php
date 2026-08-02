@@ -10,9 +10,11 @@ use App\Models\Category;
 use App\Models\Company;
 use App\Models\Party;
 use App\Models\PaymentType;
+use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
 use App\Models\ReceiptPayment;
+use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -60,14 +62,23 @@ class SalesOrderController extends Controller
             $q->where('created_by', Auth::id())
                 ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
-        $parties = Party::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
-        $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->get();
-        return view('BackEnd.SalesOrder.income_create', compact('branches', 'parties', 'categories', 'companies'));
+        $products = Product::with('category')
+            ->where('status', 'Active')
+            ->whereHas('receiptItems.receipt', function ($q) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+            })
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            })
+            ->orderBy('name')
+            ->get();
+        return view('BackEnd.SalesOrder.income_create', compact('branches', 'parties', 'products', 'companies'));
     }
 
     private function generateReceiptNo()
@@ -90,44 +101,45 @@ class SalesOrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:Income,Expense,Challan,Sales-Order',
             'company_id' => 'nullable',
             'branch_id' => 'required|exists:branches,id',
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
-            'items' => 'required',
+            'product_id' => 'required|array|min:1',
+            'product_id.*' => 'required|exists:products,id',
+            'qty' => 'required|array',
+            'qty.*' => 'required|numeric|min:1',
+            'rate' => 'required|array',
+            'rate.*' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'vat' => 'nullable|numeric|min:0',
         ]);
-        if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Receipt::where('company_id', Auth::user()->company_id)
-                ->where('type', 'Sales-Order')
-                ->count();
-            if ($message = PackageHelper::checkLimit('sales_order_limit', $current)) {
-                return back()->with('error', $message);
-            }
-        }
         DB::beginTransaction();
         try {
-            $items = json_decode($request->items, true);
-            if (!$items || count($items) == 0) {
-                return back()->withInput()->with('error', 'Please add at least one item.');
-            }
             $totalQty = 0;
             $subTotal = 0;
-            foreach ($items as $item) {
-                $qty = $item['qty'] ?? 1;
-                $amount = $item['amount'];
+            foreach ($request->product_id as $key => $productId) {
+                $product = Product::findOrFail($productId);
+                $qty = (float)$request->qty[$key];
+                if ($qty > $product->current_stock) {
+                    throw new \Exception(
+                        $product->name .
+                            ' stock is only ' .
+                            $product->current_stock
+                    );
+                }
                 $totalQty += $qty;
-                $subTotal += $amount;
+                $subTotal += ($qty * $request->rate[$key]);
             }
-            $discount = (float) ($request->discount ?? 0);
-            $vatPercent = (float) ($request->vat ?? 0);
+            $discount = $request->discount ?? 0;
+            $vatPercent = $request->vat ?? 0;
             $afterDiscount = $subTotal - $discount;
             $vatAmount = ($afterDiscount * $vatPercent) / 100;
             $grandTotal = $afterDiscount + $vatAmount;
             $receipt = Receipt::create([
                 'receipt_no' => $this->generateReceiptNo(),
                 'so_no' => $this->generateSONo(),
-                'type' => $request->type,
+                'type' => 'Sales-Order',
                 'company_id' => $request->company_id,
                 'branch_id' => $request->branch_id,
                 'party_id' => $request->party_id,
@@ -144,19 +156,39 @@ class SalesOrderController extends Controller
                 'status' => 'Completed',
                 'created_by' => Auth::id(),
             ]);
-            foreach ($items as $item) {
+            foreach ($request->product_id as $key => $productId) {
+                $product = Product::findOrFail($productId);
+                $qty = (float)$request->qty[$key];
+                $rate = (float)$request->rate[$key];
+                $amount = $qty * $rate;
                 ReceiptItem::create([
                     'receipt_id' => $receipt->id,
-                    'category_id' => $item['category_id'],
-                    'account_head_id' => $item['account_head_id'],
-                    'qty' => $item['qty'] ?? 1,
-                    'rate' => $item['rate'] ?? $item['amount'],
-                    'amount' => $item['amount'],
-                    'details' => $item['details'] ?? null,
+                    'product_id' => $productId,
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'amount' => $amount,
+                    'details' => $request->details[$key] ?? null,
+                ]);
+                $product->decrement(
+                    'current_stock',
+                    $qty
+                );
+                StockTransaction::create([
+                    'company_id' => $receipt->company_id,
+                    'branch_id' => $receipt->branch_id,
+                    'product_id' => $product->id,
+                    'receipt_id' => $receipt->id,
+                    'transaction_type' => 'Sale',
+                    'stock_in' => 0,
+                    'stock_out' => $qty,
+                    'balance' => $product->fresh()->current_stock,
+                    'transaction_date' => $receipt->receipt_date,
+                    'remarks' => 'Sales Order',
+                    'created_by' => Auth::id(),
                 ]);
             }
             DB::commit();
-            return redirect()->route('sales.order.show', $receipt->id)->with('success', 'Sales Order Created Successfully.');
+            return redirect()->route('sales.order.show', $receipt)->with('success', 'Sales Order Created Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -170,13 +202,15 @@ class SalesOrderController extends Controller
             'branch',
             'party',
             'creator',
-            'items.category',
-            'items.accountHead',
+            'items.product.category',
+            'items.product.brand',
             'payments.account',
             'payments.paymentType',
             'payments.user',
         ]);
+
         $paymentTypes = PaymentType::where('status', 'Active')->get();
+
         return view('BackEnd.SalesOrder.show', compact('receipt', 'paymentTypes'));
     }
 
@@ -196,13 +230,22 @@ class SalesOrderController extends Controller
             $q->where('created_by', Auth::id())
                 ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
-        $parties = Party::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
-        $categories = Category::where('type', 'Income')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->get();
+        $products = Product::with('category')
+            ->where('status', 'Active')
+            ->whereHas('receiptItems.receipt', function ($q) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+            })
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('company_id', Auth::user()->company_id)
+                    ->where('created_by', Auth::id());
+            })
+            ->orderBy('name')
+            ->get();
         $receiptItems = $receipt->items->map(function ($item) {
             return [
                 'category_id'       => $item->category_id,
@@ -213,7 +256,17 @@ class SalesOrderController extends Controller
                 'details'           => $item->details,
             ];
         });
-        return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'categories', 'receiptItems', 'companies'));
+
+        $oldItems = $receipt->items->map(function ($item) {
+            return [
+                'product_id' => $item->product_id,
+                'stock'      => $item->product->current_stock + $item->qty,
+                'qty'        => $item->qty,
+                'rate'       => $item->rate,
+                'details'    => $item->details,
+            ];
+        })->values();
+        return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'products', 'receiptItems', 'companies', 'oldItems'));
     }
 
     public function update(Request $request, Receipt $receipt)
@@ -222,27 +275,52 @@ class SalesOrderController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
-            'items' => 'required',
+            'product_id' => 'required|array|min:1',
+            'product_id.*' => 'required|exists:products,id',
+            'qty' => 'required|array',
+            'qty.*' => 'required|numeric|min:1',
+            'rate' => 'required|array',
+            'rate.*' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
+            'vat' => 'nullable|numeric|min:0',
         ]);
         DB::beginTransaction();
         try {
-            $items = json_decode($request->items, true);
-            if (!$items || count($items) == 0) {
-                return back()->withInput()->with('error', 'Please add at least one item.');
+            foreach ($receipt->items as $oldItem) {
+                Product::where(
+                    'id',
+                    $oldItem->product_id
+                )->increment(
+                    'current_stock',
+                    $oldItem->qty
+                );
             }
+            StockTransaction::where('receipt_id', $receipt->id)->delete();
+            $receipt->items()->delete();
             $totalQty = 0;
             $subTotal = 0;
-            foreach ($items as $item) {
-                $qty = $item['qty'] ?? 1;
-                $amount = $item['amount'];
+            foreach ($request->product_id as $key => $productId) {
+                $product = Product::findOrFail($productId);
+                $qty = (float)$request->qty[$key];
+                if ($qty > $product->current_stock) {
+                    throw new \Exception(
+                        $product->name .
+                            ' available stock is only '
+                            . $product->current_stock
+                    );
+                }
                 $totalQty += $qty;
-                $subTotal += $amount;
+                $subTotal +=
+                    $qty * $request->rate[$key];
             }
-            $discount = (float) ($request->discount ?? 0);
-            $vatPercent = (float) ($request->vat ?? 0);
-            $afterDiscount = $subTotal - $discount;
-            $vatAmount = ($afterDiscount * $vatPercent) / 100;
-            $grandTotal = $afterDiscount + $vatAmount;
+            $discount = $request->discount ?? 0;
+            $vatPercent = $request->vat ?? 0;
+            $afterDiscount =
+                $subTotal - $discount;
+            $vatAmount =
+                ($afterDiscount * $vatPercent) / 100;
+            $grandTotal =
+                $afterDiscount + $vatAmount;
             $receipt->update([
                 'branch_id' => $request->branch_id,
                 'party_id' => $request->party_id,
@@ -253,27 +331,52 @@ class SalesOrderController extends Controller
                 'discount' => $discount,
                 'vat' => $vatPercent,
                 'total_amount' => $grandTotal,
-                'due_amount' => $grandTotal - $receipt->paid_amount,
-                'updated_by' => auth()->id(),
+                'due_amount' =>
+                $grandTotal -
+                    $receipt->paid_amount,
+                'updated_by' => auth()->id()
             ]);
-            $receipt->items()->delete();
-            foreach ($items as $item) {
+
+            foreach ($request->product_id as $key => $productId) {
+                $product = Product::findOrFail($productId);
+                $qty = $request->qty[$key];
+                $rate = $request->rate[$key];
+                $amount =
+                    $qty * $rate;
                 ReceiptItem::create([
                     'receipt_id' => $receipt->id,
-                    'category_id' => $item['category_id'],
-                    'account_head_id' => $item['account_head_id'],
-                    'qty' => $item['qty'] ?? 1,
-                    'rate' => $item['rate'] ?? 0,
-                    'amount' => $item['amount'],
-                    'details' => $item['details'] ?? null,
+                    'product_id' => $productId,
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'amount' => $amount,
+                    'details' =>
+                    $request->details[$key] ?? null,
+                ]);
+                $product->decrement(
+                    'current_stock',
+                    $qty
+                );
+                StockTransaction::create([
+                    'company_id' => $receipt->company_id,
+                    'branch_id' => $receipt->branch_id,
+                    'product_id' => $productId,
+                    'receipt_id' => $receipt->id,
+                    'transaction_type' => 'Sale',
+                    'stock_in' => 0,
+                    'stock_out' => $qty,
+                    'balance' =>
+                    $product->fresh()->current_stock,
+                    'transaction_date' =>
+                    $receipt->receipt_date,
+                    'remarks' => 'Sales Update',
+                    'created_by' => auth()->id()
                 ]);
             }
-            if (
-                $receipt->paid_amount <= 0
-            ) {
+            if ($receipt->paid_amount <= 0) {
                 $receipt->payment_status = 'Pending';
             } elseif (
-                $receipt->paid_amount < $receipt->total_amount
+                $receipt->paid_amount <
+                $receipt->total_amount
             ) {
                 $receipt->payment_status = 'Partial';
             } else {
@@ -281,10 +384,10 @@ class SalesOrderController extends Controller
             }
             $receipt->save();
             DB::commit();
-            return redirect()->route('sales.order.show', $receipt->id)->with('success', 'Receipt Updated Successfully.');
+            return redirect()->route('sales.order.show', $receipt)->with('success', 'Sales Order Updated Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', $e->getMessage());
+            dd($e);
         }
     }
 
