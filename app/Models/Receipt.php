@@ -52,4 +52,9 @@ class Receipt extends Model
     {
         return $this->belongsTo(Party::class, 'party_id');
     }
+
+    public function serialNumbers()
+    {
+        return $this->hasMany(SerialNumber::class);
+    }
 }

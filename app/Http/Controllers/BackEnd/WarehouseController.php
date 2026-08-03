@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
 use App\Models\Receipt;
+use App\Models\SerialNumber;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,15 @@ class WarehouseController extends Controller
                 'received_by'  => auth()->id(),
                 'status'       => 'Completed'
             ]);
+            SerialNumber::where(
+                'receipt_item_id',
+                $item->id
+            )
+                ->update([
+                    'status' => 'Available',
+                    'receive_date' => today(),
+                    'updated_by' => auth()->id()
+                ]);
             DB::commit();
             return redirect()->route('warehouse.index')->with('success', 'Goods received successfully.');
         } catch (\Exception $e) {

@@ -7,6 +7,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
+use App\Models\SerialNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -137,7 +138,7 @@ class PurchaseController extends Controller
                 $qty = $request->qty[$key];
                 $rate = $request->rate[$key];
                 $amount = $qty * $rate;
-                ReceiptItem::create([
+                $receiptItem = ReceiptItem::create([
                     'receipt_id' => $receipt->id,
                     'product_id' => $productId,
                     'qty'        => $qty,
@@ -148,6 +149,32 @@ class PurchaseController extends Controller
                 // Product::where('id', $productId)->update(['purchase_price' => $rate]);
                 $totalQty += $qty;
                 $subTotal += $amount;
+
+                $serials = json_decode($request->serial_json[$key], true);
+                if (count($serials) != $qty) {
+                    throw new \Exception(
+                        "Serial quantity does not match Qty."
+                    );
+                }
+                foreach ($serials as $serial) {
+                    if (
+                        SerialNumber::where('serial_no', trim($serial))->exists()
+                    ) {
+                        throw new \Exception(
+                            "Duplicate Serial : " . $serial
+                        );
+                    }
+                    SerialNumber::create([
+                        'company_id'      => auth()->user()->company_id,
+                        'branch_id'       => auth()->user()->branch_id,
+                        'product_id'      => $productId,
+                        'receipt_id'      => $receipt->id,
+                        'receipt_item_id' => $receiptItem->id,
+                        'serial_no'       => trim($serial),
+                        'status'          => 'Pending',
+                        'created_by'      => auth()->id(),
+                    ]);
+                }
             }
             $discount = $request->discount ?? 0;
             $vatPercent = $request->vat ?? 0;

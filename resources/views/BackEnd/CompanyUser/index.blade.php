@@ -59,7 +59,7 @@
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->phone ?? '-' }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td>{{ $user->creator->name ?? '-' }}</td>
+                                    <td>{{ $user->creator->name ?? 'Self Created' }}</td>
                                     <td class="text-center">
                                         @if (!$user->hasRole('Super-Admin'))
                                             @can('company-user-edit')

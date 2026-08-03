@@ -7,9 +7,9 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\CompanyPackage;
 use App\Models\Party;
 use App\Models\Receipt;
-use App\Models\ReceiptItem;
 use App\Models\ReceiptPayment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,27 +23,18 @@ class DashboardController extends Controller
         $companyId = $user->company_id;
         if (!$user->hasRole('Super-Admin') && empty($companyId)) {
 
+            $package = CompanyPackage::with('package')
+                ->where('user_id', auth()->id())
+                ->where('status', 'Active')
+                ->first();
+
             return view('BackEnd.Dashboard.dashboard', [
+                'package' => $package,
                 'todayIncome' => 0,
                 'todayExpense' => 0,
                 'todayProfit' => 0,
-
-                'weekIncome' => 0,
-                'weekExpense' => 0,
-                'weekProfit' => 0,
-
                 'monthIncome' => 0,
                 'monthExpense' => 0,
-                'monthProfit' => 0,
-
-                'sixMonthIncome' => 0,
-                'sixMonthExpense' => 0,
-                'sixMonthProfit' => 0,
-
-                'yearIncome' => 0,
-                'yearExpense' => 0,
-                'yearProfit' => 0,
-
                 'totalIncome' => 0,
                 'totalExpense' => 0,
                 'grossProfit' => 0,
@@ -57,46 +48,13 @@ class DashboardController extends Controller
                 'totalSupplier' => 0,
 
                 'totalBranch' => 0,
-                'totalCategory' => 0,
                 'totalAccount' => 0,
 
                 'totalReceipt' => 0,
                 'totalPayment' => 0,
-
-                'pendingReceipt' => 0,
-                'partialReceipt' => 0,
-                'paidReceipt' => 0,
-
                 'recentReceipts' => collect(),
                 'recentPayments' => collect(),
                 'recentTransactions' => collect(),
-
-                'monthLabel' => [],
-                'monthlyIncome' => [],
-                'monthlyExpense' => [],
-                'monthlyProfit' => [],
-
-                'cashFlowLabel' => [],
-                'cashIn' => [],
-                'cashOut' => [],
-
-                'expenseCategory' => collect(),
-                'expenseCategoryLabel' => [],
-                'expenseCategoryAmount' => [],
-
-                'incomeCategory' => collect(),
-                'incomeCategoryLabel' => [],
-                'incomeCategoryAmount' => [],
-
-                'dashboardExpensePie' => [
-                    'labels' => [],
-                    'data' => [],
-                ],
-
-                'dashboardIncomePie' => [
-                    'labels' => [],
-                    'data' => [],
-                ],
 
                 'topCustomers' => collect(),
                 'topSuppliers' => collect(),
@@ -124,17 +82,7 @@ class DashboardController extends Controller
         }
 
         $today = Carbon::today();
-        $week = Carbon::today()->subDays(6);
         $month = Carbon::today()->subDays(29);
-        $sixMonth = Carbon::today()->subMonths(6);
-        $year = Carbon::today()->startOfYear();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Base Queries
-    |--------------------------------------------------------------------------
-    */
-
         $receipt = Receipt::query()->where('status', 'Completed');
         $account = Account::query();
         $party = Party::query();
@@ -142,39 +90,17 @@ class DashboardController extends Controller
         $category = Category::query();
         $transaction = AccountTransaction::query();
         $payment = ReceiptPayment::query();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Company Filter
-    |--------------------------------------------------------------------------
-    */
-
         if (!$user->hasRole('Super-Admin')) {
-
             $receipt->where('company_id', $companyId);
-
             $account->where('company_id', $companyId);
-
             $party->where('company_id', $companyId);
-
             $branch->where('company_id', $companyId);
-
             $category->where('company_id', $companyId);
-
             $transaction->where('company_id', $companyId);
-
             $payment->whereHas('receipt', function ($q) use ($companyId) {
-
                 $q->where('company_id', $companyId);
             });
         }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Today Summary
-    |--------------------------------------------------------------------------
-    */
-
         $todayIncome = (clone $receipt)
             ->where('type', 'Income')
             ->whereDate('receipt_date', $today)
@@ -187,30 +113,6 @@ class DashboardController extends Controller
 
         $todayProfit = $todayIncome - $todayExpense;
 
-        /*
-    |--------------------------------------------------------------------------
-    | Last 7 Days
-    |--------------------------------------------------------------------------
-    */
-
-        $weekIncome = (clone $receipt)
-            ->where('type', 'Income')
-            ->whereDate('receipt_date', '>=', $week)
-            ->sum('total_amount');
-
-        $weekExpense = (clone $receipt)
-            ->where('type', 'Expense')
-            ->whereDate('receipt_date', '>=', $week)
-            ->sum('total_amount');
-
-        $weekProfit = $weekIncome - $weekExpense;
-
-        /*
-    |--------------------------------------------------------------------------
-    | Last 30 Days
-    |--------------------------------------------------------------------------
-    */
-
         $monthIncome = (clone $receipt)
             ->where('type', 'Income')
             ->whereDate('receipt_date', '>=', $month)
@@ -220,49 +122,6 @@ class DashboardController extends Controller
             ->where('type', 'Expense')
             ->whereDate('receipt_date', '>=', $month)
             ->sum('total_amount');
-
-        $monthProfit = $monthIncome - $monthExpense;
-
-        /*
-    |--------------------------------------------------------------------------
-    | Last 6 Months
-    |--------------------------------------------------------------------------
-    */
-
-        $sixMonthIncome = (clone $receipt)
-            ->where('type', 'Income')
-            ->whereDate('receipt_date', '>=', $sixMonth)
-            ->sum('total_amount');
-
-        $sixMonthExpense = (clone $receipt)
-            ->where('type', 'Expense')
-            ->whereDate('receipt_date', '>=', $sixMonth)
-            ->sum('total_amount');
-
-        $sixMonthProfit = $sixMonthIncome - $sixMonthExpense;
-
-        /*
-    |--------------------------------------------------------------------------
-    | Current Year
-    |--------------------------------------------------------------------------
-    */
-
-        $yearIncome = (clone $receipt)
-            ->where('type', 'Income')
-            ->whereDate('receipt_date', '>=', $year)
-            ->sum('total_amount');
-
-        $yearExpense = (clone $receipt)
-            ->where('type', 'Expense')
-            ->whereDate('receipt_date', '>=', $year)
-            ->sum('total_amount');
-
-        $yearProfit = $yearIncome - $yearExpense;
-        /*
-    |--------------------------------------------------------------------------
-    | Overall Summary
-    |--------------------------------------------------------------------------
-    */
 
         $totalIncome = (clone $receipt)
             ->where('type', 'Income')
@@ -274,20 +133,8 @@ class DashboardController extends Controller
 
         $grossProfit = $totalIncome - $totalExpense;
 
-        /*
-    |--------------------------------------------------------------------------
-    | Account Summary
-    |--------------------------------------------------------------------------
-    */
-
         $currentBalance = (clone $account)
             ->sum('current_balance');
-
-        /*
-    |--------------------------------------------------------------------------
-    | Receivable / Payable
-    |--------------------------------------------------------------------------
-    */
 
         $totalReceivable = (clone $receipt)
             ->where('type', 'Income')
@@ -297,60 +144,19 @@ class DashboardController extends Controller
             ->where('type', 'Expense')
             ->sum('due_amount');
 
-        /*
-    |--------------------------------------------------------------------------
-    | Party Summary
-    |--------------------------------------------------------------------------
-    */
-
         $totalCustomer = (clone $party)
-            ->whereIn('type', ['Income', 'Both'])
+            ->whereIn('type', ['Customer', 'Both'])
             ->count();
 
         $totalSupplier = (clone $party)
-            ->whereIn('type', ['Expense', 'Both'])
+            ->whereIn('type', ['Supplier', 'Both'])
             ->count();
 
-        /*
-    |--------------------------------------------------------------------------
-    | Master Data Summary
-    |--------------------------------------------------------------------------
-    */
-
         $totalBranch = (clone $branch)->count();
-
-        $totalCategory = (clone $category)->count();
-
         $totalAccount = (clone $account)->count();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Receipt Summary
-    |--------------------------------------------------------------------------
-    */
-
         $totalReceipt = (clone $receipt)->count();
 
         $totalPayment = (clone $payment)->count();
-
-        $pendingReceipt = (clone $receipt)
-            ->where('payment_status', 'Pending')
-            ->count();
-
-        $partialReceipt = (clone $receipt)
-            ->where('payment_status', 'Partial')
-            ->count();
-
-        $paidReceipt = (clone $receipt)
-            ->where('payment_status', 'Paid')
-            ->count();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Recent Receipts
-    |--------------------------------------------------------------------------
-    */
-
         $recentReceipts = (clone $receipt)
             ->with([
                 'party',
@@ -360,13 +166,6 @@ class DashboardController extends Controller
             ->latest()
             ->take(10)
             ->get();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Recent Payments
-    |--------------------------------------------------------------------------
-    */
-
         $recentPayments = (clone $payment)
             ->with([
                 'receipt',
@@ -377,12 +176,6 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        /*
-    |--------------------------------------------------------------------------
-    | Recent Account Transactions
-    |--------------------------------------------------------------------------
-    */
-
         $recentTransactions = (clone $transaction)
             ->with([
                 'account',
@@ -391,23 +184,9 @@ class DashboardController extends Controller
             ->latest()
             ->take(10)
             ->get();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Monthly Income / Expense / Profit (Last 12 Months)
-    |--------------------------------------------------------------------------
-    */
-
-        $monthLabel = [];
-        $monthlyIncome = [];
-        $monthlyExpense = [];
-        $monthlyProfit = [];
-
         for ($i = 11; $i >= 0; $i--) {
 
             $date = Carbon::now()->subMonths($i);
-
-            $monthLabel[] = $date->format('M Y');
 
             $incomeQuery = Receipt::query()
                 ->where('status', 'Completed')
@@ -427,36 +206,11 @@ class DashboardController extends Controller
 
                 $expenseQuery->where('company_id', $companyId);
             }
-
-            $income = $incomeQuery->sum('total_amount');
-
-            $expense = $expenseQuery->sum('total_amount');
-
-            $monthlyIncome[] = $income;
-
-            $monthlyExpense[] = $expense;
-
-            $monthlyProfit[] = $income - $expense;
         }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Daily Cash Flow (Last 30 Days)
-    |--------------------------------------------------------------------------
-    */
-
-        $cashFlowLabel = [];
-
-        $cashIn = [];
-
-        $cashOut = [];
 
         for ($i = 29; $i >= 0; $i--) {
 
             $date = Carbon::today()->subDays($i);
-
-            $cashFlowLabel[] = $date->format('d M');
-
             $cashInQuery = Receipt::query()
                 ->where('status', 'Completed')
                 ->where('type', 'Income')
@@ -468,89 +222,10 @@ class DashboardController extends Controller
                 ->whereDate('receipt_date', $date);
 
             if (!$user->hasRole('Super-Admin')) {
-
                 $cashInQuery->where('company_id', $companyId);
-
                 $cashOutQuery->where('company_id', $companyId);
             }
-
-            $cashIn[] = $cashInQuery->sum('total_amount');
-
-            $cashOut[] = $cashOutQuery->sum('total_amount');
         }
-        /*
-    |--------------------------------------------------------------------------
-    | Expense Category Chart
-    |--------------------------------------------------------------------------
-    */
-
-        $expenseCategory = ReceiptItem::join('receipts', 'receipt_items.receipt_id', '=', 'receipts.id')
-            ->join('categories', 'receipt_items.category_id', '=', 'categories.id')
-            ->selectRaw('categories.id, categories.name, SUM(receipt_items.amount) as total')
-            ->where('receipts.status', 'Completed')
-            ->where('receipts.type', 'Expense');
-
-        if (!$user->hasRole('Super-Admin')) {
-            $expenseCategory->where('receipts.company_id', $companyId);
-        }
-
-        $expenseCategory = $expenseCategory
-            ->groupBy('categories.id', 'categories.name')
-            ->orderByDesc('total')
-            ->limit(10)
-            ->get();
-
-        $expenseCategoryLabel = $expenseCategory->pluck('name')->toArray();
-
-        $expenseCategoryAmount = $expenseCategory->pluck('total')->toArray();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Income Category Chart
-    |--------------------------------------------------------------------------
-    */
-
-        $incomeCategory = ReceiptItem::join('receipts', 'receipt_items.receipt_id', '=', 'receipts.id')
-            ->join('categories', 'receipt_items.category_id', '=', 'categories.id')
-            ->selectRaw('categories.id, categories.name, SUM(receipt_items.amount) as total')
-            ->where('receipts.status', 'Completed')
-            ->where('receipts.type', 'Income');
-
-        if (!$user->hasRole('Super-Admin')) {
-            $incomeCategory->where('receipts.company_id', $companyId);
-        }
-
-        $incomeCategory = $incomeCategory
-            ->groupBy('categories.id', 'categories.name')
-            ->orderByDesc('total')
-            ->limit(10)
-            ->get();
-
-        $incomeCategoryLabel = $incomeCategory->pluck('name')->toArray();
-
-        $incomeCategoryAmount = $incomeCategory->pluck('total')->toArray();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Dashboard Pie Chart Data
-    |--------------------------------------------------------------------------
-    */
-
-        $dashboardExpensePie = [
-            'labels' => $expenseCategoryLabel,
-            'data'   => $expenseCategoryAmount,
-        ];
-
-        $dashboardIncomePie = [
-            'labels' => $incomeCategoryLabel,
-            'data'   => $incomeCategoryAmount,
-        ];
-        /*
-    |--------------------------------------------------------------------------
-    | Top Customers
-    |--------------------------------------------------------------------------
-    */
-
         $topCustomers = Receipt::join('parties', 'receipts.party_id', '=', 'parties.id')
             ->selectRaw('parties.id, parties.name, SUM(receipts.total_amount) as total')
             ->where('receipts.status', 'Completed')
@@ -565,12 +240,6 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->limit(10)
             ->get();
-
-        /*
-    |--------------------------------------------------------------------------
-    | Top Suppliers
-    |--------------------------------------------------------------------------
-    */
 
         $topSuppliers = Receipt::join('parties', 'receipts.party_id', '=', 'parties.id')
             ->selectRaw('parties.id, parties.name, SUM(receipts.total_amount) as total')
@@ -587,12 +256,6 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        /*
-    |--------------------------------------------------------------------------
-    | Growth Percentage
-    |--------------------------------------------------------------------------
-    */
-
         $incomeGrowth = 0;
 
         if ($monthIncome > 0) {
@@ -604,12 +267,6 @@ class DashboardController extends Controller
         if ($monthExpense > 0) {
             $expenseGrowth = round((($todayExpense * 30) / $monthExpense) * 100, 2);
         }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Top Income Receipts
-    |--------------------------------------------------------------------------
-    */
 
         $topIncomeReceipts = Receipt::with([
             'party',
@@ -628,12 +285,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        /*
-    |--------------------------------------------------------------------------
-    | Top Expense Receipts
-    |--------------------------------------------------------------------------
-    */
-
         $topExpenseReceipts = Receipt::with([
             'party',
             'branch',
@@ -650,11 +301,6 @@ class DashboardController extends Controller
             ->orderByDesc('total_amount')
             ->take(5)
             ->get();
-        /*
-    |--------------------------------------------------------------------------
-    | Payment Summary
-    |--------------------------------------------------------------------------
-    */
 
         $paymentSummary = [
 
@@ -671,13 +317,6 @@ class DashboardController extends Controller
                 ->count(),
 
         ];
-
-        /*
-    |--------------------------------------------------------------------------
-    | Receipt Summary
-    |--------------------------------------------------------------------------
-    */
-
         $receiptSummary = [
 
             'income' => (clone $receipt)
@@ -709,40 +348,26 @@ class DashboardController extends Controller
 
         ];
 
-        /*
-    |--------------------------------------------------------------------------
-    | Return View
-    |--------------------------------------------------------------------------
-    */
+        $package = null;
+
+        if (!auth()->user()->hasRole('Super-Admin')) {
+
+            $package = CompanyPackage::with('package')
+                ->where('user_id', auth()->id())
+                ->where('status', 'Active')
+                ->first();
+        }
 
         return view('BackEnd.Dashboard.dashboard', compact(
-
             'todayIncome',
             'todayExpense',
             'todayProfit',
-
-            'weekIncome',
-            'weekExpense',
-            'weekProfit',
-
             'monthIncome',
             'monthExpense',
-            'monthProfit',
-
-            'sixMonthIncome',
-            'sixMonthExpense',
-            'sixMonthProfit',
-
-            'yearIncome',
-            'yearExpense',
-            'yearProfit',
-
             'totalIncome',
             'totalExpense',
             'grossProfit',
-
             'currentBalance',
-
             'totalReceivable',
             'totalPayable',
 
@@ -750,39 +375,13 @@ class DashboardController extends Controller
             'totalSupplier',
 
             'totalBranch',
-            'totalCategory',
             'totalAccount',
 
             'totalReceipt',
             'totalPayment',
-
-            'pendingReceipt',
-            'partialReceipt',
-            'paidReceipt',
-
             'recentReceipts',
             'recentPayments',
             'recentTransactions',
-
-            'monthLabel',
-            'monthlyIncome',
-            'monthlyExpense',
-            'monthlyProfit',
-
-            'cashFlowLabel',
-            'cashIn',
-            'cashOut',
-
-            'expenseCategory',
-            'expenseCategoryLabel',
-            'expenseCategoryAmount',
-
-            'incomeCategory',
-            'incomeCategoryLabel',
-            'incomeCategoryAmount',
-
-            'dashboardExpensePie',
-            'dashboardIncomePie',
 
             'topCustomers',
             'topSuppliers',
@@ -794,7 +393,8 @@ class DashboardController extends Controller
             'expenseGrowth',
 
             'paymentSummary',
-            'receiptSummary'
+            'receiptSummary',
+            'package',
         ));
     }
 }

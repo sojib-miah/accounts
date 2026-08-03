@@ -61,6 +61,21 @@
             .custome .select2-container--default {
                 width: 180px !important;
             }
+
+            .swal2-container {
+                z-index: 999999 !important;
+            }
+
+            .swal2-toast .swal2-title {
+                font-size: 14px !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .swal2-toast .swal2-html-container {
+                font-size: 13px;
+            }
         </style>
     </head>
 
@@ -123,11 +138,13 @@
         @if (session('success'))
             <script>
                 Swal.fire({
+                    toast: true,
+                    position: 'top-end',
                     icon: 'success',
-                    title: 'Success',
-                    text: '{{ session('success') }}',
-                    timer: 2000,
-                    showConfirmButton: false
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
                 });
             </script>
         @endif
@@ -135,9 +152,13 @@
         @if (session('error'))
             <script>
                 Swal.fire({
+                    toast: true,
+                    position: 'top-end',
                     icon: 'error',
-                    title: 'Error',
-                    text: '{{ session('error') }}'
+                    text: "{{ session('error') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
                 });
             </script>
         @endif

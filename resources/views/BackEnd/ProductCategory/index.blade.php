@@ -25,7 +25,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($categories as $category)
+                        @forelse ($categories as $category)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $category->name }}</td>
@@ -56,7 +56,13 @@
                                     </form>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No categories found.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $categories->links() }}

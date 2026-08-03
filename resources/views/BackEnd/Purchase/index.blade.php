@@ -19,12 +19,12 @@
                 <div class="card-body">
                     <form method="GET">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label>PO No</label>
                                 <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                                     placeholder="PO No">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label>Supplier</label>
                                 <select name="supplier" class="form-select select2">
                                     <option value="">All Supplier</option>
@@ -57,15 +57,15 @@
                                     </option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-primary">
-                                <i class="fa fa-search"></i>
-                                Search
-                            </button>
-                            <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
-                                Reset
-                            </a>
+                            <div class="col-md-2 mt-5">
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-search"></i>
+                                    Search
+                                </button>
+                                <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
+                                    Reset
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>

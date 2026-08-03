@@ -15,6 +15,31 @@
                     Income • Expense • Cash Flow • Reports
                 </small>
             </div>
+            <div class="card shadow-sm mt-5">
+                <div class="card-body">
+                    <p class="text-primary">
+                        <strong>Package:</strong>
+                        {{ $package?->package?->name ?? 'No Package' }}
+                    </p>
+
+                    <p>
+                        <strong>Start:</strong>
+                        {{ $package?->start_date?->format('d M Y') }}
+                    </p>
+
+                    <p>
+                        <strong>Expire:</strong>
+                        {{ $package?->package?->end_date?->format('d M Y') }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="badge bg-success">
+                            {{ $package?->status ?? 'Inactive' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
             <div>
                 <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger btn-sm" target="_blank">
                     <i class="fa fa-file-pdf me-2"></i>

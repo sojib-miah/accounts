@@ -1,5 +1,5 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu">
-    <div class="app-brand demo ">
+    <div class="app-brand demo mt-5 mb-3">
         <a href="{{ route('dashboard.index') }}" class="app-brand-link">
             <span class="app-brand-text demo menu-text fw-bold ms-3">ComitsBD</span>
         </a>

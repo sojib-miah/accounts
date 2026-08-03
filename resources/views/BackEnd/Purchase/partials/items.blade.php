@@ -2,7 +2,8 @@
     <table class="table table-bordered table-hover align-middle">
         <thead>
             <tr>
-                <th width="35%">Product</th>
+                <th width="25%">Product</th>
+                <th width="10%">Serial No</th>
                 <th width="10%">Unit</th>
                 <th width="10%">Stock</th>
                 <th width="10%">Qty</th>
@@ -21,11 +22,16 @@
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}" data-unit="{{ $product->unit }}"
                                 data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-                                {{ $product->model_no }}
+                                {{ $product->sku }}
                                 - {{ $product->name }}
                             </option>
                         @endforeach
                     </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info serialBtn">
+                        <i class="fa fa-barcode"></i>
+                    </button>
                 </td>
                 <td>
                     <input type="text" name="unit[]" class="form-control unit" readonly>
@@ -35,7 +41,7 @@
                 </td>
                 <td>
                     <input type="number" min="1" value="1" name="qty[]" class="form-control qty"
-                        required>
+                        readonly>
                 </td>
                 <td>
                     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate"
@@ -61,10 +67,15 @@
     <option value="">Select Product</option>
     @foreach($products as $product)
         <option value="{{ $product->id }}" data-unit="{{ $product->unit }}" data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
-           {{ $product->model_no }} - {{ $product->name }}
+           {{ $product->sku }} - {{ $product->name }}
         </option>
     @endforeach
 </select>
+</td>
+<td>
+   <button type="button" class="btn btn-info serialBtn">
+        <i class="fa fa-barcode"></i>
+    </button>
 </td>
 <td>
     <input type="text" name="unit[]" class="form-control unit" readonly>
@@ -73,7 +84,7 @@
     <input type="text" class="form-control stock" readonly>
 </td>
 <td>
-    <input type="number" min="1" value="1" name="qty[]" class="form-control qty" required>
+    <input type="number" min="1" value="1" name="qty[]" class="form-control qty" readonly>
 </td>
 <td>
     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>

@@ -56,4 +56,9 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+
+    public function serialNumbers()
+    {
+        return $this->hasMany(SerialNumber::class);
+    }
 }

@@ -120,6 +120,59 @@
                 return false;
             }
             calculateSummary();
+            let serialValid = true;
+
+            $('#purchaseBody tr').each(function() {
+
+                let row = $(this);
+
+                let qty = parseInt(
+
+                    row.find('.qty').val()
+
+                ) || 0;
+
+                let serial = [];
+
+                try {
+
+                    serial = JSON.parse(
+
+                        row.find('.serial_json').val() || '[]'
+
+                    );
+
+                } catch (e) {
+
+                    serial = [];
+
+                }
+
+                if (qty != serial.length) {
+
+                    serialValid = false;
+
+                    row.addClass('table-danger');
+
+                }
+
+            });
+
+            if (!serialValid) {
+
+                Swal.fire({
+
+                    icon: 'warning',
+
+                    title: 'Serial Missing',
+
+                    text: 'Total Serial must equal Quantity.'
+
+                });
+
+                return false;
+
+            }
         });
         calculateSummary();
     });
