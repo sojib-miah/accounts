@@ -451,5 +451,92 @@
             }
 
         }
+        $(document).on('click', '.removeSerial', function() {
+
+            let index = $(this).data('index');
+
+            Swal.fire({
+
+                title: 'Remove Serial?',
+
+                icon: 'warning',
+
+                showCancelButton: true,
+
+                confirmButtonText: 'Yes'
+
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    serialArray.splice(index, 1);
+
+                    renderSerialList();
+
+                }
+
+            });
+
+        });
+        $('#saveSerial').click(function() {
+
+            if (serialArray.length == 0) {
+
+                Swal.fire({
+
+                    icon: 'warning',
+
+                    title: 'No Serial Found'
+
+                });
+
+                return;
+
+            }
+
+            currentRow.find('.serial_json').val(
+
+                JSON.stringify(serialArray)
+
+            );
+
+            currentRow.find('.qty').val(
+
+                serialArray.length
+
+            );
+
+            currentRow.find('.serialBadge').removeClass(
+
+                'bg-secondary'
+
+            ).addClass(
+
+                'bg-success'
+
+            ).text(
+
+                serialArray.length + ' Serial'
+
+            );
+
+            currentRow.find('.serialBtn').removeClass(
+
+                'btn-info'
+
+            ).addClass(
+
+                'btn-success'
+
+            );
+
+            $('#serialModal').modal('hide');
+
+        });
+        $('#serialModal').on('hidden.bs.modal', function() {
+
+            $('#serialInput').val('');
+
+        });
     </script>
 @endpush
