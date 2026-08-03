@@ -501,17 +501,11 @@
             );
 
             currentRow.find('.qty').val(
-
                 serialArray.length
-
             );
-
             currentRow.find('.serialBadge').removeClass(
-
                 'bg-secondary'
-
             ).addClass(
-
                 'bg-success'
 
             ).text(
