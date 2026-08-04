@@ -3,7 +3,7 @@
 @section('title', 'Purchase Details')
 
 @section('content')
-    <div class="p-4">
+    <div class="p-5">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between">
                 <h4>Purchase Details</h4>
@@ -72,6 +72,9 @@
                                     Product
                                 </th>
                                 <th>
+                                    Serial No
+                                </th>
+                                <th>
                                     Unit
                                 </th>
                                 <th class="text-end">
@@ -95,6 +98,13 @@
                                         {{ $item->product->product_code }}
                                         -
                                         {{ $item->product->name }}
+                                    </td>
+                                    <td>
+                                        @if ($item->serialNumbers->count())
+                                            {{ $item->serialNumbers->pluck('serial_no')->implode(', ') }}
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $item->product->unit }}

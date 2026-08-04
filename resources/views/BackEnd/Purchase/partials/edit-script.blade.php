@@ -63,7 +63,7 @@
             let row = current.closest('tr');
             let option = current.find(':selected');
             row.find('.unit').val(option.data('unit'));
-            row.find('.stock').val(option.data('stock'));
+            row.find('.stock').val(parseFloat(option.data('stock')));
             if (option.data('rate') != undefined) {
                 row.find('.rate').val(option.data('rate'));
             }
@@ -127,6 +127,33 @@
             }
             calculateSummary();
             return true;
+            let serialValid = true;
+            $('#purchaseBody tr').each(function() {
+                let row = $(this);
+                let qty = parseInt(
+                    row.find('.qty').val()
+                ) || 0;
+                let serial = [];
+                try {
+                    serial = JSON.parse(
+                        row.find('.serial_json').val() || '[]'
+                    );
+                } catch (e) {
+                    serial = [];
+                }
+                if (qty != serial.length) {
+                    serialValid = false;
+                    row.addClass('table-danger');
+                }
+            });
+            if (!serialValid) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Serial Missing',
+                    text: 'Total Serial must equal Quantity.'
+                });
+                return false;
+            }
         });
     });
 </script>

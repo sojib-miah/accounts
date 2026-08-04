@@ -14,7 +14,9 @@ use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
 use App\Models\ReceiptPayment;
+use App\Models\SerialNumber;
 use App\Models\StockTransaction;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,11 +85,11 @@ class SalesOrderController extends Controller
 
     private function generateReceiptNo()
     {
-        $last = Receipt::orderByDesc('receipt_no')->first();
+        do {
+            $number = 'SR-' . date('Ymd') . rand(1000, 9999);
+        } while (Receipt::where('receipt_no', $number)->exists());
 
-        return $last
-            ? ((int) $last->receipt_no + 1)
-            : 10001;
+        return $number;
     }
 
     private function generateSONo()
@@ -161,7 +163,7 @@ class SalesOrderController extends Controller
                 $qty = (float)$request->qty[$key];
                 $rate = (float)$request->rate[$key];
                 $amount = $qty * $rate;
-                ReceiptItem::create([
+                $receiptItem = ReceiptItem::create([
                     'receipt_id' => $receipt->id,
                     'product_id' => $productId,
                     'qty' => $qty,
@@ -169,6 +171,31 @@ class SalesOrderController extends Controller
                     'amount' => $amount,
                     'details' => $request->details[$key] ?? null,
                 ]);
+                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
+                $count = SerialNumber::where('product_id', $productId)
+                    ->where('status', 'Available')
+                    ->whereIn('serial_no', $serials)
+                    ->count();
+
+                if ($count != count($serials)) {
+
+                    throw new Exception(
+                        'Some serials are unavailable.'
+                    );
+                }
+                foreach ($serials as $serial) {
+
+                    SerialNumber::where('product_id', $productId)
+                        ->where('serial_no', $serial)
+                        ->where('status', 'Available')
+                        ->update([
+                            'status' => 'Sold',
+                            'sale_date' => today(),
+                            'receipt_id' => $receipt->id,
+                            'receipt_item_id' => $receiptItem->id,
+                            'updated_by' => Auth::id(),
+                        ]);
+                }
                 $product->decrement(
                     'current_stock',
                     $qty
@@ -295,6 +322,14 @@ class SalesOrderController extends Controller
                     $oldItem->qty
                 );
             }
+            SerialNumber::where('receipt_id', $receipt->id)
+                ->update([
+                    'status' => 'Available',
+                    'sale_date' => null,
+                    'receipt_id' => null,
+                    'receipt_item_id' => null,
+                    'updated_by' => auth()->id(),
+                ]);
             StockTransaction::where('receipt_id', $receipt->id)->delete();
             $receipt->items()->delete();
             $totalQty = 0;
@@ -343,7 +378,7 @@ class SalesOrderController extends Controller
                 $rate = $request->rate[$key];
                 $amount =
                     $qty * $rate;
-                ReceiptItem::create([
+                $receiptItem = ReceiptItem::create([
                     'receipt_id' => $receipt->id,
                     'product_id' => $productId,
                     'qty' => $qty,
@@ -352,6 +387,48 @@ class SalesOrderController extends Controller
                     'details' =>
                     $request->details[$key] ?? null,
                 ]);
+                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
+
+                if (!is_array($serials)) {
+                    throw new \Exception('Invalid serial data.');
+                }
+
+                if (count($serials) != $qty) {
+                    throw new \Exception(
+                        $product->name . ' serial quantity mismatch.'
+                    );
+                }
+
+                if (count($serials) !== count(array_unique($serials))) {
+                    throw new \Exception(
+                        'Duplicate serial selected.'
+                    );
+                }
+                $count = SerialNumber::where('company_id', auth()->user()->company_id)
+                    ->where('product_id', $productId)
+                    ->where('status', 'Available')
+                    ->whereIn('serial_no', $serials)
+                    ->count();
+
+                if ($count != count($serials)) {
+                    throw new \Exception(
+                        'Some serials are unavailable.'
+                    );
+                }
+                foreach ($serials as $serial) {
+
+                    SerialNumber::where('company_id', auth()->user()->company_id)
+                        ->where('product_id', $productId)
+                        ->where('serial_no', $serial)
+                        ->where('status', 'Available')
+                        ->update([
+                            'status' => 'Sold',
+                            'sale_date' => today(),
+                            'receipt_id' => $receipt->id,
+                            'receipt_item_id' => $receiptItem->id,
+                            'updated_by' => auth()->id(),
+                        ]);
+                }
                 $product->decrement(
                     'current_stock',
                     $qty

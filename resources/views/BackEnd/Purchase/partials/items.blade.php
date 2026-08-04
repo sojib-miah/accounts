@@ -32,6 +32,7 @@
                     <button type="button" class="btn btn-info serialBtn">
                         <i class="fa fa-barcode"></i>
                     </button>
+                    <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
                 </td>
                 <td>
                     <input type="text" name="unit[]" class="form-control unit" readonly>
@@ -40,7 +41,7 @@
                     <input type="text" class="form-control stock" readonly>
                 </td>
                 <td>
-                    <input type="number" min="1" value="1" name="qty[]" class="form-control qty"
+                    <input type="number" min="1" value="0" name="qty[]" class="form-control qty"
                         readonly>
                 </td>
                 <td>
@@ -76,6 +77,7 @@
    <button type="button" class="btn btn-info serialBtn">
         <i class="fa fa-barcode"></i>
     </button>
+    <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
 </td>
 <td>
     <input type="text" name="unit[]" class="form-control unit" readonly>
@@ -84,7 +86,7 @@
     <input type="text" class="form-control stock" readonly>
 </td>
 <td>
-    <input type="number" min="1" value="1" name="qty[]" class="form-control qty" readonly>
+    <input type="number" min="1" value="0" name="qty[]" class="form-control qty" readonly>
 </td>
 <td>
     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>

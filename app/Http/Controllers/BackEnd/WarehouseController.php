@@ -13,7 +13,17 @@ class WarehouseController extends Controller
 {
     public function index()
     {
-        $purchases = Receipt::with('supplier')->where('type', 'Purchase-Order')->where('is_receive', false)->latest()->paginate(20);
+        $user = auth()->user();
+
+        $purchases = Receipt::with('supplier')
+            ->where('type', 'Purchase-Order')
+            ->where('status', 'Draft')
+            ->where('is_receive', false)
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+            ->latest()
+            ->paginate(20);
 
         return view('BackEnd.Warehouse.index', compact('purchases'));
     }
@@ -22,7 +32,8 @@ class WarehouseController extends Controller
     {
         $receipt->load(
             'supplier',
-            'items.product'
+            'items.product',
+            'items.serialNumbers'
         );
 
         return view('BackEnd.Warehouse.show', compact('receipt'));
@@ -39,9 +50,8 @@ class WarehouseController extends Controller
             foreach ($receipt->items as $item) {
                 $product = $item->product;
                 $product->increment('current_stock', $item->qty);
-                $product->update([
-                    'purchase_price' => $item->rate
-                ]);
+                $product->purchase_price = $item->rate;
+                $product->save();
                 $product->refresh();
                 StockTransaction::create([
                     'company_id'       => $receipt->company_id,
@@ -54,8 +64,14 @@ class WarehouseController extends Controller
                     'balance'          => $product->current_stock,
                     'transaction_date' => $receipt->receipt_date,
                     'remarks'          => 'Purchase Receive',
-                    'created_by'       => auth()->id()
+                    'created_by'       => auth()->id(),
                 ]);
+                SerialNumber::where('receipt_item_id', $item->id)
+                    ->update([
+                        'status'       => 'Available',
+                        'receive_date' => today(),
+                        'updated_by'   => auth()->id(),
+                    ]);
             }
             $receipt->update([
                 'is_receive'   => true,
@@ -63,15 +79,6 @@ class WarehouseController extends Controller
                 'received_by'  => auth()->id(),
                 'status'       => 'Completed'
             ]);
-            SerialNumber::where(
-                'receipt_item_id',
-                $item->id
-            )
-                ->update([
-                    'status' => 'Available',
-                    'receive_date' => today(),
-                    'updated_by' => auth()->id()
-                ]);
             DB::commit();
             return redirect()->route('warehouse.index')->with('success', 'Goods received successfully.');
         } catch (\Exception $e) {

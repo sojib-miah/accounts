@@ -1,7 +1,7 @@
 <!doctype html>
 
 <html lang="en" class=" layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr" data-skin="default"
-    data-bs-theme="light" data-assets-path="../../assets/" data-template="vertical-menu-template">
+    data-bs-theme="light" data-assets-path="{{ asset('assets/') }}/" data-template="vertical-menu-template">
 
     <head>
         <meta charset="utf-8" />
@@ -24,7 +24,6 @@
             href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
             rel="stylesheet" />
 
-        {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
         <link rel="stylesheet" href="{{ asset('/assets/vendor/fonts/iconify-icons.css') }}" />
 
         <link rel="stylesheet" href="{{ asset('/assets/vendor/css/core.css') }}" />
@@ -37,10 +36,11 @@
         <script src="{{ asset('/assets/vendor/js/helpers.js') }}"></script>
         <script src="{{ asset('/assets/vendor/js/template-customizer.js') }}"></script>
         <script src="{{ asset('/assets/js/config.js') }}"></script>
+        <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/pickr/pickr-themes.css') }}" />
 
+        {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
         {{-- <script src="{{ asset('/assets/vendor/libs/@algolia/autocomplete-js.js') }}"></script> --}}
         {{-- <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/node-waves/node-waves.css') }}" /> --}}
-        {{-- <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
         {{-- <link rel="stylesheet" href="{{ asset('/assets/css/demo.css') }}" /> --}}
         {{-- <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/apex-charts/apex-charts.css') }}" /> --}}
         {{-- <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/swiper/swiper.css') }}" /> --}}
@@ -115,10 +115,10 @@
         <script src="{{ asset('/assets/js/forms-selects.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+        <script src="{{ asset('/assets/vendor/libs/pickr/pickr.js') }}"></script>
 
         {{-- <script src="{{ asset('/assets/vendor/libs/popper/popper.js') }}"></script> --}}
         {{-- <script src="{{ asset('/assets/vendor/libs/node-waves/node-waves.js') }}"></script> --}}
-        {{-- <script src="{{ asset('/assets/vendor/libs/pickr/pickr.js') }}"></script> --}}
         {{-- <script src="{{ asset('/assets/vendor/libs/hammer/hammer.js') }}"></script> --}}
         {{-- <script src="{{ asset('/assets/vendor/libs/i18n/i18n.js') }}"></script> --}}
         {{-- <script src="{{ asset('/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script> --}}
@@ -157,7 +157,7 @@
                     icon: 'error',
                     text: "{{ session('error') }}",
                     showConfirmButton: false,
-                    timer: 3000,
+                    timer: 9000,
                     timerProgressBar: true
                 });
             </script>

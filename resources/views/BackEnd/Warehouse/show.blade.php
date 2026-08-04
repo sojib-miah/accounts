@@ -61,6 +61,9 @@
                                     Product
                                 </th>
                                 <th>
+                                    Serial Number
+                                </th>
+                                <th>
                                     Unit
                                 </th>
                                 <th class="text-end">
@@ -93,6 +96,13 @@
                                     </td>
                                     <td>
                                         {{ $item->product->name }}
+                                    </td>
+                                    <td>
+                                        @if ($item->serialNumbers->count())
+                                            {{ $item->serialNumbers->pluck('serial_no')->implode(', ') }}
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $item->product->unit }}

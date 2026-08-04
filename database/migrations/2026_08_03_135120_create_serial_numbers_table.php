@@ -20,12 +20,13 @@ return new class extends Migration
             $table->foreignId('receipt_item_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->string('serial_no')->unique();
             $table->enum('status', [
+                'Pending',
                 'Available',
                 'Sold',
                 'Returned',
                 'Damaged',
                 'Lost'
-            ])->default('Available');
+            ])->default('Pending');
             $table->date('receive_date')->nullable();
             $table->date('sale_date')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();

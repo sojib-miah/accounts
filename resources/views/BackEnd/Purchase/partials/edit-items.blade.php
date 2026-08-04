@@ -2,7 +2,8 @@
     <table class="table table-bordered table-hover align-middle">
         <thead>
             <tr>
-                <th width="35%">Product</th>
+                <th width="25%">Product</th>
+                <th width="10%">Serial No</th>
                 <th width="10%">Unit</th>
                 <th width="10%">Stock</th>
                 <th width="10%">Qty</th>
@@ -31,16 +32,23 @@
                         </select>
                     </td>
                     <td>
+                        <button type="button" class="btn btn-info serialBtn">
+                            <i class="fa fa-barcode"></i>
+                        </button>
+                        <input type="hidden" name="serial_json[]" class="serial_json"
+                            value='@json($item->serialNumbers->pluck('serial_no')->values())'>
+                    </td>
+                    <td>
                         <input type="text" name="unit[]" class="form-control unit"
                             value="{{ $item->product->unit }}" readonly>
                     </td>
                     <td>
-                        <input type="text" class="form-control stock" value="{{ $item->product->current_stock }}"
-                            readonly>
+                        <input type="text" class="form-control stock"
+                            value="{{ (int) $item->product->current_stock }}" readonly>
                     </td>
                     <td>
                         <input type="number" min="1" name="qty[]" class="form-control qty"
-                            value="{{ $item->qty }}" required>
+                            value="{{ (int) $item->qty }}" required readonly>
                     </td>
                     <td>
                         <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate"
@@ -83,13 +91,19 @@
         </select>
     </td>
     <td>
+        <button type="button" class="btn btn-info serialBtn">
+            <i class="fa fa-barcode"></i>
+        </button>
+        <input type="hidden" name="serial_json[]" class="serial_json" value='@json($item->serialNumbers->pluck("serial_no")->values())'>
+    </td>
+    <td>
         <input type="text" name="unit[]" class="form-control unit" readonly>
     </td>
     <td>
         <input type="text" class="form-control stock" readonly>
     </td>
     <td>
-        <input type="number" min="1" value="1" name="qty[]" class="form-control qty" required>
+        <input type="number" min="1" value="0" name="qty[]" class="form-control qty" required readonly>
     </td>
     <td>
         <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>

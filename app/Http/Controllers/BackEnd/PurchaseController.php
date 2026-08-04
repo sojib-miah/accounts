@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
 use App\Models\SerialNumber;
+use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -111,6 +112,8 @@ class PurchaseController extends Controller
             'discount'     => 'nullable|numeric|min:0',
             'vat'          => 'nullable|numeric|min:0',
             'paid_amount'  => 'nullable|numeric|min:0',
+            'serial_json' => 'required|array',
+            'serial_json.*' => 'required',
         ]);
 
         DB::beginTransaction();
@@ -150,15 +153,26 @@ class PurchaseController extends Controller
                 $totalQty += $qty;
                 $subTotal += $amount;
 
-                $serials = json_decode($request->serial_json[$key], true);
+                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
+
+                if (!is_array($serials)) {
+                    throw new \Exception('Invalid serial data.');
+                }
+
                 if (count($serials) != $qty) {
-                    throw new \Exception(
-                        "Serial quantity does not match Qty."
-                    );
+                    throw new \Exception("Serial quantity does not match Qty.");
+                }
+                if (count($serials) !== count(array_unique($serials))) {
+                    throw new \Exception('Duplicate serial found in this product.');
                 }
                 foreach ($serials as $serial) {
+                    $serial = trim($serial);
+
+                    if ($serial == '') {
+                        throw new \Exception("Serial cannot be empty.");
+                    }
                     if (
-                        SerialNumber::where('serial_no', trim($serial))->exists()
+                        SerialNumber::where('company_id', auth()->user()->company_id)->where('serial_no', $serial)->exists()
                     ) {
                         throw new \Exception(
                             "Duplicate Serial : " . $serial
@@ -170,7 +184,7 @@ class PurchaseController extends Controller
                         'product_id'      => $productId,
                         'receipt_id'      => $receipt->id,
                         'receipt_item_id' => $receiptItem->id,
-                        'serial_no'       => trim($serial),
+                        'serial_no'       => $serial,
                         'status'          => 'Pending',
                         'created_by'      => auth()->id(),
                     ]);
@@ -213,7 +227,14 @@ class PurchaseController extends Controller
      */
     public function show(Receipt $purchase)
     {
-        $purchase->load(['supplier', 'items.product', 'company', 'branch']);
+        $purchase->load([
+            'supplier',
+            'company',
+            'branch',
+            'items.product',
+            'items.serialNumbers',
+        ]);
+
         return view('BackEnd.Purchase.show', compact('purchase'));
     }
 
@@ -225,7 +246,7 @@ class PurchaseController extends Controller
         if ($purchase->status == 'Cancelled') {
             return redirect()->route('purchase.index')->with('error', 'Cancelled purchase cannot be edited.');
         }
-        $purchase->load('items.product');
+        $purchase->load('items.product', 'items.serialNumbers',);
         $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', auth()->id());
         })->orderBy('name')->get();
@@ -250,15 +271,21 @@ class PurchaseController extends Controller
             'product_id.*' => 'required|exists:products,id',
             'qty.*'        => 'required|numeric|min:1',
             'rate.*'       => 'required|numeric|min:0',
+            'serial_json'   => 'required|array',
+            'serial_json.*' => 'required',
         ]);
         if ($purchase->status == 'Cancelled') {
             return back()->with('error', 'Cancelled purchase cannot be updated.');
         }
         DB::beginTransaction();
         try {
-            foreach ($purchase->items as $item) {
-                Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
+            if ($purchase->is_receive) {
+                foreach ($purchase->items as $item) {
+                    Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
+                }
             }
+            SerialNumber::where('receipt_id', $purchase->id)->delete();
+            StockTransaction::where('receipt_id', $purchase->id)->where('transaction_type', 'Purchase')->delete();
             $purchase->items()->delete();
             $purchase->update([
                 'party_id'      => $request->party_id,
@@ -275,7 +302,7 @@ class PurchaseController extends Controller
                 $qty = $request->qty[$key];
                 $rate = $request->rate[$key];
                 $amount = $qty * $rate;
-                ReceiptItem::create([
+                $receiptItem = ReceiptItem::create([
                     'receipt_id' => $purchase->id,
                     'product_id' => $productId,
                     'qty' => $qty,
@@ -286,6 +313,53 @@ class PurchaseController extends Controller
                 // Product::where('id', $productId)->update(['purchase_price' => $rate]);
                 $totalQty += $qty;
                 $subTotal += $amount;
+
+                if ($purchase->is_receive) {
+
+                    Product::where('id', $productId)
+                        ->increment('current_stock', $qty);
+
+                    Product::where('id', $productId)
+                        ->update([
+                            'purchase_price' => $rate
+                        ]);
+                }
+
+                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
+                if (!is_array($serials)) {
+                    throw new \Exception('Invalid serial data.');
+                }
+                if (count($serials) != $qty) {
+                    throw new \Exception("Serial quantity does not match Qty.");
+                }
+                if (count($serials) !== count(array_unique($serials))) {
+                    throw new \Exception("Duplicate serial found.");
+                }
+                foreach ($serials as $serial) {
+                    $serial = trim($serial);
+                    if ($serial == '') {
+                        throw new \Exception("Serial cannot be empty.");
+                    }
+                    if (
+                        SerialNumber::where('company_id', auth()->user()->company_id)
+                        ->where('serial_no', $serial)
+                        ->exists()
+                    ) {
+                        throw new \Exception("Duplicate Serial : {$serial}");
+                    }
+                    SerialNumber::create([
+                        'company_id'      => auth()->user()->company_id,
+                        'branch_id'       => auth()->user()->branch_id,
+                        'product_id'      => $productId,
+                        'receipt_id'      => $purchase->id,
+                        'receipt_item_id' => $receiptItem->id,
+                        'serial_no'       => $serial,
+                        'status' => $purchase->is_receive
+                            ? 'Available'
+                            : 'Pending',
+                        'created_by'      => auth()->id(),
+                    ]);
+                }
             }
             $discount = $request->discount ?? 0;
             $vatPercent = $request->vat ?? 0;
@@ -330,9 +404,16 @@ class PurchaseController extends Controller
         }
         DB::beginTransaction();
         try {
-            // foreach ($purchase->items as $item) {
-            //     Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
-            // }
+            if ($purchase->is_receive) {
+                foreach ($purchase->items as $item) {
+                    Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
+                }
+                // SerialNumber::where('receipt_id', $purchase->id)
+                //     ->update([
+                //         'status' => 'Cancelled'
+                //     ]);
+                StockTransaction::where('receipt_id', $purchase->id)->where('transaction_type', 'Purchase')->delete();
+            }
             $purchase->update([
                 'status' => 'Cancelled',
                 'updated_by' => auth()->id(),

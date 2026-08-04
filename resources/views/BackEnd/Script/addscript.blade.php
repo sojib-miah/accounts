@@ -47,7 +47,7 @@
              return;
          }
          row.find('.stock').val(
-             option.data('stock') ?? 0
+             parseFloat(option.data('stock')) ?? 0
          );
          row.find('.rate').val(
              option.data('price') ?? 0

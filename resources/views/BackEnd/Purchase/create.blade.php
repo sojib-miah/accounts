@@ -7,7 +7,6 @@
         <form action="{{ route('purchase.store') }}" method="POST">
             @csrf
             @include('BackEnd.Purchase.partials.form')
-            <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between">
                     <h5 class="mb-0">Purchase Items</h5>
@@ -82,193 +81,110 @@
 
     <!-- Serial Modal -->
     <div class="modal fade" id="serialModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-
         <div class="modal-dialog modal-lg">
-
             <div class="modal-content">
-
                 <div class="modal-header">
-
                     <h5 class="modal-title fw-bold">
                         <i class="fa fa-barcode me-2"></i>
                         Serial / IMEI Number
                     </h5>
-
                     <button type="button" class="btn-close" data-bs-dismiss="modal">
                     </button>
-
                 </div>
-
                 <div class="modal-body">
-
                     <!-- Product Name -->
                     <div class="mb-3">
-
                         <label class="form-label fw-bold">
                             Product
                         </label>
-
                         <input type="text" id="serialProductName" class="form-control" readonly>
-
                     </div>
-
                     <!-- Serial Input -->
                     <div class="mb-3">
-
                         <label class="form-label fw-bold">
                             Serial Number
                         </label>
-
                         <div class="input-group">
-
                             <input type="text" id="serialInput" class="form-control" placeholder="Enter Serial Number"
                                 autocomplete="off">
-
                             <button type="button" class="btn btn-primary" id="addSerial">
-
                                 <i class="fa fa-plus"></i>
                                 Add
-
                             </button>
-
                         </div>
-
                     </div>
-
                     <!-- Status -->
                     <div class="row mb-3">
-
                         <div class="col-md-4">
-
                             <div class="alert alert-primary py-2 mb-0">
-
                                 <strong>Total Serial :</strong>
-
                                 <span id="serialCount">
                                     0
                                 </span>
-
                             </div>
-
                         </div>
-
                         <div class="col-md-4">
-
                             <div class="alert alert-success py-2 mb-0">
-
                                 <strong>Total Qty :</strong>
-
                                 <span id="requiredQty">
                                     0
                                 </span>
-
                             </div>
-
                         </div>
-
                         <div class="col-md-4">
-
                             <div class="alert alert-warning py-2 mb-0 text-center">
-
                                 <span id="serialStatus">
-
                                     Waiting...
-
                                 </span>
-
                             </div>
-
                         </div>
-
                     </div>
-
                     <!-- Serial List -->
-
                     <div class="table-responsive">
-
                         <table class="table table-bordered table-hover">
-
                             <thead class="table-light">
-
                                 <tr>
-
                                     <th width="70">
                                         SL
                                     </th>
-
                                     <th>
                                         Serial / IMEI Number
                                     </th>
-
                                     <th width="80" class="text-center">
-
                                         Action
-
                                     </th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="serialList">
-
                                 <tr>
-
                                     <td colspan="3" class="text-center text-muted">
-
                                         No Serial Added
-
                                     </td>
-
                                 </tr>
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                     <div class="mt-3">
-
                         <small class="text-danger">
-
                             <b>Note :</b>
-
                             Add one serial at a time.
-
                             Quantity will be calculated automatically
                             from total serial numbers.
-
                         </small>
-
                     </div>
-
                 </div>
-
                 <div class="modal-footer">
-
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
                         <i class="fa fa-times me-1"></i>
-
                         Close
-
                     </button>
-
                     <button type="button" id="saveSerial" class="btn btn-success">
-
                         <i class="fa fa-save me-1"></i>
-
                         Save
-
                     </button>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 @endsection
 
@@ -279,258 +195,123 @@
         let currentRow = null;
         let serialArray = [];
         $(document).on('click', '.serialBtn', function() {
-
             currentRow = $(this).closest('tr');
-
-            serialArray = [];
-
-            let productName = currentRow.find('.product option:selected').text();
-
-            $('#serialProductName').val(productName);
-
             $('#serialInput').val('');
-
+            let productName = currentRow.find('.product option:selected').text();
+            $('#serialProductName').val(productName);
             let json = currentRow.find('.serial_json').val();
-
-            if (json && json !== '[]') {
-
+            serialArray = [];
+            if (json && json !== '' && json !== '[]') {
                 try {
-
                     serialArray = JSON.parse(json);
-
                 } catch (e) {
-
                     serialArray = [];
-
                 }
-
             }
-
             renderSerialList();
-
             $('#serialModal').modal('show');
-
             setTimeout(function() {
-
                 $('#serialInput').focus();
-
-            }, 300);
-
+            }, 200);
         });
         $('#addSerial').click(function() {
-
             let serial = $('#serialInput').val().trim();
-
             if (serial == '') {
-
-                Swal.fire({
-
-                    icon: 'warning',
-
-                    title: 'Please enter Serial Number'
-
-                });
-
+                $('#serialInput').focus();
                 return;
-
             }
-
             if (serialArray.includes(serial)) {
-
-                Swal.fire({
-
-                    icon: 'warning',
-
-                    title: 'Duplicate Serial Number'
-
-                });
-
+                Swal.fire('Duplicate Serial');
                 return;
-
             }
-
             serialArray.push(serial);
-
-            $('#serialInput').val('');
-
             renderSerialList();
-
-            $('#serialInput').focus();
-
+            $('#serialInput').val('').focus();
         });
         $('#serialInput').keypress(function(e) {
-
             if (e.which == 13) {
-
                 e.preventDefault();
-
                 $('#addSerial').click();
-
             }
-
         });
 
         function renderSerialList() {
-
             let html = '';
-
             if (serialArray.length == 0) {
-
-                html = `
-
-            <tr>
-
-                <td colspan="3"
-                    class="text-center text-muted">
-
-                    No Serial Added
-
-                </td>
-
-            </tr>
-
-        `;
-
+                html = `<tr><td colspan="3" class="text-center">No Serial Added</td></tr>`;
             } else {
-
-                $.each(serialArray, function(index, serial) {
-
+                $.each(serialArray, function(index, item) {
                     html += `
-
-            <tr>
-
-                <td>
-
-                    ${index+1}
-
-                </td>
-
-                <td>
-
-                    ${serial}
-
-                </td>
-
-                <td class="text-center">
-
-                    <button
-                        type="button"
-                        class="btn btn-danger btn-sm removeSerial"
-                        data-index="${index}">
-
-                        <i class="fa fa-trash"></i>
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-            `;
-
+                    <tr>
+                        <td>${index+1}</td>
+                        <td>${item}</td>
+                        <td class="text-center">
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-sm removeSerial"
+                                data-index="${index}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
                 });
-
             }
-
             $('#serialList').html(html);
-
             $('#serialCount').text(serialArray.length);
-
             $('#requiredQty').text(serialArray.length);
-
-            $('#serialStatus').html(
-
-                '<span class="text-success">Qty Auto Updated</span>'
-
-            );
-
-            if (currentRow) {
-
-                currentRow.find('.qty').val(serialArray.length);
-
-            }
-
         }
         $(document).on('click', '.removeSerial', function() {
-
             let index = $(this).data('index');
-
             Swal.fire({
-
                 title: 'Remove Serial?',
-
                 icon: 'warning',
-
                 showCancelButton: true,
-
                 confirmButtonText: 'Yes'
-
             }).then((result) => {
-
                 if (result.isConfirmed) {
-
                     serialArray.splice(index, 1);
-
                     renderSerialList();
-
                 }
-
             });
-
         });
+
+        function calculateSummary() {
+            let totalQty = 0;
+            let subTotal = 0;
+            $('#purchaseBody tr').each(function() {
+                totalQty += parseFloat($(this).find('.qty').val()) || 0;
+                subTotal += parseFloat($(this).find('.amount').val()) || 0;
+            });
+            $('#totalQty').val(totalQty);
+            $('#subTotal').val(subTotal.toFixed(2));
+            let discount = parseFloat($('#discount').val()) || 0;
+            let vat = parseFloat($('#vat').val()) || 0;
+            let vatAmount = ((subTotal - discount) * vat) / 100;
+            let grandTotal = (subTotal - discount) + vatAmount;
+            $('#grandTotal').val(grandTotal.toFixed(2));
+            let paid = parseFloat($('#paidAmount').val()) || 0;
+            let due = grandTotal - paid;
+            $('#dueAmount').val(due < 0 ? 0 : due.toFixed(2));
+        }
+
+        function calculateRow(row) {
+            let qty = parseFloat(row.find('.qty').val()) || 0;
+            let rate = parseFloat(row.find('.rate').val()) || 0;
+            let amount = qty * rate;
+            row.find('.amount').val(amount.toFixed(2));
+            calculateSummary();
+        }
         $('#saveSerial').click(function() {
-
-            if (serialArray.length == 0) {
-
-                Swal.fire({
-
-                    icon: 'warning',
-
-                    title: 'No Serial Found'
-
-                });
-
-                return;
-
-            }
-
             currentRow.find('.serial_json').val(
-
                 JSON.stringify(serialArray)
-
             );
-
-            currentRow.find('.qty').val(
-                serialArray.length
-            );
-            currentRow.find('.serialBadge').removeClass(
-                'bg-secondary'
-            ).addClass(
-                'bg-success'
-
-            ).text(
-
-                serialArray.length + ' Serial'
-
-            );
-
-            currentRow.find('.serialBtn').removeClass(
-
-                'btn-info'
-
-            ).addClass(
-
-                'btn-success'
-
-            );
-
+            currentRow.find('.qty').val(serialArray.length);
+            calculateRow(currentRow);
+            calculateSummary();
             $('#serialModal').modal('hide');
-
         });
         $('#serialModal').on('hidden.bs.modal', function() {
-
             $('#serialInput').val('');
-
         });
     </script>
 @endpush
