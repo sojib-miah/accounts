@@ -5,7 +5,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Comits BD</title>
-        <link rel="stylesheet" href="assets/css/style.css">
 
         <link rel="icon" type="image/x-icon"
             href="{{ optional(setting())->favaicon ? asset('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
@@ -417,7 +416,8 @@
                     </div>
 
                     <!-- Mobile Hamburger Button -->
-                    <button id="menuBtn" class="lg:hidden text-2xl sm:text-3xl text-slate-800 p-1 focus:outline-none">
+                    <button id="menuBtn" class="lg:hidden text-2xl sm:text-3xl text-slate-800 p-1 focus:outline-none"
+                        aria-label="Toggle menu" aria-expanded="false">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
@@ -434,11 +434,11 @@
                     <hr class="border-slate-100 my-1">
                     <div class="flex flex-col gap-2 pt-1">
                         <a href="{{ route('admin.login') }}"
-                            class="w-full border border-cyan-600 text-cyan-500 font-semibold rounded-lg py-2.5 hover:bg-cyan-50 transition">
+                            class="w-full border text-center border-cyan-600 text-cyan-500 font-semibold rounded-lg py-2.5 hover:bg-cyan-50 transition">
                             Login
                         </a>
                         <a href="{{ route('admin.register') }}"
-                            class="w-full bg-emerald-600 text-white font-semibold rounded-lg py-2.5 hover:bg-emerald-700 transition">
+                            class="w-full bg-emerald-600 text-center text-white font-semibold rounded-lg py-2.5 hover:bg-emerald-700 transition">
                             Free Trial
                         </a>
                     </div>
@@ -1189,8 +1189,8 @@
             <button id="backToTop" class="back-to-top">
                 <i class="fa-solid fa-arrow-up"></i>
             </button>
+
             <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-            <script src="assets/js/app.js"></script>
     </body>
 
     <script>
@@ -1621,10 +1621,25 @@
 
         if (menuBtn && mobileMenu) {
             menuBtn.addEventListener("click", () => {
-                mobileMenu.classList.toggle("hidden");
-                menuBtn.innerHTML = mobileMenu.classList.contains("hidden") ?
-                    '<i class="ri-menu-3-line"></i>' :
-                    '<i class="ri-close-line"></i>';
+                const isHidden = mobileMenu.classList.toggle("hidden");
+
+                menuBtn.innerHTML = isHidden ?
+                    '<i class="fa-solid fa-bars"></i>' :
+                    '<i class="fa-solid fa-xmark"></i>';
+
+                menuBtn.setAttribute("aria-expanded", String(!isHidden));
+            });
+
+            // Close menu when clicking a menu link
+            mobileMenu.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", () => {
+                    mobileMenu.classList.add("hidden");
+
+                    menuBtn.innerHTML =
+                        '<i class="fa-solid fa-bars"></i>';
+
+                    menuBtn.setAttribute("aria-expanded", "false");
+                });
             });
         }
 
