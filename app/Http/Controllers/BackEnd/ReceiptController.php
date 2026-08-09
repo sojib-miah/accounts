@@ -458,7 +458,18 @@ class ReceiptController extends Controller
 
     public function print(Receipt $receipt)
     {
-        $receipt->load(['company', 'branch', 'party', 'creator', 'items.category', 'items.accountHead', 'payments.paymentType', 'payments.account', 'payments.user',]);
+        $receipt->load([
+            'company',
+            'branch',
+            'party',
+            'creator',
+            'items.category',
+            'items.accountHead',
+            'payments.paymentType',
+            'payments.account',
+            'payments.user',
+        ]);
+
         return view('BackEnd.Receipt.print', compact('receipt'));
     }
 
@@ -469,8 +480,7 @@ class ReceiptController extends Controller
             'branch',
             'party',
             'creator',
-            'items.category',
-            'items.accountHead',
+            'items.product',
             'payments.paymentType',
             'payments.account',
             'payments.user',

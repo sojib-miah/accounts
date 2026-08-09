@@ -1,289 +1,294 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
     <head>
         <meta charset="UTF-8">
-        <title>Inventory Report</title>
+        <title>Stock Report</title>
         <style>
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+
             * {
                 box-sizing: border-box;
             }
 
             body {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 13px;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 11px;
                 color: #000;
-                width: 1200px;
-                margin: auto;
+                width: 1000px;
+                margin: 20px auto;
+                padding: 0;
             }
 
-            .text-center {
+            .header {
                 text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .header h2 {
+                margin: 0 0 5px;
+                font-size: 20px;
+            }
+
+            .header p {
+                margin: 2px 0;
+            }
+
+            .date {
+                text-align: center;
+                margin-bottom: 12px;
+            }
+
+            .summary {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .summary td {
+                width: 25%;
+                border: 1px solid #999;
+                padding: 8px;
+            }
+
+            .summary-title {
+                font-size: 10px;
+                color: #555;
+            }
+
+            .summary-value {
+                font-size: 15px;
+                font-weight: bold;
+                margin-top: 3px;
+            }
+
+            table.report {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+            }
+
+            table.report th,
+            table.report td {
+                border: 1px solid #555;
+                padding: 5px 4px;
+                vertical-align: middle;
+            }
+
+            table.report th {
+                background: #eeeeee;
+                text-align: center;
+                font-weight: bold;
             }
 
             .text-end {
                 text-align: right;
             }
 
-            .text-start {
-                text-align: left;
-            }
-
-            .mb-5 {
-                margin-bottom: 5px;
-            }
-
-            .mb-10 {
-                margin-bottom: 10px;
-            }
-
-            .mb-20 {
-                margin-bottom: 20px;
-            }
-
-            h2,
-            h3,
-            h4,
-            p {
-                margin: 0;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            table th,
-            table td {
-                border: 1px solid #000;
-                padding: 6px;
-            }
-
-            table th {
-                background: #f2f2f2;
-            }
-
-            .summary td {
-                font-weight: bold;
-                background: #fafafa;
+            .text-center {
+                text-align: center;
             }
 
             .footer {
-                margin-top: 70px;
-            }
-
-            .footer table td {
-                border: none;
-                text-align: center;
-                width: 33%;
-            }
-
-            .line {
-                border-top: 1px solid #000;
-                margin: auto;
-                width: 180px;
-                margin-bottom: 5px;
+                margin-top: 15px;
+                font-size: 9px;
             }
 
             @media print {
                 .no-print {
-                    display: none;
-                }
-
-                @page {
-                    size: A4 portrait;
-                    margin: 12mm;
+                    display: none !important;
                 }
             }
         </style>
     </head>
 
     <body>
-        <div class="mb-20">
-            {{-- Company Logo --}}
-            {{-- <img src="{{ asset('logo.png') }}" height="70"> --}}
-            <h2>{{ config('app.name') }}</h2>
-            <p>Complete IT Solution Provider</p>
-            <p>Dhaka, Bangladesh</p>
-            <p>Phone : +8801XXXXXXXXX</p>
-            <br>
-            <h3>INVENTORY REPORT</h3>
+        <div class="header">
+            <h2>
+                STOCK REPORT
+            </h2>
             <p>
-                Print Date :
-                {{ now()->format('d M Y h:i A') }}
+                Inventory Stock Statement
             </p>
+            <div class="date">
+                @if (request('from_date') || request('to_date'))
+                    Period:
+                    {{ request('from_date') ? \Carbon\Carbon::parse(request('from_date'))->format('d-M-Y') : 'Beginning' }}
+                    -
+                    {{ request('to_date') ? \Carbon\Carbon::parse(request('to_date'))->format('d-M-Y') : 'Present' }}
+                @else
+                    All Received Stock
+                @endif
+            </div>
         </div>
-        @php
-            $totalQty = 0;
-            $purchaseValue = 0;
-        @endphp
-        <table>
+        {{-- SUMMARY --}}
+        <table class="summary">
+            <tr>
+                <td>
+                    <div class="summary-title">
+                        Total Products
+                    </div>
+                    <div class="summary-value">
+                        {{ number_format($totalProducts) }}
+                    </div>
+                </td>
+                <td>
+                    <div class="summary-title">
+                        Received Qty
+                    </div>
+                    <div class="summary-value">
+                        {{ number_format($totalReceivedQty, 2) }}
+                    </div>
+                </td>
+                <td>
+                    <div class="summary-title">
+                        Current Stock
+                    </div>
+                    <div class="summary-value">
+                        {{ number_format($totalCurrentStock, 2) }}
+                    </div>
+                </td>
+                <td>
+                    <div class="summary-title">
+                        Stock Value
+                    </div>
+                    <div class="summary-value">
+                        {{ number_format($totalStockValue, 2) }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+        {{-- REPORT TABLE --}}
+        <table class="report">
             <thead>
                 <tr>
-                    <th width="40">SL</th>
-                    <th>PO No</th>
-                    <th>Receive Date</th>
-                    <th>Supplier</th>
-                    <th>Code</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th width="60">Unit</th>
+                    <th width="4%">
+                        SL
+                    </th>
+                    <th width="10%">
+                        Product Code
+                    </th>
+                    <th width="20%">
+                        Product
+                    </th>
+                    <th width="11%">
+                        Category
+                    </th>
+                    <th width="10%">
+                        Brand
+                    </th>
+                    <th width="6%">
+                        Unit
+                    </th>
+                    <th width="8%">
+                        Received Qty
+                    </th>
+                    <th width="9%">
+                        Purchase
+                    </th>
+                    <th width="9%">
+                        Sale Price
+                    </th>
+                    <th width="8%">
+                        Current Stock
+                    </th>
+                    <th width="10%">
+                        Stock Value
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($receipts as $receipt)
-
-                    @foreach ($receipt->items as $item)
-                        @php
-
-                            $stockValue = $item->product->current_stock * $item->product->purchase_price;
-
-                            $totalQty += $item->product->current_stock;
-
-                            $purchaseValue += $stockValue;
-
-                        @endphp
-
-                        <tr>
-
-                            <td>
-
-                                {{ $loop->parent->iteration }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $receipt->po_no }}
-
-                            </td>
-
-                            <td>
-
-                                {{ date('d-M-Y', strtotime($receipt->received_date)) }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $receipt->supplier->name }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $item->product->product_code }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $item->product->name }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $item->product->category->name ?? '-' }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $item->product->unit }}
-
-                            </td>
-
-                            <td class="text-end">
-
-                                {{ number_format($item->product->purchase_price, 2) }}
-
-                            </td>
-
-                            <td class="text-end">
-
-                                {{ number_format($item->product->sale_price, 2) }}
-
-                            </td>
-
-                            <td class="text-end">
-
-                                {{ number_format($item->product->current_stock, 2) }}
-
-                            </td>
-
-                            <td class="text-end">
-
-                                {{ number_format($stockValue, 2) }}
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-
-                @empty
-
+                @foreach ($products as $product)
+                    @php
+                        $receivedQty = $product->receiptItems
+                            ->filter(function ($item) {
+                                return $item->receipt &&
+                                    $item->receipt->type === 'Purchase-Order' &&
+                                    $item->receipt->is_receive == true;
+                            })
+                            ->sum('qty');
+                        $stockValue = $product->current_stock * $product->purchase_price;
+                    @endphp
                     <tr>
-
-                        <td colspan="12" class="text-center">
-
-                            No Inventory Found
-
+                        <td class="text-center">
+                            {{ $loop->iteration }}
                         </td>
-
+                        <td>
+                            {{ $product->product_code ?? ($product->sku ?? '-') }}
+                        </td>
+                        <td>
+                            {{ $product->name }}
+                        </td>
+                        <td>
+                            {{ $product->category->name ?? '-' }}
+                        </td>
+                        <td>
+                            {{ $product->brand->name ?? '-' }}
+                        </td>
+                        <td class="text-center">
+                            {{ $product->unit ?? '-' }}
+                        </td>
+                        <td class="text-end">
+                            {{ number_format($receivedQty, 2) }}
+                        </td>
+                        <td class="text-end">
+                            {{ number_format($product->purchase_price, 2) }}
+                        </td>
+                        <td class="text-end">
+                            {{ number_format($product->sale_price, 2) }}
+                        </td>
+                        <td class="text-end">
+                            {{ number_format($product->current_stock, 2) }}
+                        </td>
+                        <td class="text-end">
+                            {{ number_format($stockValue, 2) }}
+                        </td>
                     </tr>
-
-                @endforelse
+                @endforeach
             </tbody>
             <tfoot>
-
-                <tr class="summary">
-
-                    <td colspan="10" class="text-end">
-
-                        Total Stock
-
-                    </td>
-
-                    <td class="text-end">
-
-                        {{ number_format($totalQty, 2) }}
-
-                    </td>
-
-                    <td class="text-end">
-
-                        {{ number_format($purchaseValue, 2) }}
-
-                    </td>
-
+                <tr>
+                    <th colspan="6" class="text-end">
+                        Total
+                    </th>
+                    <th class="text-end">
+                        {{ number_format(
+                            $products->sum(function ($product) {
+                                return $product->receiptItems->filter(function ($item) {
+                                        return $item->receipt &&
+                                            $item->receipt->type === 'Purchase-Order' &&
+                                            $item->receipt->is_receive == true;
+                                    })->sum('qty');
+                            }),
+                            2,
+                        ) }}
+                    </th>
+                    <th colspan="2"></th>
+                    <th class="text-end">
+                        {{ number_format($products->sum('current_stock'), 2) }}
+                    </th>
+                    <th class="text-end">
+                        {{ number_format(
+                            $products->sum(function ($product) {
+                                return $product->current_stock * $product->purchase_price;
+                            }),
+                            2,
+                        ) }}
+                    </th>
                 </tr>
-
             </tfoot>
         </table>
         <div class="footer">
-            <table>
-                <tr>
-                    <td>
-                        <div class="line"></div>
-                        Prepared By
-                    </td>
-                    <td>
-                        <div class="line"></div>
-                        Checked By
-                    </td>
-                    <td>
-                        <div class="line"></div>
-                        Approved By
-                    </td>
-                </tr>
-            </table>
+            Printed:
+            {{ now()->format('d-M-Y h:i A') }}
         </div>
-        <div class="text-center no-print" style="margin-top:30px;">
-            <button onclick="window.print()" style="padding:10px 25px;cursor:pointer;">
-                Print
-            </button>
-        </div>
+        <script>
+            window.onload = function() {
+                window.print();
+            };
+        </script>
     </body>
 
 </html>

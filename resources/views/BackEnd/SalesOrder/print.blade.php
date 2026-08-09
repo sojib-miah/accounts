@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
 
         <title>
-            Challan - {{ $receipt->dm_no }}
+            Invoice - {{ $receipt->inv_no }}
         </title>
 
         <style>
@@ -494,7 +494,7 @@
                 </tr>
             </table>
             <div class="invoice-title">
-                CHALLAN
+                INVOICE
             </div>
             <div class="page-number">
                 Page No.: 1/1
@@ -513,14 +513,14 @@
                 </tr>
                 <tr>
                     <td class="info-label">
-                        Challan No.
+                        Invoice No.
                     </td>
                     <td class="colon">
                         :
                     </td>
                     <td class="info-value">
                         <span class="break">
-                            {{ $receipt->dm_no }}
+                            {{ $receipt->inv_no }}
                         </span>
                     </td>
                 </tr>
@@ -655,7 +655,7 @@
                         <th class="uom-col">
                             UOM
                         </th>
-                        {{-- <th class="price-col">
+                        <th class="price-col">
                             Unit price
                         </th>
                         <th class="disc-col">
@@ -663,7 +663,7 @@
                         </th>
                         <th class="amount-col">
                             Amount
-                        </th> --}}
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -705,17 +705,17 @@
                                 {{ $uom }}
                             </td>
                             {{-- RATE --}}
-                            {{-- <td class="price-col number">
+                            <td class="price-col number">
                                 {{ number_format($rate, 2) }}
-                            </td> --}}
+                            </td>
                             {{-- DISCOUNT --}}
-                            {{-- <td class="disc-col center">
+                            <td class="disc-col center">
                                 0
-                            </td> --}}
+                            </td>
                             {{-- AMOUNT --}}
-                            {{-- <td class="amount-col number">
+                            <td class="amount-col number">
                                 {{ number_format($amount, 2) }}
-                            </td> --}}
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -724,17 +724,17 @@
                             </td>
                         </tr>
                     @endforelse
-                    {{-- <tr class="total-row">
+                    <tr class="total-row">
                         <td colspan="7" class="total-title">
                             Total BDT
                         </td>
                         <td class="amount-col total-value">
                             {{ number_format($receipt->total_amount, 2) }}
                         </td>
-                    </tr> --}}
+                    </tr>
                 </tbody>
             </table>
-            {{-- <div class="amount-words">
+            <div class="amount-words">
                 <strong>
                     Amount BDT (In Words)
                 </strong>
@@ -745,7 +745,7 @@
                     {{ number_format($receipt->total_amount, 2) }}
                 @endif
                 ONLY
-            </div> --}}
+            </div>
             @if ($receipt->remarks)
                 <div class="remarks">
                     <strong>

@@ -16,6 +16,7 @@ use App\Models\ReceiptItem;
 use App\Models\ReceiptPayment;
 use App\Models\SerialNumber;
 use App\Models\StockTransaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -681,5 +682,41 @@ class SalesOrderController extends Controller
             'inv_no' => $this->generateInvoiceNo(),
         ]);
         return back()->with('success', 'Converted to Invoice Successfully.');
+    }
+
+    public function print(Receipt $receipt)
+    {
+        $receipt->load([
+            'company',
+            'branch',
+            'party',
+            'creator',
+            'items.category',
+            'items.accountHead',
+            'payments.paymentType',
+            'payments.account',
+            'payments.user',
+        ]);
+
+        return view('BackEnd.SalesOrder.print', compact('receipt'));
+    }
+
+    public function pdf(Receipt $receipt)
+    {
+        $receipt->load([
+            'company',
+            'branch',
+            'party',
+            'creator',
+            'items.product',
+            'payments.paymentType',
+            'payments.account',
+            'payments.user',
+        ]);
+        $pdf = Pdf::loadView('BackEnd.SalesOrder.pdf', compact('receipt'));
+        $pdf->setPaper('a4', 'portrait');
+        return $pdf->stream(
+            $receipt->receipt_no . '.pdf'
+        );
     }
 }

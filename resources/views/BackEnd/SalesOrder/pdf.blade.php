@@ -2,13 +2,10 @@
 <html lang="en">
 
     <head>
-
         <meta charset="UTF-8">
-
         <title>
-            Challan - {{ $receipt->dm_no }}
+            Invoice - {{ $receipt->inv_no }}
         </title>
-
         <style>
             @page {
                 size: A4 portrait;
@@ -19,7 +16,7 @@
                 box-sizing: border-box;
             }
 
-            /* html,
+            html,
             body {
                 margin: 0;
                 padding: 0;
@@ -29,17 +26,19 @@
 
             body {
                 font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 15px;
+                font-size: 12px;
                 color: #222;
                 background: #fff;
-            } */
+            }
 
             .page {
                 width: 194mm;
                 min-height: 281mm;
-                margin: 20px auto;
-                padding-top: 7mm;
-                padding-bottom: 7mm;
+                margin-left: 8mm;
+                margin-right: 8mm;
+                padding-top: 8mm;
+                padding-bottom: 8mm;
+                position: relative;
             }
 
             table {
@@ -48,8 +47,9 @@
             }
 
             td,
-            th {
-                vertical-align: top;
+            th,
+            div,
+            span {
                 word-wrap: break-word;
                 overflow-wrap: break-word;
             }
@@ -60,68 +60,73 @@
                 word-wrap: break-word;
             }
 
-            .header {
+            /* .header {
                 width: 194mm;
                 max-width: 194mm;
                 table-layout: fixed;
-                border-collapse: collapse;
             }
 
             .header td {
                 border: none;
                 padding: 0;
                 vertical-align: top;
-                word-break: break-word;
+                word-wrap: break-word;
                 overflow-wrap: break-word;
-            }
+                word-break: break-word;
+            } */
 
             .logo-area {
                 width: 27mm;
                 text-align: left;
-                vertical-align: top;
             }
 
             .company-area {
                 width: 129mm;
                 text-align: left;
-                vertical-align: top;
             }
 
             .contact-area {
                 width: 38mm;
                 text-align: right;
-                vertical-align: top;
             }
 
             .logo {
                 width: 60px;
                 max-width: 60px;
                 height: auto;
-                display: block;
             }
 
             .company-name {
-                width: 129mm;
-                max-width: 129mm;
-                font-size: 25px;
-                line-height: 20px;
+                font-family: DejaVu Sans, Arial, sans-serif;
+                font-size: 20px;
+                line-height: 19px;
                 font-weight: bold;
                 color: #4d4d4d;
-                text-align: left;
+                width: 129mm;
+                max-width: 129mm;
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             .company-info {
+                font-size: 12px;
+                line-height: 10px;
+                color: #555;
                 width: 129mm;
                 max-width: 129mm;
-                margin-top: 2px;
-                font-size: 14px;
-                line-height: 13px;
-                color: #555;
-                text-align: left;
                 word-break: break-word;
                 overflow-wrap: break-word;
+            }
+
+            .contact-info {
+                width: 38mm;
+                max-width: 38mm;
+                font-size: 12px;
+                line-height: 10px;
+                color: #555;
+                text-align: right;
+                word-break: break-all;
+                overflow-wrap: anywhere;
             }
 
             .invoice-title {
@@ -129,79 +134,79 @@
                 text-align: center;
                 font-size: 20px;
                 font-weight: bold;
-                margin-top: 8px;
+                margin-top: 10px;
             }
 
             .page-number {
                 width: 194mm;
                 text-align: right;
                 font-size: 12px;
-                margin-top: -8px;
-                margin-bottom: 7px;
+                margin-top: -10px;
+                margin-bottom: 8px;
             }
 
             .info-table,
             .customer-table {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
                 border-collapse: collapse;
-                border-spacing: 0;
-                margin: 0;
-                padding: 0;
+                table-layout: auto;
+                width: auto;
+                max-width: 194mm;
             }
 
             .info-table td,
             .customer-table td {
                 border: none;
+
                 padding-top: 1.5px;
                 padding-bottom: 1.5px;
+
                 padding-left: 0;
                 padding-right: 0;
+
                 vertical-align: top;
+
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             .info-label,
             .customer-label {
-                width: 42mm;
                 font-weight: bold;
-                padding-right: 6px !important;
-                text-align: left;
                 white-space: nowrap;
+                padding-right: 6px !important;
             }
 
             .info-table .colon,
             .customer-table .colon {
-                width: 6mm;
-                min-width: 6mm;
-                max-width: 6mm;
+                width: 5px;
+
+                min-width: 5px;
+
                 padding-left: 0 !important;
+
+                /* Same gap after colon */
                 padding-right: 6px !important;
+
                 text-align: left;
+
                 white-space: nowrap;
             }
 
             .info-value,
             .customer-value {
-                width: 146mm;
                 padding-left: 0 !important;
                 padding-right: 0 !important;
-                text-align: left;
+
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             .info-value .break,
-            .customer-value .break {
+            .customer-value .break,
+            .break {
                 word-break: break-all;
                 overflow-wrap: anywhere;
                 word-wrap: break-word;
-            }
-
-            .customer-table {
-                margin-top: 2px;
             }
 
             .items {
@@ -209,14 +214,13 @@
                 max-width: 194mm;
                 table-layout: fixed;
                 margin-top: 8px;
-                border-collapse: collapse;
             }
 
             .items th {
                 border: 1px solid #666;
-                padding: 4px 2px;
+                padding: 3px 2px;
                 height: 22px;
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: bold;
                 text-align: center;
                 vertical-align: middle;
@@ -226,9 +230,8 @@
 
             .items td {
                 border: 1px solid #666;
-                padding: 4px 2px;
-                font-size: 13px;
-                line-height: 12px;
+                padding: 3px 2px;
+                font-size: 12px;
                 vertical-align: top;
                 word-break: break-word;
                 overflow-wrap: break-word;
@@ -274,7 +277,7 @@
 
             .description {
                 width: 65mm;
-                line-height: 12px;
+                line-height: 10px;
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
@@ -285,67 +288,66 @@
                 overflow-wrap: anywhere;
             }
 
-            .center {
-                text-align: center;
-            }
-
             .number {
                 text-align: right;
                 white-space: nowrap;
             }
 
+            .center {
+                text-align: center;
+            }
+
             .total-row td {
                 font-weight: bold;
-                font-size: 15px;
             }
 
             .total-title {
                 text-align: right;
-                padding-right: 5px !important;
+                font-size: 8px;
             }
 
             .total-value {
                 width: 24mm;
                 text-align: right;
+                font-size: 8px;
                 white-space: nowrap;
             }
 
             .amount-words {
                 width: 194mm;
-                max-width: 194mm;
                 margin-top: 7px;
-                font-size: 15px;
-                line-height: 13px;
+                font-size: 12px;
+                line-height: 12px;
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             .remarks {
                 width: 194mm;
-                max-width: 194mm;
                 margin-top: 6px;
-                font-size: 14px;
-                line-height: 12px;
+                font-size: 8px;
+                line-height: 11px;
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             .bottom-area {
                 width: 194mm;
-                max-width: 194mm;
-                margin-top: 25px;
+                margin-top: 30px;
             }
 
             .signature-table {
                 width: 194mm;
                 max-width: 194mm;
                 table-layout: fixed;
-                border-collapse: collapse;
+                margin-top: 8px;
             }
 
             .signature-table td {
                 border: none;
                 vertical-align: bottom;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
 
             .signature-left {
@@ -358,13 +360,13 @@
             }
 
             .signature-line {
-                font-size: 15px;
+                font-size: 12px;
                 margin-top: 3px;
                 white-space: nowrap;
             }
 
             .authorized {
-                font-size: 15px;
+                font-size: 12px;
                 font-weight: bold;
                 margin-top: 3px;
                 white-space: nowrap;
@@ -372,100 +374,60 @@
 
             .system-note {
                 width: 194mm;
-                max-width: 194mm;
                 text-align: center;
-                font-size: 14px;
+                font-size: 12px;
                 margin-top: 8px;
             }
 
             .footer-line {
                 width: 194mm;
-                max-width: 194mm;
                 border-top: 1px solid #777;
                 margin-top: 6px;
             }
 
             .footer-text {
                 width: 194mm;
-                max-width: 194mm;
                 text-align: center;
-                font-size: 13px;
+                font-size: 12px;
                 color: #777;
                 margin-top: 4px;
-                line-height: 11px;
+                line-height: 10px;
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
 
             tr {
-
                 page-break-inside: avoid;
             }
 
-            .print-btn {
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                z-index: 99999;
-                padding: 8px 15px;
-                border: none;
-                border-radius: 4px;
-                background: #0d6efd;
-                color: #fff;
-                font-size: 13px;
-                cursor: pointer;
-            }
-
-            @media print {
-                @page {
-                    size: A4 portrait;
-                    margin: 0;
-                }
-
-                html,
-                body {
-                    width: 210mm;
-                    min-height: 297mm;
-                    margin: 0;
-                    padding: 0;
-                }
-
-                body {
-                    background: #fff;
-                }
-
-                .page {
-                    width: 194mm;
-                    min-height: 281mm;
-                    margin-left: 8mm;
-                    margin-right: 8mm;
-                    padding-top: 7mm;
-                    padding-bottom: 7mm;
-                    overflow: visible;
-                }
-
-                .print-btn {
-                    display: none !important;
-                }
+            td,
+            th {
+                max-width: 100%;
             }
         </style>
     </head>
 
     <body>
-        <button type="button" class="print-btn" onclick="window.print()">
-            Print
-        </button>
         <div class="page">
             <table class="header">
                 <tr>
+                    {{-- LOGO --}}
                     <td class="logo-area">
-                        @if (setting() && setting()->logo)
-                            <img src="{{ asset('uploads/settings/' . setting()->logo) }}" class="logo">
+                        @if (function_exists('setting') && setting() && setting()->logo)
+                            @php
+                                $logoPath = public_path('uploads/settings/' . setting()->logo);
+                            @endphp
+                            @if (file_exists($logoPath))
+                                <img src="{{ $logoPath }}" class="logo">
+                            @endif
                         @endif
                     </td>
+                    {{-- COMPANY --}}
                     <td class="company-area">
                         <div class="company-name">
-                            {{ $receipt->company->name ?? config('app.name') }}
+                            {{ $receipt->company->name ??
+                                ($receipt->branch->name ??
+                                    ((function_exists('setting') && setting() ? setting()->company_name : null) ?? config('app.name'))) }}
                         </div>
                         <div class="company-info">
                             @if ($receipt->company->address ?? null)
@@ -489,12 +451,10 @@
                             @endif
                         </div>
                     </td>
-                    <td class="contact-area">
-                    </td>
                 </tr>
             </table>
             <div class="invoice-title">
-                CHALLAN
+                INVOICE
             </div>
             <div class="page-number">
                 Page No.: 1/1
@@ -513,14 +473,14 @@
                 </tr>
                 <tr>
                     <td class="info-label">
-                        Challan No.
+                        Invoice No.
                     </td>
                     <td class="colon">
                         :
                     </td>
                     <td class="info-value">
                         <span class="break">
-                            {{ $receipt->dm_no }}
+                            {{ $receipt->inv_no }}
                         </span>
                     </td>
                 </tr>
@@ -655,7 +615,7 @@
                         <th class="uom-col">
                             UOM
                         </th>
-                        {{-- <th class="price-col">
+                        <th class="price-col">
                             Unit price
                         </th>
                         <th class="disc-col">
@@ -663,14 +623,14 @@
                         </th>
                         <th class="amount-col">
                             Amount
-                        </th> --}}
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($receipt->items as $item)
                         @php
                             $product = $item->product;
-                            $itemCode = $product->sku ?? ($product->product_code ?? '');
+                            $itemCode = $product->sku ?? '';
                             $description = $product->name ?? '';
                             $uom = $product->unit ?? 'Number';
                             $qty = (float) $item->qty;
@@ -682,7 +642,7 @@
                             <td class="sl-col center">
                                 {{ $loop->iteration }}
                             </td>
-                            {{-- ITEM CODE --}}
+                            {{-- ITEM NO --}}
                             <td class="item-col">
                                 <span class="break">
                                     {{ $itemCode }}
@@ -704,18 +664,18 @@
                             <td class="uom-col center">
                                 {{ $uom }}
                             </td>
-                            {{-- RATE --}}
-                            {{-- <td class="price-col number">
+                            {{-- UNIT PRICE --}}
+                            <td class="price-col number">
                                 {{ number_format($rate, 2) }}
-                            </td> --}}
+                            </td>
                             {{-- DISCOUNT --}}
-                            {{-- <td class="disc-col center">
+                            <td class="disc-col center">
                                 0
-                            </td> --}}
+                            </td>
                             {{-- AMOUNT --}}
-                            {{-- <td class="amount-col number">
+                            <td class="amount-col number">
                                 {{ number_format($amount, 2) }}
-                            </td> --}}
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -724,28 +684,25 @@
                             </td>
                         </tr>
                     @endforelse
-                    {{-- <tr class="total-row">
+                    {{-- TOTAL --}}
+                    <tr class="total-row">
                         <td colspan="7" class="total-title">
                             Total BDT
                         </td>
                         <td class="amount-col total-value">
                             {{ number_format($receipt->total_amount, 2) }}
                         </td>
-                    </tr> --}}
+                    </tr>
                 </tbody>
             </table>
-            {{-- <div class="amount-words">
+            <div class="amount-words">
                 <strong>
                     Amount BDT (In Words)
                 </strong>
                 :
-                @if (function_exists('numberToWords'))
-                    {{ numberToWords($receipt->total_amount) }}
-                @else
-                    {{ number_format($receipt->total_amount, 2) }}
-                @endif
+                {{ numberToWords($receipt->total_amount) }}
                 ONLY
-            </div> --}}
+            </div>
             @if ($receipt->remarks)
                 <div class="remarks">
                     <strong>
@@ -772,30 +729,23 @@
                         </td>
                     </tr>
                 </table>
-                {{-- SYSTEM NOTE --}}
                 <div class="system-note">
                     This is a System Generated Invoice.
                 </div>
-                {{-- FOOTER LINE --}}
                 <div class="footer-line">
                 </div>
-                {{-- FOOTER --}}
                 <div class="footer-text">
-                    Printed On :
-                    {{ now()->format('d/m/Y h:i A') }}
-                    &nbsp;&nbsp;&nbsp;
-                    Generated By :
-                    {{ $receipt->creator->name ?? '' }}
+                    <div>
+                        Printed On :
+                        {{ now()->format('d/m/Y h:i A') }}
+                    </div>
+                    <div>
+                        Generated By :
+                        {{ auth()->user()->name ?? '' }}
+                    </div>
                 </div>
             </div>
         </div>
-        <script>
-            window.onload = function() {
-                setTimeout(function() {
-                    window.print();
-                }, 300);
-            };
-        </script>
     </body>
 
 </html>

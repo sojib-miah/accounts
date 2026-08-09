@@ -5,197 +5,302 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Receipt;
+use App\Models\ReceiptItem;
+use App\Models\SerialNumber;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $receipts = Receipt::with([
-            'supplier',
-            'items.product'
-        ])
-            ->where('type', 'Purchase-Order')
-            ->where('is_receive', true)
-            ->latest()
-            ->paginate(20);
+        $user = auth()->user();
 
-        return view('BackEnd.Inventory.index', compact('receipts'));
-    }
+        $query = ReceiptItem::with(['receipt.supplier', 'receipt.branch', 'product',])
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('created_by', $user->id);
+                }
+            });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('product', function ($product) use ($search) {
+                    $product->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('receipt', function ($receipt) use ($search) {
+                        $receipt->where('po_no', 'like', "%{$search}%")
+                            ->orWhere('receipt_no', 'like', "%{$search}%")
+                            ->orWhereHas('supplier', function ($supplier) use ($search) {
+                                $supplier->where(
+                                    'name',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                            });
+                    });
+            });
+        }
 
-    public function show(Receipt $receipt)
-    {
-        $receipt->load([
-            'supplier',
-            'items.product'
-        ]);
+        $items = $query->latest('id')->paginate(20)->withQueryString();
+        $totalQuery = ReceiptItem::whereHas('receipt', function ($q) use ($user) {
+            $q->where('type', 'Purchase-Order')->where('is_receive', true);
+            if (!$user->hasRole('Super-Admin')) {
+                $q->where('company_id', $user->company_id)->where('created_by', $user->id);
+            }
+        });
+        $totalItems = (clone $totalQuery)->count();
+        $totalQty = (clone $totalQuery)->sum('qty');
+        $totalValue = (clone $totalQuery)->sum('amount');
 
         return view(
-            'BackEnd.Inventory.show',
-            compact('receipt')
+            'BackEnd.Inventory.index',
+            compact(
+                'items',
+                'totalItems',
+                'totalQty',
+                'totalValue'
+            )
         );
     }
 
-    public function lowStock()
+    public function show(ReceiptItem $item)
     {
-        $products = Product::with(['category', 'brand'])
+        $item->load([
+            'product',
+            'receipt.supplier',
+            'receipt.branch',
+        ]);
+
+        $serials = SerialNumber::where(
+            'receipt_item_id',
+            $item->id
+        )->orderBy('id')->get();
+
+        return view('BackEnd.Inventory.show', compact('item', 'serials'));
+    }
+
+    public function lowStock(Request $request)
+    {
+        $user = Auth::user();
+        $baseQuery = Product::query()
+            ->with(['category', 'brand',])
             ->whereHas('receiptItems.receipt', function ($query) {
                 $query->where('is_receive', true)
                     ->where('type', 'Purchase-Order');
-            })
-            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where('company_id', Auth::user()->company_id)
-                    ->where('created_by', Auth::id());
-            })
-            ->whereColumn('current_stock', '<=', 'minimum_stock')
-            ->orderBy('current_stock')
-            ->paginate(20);
+            });
 
-        return view('BackEnd.Inventory.low-stock', compact('products'));
+        if (!$user->hasRole('Super-Admin')) {
+            $baseQuery->where('company_id', $user->company_id)->where('created_by', $user->id);
+        }
+
+        $lowStockQuery = clone $baseQuery;
+
+        $lowStockQuery->whereColumn('current_stock', '<=', 'minimum_stock');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $lowStockQuery->where(function ($query) use ($search) {
+                $query->where(
+                    'name',
+                    'like',
+                    "%{$search}%"
+                )->orWhere('product_code', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('brand', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+        $products = $lowStockQuery->orderBy('current_stock')->paginate(20)->withQueryString();
+        $lowStockCount = (clone $baseQuery)->whereColumn('current_stock', '<=', 'minimum_stock')->count();
+        $outOfStockCount = (clone $baseQuery)->where('current_stock', '<=', 0)->count();
+        $lowStockQty = (clone $baseQuery)->whereColumn('current_stock', '<=', 'minimum_stock')->sum('current_stock');
+
+        $lowStockValue = (clone $baseQuery)
+            ->whereColumn('current_stock', '<=', 'minimum_stock')
+            ->selectRaw(
+                'COALESCE(SUM(current_stock * purchase_price), 0) as total'
+            )->value('total');
+
+        $totalProductCount = (clone $baseQuery)->count();
+
+        $totalCurrentStock = (clone $baseQuery)->sum('current_stock');
+        return view(
+            'BackEnd.Inventory.low-stock',
+            compact(
+                'products',
+                'lowStockCount',
+                'outOfStockCount',
+                'lowStockQty',
+                'lowStockValue',
+                'totalProductCount',
+                'totalCurrentStock'
+            )
+        );
     }
 
+    private function stockReportQuery(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = Product::with(['category', 'brand', 'receiptItems.receipt.supplier',])
+            ->where('status', 'Active')
+            ->whereHas('receiptItems.receipt', function ($q) use ($request) {
+                $q->where('type', 'Purchase-Order')->where('is_receive', true);
+                if ($request->filled('from_date')) {
+                    $q->whereDate('received_date', '>=', $request->from_date);
+                }
+
+                if ($request->filled('to_date')) {
+                    $q->whereDate('received_date', '<=', $request->to_date);
+                }
+            });
+
+        if (!$user->hasRole('Super-Admin')) {
+            $query->where('company_id', $user->company_id)->where('created_by', $user->id);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Stock Report
+     */
     public function report(Request $request)
     {
-        $query = Receipt::with([
-            'supplier',
-            'items.product.category',
-            'items.product.brand'
-        ])
-            ->where('type', 'Purchase-Order')
-            ->where('is_receive', true);
-
-        if (!auth()->user()->hasRole('Super-Admin')) {
-
-            $query->where(function ($q) {
-
-                $q->where('company_id', auth()->user()->company_id)
-                    ->where('created_by', auth()->id());
-            });
+        $products = $this->stockReportQuery($request)->orderBy('name')->paginate(20)->withQueryString();
+        $summaryQuery = $this->stockReportQuery($request);
+        $totalProducts = (clone $summaryQuery)->count();
+        $totalCurrentStock = (clone $summaryQuery)->sum('current_stock');
+        $totalStockValue = (clone $summaryQuery)->selectRaw('COALESCE(SUM(current_stock * purchase_price), 0) as total')->value('total');
+        $totalSaleValue = (clone $summaryQuery)->selectRaw('COALESCE(SUM(current_stock * sale_price), 0) as total')->value('total');
+        $receivedQuery = Receipt::query()->where('type', 'Purchase-Order')->where('is_receive', true);
+        if (!$request->user()->hasRole('Super-Admin')) {
+            $receivedQuery
+                ->where('company_id', $request->user()->company_id)
+                ->where('created_by', $request->user()->id);
         }
 
         if ($request->filled('from_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '>=',
-                $request->from_date
-            );
+            $receivedQuery->whereDate('received_date', '>=', $request->from_date);
         }
 
         if ($request->filled('to_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '<=',
-                $request->to_date
-            );
+            $receivedQuery->whereDate('received_date', '<=', $request->to_date);
         }
 
-        $receipts = $query
-            ->orderByDesc('received_date')
-            ->paginate(20)
-            ->withQueryString();
+        $totalReceivedQty = $receivedQuery->withSum('items', 'qty')->get()->sum('items_sum_qty');
 
         return view(
             'BackEnd.Inventory.report',
-            compact('receipts')
+            compact(
+                'products',
+                'totalProducts',
+                'totalCurrentStock',
+                'totalStockValue',
+                'totalSaleValue',
+                'totalReceivedQty'
+            )
         );
     }
 
+    /**
+     * Print Stock Report
+     */
     public function print(Request $request)
     {
-        $query = Receipt::with([
-            'supplier',
-            'items.product.category',
-            'items.product.brand'
-        ])
-            ->where('type', 'Purchase-Order')
-            ->where('is_receive', true);
+        $products = $this->stockReportQuery($request)->orderBy('name')->get();
+        $totalProducts = $products->count();
+        $totalCurrentStock = $products->sum('current_stock');
+        $totalStockValue = $products->sum(function ($product) {
+            return
+                (float) $product->current_stock *
+                (float) $product->purchase_price;
+        });
 
-        if (!auth()->user()->hasRole('Super-Admin')) {
+        $totalSaleValue = $products->sum(function ($product) {
+            return
+                (float) $product->current_stock *
+                (float) $product->sale_price;
+        });
 
-            $query->where(function ($q) {
+        $totalReceivedQty = 0;
 
-                $q->where('company_id', auth()->user()->company_id)
-                    ->where('created_by', auth()->id());
-            });
+        foreach ($products as $product) {
+            $totalReceivedQty += $product->receiptItems
+                ->filter(function ($item) {
+                    return
+                        $item->receipt &&
+                        $item->receipt->type === 'Purchase-Order' &&
+                        $item->receipt->is_receive == true;
+                })->sum('qty');
         }
 
-        if ($request->filled('from_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '>=',
-                $request->from_date
-            );
-        }
-
-        if ($request->filled('to_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        $receipts = $query
-            ->orderByDesc('received_date')
-            ->get();
-
-        return view('BackEnd.Inventory.report-print', compact('receipts'));
+        return view(
+            'BackEnd.Inventory.report-print',
+            compact(
+                'products',
+                'totalProducts',
+                'totalCurrentStock',
+                'totalStockValue',
+                'totalSaleValue',
+                'totalReceivedQty'
+            )
+        );
     }
 
+    /**
+     * PDF Stock Report
+     */
     public function pdf(Request $request)
     {
-        $query = Receipt::with([
-            'supplier',
-            'items.product.category',
-            'items.product.brand'
-        ])
-            ->where('type', 'Purchase-Order')
-            ->where('is_receive', true);
+        $products = $this->stockReportQuery($request)->orderBy('name')->get();
+        $totalProducts = $products->count();
+        $totalCurrentStock = $products->sum('current_stock');
+        $totalStockValue = $products->sum(function ($product) {
+            return
+                (float) $product->current_stock *
+                (float) $product->purchase_price;
+        });
 
-        if (!auth()->user()->hasRole('Super-Admin')) {
+        $totalSaleValue = $products->sum(function ($product) {
+            return
+                (float) $product->current_stock *
+                (float) $product->sale_price;
+        });
 
-            $query->where(function ($q) {
+        $totalReceivedQty = 0;
 
-                $q->where('company_id', auth()->user()->company_id)
-                    ->where('created_by', auth()->id());
-            });
+        foreach ($products as $product) {
+            $totalReceivedQty += $product->receiptItems
+                ->filter(function ($item) {
+                    return
+                        $item->receipt &&
+                        $item->receipt->type === 'Purchase-Order' &&
+                        $item->receipt->is_receive == true;
+                })->sum('qty');
         }
-
-        if ($request->filled('from_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '>=',
-                $request->from_date
-            );
-        }
-
-        if ($request->filled('to_date')) {
-
-            $query->whereDate(
-                'received_date',
-                '<=',
-                $request->to_date
-            );
-        }
-
-        $receipts = $query
-            ->orderBy('received_date')
-            ->get();
 
         $pdf = Pdf::loadView(
             'BackEnd.Inventory.report-pdf',
-            compact('receipts')
+            compact(
+                'products',
+                'totalProducts',
+                'totalCurrentStock',
+                'totalStockValue',
+                'totalSaleValue',
+                'totalReceivedQty'
+            )
         );
 
         $pdf->setPaper('A4', 'landscape');
-
-        return $pdf->stream('Inventory_Report.pdf');
+        return $pdf->stream('Stock_Report.pdf');
     }
 }

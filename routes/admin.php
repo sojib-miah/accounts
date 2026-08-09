@@ -176,6 +176,8 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/sales/order/{receipt}/cancel', [SalesOrderController::class, 'cancel'])->name('sales.order.cancel');
     Route::get('/sales/order/{party}/profile', [SalesOrderController::class, 'profile'])->name('sales.order.profile');
     Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
+    Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
+    Route::get('/sales/order/{receipt}/pdf', [SalesOrderController::class, 'pdf'])->name('sales.order.pdf');
 
     Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
 
@@ -234,7 +236,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
     Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
     Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
-    Route::get('/inventory/{receipt}', [InventoryController::class, 'show'])->name('inventory.show');
+    Route::get('/inventory/item/{item}', [InventoryController::class, 'show'])->name('inventory.item.show');
 
     // brand route 
     Route::resource('brand', BrandController::class);

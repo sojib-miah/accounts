@@ -194,11 +194,11 @@
                                                 {{ $loop->iteration }}
                                             </td>
                                             <td>
-                                                {{ $item->product->product_code }}
+                                                {{ $item->product->product_code ?? '-' }}
                                             </td>
                                             <td>
                                                 <strong>
-                                                    {{ $item->product->name }}
+                                                    {{ $item->product->name ?? '-' }}
                                                 </strong>
                                             </td>
                                             <td>
@@ -208,7 +208,7 @@
                                                 {{ $item->product->brand->name ?? '-' }}
                                             </td>
                                             <td class="text-center">
-                                                {{ $item->product->unit }}
+                                                {{ $item->product->unit ?? '-' }}
                                             </td>
                                             <td class="text-end">
                                                 {{ number_format($item->qty, 2) }}
@@ -371,7 +371,7 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank"
+                        <a href="{{ route('sales.order.print', $receipt->id) }}" target="_blank"
                             class="btn btn-danger btn-lg">
                             <i class="fa fa-print me-2"></i>
                             Print Invoice
