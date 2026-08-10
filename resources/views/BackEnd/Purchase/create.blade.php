@@ -79,7 +79,11 @@
                 </div>
             </div>
             <div class="text-end mt-3">
-                <button class="btn btn-success btn-lg">
+                <button class="btn btn-danger me-3" onclick="location.reload()">
+                    <i class="fa-solid fa-arrows-rotate me-2"></i>
+                    Reset
+                </button>
+                <button class="btn btn-success">
                     <i class="fa fa-save me-2"></i>
                     Save Purchase
                 </button>

@@ -33,42 +33,44 @@ class ReceiverController extends Controller
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'name'    => 'required|max:255',
-            'phone'   => 'nullable|max:30',
-            'email'   => 'nullable|email|max:255',
-            'address' => 'nullable|string',
+            'name'        => 'required|max:255',
+            'phone'       => 'nullable|max:30',
+            'email'       => 'nullable|email|max:255',
+            'address'     => 'nullable|string',
             'company_name' => 'required|string|max:255',
             'designation' => 'nullable|string',
-            'status'  => 'required|in:Active,Inactive',
+            'status'      => 'required|in:Active,Inactive',
         ]);
+
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Party::where('created_by', Auth::id())->where('type', 'Customer')->count();
+            $current = Party::where('created_by', Auth::id())
+                ->where('type', 'Customer')
+                ->count();
+
             if ($message = PackageHelper::checkLimit('party_limit', $current)) {
                 return back()->with('error', $message);
             }
         }
 
-        // Generate Party ID
-        $lastParty = Party::orderByDesc('party_id')->first();
-
-        $partyId = $lastParty ? ((int) $lastParty->party_id + 1) : 10001;
-
         Party::create([
-            'company_id' => auth()->user()->company_id,
-            'party_id'   => $partyId,
-            'name'       => $request->name,
-            'designation'       => $request->designation,
-            'phone'      => $request->phone,
-            'email'      => $request->email,
-            'company_name'      => $request->company_name,
-            'address'    => $request->address,
-            'type'       => 'Customer',
-            'status'     => $request->status,
-            'created_by' => auth()->id(),
+            'company_id'  => auth()->user()->company_id,
+            'party_id'    => random_int(100000, 999999),
+            'name'        => $request->name,
+            'designation' => $request->designation,
+            'phone'       => $request->phone,
+            'email'       => $request->email,
+            'company_name' => $request->company_name,
+            'address'     => $request->address,
+            'type'        => 'Customer',
+            'status'      => $request->status,
+            'created_by'  => auth()->id(),
         ]);
 
-        return redirect()->route('receiver.index')->with('success', 'Receiver Created Successfully.');
+        return redirect()
+            ->route('receiver.index')
+            ->with('success', 'Receiver Created Successfully.');
     }
+
 
     public function update(Request $request, Party $party)
     {

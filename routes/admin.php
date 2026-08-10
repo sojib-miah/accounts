@@ -178,6 +178,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
     Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
     Route::get('/sales/order/{receipt}/pdf', [SalesOrderController::class, 'pdf'])->name('sales.order.pdf');
+    Route::get('/ajax/product/{product}/available-serials', [SalesOrderController::class, 'availableSerials'])->name('ajax.product.availableSerials');
 
     Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
 

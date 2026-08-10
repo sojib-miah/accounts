@@ -9,9 +9,15 @@
                 <h4>Purchase Details</h4>
                 <div>
                     <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
                         Back
                     </a>
+                    <a href="{{ route('purchase.edit', $purchase->id) }}" class="btn btn-warning">
+                        <i class="fa fa-edit me-2"></i>
+                        Edit
+                    </a>
                     <button onclick="window.print()" class="btn btn-primary">
+                        <i class="fa-solid fa-print me-2"></i>
                         Print
                     </button>
                 </div>

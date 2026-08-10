@@ -150,8 +150,8 @@
                                 <thead>
                                     <tr>
                                         <th width="60" class="text-center">SN</th>
-                                        <th>Category</th>
-                                        <th>Invoice</th>
+                                        <th>Part No</th>
+                                        <th>Item Description</th>
                                         <th width="90" class="text-center">Qty</th>
                                         <th width="120" class="text-end">Unit Price</th>
                                         <th width="120" class="text-end">Amount</th>
