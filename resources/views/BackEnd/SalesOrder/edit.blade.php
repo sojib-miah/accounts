@@ -231,40 +231,42 @@
                                 <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
                             </div>
                             <div class="col-md-4">
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <th>Total Qty</th>
-                                        <td>
-                                            <input id="total_qty" readonly class="form-control text-end">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Sub Total</th>
-                                        <td>
-                                            <input id="sub_total" readonly class="form-control text-end">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Discount</th>
-                                        <td>
-                                            <input type="number" id="discount" name="discount"
-                                                value="{{ $receipt->discount }}" class="form-control text-end">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>VAT %</th>
-                                        <td>
-                                            <input type="number" id="vat" name="vat"
-                                                value="{{ $receipt->vat }}" class="form-control text-end">
-                                        </td>
-                                    </tr>
-                                    <tr class="table-primary">
-                                        <th>Grand Total</th>
-                                        <td>
-                                            <input id="grand_total" readonly class="form-control text-end fw-bold">
-                                        </td>
-                                    </tr>
-                                </table>
+                                <div class="border">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>Total Qty</th>
+                                            <td>
+                                                <input id="total_qty" readonly class="form-control text-end">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sub Total</th>
+                                            <td>
+                                                <input id="sub_total" readonly class="form-control text-end">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Discount</th>
+                                            <td>
+                                                <input type="number" id="discount" name="discount"
+                                                    value="{{ $receipt->discount }}" class="form-control text-end">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>VAT %</th>
+                                            <td>
+                                                <input type="number" id="vat" name="vat"
+                                                    value="{{ $receipt->vat }}" class="form-control text-end">
+                                            </td>
+                                        </tr>
+                                        <tr class="table-primary">
+                                            <th>Grand Total</th>
+                                            <td>
+                                                <input id="grand_total" readonly class="form-control text-end fw-bold">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-success w-100 mt-3">
@@ -313,7 +315,6 @@
         <input
            type="number"
             min="1"
-            step="0.01"
             name="qty[]"
             value="1"
             class="form-control qty text-end">

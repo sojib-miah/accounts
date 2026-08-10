@@ -211,7 +211,7 @@
                                                 {{ $item->product->unit ?? '-' }}
                                             </td>
                                             <td class="text-end">
-                                                {{ number_format($item->qty, 2) }}
+                                                {{ number_format($item->qty) }}
                                             </td>
                                             <td class="text-end">
                                                 {{ number_format($item->rate, 2) }}
@@ -348,7 +348,7 @@
                         <form action="{{ route('sales.order.convert.challan', $receipt->id) }}" method="POST"
                             class="d-inline">
                             @csrf
-                            <button class="btn btn-success btn-lg w-100" onclick="return confirm('Convert to Challan?')">
+                            <button class="btn btn-success btn-lg w-100" onclick="return confirm('Create to Challan?')">
                                 <i class="fa-solid fa-arrows-to-circle me-2"></i>
                                 Create Challan
                             </button>
@@ -365,7 +365,7 @@
                         <form action="{{ route('sales.order.convert.income', $receipt->id) }}" method="POST"
                             class="d-inline">
                             @csrf
-                            <button class="btn btn-danger btn-lg w-100" onclick="return confirm('Convert to Invoice?')">
+                            <button class="btn btn-danger btn-lg w-100" onclick="return confirm('Create to Invoice?')">
                                 <i class="fa-solid fa-arrows-to-circle me-2"></i>
                                 Create Invoice
                             </button>

@@ -3,60 +3,86 @@
 @section('title', 'Inventory')
 
 @section('content')
+
     <div class="p-5">
         <div class="card shadow-sm">
             <div class="card-header">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h4 class="mb-0">
-                            <i class="fa fa-boxes me-2"></i>
-                            Inventory
-                        </h4>
-                        <small class="text-muted">
-                            Individual Purchase Items
-                        </small>
-                    </div>
-
-                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                        <span class="badge bg-primary me-1">
-                            Items:
-                            {{ number_format($totalItems) }}
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fa fa-boxes me-2"></i>
+                        Inventory
+                    </h4>
+                    <div>
+                        <span class="badge bg-primary me-2">
+                            Products:
+                            {{ number_format($totalProducts) }}
                         </span>
-                        <span class="badge bg-success me-1">
+                        <span class="badge bg-success">
                             Qty:
                             {{ number_format($totalQty, 2) }}
-                        </span>
-                        <span class="badge bg-dark">
-                            Value:
-                            {{ number_format($totalValue, 2) }}
                         </span>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                {{-- SEARCH --}}
-                <form method="GET" action="{{ route('inventory.index') }}" class="mb-3">
+                <form method="GET" action="{{ route('inventory.index') }}" class="mb-4">
                     <div class="row">
                         <div class="col-md-5">
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control"
-                                    placeholder="Search product, SKU, PO or supplier..." value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-search me-2"></i>
-                                    Search
-                                </button>
-                            </div>
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search Product / SKU / Code..." value="{{ request('search') }}">
                         </div>
-                        @if (request('search'))
-                            <div class="col-md-2">
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-search me-1">
+                                </i>
+                                Search
+                            </button>
+                            @if (request('search'))
                                 <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
-                                    <i class="fa fa-refresh me-2"></i>
-                                    Clear
+                                    <i class="fa fa-times"></i>
                                 </a>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                     </div>
                 </form>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-primary shadow-sm">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Total Products
+                                </small>
+                                <h4 class="mb-0">
+                                    {{ number_format($totalProducts) }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success shadow-sm">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Total Received Qty
+                                </small>
+                                <h4 class="mb-0">
+                                    {{ number_format($totalQty) }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info shadow-sm">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Total Purchase Value
+                                </small>
+                                <h4 class="mb-0">
+                                    {{ number_format($totalValue, 2) }}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
@@ -65,152 +91,126 @@
                                     SL
                                 </th>
                                 <th>
-                                    PO No
+                                    Product Code
                                 </th>
                                 <th>
-                                    Receive Date
+                                    Part No
                                 </th>
                                 <th>
                                     Product
                                 </th>
                                 <th>
-                                    SKU
+                                    Category
                                 </th>
                                 <th>
-                                    Supplier
+                                    Brand
                                 </th>
-                                <th class="text-center">
-                                    Qty
-                                </th>
-                                <th class="text-end">
-                                    Rate
+                                <th>
+                                    Unit
                                 </th>
                                 <th class="text-end">
-                                    Amount
+                                    Total Qty
                                 </th>
-                                <th class="text-center">
-                                    Serial
+                                <th class="text-end">
+                                    Total Stock
                                 </th>
-                                <th class="text-center">
+                                <th class="text-end">
+                                    Avg. Purchase Price
+                                </th>
+                                <th class="text-end">
+                                    Total Value
+                                </th>
+                                <th width="100" class="text-center">
                                     Action
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($items as $item)
+                            @forelse($products as $row)
                                 @php
-                                    $receipt = $item->receipt;
-                                    $product = $item->product;
-                                    $serialCount = $item->serialNumbers()->count();
+                                    $product = $row->product;
                                 @endphp
                                 <tr>
                                     {{-- SL --}}
                                     <td>
-                                        {{ $items->firstItem() + $loop->index }}
+                                        {{ $products->firstItem() + $loop->index }}
                                     </td>
-                                    {{-- PO --}}
+                                    {{-- Product Code --}}
                                     <td>
-                                        <span class="fw-semibold">
-                                            {{ $receipt->po_no ?? $receipt->receipt_no }}
-                                        </span>
-                                        <br>
-                                        <small class="text-muted">
-                                            {{ $receipt->receipt_no }}
-                                        </small>
+                                        {{ $product->product_code ?? '-' }}
                                     </td>
-                                    {{-- RECEIVE DATE --}}
+                                    {{-- sku --}}
                                     <td>
-                                        @if ($receipt->received_date)
-                                            {{ \Carbon\Carbon::parse($receipt->received_date)->format('d-M-Y') }}
-                                        @else
-                                            -
-                                        @endif
+                                        {{ $product->sku ?? '-' }}
                                     </td>
-                                    {{-- PRODUCT --}}
+                                    {{-- Product --}}
                                     <td>
                                         <strong>
                                             {{ $product->name ?? '-' }}
                                         </strong>
                                     </td>
-                                    {{-- SKU --}}
+                                    {{-- Category --}}
                                     <td>
-                                        {{ $product->sku ?? '-' }}
+                                        {{ $product->category->name ?? '-' }}
                                     </td>
-                                    {{-- SUPPLIER --}}
+                                    {{-- Brand --}}
                                     <td>
-                                        {{ $receipt->supplier->name ?? '-' }}
+                                        {{ $product->brand->name ?? '-' }}
                                     </td>
-                                    {{-- QTY --}}
-                                    <td class="text-center">
+                                    {{-- Unit --}}
+                                    <td>
+                                        {{ $product->unit ?? '-' }}
+                                    </td>
+                                    {{-- Total Qty --}}
+                                    <td class="text-end">
                                         <span class="badge bg-primary">
-                                            {{ number_format($item->qty, 2) }}
+                                            {{ number_format($row->total_qty) }}
                                         </span>
                                     </td>
-                                    {{-- RATE --}}
+                                    {{-- stock  --}}
                                     <td class="text-end">
-                                        {{ number_format($item->rate, 2) }}
+                                        <span class="badge bg-primary">
+                                            {{ number_format($product->current_stock) }}
+                                        </span>
                                     </td>
-                                    {{-- AMOUNT --}}
+                                    {{-- Average Rate --}}
+                                    <td class="text-end">
+                                        {{ number_format($row->average_rate, 2) }}
+                                    </td>
+                                    {{-- Total Value --}}
                                     <td class="text-end">
                                         <strong>
-                                            {{ number_format($item->amount, 2) }}
+                                            {{ number_format($row->total_value, 2) }}
                                         </strong>
                                     </td>
-                                    {{-- SERIAL --}}
+                                    {{-- Action --}}
                                     <td class="text-center">
-                                        @if ($serialCount > 0)
-                                            <a href="{{ route('inventory.item.show', $item) }}"
-                                                class="btn btn-info btn-sm">
-                                                <i class="fa fa-barcode me-2"></i>
-                                                {{ $serialCount }}
-                                            </a>
-                                        @else
-                                            <span class="badge bg-secondary">
-                                                No Serial
-                                            </span>
-                                        @endif
-                                    </td>
-                                    {{-- ACTION --}}
-                                    <td class="text-center">
-                                        <a href="{{ route('inventory.item.show', $item) }}" class="btn btn-primary btn-sm"
-                                            title="View">
-                                            <i class="fa fa-eye"></i>
+                                        <a href="{{ route('inventory.product.show', $product) }}"
+                                            class="btn btn-primary btn-sm" title="View Product Details">
+                                            <i class="fa fa-eye me-1">
+                                            </i>
+                                            View
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="text-center py-5">
-                                        <i class="fa fa-box-open fa-2x text-muted mb-2"></i>
+                                    <td colspan="12" class="text-center py-5">
+                                        <i class="fa fa-box-open fa-2x text-muted">
+                                        </i>
                                         <br>
                                         <span class="text-muted">
-                                            No Received Inventory Found
+                                            No Inventory Found
                                         </span>
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
-                        @if ($items->count())
-                            <tfoot>
-                                <tr>
-                                    <th colspan="6" class="text-end">
-                                        Page Total:
-                                    </th>
-                                    <th class="text-center">
-                                        {{ number_format($items->sum('qty'), 2) }}
-                                    </th>
-                                    <th></th>
-                                    <th class="text-end">
-                                        {{ number_format($items->sum('amount'), 2) }}
-                                    </th>
-                                    <th colspan="2"></th>
-                                </tr>
-                            </tfoot>
-                        @endif
                     </table>
                 </div>
+                {{-- Pagination --}}
                 <div class="mt-3">
-                    {{ $items->links() }}
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>

@@ -41,8 +41,7 @@
                     <input type="text" class="form-control stock" readonly>
                 </td>
                 <td>
-                    <input type="number" min="1" value="0" name="qty[]" class="form-control qty"
-                        readonly>
+                    <input type="number" min="1" value="0" name="qty[]" class="form-control qty">
                 </td>
                 <td>
                     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate"
@@ -86,7 +85,7 @@
     <input type="text" class="form-control stock" readonly>
 </td>
 <td>
-    <input type="number" min="1" value="0" name="qty[]" class="form-control qty" readonly>
+    <input type="number" min="1" value="0" name="qty[]" class="form-control qty">
 </td>
 <td>
     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>

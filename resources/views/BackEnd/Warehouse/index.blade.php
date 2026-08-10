@@ -11,7 +11,7 @@
                     Warehouse Receive List
                 </h4>
                 <span class="badge bg-warning fs-6">
-                    Pending : {{ $purchases->total() }}
+                    Pending : {{ $purchases->where('status', 'Draft')->count() }}
                 </span>
             </div>
             <div class="card-body">
@@ -31,6 +31,8 @@
                                 <th>
                                     Supplier
                                 </th>
+                                <th>Item Name</th>
+                                <th>Part No</th>
                                 <th class="text-end">
                                     Qty
                                 </th>
@@ -60,16 +62,44 @@
                                     <td>
                                         {{ $purchase->supplier->name ?? '' }}
                                     </td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->product->name }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->product->sku }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
                                     <td class="text-end">
-                                        {{ number_format($purchase->total_qty, 2) }}
+                                        {{ number_format($purchase->total_qty) }}
                                     </td>
                                     <td class="text-end">
                                         {{ number_format($purchase->total_amount, 2) }}
                                     </td>
                                     <td>
-                                        <span class="badge bg-warning">
-                                            Waiting Receive
-                                        </span>
+                                        @if ($purchase->status == 'Completed')
+                                            <span class="badge bg-success">
+                                                Completed
+                                            </span>
+                                        @elseif($purchase->status == 'Cancelled')
+                                            <span class="badge bg-danger">
+                                                Cancelled
+                                            </span>
+                                        @else
+                                            <span class="badge bg-warning">
+                                                Waiting Receive
+                                            </span>
+                                        @endif
                                     </td>
                                     <td>
                                         <a href="{{ route('warehouse.show', $purchase) }}" class="btn btn-info btn-sm">
@@ -77,20 +107,20 @@
                                         </a>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center text-danger">
-                                        No Pending Purchase Found
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{ $purchases->links() }}
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center text-danger">
+                                            No Pending Purchase Found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        {{ $purchases->links() }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@endsection
+    @endsection

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Receipt;
+use App\Models\ReceiptItem;
 use App\Models\SerialNumber;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
@@ -17,8 +19,8 @@ class WarehouseController extends Controller
 
         $purchases = Receipt::with('supplier')
             ->where('type', 'Purchase-Order')
-            ->where('status', 'Draft')
-            ->where('is_receive', false)
+            // ->where('status', 'Draft')
+            // ->where('is_receive', false)
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
             })
@@ -30,13 +32,73 @@ class WarehouseController extends Controller
 
     public function show(Receipt $receipt)
     {
-        $receipt->load(
+        $receipt->load([
             'supplier',
             'items.product',
-            'items.serialNumbers'
-        );
+            'items.serialNumbers',
+            'company',
+            'branch',
+        ]);
 
         return view('BackEnd.Warehouse.show', compact('receipt'));
+    }
+
+    public function updateSerial(Request $request, Receipt $receipt, ReceiptItem $receiptItem)
+    {
+        DB::beginTransaction();
+        try {
+            if ($receiptItem->receipt_id != $receipt->id) {
+                throw new \Exception('Invalid purchase item.');
+            }
+            $product = Product::findOrFail($receiptItem->product_id);
+            $serialJson = $request->input('serial_json', '[]');
+            $serials = json_decode($serialJson, true);
+            if (!is_array($serials)) {
+                throw new \Exception('Invalid serial data.');
+            }
+            $serials = collect($serials)->map(function ($serial) {
+                return strtoupper(trim((string) $serial));
+            })->filter(function ($serial) {
+                return $serial !== '';
+            })->values()->toArray();
+            if (count($serials) !== count(array_unique($serials))) {
+                throw new \Exception('Duplicate serial number found.');
+            }
+            if (count($serials) > 0 && count($serials) != (int) $receiptItem->qty) {
+                throw new \Exception(
+                    $product->name . ' serial quantity does not match Qty. ' . 'Qty: ' . $receiptItem->qty . ', Serial: ' . count($serials)
+                );
+            }
+            $companyId = $receipt->company_id ?? auth()->user()->company_id;
+            foreach ($serials as $serial) {
+                $exists = SerialNumber::where('company_id', $companyId)
+                    ->where('serial_no', $serial)
+                    ->where('receipt_id', '!=', $receipt->id)->exists();
+                if ($exists) {
+                    throw new \Exception('Duplicate Serial Number: ' . $serial);
+                }
+            }
+            SerialNumber::where('receipt_item_id', $receiptItem->id)->delete();
+            foreach ($serials as $serial) {
+                SerialNumber::create([
+                    'company_id' => $companyId,
+                    'branch_id' => $receipt->branch_id ?? auth()->user()->branch_id,
+                    'product_id' => $receiptItem->product_id,
+                    'receipt_id' => $receipt->id,
+                    'receipt_item_id' => $receiptItem->id,
+                    'serial_no' => $serial,
+                    'status' => $receipt->is_receive ? 'Available' : 'Pending',
+                    'receive_date' => $receipt->is_receive ? today() : null,
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+            DB::commit();
+            return back()->with('success', 'Serial numbers updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     public function receive(Request $request, Receipt $receipt)

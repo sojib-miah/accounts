@@ -3,7 +3,7 @@
 @section('title', 'Invoice Details')
 
 @section('content')
-    <div class="mx-5 py-3">
+    <div class="p-5">
         <div class="row">
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -171,10 +171,10 @@
                                                 {{ $loop->iteration }}
                                             </td>
                                             <td>
-                                                {{ $item->category->name ?? '-' }}
+                                                {{ $item->product->sku ?? '-' }}
                                             </td>
                                             <td>
-                                                {{ $item->accountHead->name ?? '-' }}
+                                                {{ $item->product->description ?? '-' }}
                                             </td>
                                             <td class="text-center">
                                                 {{ number_format($item->qty) }}
@@ -207,65 +207,67 @@
                 <div class="row mt-4">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="180">
-                                    Total Qty
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($totalQty, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Sub Total
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($receipt->sub_total, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Discount
-                                </th>
-                                <td class="text-end text-danger">
-                                    {{ number_format($receipt->discount, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="d-flex align-items-center gap-2">
-                                    <span>VAT</span>
-                                    <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($receipt->vat, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-primary">
-                                <th>
-                                    Grand Total
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->total_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-success">
-                                <th>
-                                    Paid Amount
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->paid_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-danger">
-                                <th>
-                                    Due Amount
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->due_amount, 2) }}
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="border">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="180">
+                                        Total Qty
+                                    </th>
+                                    <td class="text-end">
+                                        {{ number_format($totalQty) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Sub Total
+                                    </th>
+                                    <td class="text-end">
+                                        {{ number_format($receipt->sub_total, 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Discount
+                                    </th>
+                                    <td class="text-end text-danger">
+                                        {{ number_format($receipt->discount, 2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="d-flex align-items-center gap-2">
+                                        <span>VAT</span>
+                                        <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
+                                    </th>
+                                    <td class="text-end">
+                                        {{ number_format($receipt->vat, 2) }}
+                                    </td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <th>
+                                        Grand Total
+                                    </th>
+                                    <td class="text-end fw-bold">
+                                        {{ number_format($receipt->total_amount, 2) }}
+                                    </td>
+                                </tr>
+                                <tr class="table-success">
+                                    <th>
+                                        Paid Amount
+                                    </th>
+                                    <td class="text-end fw-bold">
+                                        {{ number_format($receipt->paid_amount, 2) }}
+                                    </td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <th>
+                                        Due Amount
+                                    </th>
+                                    <td class="text-end fw-bold">
+                                        {{ number_format($receipt->due_amount, 2) }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

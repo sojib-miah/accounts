@@ -16,7 +16,7 @@
             @foreach ($purchase->items as $item)
                 <tr>
                     <td>
-                        <select name="product_id[]" class="form-select product" required>
+                        <select name="product_id[]" class="form-select product select2" required>
                             <option value="">
                                 Select Product
                             </option>
@@ -36,7 +36,7 @@
                             <i class="fa fa-barcode"></i>
                         </button>
                         <input type="hidden" name="serial_json[]" class="serial_json"
-                            value='@json($item->serialNumbers->pluck('serial_no')->values())'>
+                            value='@json($item->serialNumbers->pluck('serial_no')->values()->toArray())'>
                     </td>
                     <td>
                         <input type="text" name="unit[]" class="form-control unit"
@@ -48,7 +48,7 @@
                     </td>
                     <td>
                         <input type="number" min="1" name="qty[]" class="form-control qty"
-                            value="{{ (int) $item->qty }}" required readonly>
+                            value="{{ (int) $item->qty }}" required>
                     </td>
                     <td>
                         <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate"
@@ -74,7 +74,7 @@
     <td>
         <select
             name="product_id[]"
-            class="form-select product"
+            class="form-select product select2"
             required>
             <option value="">
                 Select Product
@@ -94,7 +94,7 @@
         <button type="button" class="btn btn-info serialBtn">
             <i class="fa fa-barcode"></i>
         </button>
-        <input type="hidden" name="serial_json[]" class="serial_json" value='@json($item->serialNumbers->pluck("serial_no")->values())'>
+        <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
     </td>
     <td>
         <input type="text" name="unit[]" class="form-control unit" readonly>
@@ -103,7 +103,7 @@
         <input type="text" class="form-control stock" readonly>
     </td>
     <td>
-        <input type="number" min="1" value="0" name="qty[]" class="form-control qty" required readonly>
+        <input type="number" min="1" value="0" name="qty[]" class="form-control qty" required>
     </td>
     <td>
         <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>

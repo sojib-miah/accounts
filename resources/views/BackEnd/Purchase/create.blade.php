@@ -11,7 +11,7 @@
                 <div class="card-header d-flex justify-content-between">
                     <h5 class="mb-0">Purchase Items</h5>
                     <button type="button" class="btn btn-primary btn-sm" id="addRow">
-                        <i class="fa fa-plus"></i>
+                        <i class="fa fa-plus me-2"></i>
                         Add Product
                     </button>
                 </div>
@@ -20,54 +20,62 @@
                 </div>
             </div>
             <div class="row mt-3">
-                <div class="col-md-4 ms-auto">
-                    <table class="table table-bordered">
-                        <tr>
-                            <th>Total Qty</th>
-                            <td>
-                                <input type="text" id="totalQty" name="total_qty" class="form-control" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Sub Total</th>
-                            <td>
-                                <input type="text" id="subTotal" name="sub_total" class="form-control" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Discount</th>
-                            <td>
-                                <input type="number" step="0.01" id="discount" name="discount" value="0"
-                                    class="form-control">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>VAT</th>
-                            <td>
-                                <input type="number" step="0.01" id="vat" name="vat" value="0"
-                                    class="form-control">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Grand Total</th>
-                            <td>
-                                <input type="text" id="grandTotal" class="form-control" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Paid Amount</th>
-                            <td>
-                                <input type="number" step="0.01" id="paidAmount" name="paid_amount" value="0"
-                                    class="form-control">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Due Amount</th>
-                            <td>
-                                <input type="text" id="dueAmount" class="form-control" readonly>
-                            </td>
-                        </tr>
-                    </table>
+                <div class="col-md-8">
+                    <label class="form-label">
+                        Remarks
+                    </label>
+                    <textarea name="remarks" rows="5" class="form-control" placeholder="Write remarks if necessary...">{{ old('remarks') }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <div class="border">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Total Qty</th>
+                                <td>
+                                    <input type="text" id="totalQty" name="total_qty" class="form-control" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Sub Total</th>
+                                <td>
+                                    <input type="text" id="subTotal" name="sub_total" class="form-control" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Discount</th>
+                                <td>
+                                    <input type="number" step="0.01" id="discount" name="discount" value="0"
+                                        class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>VAT</th>
+                                <td>
+                                    <input type="number" step="0.01" id="vat" name="vat" value="0"
+                                        class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Grand Total</th>
+                                <td>
+                                    <input type="text" id="grandTotal" class="form-control" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Paid Amount</th>
+                                <td>
+                                    <input type="number" step="0.01" id="paidAmount" name="paid_amount" value="0"
+                                        class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Due Amount</th>
+                                <td>
+                                    <input type="text" id="dueAmount" class="form-control" readonly>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="text-end mt-3">
@@ -190,128 +198,4 @@
 
 @push('scripts')
     @include('BackEnd.Purchase.partials.script')
-
-    <script>
-        let currentRow = null;
-        let serialArray = [];
-        $(document).on('click', '.serialBtn', function() {
-            currentRow = $(this).closest('tr');
-            $('#serialInput').val('');
-            let productName = currentRow.find('.product option:selected').text();
-            $('#serialProductName').val(productName);
-            let json = currentRow.find('.serial_json').val();
-            serialArray = [];
-            if (json && json !== '' && json !== '[]') {
-                try {
-                    serialArray = JSON.parse(json);
-                } catch (e) {
-                    serialArray = [];
-                }
-            }
-            renderSerialList();
-            $('#serialModal').modal('show');
-            setTimeout(function() {
-                $('#serialInput').focus();
-            }, 200);
-        });
-        $('#addSerial').click(function() {
-            let serial = $('#serialInput').val().trim();
-            if (serial == '') {
-                $('#serialInput').focus();
-                return;
-            }
-            if (serialArray.includes(serial)) {
-                Swal.fire('Duplicate Serial');
-                return;
-            }
-            serialArray.push(serial);
-            renderSerialList();
-            $('#serialInput').val('').focus();
-        });
-        $('#serialInput').keypress(function(e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                $('#addSerial').click();
-            }
-        });
-
-        function renderSerialList() {
-            let html = '';
-            if (serialArray.length == 0) {
-                html = `<tr><td colspan="3" class="text-center">No Serial Added</td></tr>`;
-            } else {
-                $.each(serialArray, function(index, item) {
-                    html += `
-                    <tr>
-                        <td>${index+1}</td>
-                        <td>${item}</td>
-                        <td class="text-center">
-                            <button
-                                type="button"
-                                class="btn btn-danger btn-sm removeSerial"
-                                data-index="${index}">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-                });
-            }
-            $('#serialList').html(html);
-            $('#serialCount').text(serialArray.length);
-            $('#requiredQty').text(serialArray.length);
-        }
-        $(document).on('click', '.removeSerial', function() {
-            let index = $(this).data('index');
-            Swal.fire({
-                title: 'Remove Serial?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    serialArray.splice(index, 1);
-                    renderSerialList();
-                }
-            });
-        });
-
-        function calculateSummary() {
-            let totalQty = 0;
-            let subTotal = 0;
-            $('#purchaseBody tr').each(function() {
-                totalQty += parseFloat($(this).find('.qty').val()) || 0;
-                subTotal += parseFloat($(this).find('.amount').val()) || 0;
-            });
-            $('#totalQty').val(totalQty);
-            $('#subTotal').val(subTotal.toFixed(2));
-            let discount = parseFloat($('#discount').val()) || 0;
-            let vat = parseFloat($('#vat').val()) || 0;
-            let vatAmount = ((subTotal - discount) * vat) / 100;
-            let grandTotal = (subTotal - discount) + vatAmount;
-            $('#grandTotal').val(grandTotal.toFixed(2));
-            let paid = parseFloat($('#paidAmount').val()) || 0;
-            let due = grandTotal - paid;
-            $('#dueAmount').val(due < 0 ? 0 : due.toFixed(2));
-        }
-
-        function calculateRow(row) {
-            let qty = parseFloat(row.find('.qty').val()) || 0;
-            let rate = parseFloat(row.find('.rate').val()) || 0;
-            let amount = qty * rate;
-            row.find('.amount').val(amount.toFixed(2));
-            calculateSummary();
-        }
-        $('#saveSerial').click(function() {
-            currentRow.find('.serial_json').val(
-                JSON.stringify(serialArray)
-            );
-            currentRow.find('.qty').val(serialArray.length);
-            calculateRow(currentRow);
-            calculateSummary();
-            $('#serialModal').modal('hide');
-        });
-        $('#serialModal').on('hidden.bs.modal', function() {
-            $('#serialInput').val('');
-        });
-    </script>
 @endpush

@@ -150,7 +150,7 @@
                                 <thead>
                                     <tr>
                                         <th width="60" class="text-center">SN</th>
-                                        <th>Category</th>
+                                        <th>Part No</th>
                                         <th>Item Description</th>
                                         <th width="90" class="text-center">Qty</th>
                                         <th>Remarks</th>
@@ -169,10 +169,10 @@
                                                 {{ $loop->iteration }}
                                             </td>
                                             <td>
-                                                {{ $item->category->name ?? '-' }}
+                                                {{ $item->product->sku ?? '-' }}
                                             </td>
                                             <td>
-                                                {{ $item->accountHead->name ?? '-' }}
+                                                {{ $item->product->description ?? '-' }}
                                             </td>
                                             <td class="text-center">
                                                 {{ number_format($item->qty) }}

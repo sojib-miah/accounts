@@ -101,46 +101,92 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'receipt_date' => 'required|date',
-            'party_id'     => 'required|exists:parties,id',
-            'product_id'   => 'required|array|min:1',
-            'product_id.*' => 'required|exists:products,id',
-            'qty'          => 'required|array',
-            'qty.*'        => 'required|numeric|min:1',
-            'rate'         => 'required|array',
-            'rate.*'       => 'required|numeric|min:0',
-            'discount'     => 'nullable|numeric|min:0',
-            'vat'          => 'nullable|numeric|min:0',
-            'paid_amount'  => 'nullable|numeric|min:0',
-            'serial_json' => 'required|array',
-            'serial_json.*' => 'required',
+            'receipt_date'      => 'required|date',
+            'party_id'          => 'required|exists:parties,id',
+            'product_id'        => 'required|array|min:1',
+            'product_id.*'      => 'required|exists:products,id',
+            'qty'               => 'required|array',
+            'qty.*'             => 'required|numeric|min:1',
+            'rate'              => 'required|array',
+            'rate.*'            => 'required|numeric|min:0',
+            'discount'          => 'nullable|numeric|min:0',
+            'vat'               => 'nullable|numeric|min:0',
+            'paid_amount'       => 'nullable|numeric|min:0',
+            'serial_json'       => 'nullable|array',
+            'serial_json.*'     => 'nullable',
         ]);
-
         DB::beginTransaction();
         try {
+            $companyId = auth()->user()->company_id;
+            $branchId  = auth()->user()->branch_id;
+            $userId    = auth()->id();
             $receipt = Receipt::create([
-                'receipt_no'      => $this->generateReceiptNo(),
-                'po_no'      => $this->generateReceiptNo(),
-                'type'            => 'Purchase-Order',
-                'company_id'      => auth()->user()->company_id,
-                'branch_id'       => auth()->user()->branch_id,
-                'party_id'        => $request->party_id,
-                'receipt_date'    => $request->receipt_date,
-                'remarks'         => $request->remarks,
-                'discount'        => $request->discount ?? 0,
-                'vat'             => $request->vat ?? 0,
-                'paid_amount'     => $request->paid_amount ?? 0,
-                'status'          => 'Draft',
-                'is_receive' => false,
-                'created_by'      => auth()->id(),
+                'receipt_no'   => $this->generateReceiptNo(),
+                'po_no'        => $this->generateReceiptNo(),
+                'type'         => 'Purchase-Order',
+                'company_id'   => $companyId,
+                'branch_id'    => $branchId,
+                'party_id'     => $request->party_id,
+                'receipt_date' => $request->receipt_date,
+                'remarks'      => $request->remarks,
+                'discount'     => $request->discount ?? 0,
+                'vat'          => $request->vat ?? 0,
+                'paid_amount'  => $request->paid_amount ?? 0,
+                'status'       => 'Draft',
+                'is_receive'   => false,
+                'created_by'   => $userId,
             ]);
-
             $totalQty = 0;
             $subTotal = 0;
             foreach ($request->product_id as $key => $productId) {
-                $qty = $request->qty[$key];
-                $rate = $request->rate[$key];
+                $qty  = (float) $request->qty[$key];
+                $rate = (float) $request->rate[$key];
                 $amount = $qty * $rate;
+                $product = Product::findOrFail($productId);
+                $serialJson = $request->serial_json[$key] ?? '[]';
+
+                $serials = json_decode($serialJson, true);
+
+                if (!is_array($serials)) {
+                    $serials = [];
+                }
+
+                $serials = collect($serials)
+                    ->map(function ($serial) {
+                        return strtoupper(trim((string) $serial));
+                    })
+                    ->filter(function ($serial) {
+                        return $serial !== '';
+                    })
+                    ->values()
+                    ->toArray();
+
+                if (count($serials) > 0 && count($serials) != $qty) {
+
+                    throw new \Exception(
+                        "Serial quantity does not match Qty for product: {$product->name}. " .
+                            "Qty: {$qty}, Serial: " . count($serials)
+                    );
+                }
+                if (count($serials) !== count(array_unique($serials))) {
+
+                    throw new \Exception(
+                        "Duplicate serial number found for product: {$product->name}"
+                    );
+                }
+                foreach ($serials as $serial) {
+
+                    $exists = SerialNumber::where('company_id', $companyId)
+                        ->where('serial_no', $serial)
+                        ->exists();
+
+                    if ($exists) {
+
+                        throw new \Exception(
+                            "Duplicate Serial Number: {$serial}"
+                        );
+                    }
+                }
                 $receiptItem = ReceiptItem::create([
                     'receipt_id' => $receipt->id,
                     'product_id' => $productId,
@@ -148,71 +194,50 @@ class PurchaseController extends Controller
                     'rate'       => $rate,
                     'amount'     => $amount,
                 ]);
-                // Product::where('id', $productId)->increment('current_stock', $qty);
-                // Product::where('id', $productId)->update(['purchase_price' => $rate]);
-                $totalQty += $qty;
-                $subTotal += $amount;
-
-                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
-
-                if (!is_array($serials)) {
-                    throw new \Exception('Invalid serial data.');
-                }
-
-                if (count($serials) != $qty) {
-                    throw new \Exception("Serial quantity does not match Qty.");
-                }
-                if (count($serials) !== count(array_unique($serials))) {
-                    throw new \Exception('Duplicate serial found in this product.');
-                }
                 foreach ($serials as $serial) {
-                    $serial = trim($serial);
-
-                    if ($serial == '') {
-                        throw new \Exception("Serial cannot be empty.");
-                    }
-                    if (
-                        SerialNumber::where('company_id', auth()->user()->company_id)->where('serial_no', $serial)->exists()
-                    ) {
-                        throw new \Exception(
-                            "Duplicate Serial : " . $serial
-                        );
-                    }
                     SerialNumber::create([
-                        'company_id'      => auth()->user()->company_id,
-                        'branch_id'       => auth()->user()->branch_id,
+                        'company_id'      => $companyId,
+                        'branch_id'       => $branchId,
                         'product_id'      => $productId,
                         'receipt_id'      => $receipt->id,
                         'receipt_item_id' => $receiptItem->id,
                         'serial_no'       => $serial,
                         'status'          => 'Pending',
-                        'created_by'      => auth()->id(),
+                        'created_by'      => $userId,
                     ]);
                 }
+                $totalQty += $qty;
+                $subTotal += $amount;
             }
-            $discount = $request->discount ?? 0;
-            $vatPercent = $request->vat ?? 0;
-            $vatAmount = (($subTotal - $discount) * $vatPercent) / 100;
-            $grandTotal = ($subTotal - $discount) + $vatAmount;
-            $paid = $request->paid_amount ?? 0;
+            $discount   = (float) ($request->discount ?? 0);
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            if ($afterDiscount < 0) {
+                $afterDiscount = 0;
+            }
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grandTotal = $afterDiscount + $vatAmount;
+            $paid = (float) ($request->paid_amount ?? 0);
             $due = $grandTotal - $paid;
+            if ($due < 0) {
+                $due = 0;
+            }
             if ($paid <= 0) {
                 $paymentStatus = 'Pending';
             } elseif ($due <= 0) {
                 $paymentStatus = 'Paid';
-                $due = 0;
             } else {
                 $paymentStatus = 'Partial';
             }
             $receipt->update([
-                'total_qty'       => $totalQty,
-                'sub_total'       => $subTotal,
-                'total_amount'    => $grandTotal,
-                'vat'             => $vatPercent,
-                'discount'        => $discount,
-                'paid_amount'     => $paid,
-                'due_amount'      => $due,
-                'payment_status'  => $paymentStatus,
+                'total_qty'      => $totalQty,
+                'sub_total'      => $subTotal,
+                'total_amount'   => $grandTotal,
+                'vat'            => $vatPercent,
+                'discount'       => $discount,
+                'paid_amount'    => $paid,
+                'due_amount'     => $due,
+                'payment_status' => $paymentStatus,
             ]);
             DB::commit();
             return redirect()->route('purchase.index')->with('success', 'Purchase saved successfully.');
@@ -246,7 +271,7 @@ class PurchaseController extends Controller
         if ($purchase->status == 'Cancelled') {
             return redirect()->route('purchase.index')->with('error', 'Cancelled purchase cannot be edited.');
         }
-        $purchase->load('items.product', 'items.serialNumbers',);
+        $purchase->load('items.product', 'items.serialNumbers', 'party');
         $suppliers = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', auth()->id());
         })->orderBy('name')->get();
@@ -265,126 +290,160 @@ class PurchaseController extends Controller
     public function update(Request $request, Receipt $purchase)
     {
         $request->validate([
-            'receipt_date' => 'required|date',
-            'party_id'     => 'required|exists:parties,id',
-            'product_id'   => 'required|array|min:1',
-            'product_id.*' => 'required|exists:products,id',
-            'qty.*'        => 'required|numeric|min:1',
-            'rate.*'       => 'required|numeric|min:0',
-            'serial_json'   => 'required|array',
-            'serial_json.*' => 'required',
+            'receipt_date'      => 'required|date',
+            'party_id'          => 'required|exists:parties,id',
+            'product_id'        => 'required|array|min:1',
+            'product_id.*'      => 'required|exists:products,id',
+            'qty'               => 'required|array',
+            'qty.*'             => 'required|numeric|min:1',
+            'rate'              => 'required|array',
+            'rate.*'            => 'required|numeric|min:0',
+            'discount'          => 'nullable|numeric|min:0',
+            'vat'               => 'nullable|numeric|min:0',
+            'paid_amount'       => 'nullable|numeric|min:0',
+            'serial_json'       => 'nullable|array',
+            'serial_json.*'     => 'nullable',
         ]);
         if ($purchase->status == 'Cancelled') {
             return back()->with('error', 'Cancelled purchase cannot be updated.');
         }
         DB::beginTransaction();
         try {
-            if ($purchase->is_receive) {
-                foreach ($purchase->items as $item) {
-                    Product::where('id', $item->product_id)->decrement('current_stock', $item->qty);
+            $companyId = auth()->user()->company_id;
+            $branchId  = auth()->user()->branch_id;
+            $userId    = auth()->id();
+            $wasReceived = (bool) $purchase->is_receive;
+            if ($wasReceived) {
+                foreach ($purchase->items as $oldItem) {
+                    Product::where('id', $oldItem->product_id)->decrement('current_stock', $oldItem->qty);
                 }
             }
-            SerialNumber::where('receipt_id', $purchase->id)->delete();
             StockTransaction::where('receipt_id', $purchase->id)->where('transaction_type', 'Purchase')->delete();
+            SerialNumber::where('receipt_id', $purchase->id)->delete();
             $purchase->items()->delete();
             $purchase->update([
-                'party_id'      => $request->party_id,
-                'receipt_date'  => $request->receipt_date,
-                'remarks'       => $request->remarks,
-                'discount'      => $request->discount ?? 0,
-                'vat'           => $request->vat ?? 0,
-                'paid_amount'   => $request->paid_amount ?? 0,
-                'updated_by'    => auth()->id()
+                'party_id'     => $request->party_id,
+                'receipt_date' => $request->receipt_date,
+                'remarks'      => $request->remarks,
+                'discount'     => $request->discount ?? 0,
+                'vat'          => $request->vat ?? 0,
+                'paid_amount'  => $request->paid_amount ?? 0,
+                'updated_by'   => $userId,
             ]);
             $totalQty = 0;
             $subTotal = 0;
             foreach ($request->product_id as $key => $productId) {
-                $qty = $request->qty[$key];
-                $rate = $request->rate[$key];
+                $product = Product::findOrFail(
+                    $productId
+                );
+                $qty = (float) $request->qty[$key];
+                $rate = (float) $request->rate[$key];
                 $amount = $qty * $rate;
                 $receiptItem = ReceiptItem::create([
                     'receipt_id' => $purchase->id,
                     'product_id' => $productId,
-                    'qty' => $qty,
-                    'rate' => $rate,
-                    'amount' => $amount,
+                    'qty'        => $qty,
+                    'rate'       => $rate,
+                    'amount'     => $amount,
                 ]);
-                // Product::where('id', $productId)->increment('current_stock', $qty);
-                // Product::where('id', $productId)->update(['purchase_price' => $rate]);
                 $totalQty += $qty;
                 $subTotal += $amount;
+                $serialJson = $request->serial_json[$key] ?? '[]';
+                $serials = json_decode($serialJson, true);
 
-                if ($purchase->is_receive) {
-
-                    Product::where('id', $productId)
-                        ->increment('current_stock', $qty);
-
-                    Product::where('id', $productId)
-                        ->update([
-                            'purchase_price' => $rate
-                        ]);
-                }
-
-                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
                 if (!is_array($serials)) {
-                    throw new \Exception('Invalid serial data.');
+                    $serials = [];
                 }
-                if (count($serials) != $qty) {
-                    throw new \Exception("Serial quantity does not match Qty.");
+                $serials = collect($serials)
+                    ->map(function ($serial) {
+                        return strtoupper(
+                            trim(
+                                (string) $serial
+                            )
+                        );
+                    })
+                    ->filter(function ($serial) {
+                        return $serial !== '';
+                    })->values()->toArray();
+                if (count($serials) > 0 && count($serials) != $qty) {
+                    throw new \Exception(
+                        "Serial quantity does not match Qty for product: " . $product->name . ". Qty: " . $qty . ", Serial: " . count($serials)
+                    );
                 }
                 if (count($serials) !== count(array_unique($serials))) {
-                    throw new \Exception("Duplicate serial found.");
+                    throw new \Exception(
+                        "Duplicate serial found for product: " . $product->name
+                    );
                 }
                 foreach ($serials as $serial) {
-                    $serial = trim($serial);
-                    if ($serial == '') {
-                        throw new \Exception("Serial cannot be empty.");
+                    $exists = SerialNumber::where('company_id', $companyId)->where('serial_no', $serial)->exists();
+                    if ($exists) {
+                        throw new \Exception("Duplicate Serial Number: " . $serial);
                     }
-                    if (
-                        SerialNumber::where('company_id', auth()->user()->company_id)
-                        ->where('serial_no', $serial)
-                        ->exists()
-                    ) {
-                        throw new \Exception("Duplicate Serial : {$serial}");
-                    }
+                }
+                foreach ($serials as $serial) {
                     SerialNumber::create([
-                        'company_id'      => auth()->user()->company_id,
-                        'branch_id'       => auth()->user()->branch_id,
+                        'company_id'      => $companyId,
+                        'branch_id'       => $branchId,
                         'product_id'      => $productId,
                         'receipt_id'      => $purchase->id,
                         'receipt_item_id' => $receiptItem->id,
                         'serial_no'       => $serial,
-                        'status' => $purchase->is_receive
-                            ? 'Available'
-                            : 'Pending',
-                        'created_by'      => auth()->id(),
+                        'status'          => $wasReceived ? 'Available' : 'Pending',
+                        'receive_date'    => $wasReceived ? today() : null,
+                        'created_by'      => $userId,
+                    ]);
+                }
+                if ($wasReceived) {
+                    $product->increment('current_stock', $qty);
+                    $product->update([
+                        'purchase_price' => $rate
+                    ]);
+                    $product->refresh();
+                    StockTransaction::create([
+                        'company_id' => $purchase->company_id,
+                        'branch_id' => $purchase->branch_id,
+                        'product_id' => $product->id,
+                        'receipt_id' => $purchase->id,
+                        'transaction_type' => 'Purchase',
+                        'stock_in' => $qty,
+                        'stock_out' => 0,
+                        'balance' => $product->current_stock,
+                        'transaction_date' => $purchase->receipt_date,
+                        'remarks' => 'Purchase Update',
+                        'created_by' => $userId,
                     ]);
                 }
             }
-            $discount = $request->discount ?? 0;
-            $vatPercent = $request->vat ?? 0;
-            $vatAmount = (($subTotal - $discount) * $vatPercent) / 100;
-            $grand = ($subTotal - $discount) + $vatAmount;
-            $paid = $request->paid_amount ?? 0;
-            $due = $grand - $paid;
-            if ($paid <= 0) {
-                $status = 'Pending';
-            } elseif ($due <= 0) {
-                $status = 'Paid';
-                $due = 0;
-            } else {
-                $status = 'Partial';
+            $discount = (float) ($request->discount ?? 0);
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            if ($afterDiscount < 0) {
+                $afterDiscount = 0;
             }
-
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grand = $afterDiscount + $vatAmount;
+            $paid = (float) ($request->paid_amount ?? 0);
+            $due = $grand - $paid;
+            if ($due < 0) {
+                $due = 0;
+            }
+            if ($paid <= 0) {
+                $paymentStatus = 'Pending';
+            } elseif ($due <= 0) {
+                $paymentStatus = 'Paid';
+            } else {
+                $paymentStatus = 'Partial';
+            }
             $purchase->update([
-                'total_qty'       => $totalQty,
-                'sub_total'       => $subTotal,
-                'vat'             => $vatPercent,
-                'discount'        => $discount,
-                'total_amount'    => $grand,
-                'paid_amount'     => $paid,
-                'due_amount'      => $due,
-                'payment_status'  => $status,
+                'total_qty' => $totalQty,
+                'sub_total' => $subTotal,
+                'vat' => $vatPercent,
+                'discount' => $discount,
+                'total_amount' => $grand,
+                'paid_amount' => $paid,
+                'due_amount' => $due,
+                'payment_status' => $paymentStatus,
             ]);
             DB::commit();
             return redirect()->route('purchase.index')->with('success', 'Purchase Updated Successfully.');

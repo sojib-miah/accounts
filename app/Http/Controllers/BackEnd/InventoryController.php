@@ -16,71 +16,133 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-
-        $query = ReceiptItem::with(['receipt.supplier', 'receipt.branch', 'product',])
+        $query = ReceiptItem::query()
+            ->select(['receipt_items.product_id',])
+            ->selectRaw('SUM(receipt_items.qty) as total_qty')
+            ->selectRaw('SUM(receipt_items.amount) as total_value')
+            ->selectRaw(
+                'CASE 
+                WHEN SUM(receipt_items.qty) > 0
+                THEN SUM(receipt_items.amount) / SUM(receipt_items.qty)
+                ELSE 0 END as average_rate'
+            )
             ->whereHas('receipt', function ($q) use ($user) {
-                $q->where('type', 'Purchase-Order')->where('is_receive', true);
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
                 if (!$user->hasRole('Super-Admin')) {
-                    $q->where('created_by', $user->id);
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
+                }
+            })
+            ->with(['product.category', 'product.brand',]);
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->whereHas(
+                'product',
+                function ($product) use ($search) {
+                    $product
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%")
+                        ->orWhere('product_code', 'like', "%{$search}%");
+                }
+            );
+        }
+        $query->groupBy('receipt_items.product_id');
+        $products = $query->orderByDesc('total_qty')->paginate(20)->withQueryString();
+        $totalQuery = ReceiptItem::query()
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
                 }
             });
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('product', function ($product) use ($search) {
-                    $product->where('name', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%");
-                })
-                    ->orWhereHas('receipt', function ($receipt) use ($search) {
-                        $receipt->where('po_no', 'like', "%{$search}%")
-                            ->orWhere('receipt_no', 'like', "%{$search}%")
-                            ->orWhereHas('supplier', function ($supplier) use ($search) {
-                                $supplier->where(
-                                    'name',
-                                    'like',
-                                    "%{$search}%"
-                                );
-                            });
-                    });
-            });
-        }
-
-        $items = $query->latest('id')->paginate(20)->withQueryString();
-        $totalQuery = ReceiptItem::whereHas('receipt', function ($q) use ($user) {
-            $q->where('type', 'Purchase-Order')->where('is_receive', true);
-            if (!$user->hasRole('Super-Admin')) {
-                $q->where('company_id', $user->company_id)->where('created_by', $user->id);
-            }
-        });
-        $totalItems = (clone $totalQuery)->count();
+        $totalProducts = (clone $totalQuery)->distinct('product_id')->count('product_id');
         $totalQty = (clone $totalQuery)->sum('qty');
         $totalValue = (clone $totalQuery)->sum('amount');
-
         return view(
             'BackEnd.Inventory.index',
             compact(
-                'items',
-                'totalItems',
+                'products',
+                'totalProducts',
                 'totalQty',
                 'totalValue'
             )
         );
     }
 
-    public function show(ReceiptItem $item)
+    public function productShow(Request $request, Product $product)
     {
-        $item->load([
-            'product',
-            'receipt.supplier',
-            'receipt.branch',
-        ]);
-
-        $serials = SerialNumber::where(
-            'receipt_item_id',
-            $item->id
-        )->orderBy('id')->get();
-
-        return view('BackEnd.Inventory.show', compact('item', 'serials'));
+        $user = auth()->user();
+        $product->load(['category', 'brand',]);
+        $query = ReceiptItem::with(['receipt.supplier', 'receipt.branch', 'serialNumbers',])
+            ->where('product_id', $product->id)
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
+                }
+            });
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->whereHas(
+                'receipt',
+                function ($receipt) use ($search) {
+                    $receipt
+                        ->where('po_no', 'like', "%{$search}%")
+                        ->orWhere('receipt_no', 'like', "%{$search}%")
+                        ->orWhereHas(
+                            'supplier',
+                            function ($supplier) use ($search) {
+                                $supplier->where('name', 'like', "%{$search}%");
+                            }
+                        );
+                }
+            );
+        }
+        $items = $query->latest('id')->paginate(20)->withQueryString();
+        $totalQty = ReceiptItem::where('product_id', $product->id)
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
+                }
+            })->sum('qty');
+        $totalValue = ReceiptItem::where('product_id', $product->id)
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
+                }
+            })->sum('amount');
+        $averageRate = $totalQty > 0 ? $totalValue / $totalQty : 0;
+        $serialCount = SerialNumber::where('product_id', $product->id)
+            ->whereHas('receipt', function ($q) use ($user) {
+                $q->where('type', 'Purchase-Order')
+                    ->where('is_receive', true);
+                if (!$user->hasRole('Super-Admin')) {
+                    $q->where('company_id', $user->company_id)
+                        ->where('created_by', $user->id);
+                }
+            })->count();
+        return view(
+            'BackEnd.Inventory.show',
+            compact(
+                'product',
+                'items',
+                'totalQty',
+                'totalValue',
+                'averageRate',
+                'serialCount'
+            )
+        );
     }
 
     public function lowStock(Request $request)

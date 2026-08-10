@@ -158,6 +158,7 @@ class ChallanController extends Controller
             'party',
             'creator',
             'items.category',
+            'items.product',
             'items.accountHead',
             'payments.account',
             'payments.paymentType',

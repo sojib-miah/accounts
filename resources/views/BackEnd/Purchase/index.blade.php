@@ -80,6 +80,7 @@
                                 <th>Date</th>
                                 <th>Supplier name</th>
                                 <th>Item Name</th>
+                                <th>Part No</th>
                                 <th class="text-end">Qty</th>
                                 <th class="text-end">Total Amount</th>
                                 <th>Status</th>
@@ -102,6 +103,15 @@
                                             </div>
                                         @endforeach
                                     </td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->product->sku }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
                                     <td class="text-end">{{ $purchase->total_qty }}</td>
                                     <td class="text-end">{{ number_format($purchase->total_amount, 2) }}</td>
                                     <td>
@@ -118,7 +128,6 @@
                                                 {{ $purchase->status }}
                                             </span>
                                         @endif
-
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -133,12 +142,14 @@
                                                     </a>
                                                 </li>
                                                 @can('purchase-edit')
-                                                    <li>
-                                                        <a href="{{ route('purchase.edit', $purchase->id) }}"
-                                                            class="btn btn-warning btn-sm w-100 mb-1" title="Edit Purchase">
-                                                            <i class="fa fa-edit"></i>
-                                                        </a>
-                                                    </li>
+                                                    @if ($purchase->status !== 'Completed')
+                                                        <li>
+                                                            <a href="{{ route('purchase.edit', $purchase->id) }}"
+                                                                class="btn btn-warning btn-sm w-100 mb-1" title="Edit Purchase">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        </li>
+                                                    @endif
                                                 @endcan
                                                 @can('purchase-delete')
                                                     <li>

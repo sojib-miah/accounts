@@ -48,12 +48,6 @@
                     </div>
                 @enderror
             </div>
-            <div class="col-md-12">
-                <label class="form-label">
-                    Remarks
-                </label>
-                <textarea name="remarks" rows="3" class="form-control" placeholder="Write remarks if necessary...">{{ old('remarks') }}</textarea>
-            </div>
         </div>
     </div>
 </div>

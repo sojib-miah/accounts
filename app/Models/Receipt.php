@@ -23,9 +23,16 @@ class Receipt extends Model
         return $this->belongsTo(Party::class);
     }
 
+    // public function items()
+    // {
+    //     return $this->hasMany(ReceiptItem::class);
+    // }
     public function items()
     {
-        return $this->hasMany(ReceiptItem::class);
+        return $this->hasMany(
+            ReceiptItem::class,
+            'receipt_id'
+        );
     }
 
     public function payments()

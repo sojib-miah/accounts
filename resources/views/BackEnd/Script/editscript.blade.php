@@ -142,7 +142,7 @@
         let afterDiscount = subTotal - discount;
         let vatAmount = (afterDiscount * vatPercent) / 100;
         let grandTotal = afterDiscount + vatAmount;
-        $('#total_qty').val(totalQty.toFixed(2));
+        $('#total_qty').val(totalQty);
         $('#sub_total').val(subTotal.toFixed(2));
         $('#grand_total').val(grandTotal.toFixed(2));
     }

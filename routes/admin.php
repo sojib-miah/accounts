@@ -236,7 +236,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
     Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
     Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
-    Route::get('/inventory/item/{item}', [InventoryController::class, 'show'])->name('inventory.item.show');
+    Route::get('/inventory/product/{product}', [InventoryController::class, 'productShow'])->name('inventory.product.show');
 
     // brand route 
     Route::resource('brand', BrandController::class);
@@ -244,5 +244,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     // warehouse routs 
     Route::get('/warehouse', [WarehouseController::class, 'index'])->name('warehouse.index');
     Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
+    Route::post('/warehouse/{receipt}/serial/{receiptItem}', [WarehouseController::class, 'updateSerial'])->name('warehouse.serial.update');
     Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
 });

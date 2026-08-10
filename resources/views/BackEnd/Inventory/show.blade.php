@@ -1,191 +1,242 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Inventory Item')
+@section('title', 'Inventory Product Details')
 
 @section('content')
     <div class="p-5">
-        <div class="mb-3">
-            <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
-                <i class="fa fa-arrow-left me-2"></i>
-                Back to Inventory
-            </a>
-        </div>
         <div class="card shadow-sm mb-4">
             <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fa fa-box me-2"></i>
-                    Purchase Item Details
-                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fa fa-box me-2"></i>
+                        Product Details
+                    </h4>
+                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left me-1"></i>
+                        Back
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="row">
-                    {{-- PRODUCT --}}
+                    {{-- Product --}}
                     <div class="col-md-4 mb-3">
-                        <label class="text-muted">
+                        <label class="fw-bold">
                             Product
                         </label>
-                        <div class="fw-bold fs-5">
-                            {{ $item->product->name ?? '-' }}
-                        </div>
+                        <input class="form-control" readonly value="{{ $product->name }}">
                     </div>
                     {{-- SKU --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
+                    <div class="col-md-2 mb-3">
+                        <label class="fw-bold">
                             SKU
                         </label>
-                        <div class="fw-bold">
-                            {{ $item->product->sku ?? '-' }}
-                        </div>
+                        <input class="form-control" readonly value="{{ $product->sku ?? '-' }}">
                     </div>
-                    {{-- UNIT --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
+                    {{-- Category --}}
+                    <div class="col-md-2 mb-3">
+                        <label class="fw-bold">
+                            Category
+                        </label>
+                        <input class="form-control" readonly value="{{ $product->category->name ?? '-' }}">
+                    </div>
+                    {{-- Brand --}}
+                    <div class="col-md-2 mb-3">
+                        <label class="fw-bold">
+                            Brand
+                        </label>
+                        <input class="form-control" readonly value="{{ $product->brand->name ?? '-' }}">
+                    </div>
+                    {{-- Unit --}}
+                    <div class="col-md-2 mb-3">
+                        <label class="fw-bold">
                             Unit
                         </label>
-                        <div class="fw-bold">
-                            {{ $item->product->unit ?? '-' }}
+                        <input class="form-control" readonly value="{{ $product->unit ?? '-' }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Total Received Qty
+                                </small>
+                                <h4>
+                                    {{ number_format($totalQty) }}
+                                </h4>
+                            </div>
                         </div>
                     </div>
-                    {{-- PO --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            PO No
-                        </label>
-                        <div>
-                            {{ $item->receipt->po_no ?? $item->receipt->receipt_no }}
+                    <div class="col-md-3">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Current Stock
+                                </small>
+                                <h4>
+                                    {{ number_format($product->current_stock) }}
+                                </h4>
+                            </div>
                         </div>
                     </div>
-                    {{-- RECEIVE DATE --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            Receive Date
-                        </label>
-                        <div>
-                            @if ($item->receipt->received_date)
-                                {{ \Carbon\Carbon::parse($item->receipt->received_date)->format('d-M-Y') }}
-                            @else
-                                -
-                            @endif
+                    <div class="col-md-3">
+                        <div class="card border-info">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Average Purchase Price
+                                </small>
+                                <h4>
+                                    {{ number_format($averageRate, 2) }}
+                                </h4>
+                            </div>
                         </div>
                     </div>
-                    {{-- SUPPLIER --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            Supplier
-                        </label>
-                        <div>
-                            {{ $item->receipt->supplier->name ?? '-' }}
-                        </div>
-                    </div>
-                    {{-- PURCHASE QTY --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            Purchase Qty
-                        </label>
-                        <div>
-                            <span class="badge bg-primary fs-6">
-                                {{ number_format($item->qty, 2) }}
-                            </span>
-                        </div>
-                    </div>
-                    {{-- PURCHASE RATE --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            Purchase Rate
-                        </label>
-                        <div class="fw-bold">
-                            {{ number_format($item->rate, 2) }}
-                        </div>
-                    </div>
-                    {{-- TOTAL --}}
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted">
-                            Total Amount
-                        </label>
-                        <div class="fw-bold text-success">
-                            {{ number_format($item->amount, 2) }}
+                    <div class="col-md-3">
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Serial Count
+                                </small>
+                                <h4>
+                                    {{ number_format($serialCount) }}
+                                </h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="fa fa-barcode me-2"></i>
-                    Serial / IMEI Numbers
+                    <i class="fa fa-history me-2"></i>
+                    Purchase History
                 </h5>
-                <span class="badge bg-success">
-                    Total:
-                    {{ $serials->count() }}
-                </span>
             </div>
             <div class="card-body">
-                @if ($serials->count())
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead>
+                {{-- Search --}}
+                <form method="GET" class="mb-3">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search PO / Receipt / Supplier..." value="{{ request('search') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-search me-1">
+                                </i>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {{-- Table --}}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th width="60">
+                                    SL
+                                </th>
+                                <th>
+                                    PO No
+                                </th>
+                                <th>
+                                    Receive Date
+                                </th>
+                                <th>
+                                    Supplier
+                                </th>
+                                <th class="text-end">
+                                    Qty
+                                </th>
+                                <th class="text-end">
+                                    Rate
+                                </th>
+                                <th class="text-end">
+                                    Amount
+                                </th>
+                                <th>
+                                    Serial
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($items as $item)
                                 <tr>
-                                    <th width="70">
-                                        SL
-                                    </th>
-                                    <th>
-                                        Serial / IMEI No
-                                    </th>
-                                    <th>
-                                        Status
-                                    </th>
-                                    <th>
-                                        Receive Date
-                                    </th>
+                                    <td>
+                                        {{ $items->firstItem() + $loop->index }}
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            {{ $item->receipt->po_no ?? '-' }}
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        @if ($item->receipt->received_date)
+                                            {{ \Carbon\Carbon::parse($item->receipt->received_date)->format('d-M-Y') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $item->receipt->supplier->name ?? '-' }}
+                                    </td>
+                                    <td class="text-end">
+                                        {{ number_format($item->qty) }}
+                                    </td>
+                                    <td class="text-end">
+                                        {{ number_format($item->rate, 2) }}
+                                    </td>
+                                    <td class="text-end">
+                                        <strong>
+                                            {{ number_format($item->amount, 2) }}
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        @if ($item->serialNumbers->count())
+                                            @foreach ($item->serialNumbers as $serial)
+                                                <span class="badge bg-light text-dark border me-1 mb-1">
+                                                    {{ $serial->serial_no }}
+                                                </span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted">
+                                                No Serial
+                                            </span>
+                                        @endif
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($serials as $serial)
-                                    <tr>
-                                        <td>
-                                            {{ $loop->iteration }}
-                                        </td>
-                                        <td>
-                                            <strong>
-                                                {{ $serial->serial_no }}
-                                            </strong>
-                                        </td>
-                                        <td>
-                                            @if ($serial->status == 'Available')
-                                                <span class="badge bg-success">
-                                                    Available
-                                                </span>
-                                            @elseif($serial->status == 'Sold')
-                                                <span class="badge bg-danger">
-                                                    Sold
-                                                </span>
-                                            @else
-                                                <span class="badge bg-warning text-dark">
-                                                    {{ $serial->status }}
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($serial->receive_date)
-                                                {{ \Carbon\Carbon::parse($serial->receive_date)->format('d-M-Y') }}
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="fa fa-barcode fa-3x text-muted"></i>
-                        <p class="mt-3 text-muted">
-                            No serial number found for this purchase item.
-                        </p>
-                    </div>
-                @endif
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        No Purchase History Found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" class="text-end">
+                                    Total
+                                </th>
+                                <th class="text-end">
+                                    {{ number_format($totalQty) }}
+                                </th>
+                                <th></th>
+                                <th class="text-end">
+                                    {{ number_format($totalValue, 2) }}
+                                </th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {{-- Pagination --}}
+                <div class="mt-3">
+                    {{ $items->links() }}
+                </div>
             </div>
         </div>
     </div>
