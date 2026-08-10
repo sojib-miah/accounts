@@ -50,14 +50,9 @@ class PartyController extends Controller
             }
         }
 
-        // Generate Party ID
-        $lastParty = Party::orderByDesc('party_id')->first();
-
-        $partyId = $lastParty ? ((int) $lastParty->party_id + 1) : 10001;
-
         Party::create([
             'company_id' => auth()->user()->company_id,
-            'party_id'   => $partyId,
+            'party_id'   => random_int(100000, 999999),
             'name'       => $request->name,
             'company_name'       => $request->company_name,
             'designation'       => $request->designation,
