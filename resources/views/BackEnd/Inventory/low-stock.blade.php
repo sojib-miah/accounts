@@ -76,7 +76,7 @@
                                             Current Low Stock Qty
                                         </div>
                                         <h3 class="mb-0 text-primary">
-                                            {{ number_format($lowStockQty, 2) }}
+                                            {{ number_format($lowStockQty) }}
                                         </h3>
                                     </div>
                                     <div>
@@ -210,18 +210,18 @@
                                     <td class="text-end">
                                         @if ($product->current_stock <= 0)
                                             <span class="badge bg-danger">
-                                                {{ number_format($product->current_stock, 2) }}
+                                                {{ number_format($product->current_stock) }}
                                             </span>
                                         @else
                                             <span class="badge bg-warning text-dark">
-                                                {{ number_format($product->current_stock, 2) }}
+                                                {{ number_format($product->current_stock) }}
                                             </span>
                                         @endif
                                     </td>
                                     {{-- MINIMUM STOCK --}}
                                     <td class="text-end">
                                         <span class="fw-semibold">
-                                            {{ number_format($product->minimum_stock, 2) }}
+                                            {{ number_format($product->minimum_stock) }}
                                         </span>
                                     </td>
                                     {{-- PURCHASE PRICE --}}
@@ -276,7 +276,7 @@
                                         Page Total:
                                     </th>
                                     <th class="text-end">
-                                        {{ number_format($products->sum('current_stock'), 2) }}
+                                        {{ number_format($products->sum('current_stock')) }}
                                     </th>
                                     <th></th>
                                     <th></th>

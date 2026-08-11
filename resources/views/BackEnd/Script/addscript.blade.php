@@ -28,8 +28,11 @@
                 addRow();
             }
         });
-        $('#addRow').on('click', function() {
+        $(document).on('click', '#addRow', function() {
             addRow();
+            setTimeout(function() {
+                $('#salesBody tr:last').find('.product').select2('open');
+            }, 200);
         });
 
         function serial() {
@@ -490,487 +493,148 @@
                 }
             );
         });
-        $(document).on(
-            'keydown',
-            '.qty',
-            function(e) {
-
-                if (
-                    e.key === 'Enter'
-                ) {
-
-                    e.preventDefault();
-
-
-                    $(this)
-                        .closest('tr')
-                        .find('.rate')
-                        .focus();
-
-                }
-
+        $(document).on('keydown', '.qty', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).closest('tr').find('.rate').focus();
             }
-        );
-
-
-        $(document).on(
-            'keydown',
-            '.rate',
-            function(e) {
-
-                if (
-                    e.key === 'Enter'
-                ) {
-
-                    e.preventDefault();
-
-
-                    $(this)
-                        .closest('tr')
-                        .find('.details')
-                        .focus();
-
-                }
-
+        });
+        $(document).on('keydown', '.rate', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).closest('tr').find('.details').focus();
             }
-        );
-
-
-        $(document).on(
-            'keydown',
-            '.details',
-            function(e) {
-
-                if (
-                    e.key === 'Enter'
-                ) {
-
-                    e.preventDefault();
-
-
-                    addRow();
-
-
-                    $('#salesBody tr:last')
-                        .find('.product')
-                        .focus();
-
-                }
-
+        });
+        $(document).on('keydown', '.details', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addRow();
+                $('#salesBody tr:last').find('.product').focus();
             }
-        );
-
-        $(document).on(
-            'focus',
-            '.qty,.rate,#discount,#vat',
-            function() {
-
-                $(this).on(
-                    'wheel.disableScroll',
-                    function(e) {
-
-                        e.preventDefault();
-
-                    }
+        });
+        $(document).on('focus', '.qty,.rate,#discount,#vat', function() {
+            $(this).on('wheel.disableScroll', function(e) {
+                e.preventDefault();
+            });
+        });
+        $(document).on('blur', '.qty,.rate,#discount,#vat', function() {
+            $(this).off(
+                'wheel.disableScroll'
+            );
+        });
+        $('#receiptForm').on('submit', function(e) {
+            let valid = true;
+            $('#salesBody tr').each(function() {
+                let row = $(this);
+                row.removeClass(
+                    'table-danger'
                 );
-
+                let product = row.find('.product').val();
+                let qty = parseFloat(row.find('.qty').val()) || 0;
+                let rate = row.find('.rate').val();
+                if (product === '' || qty <= 0 || rate === '') {
+                    valid = false;
+                    row.addClass(
+                        'table-danger'
+                    );
+                    return;
+                }
+                let serials = getRowSerials(row);
+                let stock = parseFloat(row.find('.stock').val()) || 0;
+                if (serials.length > 0 && serials.length !== qty) {
+                    valid = false;
+                    row.addClass('table-danger');
+                }
+            });
+            if (!valid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete Data',
+                    text: 'Please complete all product and serial information.'
+                });
+                return false;
             }
-        );
-
-
-        $(document).on(
-            'blur',
-            '.qty,.rate,#discount,#vat',
-            function() {
-
-                $(this).off(
-                    'wheel.disableScroll'
-                );
-
+        });
+        $(document).on('keydown', function(e) {
+            if (e.ctrlKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                $('#receiptForm').submit();
             }
-        );
-        $('#receiptForm').on(
-            'submit',
-            function(e) {
-
-                let valid = true;
-
-
-                $('#salesBody tr')
-                    .each(
-                        function() {
-
-                            let row =
-                                $(this);
-
-
-                            row.removeClass(
-                                'table-danger'
-                            );
-
-
-                            let product =
-                                row.find(
-                                    '.product'
-                                ).val();
-
-
-                            let qty =
-                                parseFloat(
-                                    row.find(
-                                        '.qty'
-                                    ).val()
-                                ) || 0;
-
-
-                            let rate =
-                                row.find(
-                                    '.rate'
-                                ).val();
-
-
-                            if (
-                                product === '' ||
-                                qty <= 0 ||
-                                rate === ''
-                            ) {
-
-                                valid = false;
-
-                                row.addClass(
-                                    'table-danger'
-                                );
-
-                                return;
-
-                            }
-
-                            let serials =
-                                getRowSerials(
-                                    row
-                                );
-
-
-                            let stock =
-                                parseFloat(
-                                    row.find(
-                                        '.stock'
-                                    ).val()
-                                ) || 0;
-
-
-                            if (
-                                serials.length > 0 &&
-                                serials.length !== qty
-                            ) {
-
-                                valid = false;
-
-                                row.addClass(
-                                    'table-danger'
-                                );
-
-                            }
-
+        });
+        $('#company_id').change(function() {
+            let company = $(this).val();
+            if (company === '') {
+                $('#branch_id')
+                    .html('<option value="">Select Branch</option>');
+                $('#name').text('');
+                return;
+            }
+            $.get(
+                '/admin/ajax/company/' + company + '/branches',
+                function(res) {
+                    $('#name')
+                        .text(res.company.name ?? '');
+                    let html = '<option value="">Select Branch</option>';
+                    $.each(
+                        res.branches,
+                        function(i, item) {
+                            html += '<option value="' + item.id + '">' + item.name + '</option>';
                         }
                     );
-
-
-                if (!valid) {
-
-                    e.preventDefault();
-
-
-                    Swal.fire({
-
-                        icon: 'warning',
-
-                        title: 'Incomplete Data',
-
-                        text: 'Please complete all product and serial information.'
-
+                    $('#branch_id').html(html).trigger('change');
+                }
+            );
+        });
+        $('#branch_id').change(function() {
+            let id = $(this).val();
+            if (id === '') {
+                $('#company_name').text('');
+                $('#branch_name').text('');
+                $('#branch_phone').text('');
+                $('#branch_email').text('');
+                $('#branch_address').text('');
+                return;
+            }
+            $.get('/admin/ajax/branch/' + id,
+                function(res) {
+                    $('#company_name').text(res.data.company_name ?? '');
+                    $('#branch_name').text(res.data.name);
+                    $('#branch_phone').text(res.data.phone);
+                    $('#branch_email').text(res.data.email);
+                    $('#branch_address').text(res.data.address);
+                    $('#salesBody tr').each(function() {
+                        let row = $(this);
+                        let productId = row.find('.product').val();
+                        if (productId) {
+                            loadSerialCount(row, productId);
+                        }
                     });
-
-
-                    return false;
-
                 }
-
+            );
+        });
+        $('#party_id').change(function() {
+            let id = $(this).val();
+            if (id === '') {
+                $('#party_id_text').text('');
+                $('#party_name').text('');
+                $('#party_phone').text('');
+                $('#party_address').text('');
+                $('#party_email').text('');
+                $('#party_designation').text('');
+                return;
             }
-        );
-
-
-        $(document).on(
-            'keydown',
-            function(e) {
-
-                if (
-                    e.ctrlKey &&
-                    e.key.toLowerCase() ===
-                    's'
-                ) {
-
-                    e.preventDefault();
-
-                    $('#receiptForm')
-                        .submit();
-
+            $.get('/admin/ajax/party/' + id,
+                function(res) {
+                    $('#party_id_text').text(res.data.id);
+                    $('#party_name').text(res.data.name);
+                    $('#party_email').text(res.data.email);
+                    $('#party_designation').text(res.data.designation);
+                    $('#party_phone').text(res.data.phone);
+                    $('#party_address').text(res.data.address);
                 }
-
-            }
-        );
-
-        $('#company_id').change(
-            function() {
-
-                let company =
-                    $(this).val();
-
-
-                if (
-                    company === ''
-                ) {
-
-                    $('#branch_id')
-                        .html(
-                            '<option value="">Select Branch</option>'
-                        );
-
-
-                    $('#name')
-                        .text('');
-
-
-                    return;
-
-                }
-
-
-                $.get(
-                    '/admin/ajax/company/' +
-                    company +
-                    '/branches',
-                    function(res) {
-
-                        $('#name')
-                            .text(
-                                res.company.name ??
-                                ''
-                            );
-
-
-                        let html =
-                            '<option value="">Select Branch</option>';
-
-
-                        $.each(
-                            res.branches,
-                            function(
-                                i,
-                                item
-                            ) {
-
-                                html +=
-                                    '<option value="' +
-                                    item.id +
-                                    '">' +
-                                    item.name +
-                                    '</option>';
-
-                            }
-                        );
-
-
-                        $('#branch_id')
-                            .html(html)
-                            .trigger('change');
-
-                    }
-                );
-
-            }
-        );
-
-        $('#branch_id').change(
-            function() {
-
-                let id =
-                    $(this).val();
-
-
-                if (
-                    id === ''
-                ) {
-
-                    $('#company_name')
-                        .text('');
-
-                    $('#branch_name')
-                        .text('');
-
-                    $('#branch_phone')
-                        .text('');
-
-                    $('#branch_email')
-                        .text('');
-
-                    $('#branch_address')
-                        .text('');
-
-                    return;
-
-                }
-
-
-                $.get(
-                    '/admin/ajax/branch/' +
-                    id,
-                    function(res) {
-
-                        $('#company_name')
-                            .text(
-                                res.data.company_name ??
-                                ''
-                            );
-
-
-                        $('#branch_name')
-                            .text(
-                                res.data.name
-                            );
-
-
-                        $('#branch_phone')
-                            .text(
-                                res.data.phone
-                            );
-
-
-                        $('#branch_email')
-                            .text(
-                                res.data.email
-                            );
-
-
-                        $('#branch_address')
-                            .text(
-                                res.data.address
-                            );
-
-                        $('#salesBody tr')
-                            .each(
-                                function() {
-
-                                    let row =
-                                        $(this);
-
-
-                                    let productId =
-                                        row.find(
-                                            '.product'
-                                        ).val();
-
-
-                                    if (
-                                        productId
-                                    ) {
-
-                                        loadSerialCount(
-                                            row,
-                                            productId
-                                        );
-
-                                    }
-
-                                }
-                            );
-
-                    }
-                );
-
-            }
-        );
-
-        $('#party_id').change(
-            function() {
-
-                let id =
-                    $(this).val();
-
-
-                if (
-                    id === ''
-                ) {
-
-                    $('#party_id_text')
-                        .text('');
-
-                    $('#party_name')
-                        .text('');
-
-                    $('#party_phone')
-                        .text('');
-
-                    $('#party_address')
-                        .text('');
-
-                    $('#party_email')
-                        .text('');
-
-                    $('#party_designation')
-                        .text('');
-
-                    return;
-
-                }
-
-
-                $.get(
-                    '/admin/ajax/party/' +
-                    id,
-                    function(res) {
-
-                        $('#party_id_text')
-                            .text(
-                                res.data.id
-                            );
-
-
-                        $('#party_name')
-                            .text(
-                                res.data.name
-                            );
-
-
-                        $('#party_email')
-                            .text(
-                                res.data.email
-                            );
-
-
-                        $('#party_designation')
-                            .text(
-                                res.data.designation
-                            );
-
-
-                        $('#party_phone')
-                            .text(
-                                res.data.phone
-                            );
-
-
-                        $('#party_address')
-                            .text(
-                                res.data.address
-                            );
-
-                    }
-                );
-
-            }
-        );
-
+            );
+        });
         calculate();
     </script>
 @endpush

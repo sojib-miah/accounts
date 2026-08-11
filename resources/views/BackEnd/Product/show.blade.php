@@ -3,7 +3,7 @@
 @section('title', 'Product Details')
 
 @section('content')
-    <div class="p-4">
+    <div class="p-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold">
                 Product Details
@@ -14,6 +14,7 @@
                     Edit
                 </a>
                 <a href="{{ route('product.index') }}" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left me-2"></i>
                     Back
                 </a>
             </div>
@@ -135,7 +136,7 @@
                                     Minimum Stock
                                 </th>
                                 <td>
-                                    {{ $product->minimum_stock }}
+                                    {{ number_format($product->minimum_stock) }}
                                 </td>
                             </tr>
                             <tr>
@@ -145,11 +146,11 @@
                                 <td>
                                     @if ($product->current_stock <= $product->minimum_stock)
                                         <span class="badge bg-danger">
-                                            {{ $product->current_stock }}
+                                            {{ number_format($product->current_stock) }}
                                         </span>
                                     @else
                                         <span class="badge bg-success">
-                                            {{ $product->current_stock }}
+                                            {{ number_format($product->current_stock) }}
                                         </span>
                                     @endif
                                 </td>

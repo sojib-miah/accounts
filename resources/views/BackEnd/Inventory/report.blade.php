@@ -84,7 +84,7 @@
                                             Received Qty
                                         </small>
                                         <h4 class="mb-0 text-info">
-                                            {{ number_format($totalReceivedQty, 2) }}
+                                            {{ number_format($totalReceivedQty) }}
                                         </h4>
                                     </div>
                                     <i class="fa fa-arrow-down fa-2x text-info"></i>
@@ -102,7 +102,7 @@
                                             Current Stock
                                         </small>
                                         <h4 class="mb-0 text-warning">
-                                            {{ number_format($totalCurrentStock, 2) }}
+                                            {{ number_format($totalCurrentStock) }}
                                         </h4>
                                     </div>
                                     <i class="fa fa-cubes fa-2x text-warning"></i>
@@ -202,7 +202,7 @@
                                         {{ $product->unit ?? '-' }}
                                     </td>
                                     <td class="text-end">
-                                        {{ number_format($receivedQty, 2) }}
+                                        {{ number_format($receivedQty) }}
                                     </td>
                                     <td class="text-end">
                                         {{ number_format($product->purchase_price, 2) }}
@@ -213,11 +213,11 @@
                                     <td class="text-end">
                                         @if ($product->current_stock <= 0)
                                             <span class="badge bg-danger">
-                                                {{ number_format($product->current_stock, 2) }}
+                                                {{ number_format($product->current_stock) }}
                                             </span>
                                         @else
                                             <strong>
-                                                {{ number_format($product->current_stock, 2) }}
+                                                {{ number_format($product->current_stock) }}
                                             </strong>
                                         @endif
                                     </td>
@@ -251,12 +251,11 @@
                                                             $item->receipt->is_receive == true;
                                                     })->sum('qty');
                                             }),
-                                            2,
                                         ) }}
                                     </th>
                                     <th colspan="2"></th>
                                     <th class="text-end">
-                                        {{ number_format($products->sum('current_stock'), 2) }}
+                                        {{ number_format($products->sum('current_stock')) }}
                                     </th>
                                     <th class="text-end">
                                         {{ number_format(

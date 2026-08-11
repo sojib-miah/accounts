@@ -179,6 +179,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
     Route::get('/sales/order/{receipt}/pdf', [SalesOrderController::class, 'pdf'])->name('sales.order.pdf');
     Route::get('/ajax/product/{product}/available-serials', [SalesOrderController::class, 'availableSerials'])->name('ajax.product.availableSerials');
+    Route::get('/sales-order/{receipt}/product/{product}/serials', [SalesOrderController::class, 'serials'])->name('sales.order.serials');
 
     Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
 

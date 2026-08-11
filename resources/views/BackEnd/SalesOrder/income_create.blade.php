@@ -273,20 +273,8 @@
                 <select name="product_id[]" class="form-select product select2" required>
                     <option value="">Select Product</option>
                     @foreach($products as $product)
-                        <option
-                            value="{{ $product->id }}"
-                            data-stock="{{ $product->current_stock }}"
-                            data-price="{{ $product->sale_price }}"
-                            data-code="{{ $product->product_code }}"
-                            data-unit="{{ $product->unit }}">
-                            {{ $product->sku }}
-                            -
-                            {{ $product->name }}
-                            (Stock:
-                            {{ number_format(
-                                $product->current_stock,
-                                2
-                            ) }})
+                        <option value="{{ $product->id }}" data-stock="{{ $product->current_stock }}" data-price="{{ $product->sale_price }}" data-code="{{ $product->product_code }}" data-unit="{{ $product->unit }}">
+                            {{ $product->sku }}-{{ $product->name }}(Stock:{{ number_format($product->current_stock) }})
                         </option>
                     @endforeach
                 </select>

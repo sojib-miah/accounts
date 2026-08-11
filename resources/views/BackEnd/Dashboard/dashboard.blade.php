@@ -4,6 +4,30 @@
 
 @section('content')
     <div class="mx-5 py-4">
+        <div class="d-flex justify-content-end align-items-center mt-3">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 10px;">
+                    <p class="text-primary mb-0">
+                        <strong>Package:</strong>
+                        {{ $package?->package?->name ?? 'No Package' }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Start:</strong>
+                        {{ $package?->start_date?->format('d M Y') }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Expire:</strong>
+                        {{ $package?->package?->end_date?->format('d M Y') }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Status:</strong>
+                        <span class="badge bg-success">
+                            {{ $package?->status ?? 'Inactive' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
         <!-- ================= Header ================= -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -14,31 +38,6 @@
                 <small class="text-muted">
                     Income • Expense • Cash Flow • Reports
                 </small>
-            </div>
-            <div class="card shadow-sm mt-5">
-                <div class="card-body">
-                    <p class="text-primary">
-                        <strong>Package:</strong>
-                        {{ $package?->package?->name ?? 'No Package' }}
-                    </p>
-
-                    <p>
-                        <strong>Start:</strong>
-                        {{ $package?->start_date?->format('d M Y') }}
-                    </p>
-
-                    <p>
-                        <strong>Expire:</strong>
-                        {{ $package?->package?->end_date?->format('d M Y') }}
-                    </p>
-
-                    <p>
-                        <strong>Status:</strong>
-                        <span class="badge bg-success">
-                            {{ $package?->status ?? 'Inactive' }}
-                        </span>
-                    </p>
-                </div>
             </div>
             <div>
                 <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger btn-sm" target="_blank">

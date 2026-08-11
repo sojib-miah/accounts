@@ -147,11 +147,11 @@
                                 <td>
                                     @if ($product->current_stock <= $product->minimum_stock)
                                         <span class="badge bg-danger">
-                                            {{ $product->current_stock }}
+                                            {{ number_format($product->current_stock) }}
                                         </span>
                                     @else
                                         <span class="badge bg-success">
-                                            {{ $product->current_stock }}
+                                            {{ number_format($product->current_stock) }}
                                         </span>
                                     @endif
                                 </td>

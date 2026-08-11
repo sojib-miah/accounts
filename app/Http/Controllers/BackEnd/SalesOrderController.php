@@ -240,8 +240,7 @@ class SalesOrderController extends Controller
                 ]);
 
                 foreach ($serials as $serial) {
-                    $serialRecord =
-                        SerialNumber::where('company_id', $companyId)
+                    $serialRecord = SerialNumber::where('company_id', $companyId)
                         ->where('product_id', $productId)
                         ->where('serial_no', $serial)
                         ->where('status', 'Available')->lockForUpdate()->first();
@@ -310,7 +309,8 @@ class SalesOrderController extends Controller
             'party',
             'creator',
             'items.category',
-            'items.accountHead'
+            'items.accountHead',
+            'items.serialNumbers',
         ]);
         $companies = Company::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
             $q->where('id', Auth::user()->company_id);
@@ -353,6 +353,7 @@ class SalesOrderController extends Controller
                 'qty'        => $item->qty,
                 'rate'       => $item->rate,
                 'details'    => $item->details,
+                'serials' => $item->serialNumbers->pluck('serial_no')->values()->toArray(),
             ];
         })->values();
         return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'products', 'receiptItems', 'companies', 'oldItems'));
@@ -361,64 +362,96 @@ class SalesOrderController extends Controller
     public function update(Request $request, Receipt $receipt)
     {
         $request->validate([
-            'branch_id' => 'required|exists:branches,id',
-            'party_id' => 'required|exists:parties,id',
-            'receipt_date' => 'required|date',
-            'product_id' => 'required|array|min:1',
-            'product_id.*' => 'required|exists:products,id',
-            'qty' => 'required|array',
-            'qty.*' => 'required|numeric|min:1',
-            'rate' => 'required|array',
-            'rate.*' => 'required|numeric|min:0',
-            'discount' => 'nullable|numeric|min:0',
-            'vat' => 'nullable|numeric|min:0',
+            'company_id'       => 'nullable|exists:companies,id',
+            'branch_id'        => 'required|exists:branches,id',
+            'party_id'         => 'required|exists:parties,id',
+            'receipt_date'     => 'required|date',
+            'product_id'       => 'required|array|min:1',
+            'product_id.*'     => 'required|exists:products,id',
+            'qty'              => 'required|array',
+            'qty.*'            => 'required|numeric|min:1',
+            'rate'             => 'required|array',
+            'rate.*'           => 'required|numeric|min:0',
+            'serial_json'      => 'nullable|array',
+            'serial_json.*'    => 'nullable',
+            'details'          => 'nullable|array',
+            'details.*'        => 'nullable|string',
+            'discount'         => 'nullable|numeric|min:0',
+            'vat'              => 'nullable|numeric|min:0',
         ]);
+
+        if ($receipt->status === 'Cancelled') {
+            return back()->with('error', 'Cancelled Sales Order cannot be updated.');
+        }
         DB::beginTransaction();
         try {
-            foreach ($receipt->items as $oldItem) {
-                Product::where(
-                    'id',
-                    $oldItem->product_id
-                )->increment(
-                    'current_stock',
-                    $oldItem->qty
-                );
+            $user = auth()->user();
+            $userId = $user->id;
+            $companyId = $receipt->company_id;
+            if ($request->filled('company_id')) {
+                $companyId = $request->company_id;
             }
-            SerialNumber::where('receipt_id', $receipt->id)
-                ->update([
-                    'status' => 'Available',
-                    'sale_date' => null,
-                    'receipt_id' => null,
-                    'receipt_item_id' => null,
-                    'updated_by' => auth()->id(),
-                ]);
+            if (!$user->hasRole('Super-Admin')) {
+                if ($companyId != $user->company_id) {
+                    throw new \Exception('You are not allowed to update this Sales Order.');
+                }
+            }
+            $productIds = $request->product_id;
+            if (count($productIds) !== count(array_unique($productIds))) {
+                throw new \Exception('Duplicate product found in Sales Order.');
+            }
+            foreach ($receipt->items as $oldItem) {
+                Product::where('id', $oldItem->product_id)->increment('current_stock', $oldItem->qty);
+            }
+            SerialNumber::where('receipt_id', $receipt->id)->update([
+                'status' => 'Available',
+                'sale_date' => null,
+                'receipt_id' => null,
+                'receipt_item_id' => null,
+                'updated_by' => $userId,
+            ]);
             StockTransaction::where('receipt_id', $receipt->id)->delete();
             $receipt->items()->delete();
             $totalQty = 0;
             $subTotal = 0;
-            foreach ($request->product_id as $key => $productId) {
-                $product = Product::findOrFail($productId);
-                $qty = (float)$request->qty[$key];
-                if ($qty > $product->current_stock) {
-                    throw new \Exception(
-                        $product->name .
-                            ' available stock is only '
-                            . $product->current_stock
-                    );
+            foreach ($productIds as $key => $productId) {
+                $product = Product::where('id', $productId)->lockForUpdate()->firstOrFail();
+                if (!$user->hasRole('Super-Admin') && $product->company_id != $companyId) {
+                    throw new \Exception("Product {$product->name} does not belong to your company.");
+                }
+                $qty = (float) $request->qty[$key];
+                $rate = (float) $request->rate[$key];
+                if ($qty > (float) $product->current_stock) {
+                    throw new \Exception($product->name . ' available stock is only ' . $product->current_stock);
                 }
                 $totalQty += $qty;
-                $subTotal +=
-                    $qty * $request->rate[$key];
+                $subTotal += ($qty * $rate);
             }
-            $discount = $request->discount ?? 0;
-            $vatPercent = $request->vat ?? 0;
-            $afterDiscount =
-                $subTotal - $discount;
-            $vatAmount =
-                ($afterDiscount * $vatPercent) / 100;
-            $grandTotal =
-                $afterDiscount + $vatAmount;
+            $discount = (float) ($request->discount ?? 0);
+            if ($discount > $subTotal) {
+                $discount = $subTotal;
+            }
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            if ($afterDiscount < 0) {
+                $afterDiscount = 0;
+            }
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grandTotal = $afterDiscount + $vatAmount;
+            $paidAmount = (float) ($receipt->paid_amount ?? 0);
+            $dueAmount = $grandTotal - $paidAmount;
+            if ($dueAmount < 0) {
+                $dueAmount = 0;
+            }
+            if ($paidAmount <= 0) {
+                $paymentStatus = 'Pending';
+            } elseif ($paidAmount >= $grandTotal) {
+                $paymentStatus = 'Paid';
+            } else {
+                $paymentStatus = 'Partial';
+            }
             $receipt->update([
+                'company_id' => $companyId,
                 'branch_id' => $request->branch_id,
                 'party_id' => $request->party_id,
                 'receipt_date' => $request->receipt_date,
@@ -428,105 +461,94 @@ class SalesOrderController extends Controller
                 'discount' => $discount,
                 'vat' => $vatPercent,
                 'total_amount' => $grandTotal,
-                'due_amount' =>
-                $grandTotal -
-                    $receipt->paid_amount,
-                'updated_by' => auth()->id()
+                'paid_amount' => $paidAmount,
+                'due_amount' => $dueAmount,
+                'payment_status' => $paymentStatus,
+                'updated_by' => $userId,
             ]);
-
-            foreach ($request->product_id as $key => $productId) {
-                $product = Product::findOrFail($productId);
-                $qty = $request->qty[$key];
-                $rate = $request->rate[$key];
-                $amount =
-                    $qty * $rate;
+            $usedSerials = [];
+            foreach ($productIds as $key => $productId) {
+                $product = Product::where('id', $productId)->lockForUpdate()->firstOrFail();
+                $qty = (float) $request->qty[$key];
+                $rate = (float) $request->rate[$key];
+                $amount = $qty * $rate;
+                $serialJson = $request->serial_json[$key] ?? '[]';
+                $serials = json_decode($serialJson, true);
+                if (!is_array($serials)) {
+                    $serials = [];
+                }
+                $serials = collect($serials)
+                    ->map(function ($serial) {
+                        return strtoupper(
+                            trim((string) $serial)
+                        );
+                    })
+                    ->filter(function ($serial) {
+                        return $serial !== '';
+                    })->values()->toArray();
+                if (count($serials) !== count(array_unique($serials))) {
+                    throw new \Exception('Duplicate serial number found for product: ' . $product->name);
+                }
+                foreach ($serials as $serial) {
+                    if (in_array($serial, $usedSerials, true)) {
+                        throw new \Exception("Serial Number {$serial} has been selected more than once.");
+                    }
+                    $usedSerials[] = $serial;
+                }
+                $availableSerialCount = SerialNumber::where('company_id', $companyId)->where('product_id', $productId)->where('status', 'Available')->count();
+                if ($availableSerialCount > 0) {
+                    if (count($serials) != (int) $qty) {
+                        throw new \Exception("Please select exactly {$qty} serial number(s) for {$product->name}. " . "Selected: " . count($serials));
+                    }
+                }
                 $receiptItem = ReceiptItem::create([
                     'receipt_id' => $receipt->id,
                     'product_id' => $productId,
                     'qty' => $qty,
                     'rate' => $rate,
                     'amount' => $amount,
-                    'details' =>
-                    $request->details[$key] ?? null,
+                    'details' => $request->details[$key] ?? null,
                 ]);
-                $serials = json_decode($request->serial_json[$key] ?? '[]', true);
-
-                if (!is_array($serials)) {
-                    throw new \Exception('Invalid serial data.');
-                }
-
-                if (count($serials) != $qty) {
-                    throw new \Exception(
-                        $product->name . ' serial quantity mismatch.'
-                    );
-                }
-
-                if (count($serials) !== count(array_unique($serials))) {
-                    throw new \Exception(
-                        'Duplicate serial selected.'
-                    );
-                }
-                $count = SerialNumber::where('company_id', auth()->user()->company_id)
-                    ->where('product_id', $productId)
-                    ->where('status', 'Available')
-                    ->whereIn('serial_no', $serials)
-                    ->count();
-
-                if ($count != count($serials)) {
-                    throw new \Exception(
-                        'Some serials are unavailable.'
-                    );
-                }
                 foreach ($serials as $serial) {
-
-                    SerialNumber::where('company_id', auth()->user()->company_id)
+                    $serialRecord = SerialNumber::where('company_id', $companyId)
                         ->where('product_id', $productId)
                         ->where('serial_no', $serial)
-                        ->where('status', 'Available')
-                        ->update([
-                            'status' => 'Sold',
-                            'sale_date' => today(),
-                            'receipt_id' => $receipt->id,
-                            'receipt_item_id' => $receiptItem->id,
-                            'updated_by' => auth()->id(),
-                        ]);
+                        ->where('status', 'Available')->lockForUpdate()->first();
+                    if (!$serialRecord) {
+                        throw new \Exception("Serial Number {$serial} is no longer available.");
+                    }
+                    $serialRecord->update([
+                        'status' => 'Sold',
+                        'sale_date' => today(),
+                        'receipt_id' => $receipt->id,
+                        'receipt_item_id' => $receiptItem->id,
+                        'updated_by' => $userId,
+                    ]);
                 }
-                $product->decrement(
-                    'current_stock',
-                    $qty
-                );
+                if ($qty > (float) $product->current_stock) {
+                    throw new \Exception($product->name . ' available stock is only ' . $product->current_stock);
+                }
+                $product->decrement('current_stock', $qty);
+                $product->refresh();
                 StockTransaction::create([
-                    'company_id' => $receipt->company_id,
-                    'branch_id' => $receipt->branch_id,
-                    'product_id' => $productId,
+                    'company_id' => $companyId,
+                    'branch_id' => $request->branch_id,
+                    'product_id' => $product->id,
                     'receipt_id' => $receipt->id,
                     'transaction_type' => 'Sale',
                     'stock_in' => 0,
                     'stock_out' => $qty,
-                    'balance' =>
-                    $product->fresh()->current_stock,
-                    'transaction_date' =>
-                    $receipt->receipt_date,
-                    'remarks' => 'Sales Update',
-                    'created_by' => auth()->id()
+                    'balance' => $product->current_stock,
+                    'transaction_date' => $request->receipt_date,
+                    'remarks' => 'Sales Order Update',
+                    'created_by' => $userId,
                 ]);
             }
-            if ($receipt->paid_amount <= 0) {
-                $receipt->payment_status = 'Pending';
-            } elseif (
-                $receipt->paid_amount <
-                $receipt->total_amount
-            ) {
-                $receipt->payment_status = 'Partial';
-            } else {
-                $receipt->payment_status = 'Paid';
-            }
-            $receipt->save();
             DB::commit();
             return redirect()->route('sales.order.show', $receipt)->with('success', 'Sales Order Updated Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -811,6 +833,40 @@ class SalesOrderController extends Controller
             ],
             'serials' => $serials,
             'count' => $serials->count(),
+        ]);
+    }
+
+    public function serials(Receipt $receipt, Product $product)
+    {
+        $user = auth()->user();
+        if (!$user->hasRole('Super-Admin')) {
+            if ($product->company_id != $user->company_id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized product.'], 403);
+            }
+            if ($receipt->company_id != $user->company_id) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized sales order.'], 403);
+            }
+        }
+        $serials = SerialNumber::where('company_id', $receipt->company_id)
+            ->where('product_id', $product->id)
+            ->where(function ($query) use ($receipt) {
+                $query->where('status', 'Available')
+                    ->orWhere(function ($q) use ($receipt) {
+                        $q->where('status', 'Sold')
+                            ->where('receipt_id', $receipt->id);
+                    });
+            })->orderBy('serial_no')->get(['id', 'serial_no', 'status', 'receipt_id']);
+
+        return response()->json([
+            'success' => true,
+            'serials' => $serials->map(function ($serial) {
+                return [
+                    'id' => $serial->id,
+                    'serial_no' => $serial->serial_no,
+                    'status' => $serial->status,
+                    'selected' => $serial->status === 'Sold',
+                ];
+            })->values(),
         ]);
     }
 }

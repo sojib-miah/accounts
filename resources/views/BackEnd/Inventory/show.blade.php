@@ -196,11 +196,13 @@
                                     </td>
                                     <td>
                                         @if ($item->serialNumbers->count())
-                                            @foreach ($item->serialNumbers as $serial)
-                                                <span class="badge bg-light text-dark border me-1 mb-1">
-                                                    {{ $serial->serial_no }}
-                                                </span>
-                                            @endforeach
+                                            <div style="max-width: 350px; white-space: normal; word-break: break-word;">
+                                                @foreach ($item->serialNumbers as $serial)
+                                                    <span class="badge bg-light text-dark border me-1 mb-1">
+                                                        {{ $serial->serial_no }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         @else
                                             <span class="text-muted">
                                                 No Serial

@@ -108,7 +108,30 @@ class WarehouseController extends Controller
         }
         DB::beginTransaction();
         try {
-            $receipt->load('items.product');
+            $receipt->load([
+                'items.product',
+                'items.serialNumbers'
+            ]);
+            foreach ($receipt->items as $item) {
+                $product = $item->product;
+                $qty = (int) $item->qty;
+                $serialCount = $item->serialNumbers->count();
+                if ($serialCount === 0) {
+                    throw new \Exception('Serial number is required for ' . $product->name . '. Please add serial number before receiving.');
+                }
+                if ($serialCount !== $qty) {
+                    throw new \Exception('Serial quantity does not match Qty for ' . $product->name . '. ' . 'Qty: ' . $qty . ', Serial: ' . $serialCount);
+                }
+                $serials = $item->serialNumbers->pluck('serial_no')
+                    ->map(function ($serial) {
+                        return strtoupper(
+                            trim($serial)
+                        );
+                    })->filter()->values()->toArray();
+                if (count($serials) !== count(array_unique($serials))) {
+                    throw new \Exception('Duplicate serial number found for ' . $product->name);
+                }
+            }
             foreach ($receipt->items as $item) {
                 $product = $item->product;
                 $product->increment('current_stock', $item->qty);
@@ -116,30 +139,29 @@ class WarehouseController extends Controller
                 $product->save();
                 $product->refresh();
                 StockTransaction::create([
-                    'company_id'       => $receipt->company_id,
-                    'branch_id'        => $receipt->branch_id,
-                    'product_id'       => $product->id,
-                    'receipt_id'       => $receipt->id,
+                    'company_id' => $receipt->company_id,
+                    'branch_id' => $receipt->branch_id,
+                    'product_id' => $product->id,
+                    'receipt_id' => $receipt->id,
                     'transaction_type' => 'Purchase',
-                    'stock_in'         => $item->qty,
-                    'stock_out'        => 0,
-                    'balance'          => $product->current_stock,
+                    'stock_in' => $item->qty,
+                    'stock_out' => 0,
+                    'balance' => $product->current_stock,
                     'transaction_date' => $receipt->receipt_date,
-                    'remarks'          => 'Purchase Receive',
-                    'created_by'       => auth()->id(),
+                    'remarks' => 'Purchase Receive',
+                    'created_by' => auth()->id(),
                 ]);
-                SerialNumber::where('receipt_item_id', $item->id)
-                    ->update([
-                        'status'       => 'Available',
-                        'receive_date' => today(),
-                        'updated_by'   => auth()->id(),
-                    ]);
+                SerialNumber::where('receipt_item_id', $item->id)->update([
+                    'status' => 'Available',
+                    'receive_date' => today(),
+                    'updated_by' => auth()->id(),
+                ]);
             }
             $receipt->update([
-                'is_receive'   => true,
+                'is_receive' => true,
                 'received_date' => now()->toDateString(),
-                'received_by'  => auth()->id(),
-                'status'       => 'Completed'
+                'received_by' => auth()->id(),
+                'status' => 'Completed',
             ]);
             DB::commit();
             return redirect()->route('warehouse.index')->with('success', 'Goods received successfully.');
