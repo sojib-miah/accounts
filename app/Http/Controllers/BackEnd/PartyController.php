@@ -34,7 +34,7 @@ class PartyController extends Controller
     {
         $request->validateWithBag('add', [
             'name'    => 'required|max:255',
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -71,7 +71,7 @@ class PartyController extends Controller
     {
         $request->validateWithBag('edit', [
             'name'    => 'required|max:255',
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
             'address' => 'nullable|string',

@@ -46,9 +46,7 @@
                                 <div class="row">
                                     {{-- company --}}
                                     <div class="col-md-4">
-                                        <label class="form-label">
-                                            Company Name <span class="text-danger">*</span>
-                                        </label>
+                                        <label class="form-label">Company Name <span class="text-danger">*</span></label>
                                         <select name="company_id" id="company_id" class="form-select select2" required>
                                             <option value="">Select Company</option>
                                             @foreach ($companies as $company)
@@ -63,13 +61,9 @@
                                     </div>
                                     <!-- Branch -->
                                     <div class="col-md-4">
-                                        <label class="form-label">
-                                            Branch Name <span class="text-danger">*</span>
-                                        </label>
+                                        <label class="form-label">Branch Name <span class="text-danger">*</span></label>
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
-                                            <option value="">
-                                                Select Branch
-                                            </option>
+                                            <option value="">Select Branch</option>
                                         </select>
                                         <div class="mt-3">
                                             <p class="mb-1"><b>Company Name :</b> <span id="company_name"></span></p>
@@ -85,9 +79,7 @@
                                             Customer Name <span class="text-danger">*</span>
                                         </label>
                                         <select name="party_id" id="party_id" class="form-select select2" required>
-                                            <option value="">
-                                                Select Customer
-                                            </option>
+                                            <option value="">Select Customer</option>
                                             @foreach ($parties as $party)
                                                 <option value="{{ $party->id }}">
                                                     {{ $party->name }}
@@ -96,8 +88,7 @@
                                         </select>
                                         <div class="mt-3">
                                             <p class="mb-1"><b>Name :</b> <span id="party_name"></span></p>
-                                            <p class="mb-1"><b>Designation :</b> <span id="party_designation"></span>
-                                            </p>
+                                            <p class="mb-1"><b>Designation :</b> <span id="party_designation"></span></p>
                                             <p class="mb-1"><b>Mobile :</b> <span id="party_phone"></span></p>
                                             <p class="mb-1"><b>E-mail :</b> <span id="party_email"></span></p>
                                             <p class="mb-1"><b>Address :</b> <span id="party_address"></span></p>
@@ -138,15 +129,13 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- ========================= --}}
                         {{-- Total --}}
-                        {{-- ========================= --}}
                         <div class="row mt-4">
                             <div class="col-md-8">
                                 <label>Remarks</label>
                                 <textarea name="remarks" rows="5" class="form-control"></textarea>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 border">
                                 <table class="table table-bordered">
                                     <tr>
                                         <th>Total Qty</th>

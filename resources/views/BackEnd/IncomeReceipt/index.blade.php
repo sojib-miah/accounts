@@ -71,30 +71,14 @@
                             <thead>
                                 <tr>
                                     <th>SN</th>
-                                    <th class="text-center">
-                                        Sales Order No
-                                    </th>
-                                    <th class="text-center">
-                                        Challan No
-                                    </th>
-                                    <th class="text-center">
-                                        Invoice No
-                                    </th>
-                                    <th class="text-center">
-                                        Customer
-                                    </th>
-                                    <th class="text-center">
-                                        Created BY
-                                    </th>
-                                    <th class="text-center">
-                                        DATE & TIME
-                                    </th>
-                                    <th class="text-center">
-                                        STATUS
-                                    </th>
-                                    <th class="text-center" width="90">
-                                        ACTION
-                                    </th>
+                                    <th class="text-center">Sales Order No</th>
+                                    <th class="text-center">Challan No</th>
+                                    <th class="text-center">Invoice No</th>
+                                    <th class="text-center">Customer</th>
+                                    <th class="text-center">Created BY</th>
+                                    <th class="text-center">DATE & TIME</th>
+                                    <th class="text-center">STATUS</th>
+                                    <th class="text-center" width="90">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -105,36 +89,32 @@
                                         <td class="text-center">
                                             <a href="{{ route('income.receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->so_no }}
+                                                {{ $receipt->so_no ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('income.receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->dm_no }}
+                                                {{ $receipt->dm_no ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('income.receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->inv_no }}
+                                                {{ $receipt->inv_no ?? '-' }}
                                             </a>
                                         </td>
                                         {{-- Payee --}}
                                         <td class="text-center">
                                             <a href="{{ route('income.party.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
-                                                {{ $receipt->party->name }}
+                                                {{ $receipt->party->name ?? '-' }}
                                             </a>
                                         </td>
                                         {{-- Receipt By --}}
-                                        <td class="text-center">
-                                            {{ $receipt->creator->name ?? '-' }}
-                                        </td>
+                                        <td class="text-center">{{ $receipt->creator->name ?? '-' }}</td>
                                         {{-- Date Time --}}
-                                        <td class="text-center">
-                                            {{ $receipt->created_at->format('d-m-Y h:i A') }}
-                                        </td>
+                                        <td class="text-center">{{ $receipt->created_at->format('d-m-Y h:i A') }}</td>
                                         {{-- Payment Status --}}
                                         <td class="text-center">
                                             @if ($receipt->payment_status == 'Paid')

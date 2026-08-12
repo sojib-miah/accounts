@@ -6,35 +6,30 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Payee List</h4>
+                <h4 class="mb-0">Customer List</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('party.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search Payee List">
-
+                            placeholder="Search Customer List">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
                         @if (request('search'))
                             <a href="{{ route('party.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('payee-list-create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPartyModal">
                             <i class="fa fa-plus me-2"></i>
-                            Add Payee
+                            Add Customer
                         </button>
                     @endcan
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -42,8 +37,8 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
-                                    <th>Payee ID</th>
-                                    <th>Payee Name</th>
+                                    <th>Customer ID</th>
+                                    <th>Customer Name</th>
                                     <th>Company Name</th>
                                     <th>Designation</th>
                                     <th>Phone</th>
@@ -113,8 +108,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">
-                                            No Payee Found.
+                                        <td colspan="12" class="text-center">
+                                            No Customer Found.
                                         </td>
                                     </tr>
                                 @endforelse

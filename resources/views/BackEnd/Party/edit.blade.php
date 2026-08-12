@@ -6,17 +6,25 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        Edit Payee
-                    </h5>
+                    <h5 class="modal-title">Edit Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <!-- Payee Name -->
+                        <!-- company Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Payee Name <span class="text-danger">*</span>
+                                Company Name
+                            </label>
+                            <input type="text" name="company_name" class="form-control" id="edit_company_name">
+                            @error('company_name', 'edit')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <!-- Customer Name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Customer Name <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name" id="edit_name" class="form-control" required>
                             @error('name', 'edit')
@@ -25,9 +33,7 @@
                         </div>
                         <!-- designation -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Designation
-                            </label>
+                            <label class="form-label">Designation</label>
                             <input type="text" name="designation" id="edit_designation" class="form-control">
                             @error('designation', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -35,9 +41,7 @@
                         </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Phone
-                            </label>
+                            <label class="form-label">Phone</label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
                             @error('phone', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -45,9 +49,7 @@
                         </div>
                         <!-- Email -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Email
-                            </label>
+                            <label class="form-label">Email</label>
                             <input type="email" name="email" id="edit_email" class="form-control">
                             @error('email', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -55,9 +57,7 @@
                         </div>
                         <!-- Status -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Status
-                            </label>
+                            <label class="form-label">Status</label>
                             <select name="status" id="edit_status" class="form-select select2">
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
@@ -66,21 +66,9 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <!-- company Name -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Company Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="company_name" class="form-control" id="edit_company_name">
-                            @error('company_name', 'edit')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Address
-                            </label>
+                            <label class="form-label">Address</label>
                             <textarea name="address" id="edit_address" rows="3" class="form-control"></textarea>
                             @error('address', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -89,12 +77,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fa fa-save me-1"></i>
-                        Update Payee
+                        Update Customer
                     </button>
                 </div>
             </form>

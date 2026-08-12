@@ -30,15 +30,11 @@
                 <form method="GET" action="{{ route('inventory.report') }}" class="mb-4">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-3">
-                            <label class="form-label">
-                                From Date
-                            </label>
+                            <label class="form-label">From Date</label>
                             <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">
-                                To Date
-                            </label>
+                            <label class="form-label">To Date</label>
                             <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                         </div>
                         <div class="col-md-1">
@@ -62,12 +58,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <small class="text-muted">
-                                            Total Products
-                                        </small>
-                                        <h4 class="mb-0 text-primary">
-                                            {{ number_format($totalProducts) }}
-                                        </h4>
+                                        <small class="text-muted">Total Products</small>
+                                        <h4 class="mb-0 text-primary">{{ number_format($totalProducts) }}</h4>
                                     </div>
                                     <i class="fa fa-boxes fa-2x text-primary"></i>
                                 </div>
@@ -80,12 +72,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <small class="text-muted">
-                                            Received Qty
-                                        </small>
-                                        <h4 class="mb-0 text-info">
-                                            {{ number_format($totalReceivedQty) }}
-                                        </h4>
+                                        <small class="text-muted">Received Qty</small>
+                                        <h4 class="mb-0 text-info">{{ number_format($totalReceivedQty) }}</h4>
                                     </div>
                                     <i class="fa fa-arrow-down fa-2x text-info"></i>
                                 </div>
@@ -98,12 +86,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <small class="text-muted">
-                                            Current Stock
-                                        </small>
-                                        <h4 class="mb-0 text-warning">
-                                            {{ number_format($totalCurrentStock) }}
-                                        </h4>
+                                        <small class="text-muted">Current Stock</small>
+                                        <h4 class="mb-0 text-warning">{{ number_format($totalCurrentStock) }}</h4>
                                     </div>
                                     <i class="fa fa-cubes fa-2x text-warning"></i>
                                 </div>
@@ -116,12 +100,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <small class="text-muted">
-                                            Current Stock Value
-                                        </small>
-                                        <h4 class="mb-0 text-success">
-                                            {{ number_format($totalStockValue, 2) }}
-                                        </h4>
+                                        <small class="text-muted">Current Stock Value</small>
+                                        <h4 class="mb-0 text-success">{{ number_format($totalStockValue, 2) }}</h4>
                                     </div>
                                     <i class="fa fa-money-bill-wave fa-2x text-success"></i>
                                 </div>
@@ -133,39 +113,18 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="50">
-                                    SL
-                                </th>
-                                <th>
-                                    Product Code
-                                </th>
-                                <th>
-                                    Product
-                                </th>
-                                <th>
-                                    Category
-                                </th>
-                                <th>
-                                    Brand
-                                </th>
-                                <th>
-                                    Unit
-                                </th>
-                                <th class="text-end">
-                                    Received Qty
-                                </th>
-                                <th class="text-end">
-                                    Purchase Price
-                                </th>
-                                <th class="text-end">
-                                    Sale Price
-                                </th>
-                                <th class="text-end">
-                                    Current Stock
-                                </th>
-                                <th class="text-end">
-                                    Stock Value
-                                </th>
+                                <th width="50">SN</th>
+                                <th>Product Code</th>
+                                <th>Part No</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Product</th>
+                                <th>Unit</th>
+                                <th class="text-end">Received Qty</th>
+                                <th class="text-end">Purchase Price</th>
+                                <th class="text-end">Sale Price</th>
+                                <th class="text-end">Current Stock</th>
+                                <th class="text-end">Stock Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -181,57 +140,29 @@
                                     $stockValue = $product->current_stock * $product->purchase_price;
                                 @endphp
                                 <tr>
-                                    <td>
-                                        {{ $products->firstItem() + $loop->index }}
-                                    </td>
-                                    <td>
-                                        {{ $product->product_code ?? ($product->sku ?? '-') }}
-                                    </td>
-                                    <td>
-                                        <strong>
-                                            {{ $product->name }}
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        {{ $product->category->name ?? '-' }}
-                                    </td>
-                                    <td>
-                                        {{ $product->brand->name ?? '-' }}
-                                    </td>
-                                    <td>
-                                        {{ $product->unit ?? '-' }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($receivedQty) }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($product->purchase_price, 2) }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($product->sale_price, 2) }}
-                                    </td>
+                                    <td>{{ $products->firstItem() + $loop->index }}</td>
+                                    <td>{{ $product->product_code ?? '-' }}</td>
+                                    <td>{{ $product->sku ?? '-' }}</td>
+                                    <td>{{ $product->category->name ?? '-' }}</td>
+                                    <td>{{ $product->brand->name ?? '-' }}</td>
+                                    <td><strong>{{ $product->name }}</strong></td>
+                                    <td>{{ $product->unit ?? '-' }}</td>
+                                    <td class="text-end">{{ number_format($receivedQty) }}</td>
+                                    <td class="text-end">{{ number_format($product->purchase_price, 2) }}</td>
+                                    <td class="text-end">{{ number_format($product->sale_price, 2) }}</td>
                                     <td class="text-end">
                                         @if ($product->current_stock <= 0)
-                                            <span class="badge bg-danger">
-                                                {{ number_format($product->current_stock) }}
-                                            </span>
+                                            <span
+                                                class="badge bg-danger">{{ number_format($product->current_stock) }}</span>
                                         @else
-                                            <strong>
-                                                {{ number_format($product->current_stock) }}
-                                            </strong>
+                                            <strong>{{ number_format($product->current_stock) }}</strong>
                                         @endif
                                     </td>
-                                    <td class="text-end">
-                                        <strong>
-                                            {{ number_format($stockValue, 2) }}
-                                        </strong>
-                                    </td>
+                                    <td class="text-end"><strong>{{ number_format($stockValue, 2) }}</strong></td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="text-center py-5">
-                                        No Stock Data Found.
-                                    </td>
+                                    <td colspan="12" class="text-center py-5">No Stock Data Found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -239,9 +170,7 @@
                         @if ($products->count())
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-end">
-                                        Page Total
-                                    </th>
+                                    <th colspan="7" class="text-end">Page Total</th>
                                     <th class="text-end">
                                         {{ number_format(
                                             $products->sum(function ($product) {
@@ -254,9 +183,7 @@
                                         ) }}
                                     </th>
                                     <th colspan="2"></th>
-                                    <th class="text-end">
-                                        {{ number_format($products->sum('current_stock')) }}
-                                    </th>
+                                    <th class="text-end">{{ number_format($products->sum('current_stock')) }}</th>
                                     <th class="text-end">
                                         {{ number_format(
                                             $products->sum(function ($product) {

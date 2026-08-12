@@ -264,7 +264,7 @@
                     @can('payee-list-list')
                         <li class="menu-item {{ request()->routeIs('party.index') ? 'active' : '' }}">
                             <a href="{{ route('party.index') }}" class="menu-link">
-                                Payee List
+                                Customer List
                             </a>
                         </li>
                     @endcan

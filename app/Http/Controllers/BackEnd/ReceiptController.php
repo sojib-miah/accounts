@@ -61,104 +61,342 @@ class ReceiptController extends Controller
 
     public function expenseCreate()
     {
-        $companies = Company::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
-            $q->where('id', Auth::user()->company_id);
-        })->get();
-        $branches = Branch::when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
-            $q->where('created_by', Auth::id())
-                ->orWhere('id', Auth::user()->branch_id);
-        })->latest()->get();
-        $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->get();
-        $categories = Category::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->get();
-        return view('BackEnd.Receipt.expense_create', compact('branches', 'parties', 'categories', 'companies'));
+        $user = Auth::user();
+
+        $companies = Company::when(
+            !$user->hasRole('Super-Admin'),
+            function ($q) use ($user) {
+                $q->where('id', $user->company_id);
+            }
+        )
+            ->orderBy('name')
+            ->get();
+
+        $branches = Branch::when(
+            !$user->hasRole('Super-Admin'),
+            function ($q) use ($user) {
+                $q->where(function ($query) use ($user) {
+                    $query->where('created_by', $user->id)
+                        ->orWhere('id', $user->branch_id);
+                });
+            }
+        )
+            ->orderBy('name')
+            ->get();
+
+        $parties = Party::where('type', 'Expense')
+            ->where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
+
+        $categories = Category::where('type', 'Expense')
+            ->where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'BackEnd.Receipt.expense_create',
+            compact(
+                'companies',
+                'branches',
+                'parties',
+                'categories'
+            )
+        );
     }
 
     private function generateReceiptNo()
     {
         $last = Receipt::orderByDesc('receipt_no')->first();
-
-        return $last
-            ? ((int) $last->receipt_no + 1)
-            : 10001;
+        return $last ? ((int) $last->receipt_no + 1) : 10001;
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'type' => 'required|in:Income,Expense,Challan',
-            'company_id' => 'nullable',
-            'branch_id' => 'required|exists:branches,id',
-            'party_id' => 'required|exists:parties,id',
-            'receipt_date' => 'required|date',
-            'items' => 'required',
-        ]);
-        if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Receipt::where('company_id', Auth::user()->company_id)
-                ->where('type', 'Expense')
-                ->count();
 
-            if ($message = PackageHelper::checkLimit('expense_limit', $current)) {
-                return back()->with('error', $message);
+            'company_id' => 'required|exists:companies,id',
+
+            'branch_id' => 'required|exists:branches,id',
+
+            'party_id' => 'required|exists:parties,id',
+
+            'receipt_date' => 'required|date',
+
+            'items' => 'required|string',
+
+            'discount' => 'nullable|numeric|min:0',
+
+            'vat' => 'nullable|numeric|min:0',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user->hasRole('Super-Admin')) {
+
+            if ((int) $request->company_id !== (int) $user->company_id) {
+
+                return back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'You are not allowed to create expense for this company.'
+                    );
             }
         }
-        DB::beginTransaction();
-        try {
-            $items = json_decode($request->items, true);
-            if (!$items || count($items) == 0) {
-                return back()->withInput()->with('error', 'Please add at least one item.');
+        if (!$user->hasRole('Super-Admin')) {
+
+            $current = Receipt::where(
+                'company_id',
+                $user->company_id
+            )
+                ->where(
+                    'type',
+                    'Expense'
+                )
+                ->count();
+
+            if (
+                $message = PackageHelper::checkLimit(
+                    'expense_limit',
+                    $current
+                )
+            ) {
+                return back()
+                    ->withInput()
+                    ->with('error', $message);
             }
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $items = json_decode(
+                $request->items,
+                true
+            );
+
+            if (
+                !is_array($items) ||
+                count($items) === 0
+            ) {
+
+                throw new \Exception(
+                    'Please add at least one expense item.'
+                );
+            }
+
             $totalQty = 0;
+
             $subTotal = 0;
-            foreach ($items as $item) {
-                $qty = $item['qty'] ?? 1;
-                $amount = $item['amount'];
+
+            foreach ($items as $index => $item) {
+
+                $categoryId = $item['category_id'] ?? null;
+
+                $accountHeadId = $item['account_head_id'] ?? null;
+
+                $qty = (float) (
+                    $item['qty'] ?? 1
+                );
+
+                $rate = (float) (
+                    $item['rate'] ?? 0
+                );
+
+
+                if (!$categoryId) {
+
+                    throw new \Exception(
+                        'Category is required for item #' . ($index + 1)
+                    );
+                }
+
+                if (!$accountHeadId) {
+
+                    throw new \Exception(
+                        'Expense is required for item #' . ($index + 1)
+                    );
+                }
+
+                if ($qty <= 0) {
+
+                    throw new \Exception(
+                        'Quantity must be greater than 0 for item #' . ($index + 1)
+                    );
+                }
+
+                if ($rate < 0) {
+
+                    throw new \Exception(
+                        'Rate cannot be negative for item #' . ($index + 1)
+                    );
+                }
+
+                $amount = $qty * $rate;
+
                 $totalQty += $qty;
+
                 $subTotal += $amount;
             }
-            $discount = (float) ($request->discount ?? 0);
-            $vatPercent = (float) ($request->vat ?? 0);
-            $afterDiscount = $subTotal - $discount;
-            $vatAmount = ($afterDiscount * $vatPercent) / 100;
-            $grandTotal = $afterDiscount + $vatAmount;
+
+            $discount = (float) (
+                $request->discount ?? 0
+            );
+
+            if ($discount > $subTotal) {
+
+                throw new \Exception(
+                    'Discount cannot be greater than subtotal.'
+                );
+            }
+
+            $vatPercent = (float) (
+                $request->vat ?? 0
+            );
+
+            if ($vatPercent < 0) {
+
+                throw new \Exception(
+                    'VAT cannot be negative.'
+                );
+            }
+
+            $afterDiscount =
+                $subTotal - $discount;
+
+            $vatAmount =
+                ($afterDiscount * $vatPercent) / 100;
+
+            $grandTotal =
+                $afterDiscount + $vatAmount;
+
             $receipt = Receipt::create([
-                'receipt_no' => $this->generateReceiptNo(),
-                'type' => $request->type,
-                'company_id' => $request->company_id,
-                'branch_id' => $request->branch_id,
-                'party_id' => $request->party_id,
-                'receipt_date' => $request->receipt_date,
-                'remarks' => $request->remarks,
-                'total_qty' => $totalQty,
-                'sub_total' => $subTotal,
-                'discount' => $discount,
-                'vat' => $vatPercent,
-                'total_amount' => $grandTotal,
-                'paid_amount' => 0,
-                'due_amount' => $grandTotal,
-                'payment_status' => 'Pending',
-                'status' => 'Completed',
-                'created_by' => Auth::id(),
+
+                'receipt_no' =>
+                $this->generateReceiptNo(),
+
+                'type' =>
+                $request->type,
+
+                'company_id' =>
+                $request->company_id,
+
+                'branch_id' =>
+                $request->branch_id,
+
+                'party_id' =>
+                $request->party_id,
+
+                'receipt_date' =>
+                $request->receipt_date,
+
+                'remarks' =>
+                $request->remarks,
+
+                'total_qty' =>
+                $totalQty,
+
+                'sub_total' =>
+                $subTotal,
+
+                'discount' =>
+                $discount,
+
+                'vat' =>
+                $vatPercent,
+
+                'total_amount' =>
+                $grandTotal,
+
+                'paid_amount' =>
+                0,
+
+                'due_amount' =>
+                $grandTotal,
+
+                'payment_status' =>
+                'Pending',
+
+                'status' =>
+                'Completed',
+
+                'created_by' =>
+                $user->id,
             ]);
+
             foreach ($items as $item) {
+
+                $qty = (float) (
+                    $item['qty'] ?? 1
+                );
+
+                $rate = (float) (
+                    $item['rate'] ?? 0
+                );
+
+                $amount =
+                    $qty * $rate;
+
                 ReceiptItem::create([
-                    'receipt_id' => $receipt->id,
-                    'category_id' => $item['category_id'],
-                    'account_head_id' => $item['account_head_id'],
-                    'qty' => $item['qty'] ?? 1,
-                    'rate' => $item['rate'] ?? $item['amount'],
-                    'amount' => $item['amount'],
-                    'details' => $item['details'] ?? null,
+
+                    'receipt_id' =>
+                    $receipt->id,
+
+                    'category_id' =>
+                    $item['category_id'],
+
+                    'account_head_id' =>
+                    $item['account_head_id'],
+
+                    'qty' =>
+                    $qty,
+
+                    'rate' =>
+                    $rate,
+
+                    'amount' =>
+                    $amount,
+
+                    'details' =>
+                    $item['details'] ?? null,
                 ]);
             }
+
             DB::commit();
-            return redirect()->route('receipt.show', $receipt->id)->with('success', 'Receipt Created Successfully.');
+
+            return redirect()
+                ->route(
+                    'receipt.show',
+                    $receipt->id
+                )
+                ->with(
+                    'success',
+                    'Expense Receipt Created Successfully.'
+                );
         } catch (\Exception $e) {
+
             DB::rollBack();
-            return back()->withInput()->with('error', $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
         }
     }
 

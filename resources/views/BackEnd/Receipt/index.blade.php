@@ -71,24 +71,12 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
-                                    <th class="text-center">
-                                        RECEIPT ID
-                                    </th>
-                                    <th class="text-center">
-                                        PAYEE Name
-                                    </th>
-                                    <th class="text-center">
-                                        Created BY
-                                    </th>
-                                    <th class="text-center">
-                                        DATE & TIME
-                                    </th>
-                                    <th class="text-center">
-                                        STATUS
-                                    </th>
-                                    <th class="text-center" width="90">
-                                        ACTION
-                                    </th>
+                                    <th class="text-center">RECEIPT ID</th>
+                                    <th class="text-center">PAYEE Name</th>
+                                    <th class="text-center">Created BY</th>
+                                    <th class="text-center">DATE & TIME</th>
+                                    <th class="text-center">STATUS</th>
+                                    <th class="text-center" width="90">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -110,13 +98,9 @@
                                             </a>
                                         </td>
                                         {{-- Receipt By --}}
-                                        <td class="text-center">
-                                            {{ $receipt->creator->name ?? '-' }}
-                                        </td>
+                                        <td class="text-center">{{ $receipt->creator->name ?? '-' }}</td>
                                         {{-- Date Time --}}
-                                        <td class="text-center">
-                                            {{ $receipt->created_at->format('d-m-Y h:i A') }}
-                                        </td>
+                                        <td class="text-center">{{ $receipt->created_at->format('d-m-Y h:i A') }}</td>
                                         {{-- Payment Status --}}
                                         <td class="text-center">
                                             @if ($receipt->payment_status == 'Paid')
@@ -180,7 +164,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
                                             No Expense Receipt Found

@@ -21,37 +21,27 @@
                 <div class="row">
                     {{-- Product --}}
                     <div class="col-md-4 mb-3">
-                        <label class="fw-bold">
-                            Product
-                        </label>
+                        <label class="fw-bold">Product</label>
                         <input class="form-control" readonly value="{{ $product->name }}">
                     </div>
                     {{-- SKU --}}
                     <div class="col-md-2 mb-3">
-                        <label class="fw-bold">
-                            SKU
-                        </label>
+                        <label class="fw-bold">SKU</label>
                         <input class="form-control" readonly value="{{ $product->sku ?? '-' }}">
                     </div>
                     {{-- Category --}}
                     <div class="col-md-2 mb-3">
-                        <label class="fw-bold">
-                            Category
-                        </label>
+                        <label class="fw-bold">Category</label>
                         <input class="form-control" readonly value="{{ $product->category->name ?? '-' }}">
                     </div>
                     {{-- Brand --}}
                     <div class="col-md-2 mb-3">
-                        <label class="fw-bold">
-                            Brand
-                        </label>
+                        <label class="fw-bold">Brand</label>
                         <input class="form-control" readonly value="{{ $product->brand->name ?? '-' }}">
                     </div>
                     {{-- Unit --}}
                     <div class="col-md-2 mb-3">
-                        <label class="fw-bold">
-                            Unit
-                        </label>
+                        <label class="fw-bold">Unit</label>
                         <input class="form-control" readonly value="{{ $product->unit ?? '-' }}">
                     </div>
                 </div>
@@ -59,48 +49,32 @@
                     <div class="col-md-3">
                         <div class="card border-primary">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Total Received Qty
-                                </small>
-                                <h4>
-                                    {{ number_format($totalQty) }}
-                                </h4>
+                                <small class="text-muted">Total Received Qty</small>
+                                <h4>{{ number_format($totalQty) }}</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card border-success">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Current Stock
-                                </small>
-                                <h4>
-                                    {{ number_format($product->current_stock) }}
-                                </h4>
+                                <small class="text-muted">Current Stock</small>
+                                <h4>{{ number_format($product->current_stock) }}</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card border-info">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Average Purchase Price
-                                </small>
-                                <h4>
-                                    {{ number_format($averageRate, 2) }}
-                                </h4>
+                                <small class="text-muted">Average Purchase Price</small>
+                                <h4>{{ number_format($averageRate, 2) }}</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card border-warning">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Serial Count
-                                </small>
-                                <h4>
-                                    {{ number_format($serialCount) }}
-                                </h4>
+                                <small class="text-muted">Serial Count</small>
+                                <h4>{{ number_format($serialCount) }}</h4>
                             </div>
                         </div>
                     </div>
@@ -124,8 +98,7 @@
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-search me-1">
-                                </i>
+                                <i class="fa fa-search me-1"></i>
                                 Search
                             </button>
                         </div>
@@ -136,43 +109,22 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">
-                                    SL
-                                </th>
-                                <th>
-                                    PO No
-                                </th>
-                                <th>
-                                    Receive Date
-                                </th>
-                                <th>
-                                    Supplier
-                                </th>
-                                <th class="text-end">
-                                    Qty
-                                </th>
-                                <th class="text-end">
-                                    Rate
-                                </th>
-                                <th class="text-end">
-                                    Amount
-                                </th>
-                                <th>
-                                    Serial
-                                </th>
+                                <th width="60">SN</th>
+                                <th>PO No</th>
+                                <th>Receive Date</th>
+                                <th>Supplier</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Stock</th>
+                                <th class="text-end">Rate</th>
+                                <th class="text-end">Amount</th>
+                                <th>Serial</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($items as $item)
                                 <tr>
-                                    <td>
-                                        {{ $items->firstItem() + $loop->index }}
-                                    </td>
-                                    <td>
-                                        <strong>
-                                            {{ $item->receipt->po_no ?? '-' }}
-                                        </strong>
-                                    </td>
+                                    <td>{{ $items->firstItem() + $loop->index }}</td>
+                                    <td><strong>{{ $item->receipt->po_no ?? '-' }}</strong></td>
                                     <td>
                                         @if ($item->receipt->received_date)
                                             {{ \Carbon\Carbon::parse($item->receipt->received_date)->format('d-M-Y') }}
@@ -180,20 +132,11 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>
-                                        {{ $item->receipt->supplier->name ?? '-' }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($item->qty) }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($item->rate, 2) }}
-                                    </td>
-                                    <td class="text-end">
-                                        <strong>
-                                            {{ number_format($item->amount, 2) }}
-                                        </strong>
-                                    </td>
+                                    <td>{{ $item->receipt->supplier->name ?? '-' }}</td>
+                                    <td class="text-end">{{ number_format($item->qty) }}</td>
+                                    <td class="text-end">{{ number_format($item->product->current_stock) }}</td>
+                                    <td class="text-end">{{ number_format($item->rate, 2) }}</td>
+                                    <td class="text-end"><strong>{{ number_format($item->amount, 2) }}</strong></td>
                                     <td>
                                         @if ($item->serialNumbers->count())
                                             <div style="max-width: 350px; white-space: normal; word-break: break-word;">
@@ -204,32 +147,22 @@
                                                 @endforeach
                                             </div>
                                         @else
-                                            <span class="text-muted">
-                                                No Serial
-                                            </span>
+                                            <span class="text-muted">No Serial</span>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
-                                        No Purchase History Found.
-                                    </td>
+                                    <td colspan="8" class="text-center py-5">No Purchase History Found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="4" class="text-end">
-                                    Total
-                                </th>
-                                <th class="text-end">
-                                    {{ number_format($totalQty) }}
-                                </th>
+                                <th colspan="4" class="text-end">Total</th>
+                                <th class="text-end">{{ number_format($totalQty) }}</th>
                                 <th></th>
-                                <th class="text-end">
-                                    {{ number_format($totalValue, 2) }}
-                                </th>
+                                <th class="text-end">{{ number_format($totalValue, 2) }}</th>
                                 <th></th>
                             </tr>
                         </tfoot>

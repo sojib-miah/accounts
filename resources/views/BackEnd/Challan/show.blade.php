@@ -3,18 +3,8 @@
 @section('title', 'Receipt Details')
 
 @section('content')
-    <div class="mx-5 py-3">
+    <div class="p-5">
         <div class="row">
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
             <!-- LEFT SIDE -->
             <div class="col-lg-9">
                 <div class="card shadow-sm border-0">
@@ -135,9 +125,7 @@
                     </div>
                 </div>
 
-                {{-- ========================= --}}
                 {{-- Income Receipt List --}}
-                {{-- ========================= --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding: 8px !important;">
                         <h3 class="mb-0 fw-bold">
@@ -165,27 +153,15 @@
                                             $totalQty += $item->qty;
                                         @endphp
                                         <tr>
-                                            <td class="text-center">
-                                                {{ $loop->iteration }}
-                                            </td>
-                                            <td>
-                                                {{ $item->product->sku ?? '-' }}
-                                            </td>
-                                            <td>
-                                                {{ $item->product->description ?? '-' }}
-                                            </td>
-                                            <td class="text-center">
-                                                {{ number_format($item->qty) }}
-                                            </td>
-                                            <td>
-                                                {{ $item->details }}
-                                            </td>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>{{ $item->product->sku ?? '-' }}</td>
+                                            <td>{{ $item->product->description ?? '-' }}</td>
+                                            <td class="text-center">{{ number_format($item->qty) }}</td>
+                                            <td>{{ $item->details }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                No Item Found
-                                            </td>
+                                            <td colspan="5" class="text-center text-muted py-4">No Item Found</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -199,9 +175,7 @@
                 {{-- Receipt Notes --}}
                 <div class="card shadow-sm border-0 mb-3">
                     <div class="card-header">
-                        <strong>
-                            Delivery Notes
-                        </strong>
+                        <strong>Delivery Notes</strong>
                         <span class="text-danger">*</span>
                     </div>
                     <div class="card-body">
@@ -242,6 +216,5 @@
                 </a>
             </div>
         </div>
-    </div>
     </div>
 @endsection

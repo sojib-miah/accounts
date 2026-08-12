@@ -12,9 +12,7 @@
                             <i class="fa fa-triangle-exclamation text-danger me-2"></i>
                             Low Stock Products
                         </h4>
-                        <small class="text-muted">
-                            Products that reached minimum stock level
-                        </small>
+                        <small class="text-muted">Products that reached minimum stock level</small>
                     </div>
                     <div class="col-md-6 text-md-end mt-2 mt-md-0">
                         <a href="{{ route('inventory.index') }}" class="btn btn-primary">
@@ -32,12 +30,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <div class="text-muted small">
-                                            Low Stock Products
-                                        </div>
-                                        <h3 class="mb-0 text-warning">
-                                            {{ number_format($lowStockCount) }}
-                                        </h3>
+                                        <div class="text-muted small">Low Stock Products</div>
+                                        <h3 class="mb-0 text-warning">{{ number_format($lowStockCount) }}</h3>
                                     </div>
                                     <div>
                                         <i class="fa fa-triangle-exclamation fa-2x text-warning"></i>
@@ -52,16 +46,10 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <div class="text-muted small">
-                                            Out of Stock
-                                        </div>
-                                        <h3 class="mb-0 text-danger">
-                                            {{ number_format($outOfStockCount) }}
-                                        </h3>
+                                        <div class="text-muted small">Out of Stock</div>
+                                        <h3 class="mb-0 text-danger">{{ number_format($outOfStockCount) }}</h3>
                                     </div>
-                                    <div>
-                                        <i class="fa fa-circle-xmark fa-2x text-danger"></i>
-                                    </div>
+                                    <div><i class="fa fa-circle-xmark fa-2x text-danger"></i></div>
                                 </div>
                             </div>
                         </div>
@@ -72,16 +60,10 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <div class="text-muted small">
-                                            Current Low Stock Qty
-                                        </div>
-                                        <h3 class="mb-0 text-primary">
-                                            {{ number_format($lowStockQty) }}
-                                        </h3>
+                                        <div class="text-muted small">Current Low Stock Qty</div>
+                                        <h3 class="mb-0 text-primary">{{ number_format($lowStockQty) }}</h3>
                                     </div>
-                                    <div>
-                                        <i class="fa fa-box-open fa-2x text-primary"></i>
-                                    </div>
+                                    <div><i class="fa fa-box-open fa-2x text-primary"></i></div>
                                 </div>
                             </div>
                         </div>
@@ -92,16 +74,10 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <div class="text-muted small">
-                                            Low Stock Value
-                                        </div>
-                                        <h3 class="mb-0 text-success">
-                                            {{ number_format($lowStockValue, 2) }}
-                                        </h3>
+                                        <div class="text-muted small">Low Stock Value</div>
+                                        <h3 class="mb-0 text-success">{{ number_format($lowStockValue, 2) }}</h3>
                                     </div>
-                                    <div>
-                                        <i class="fa fa-money-bill-wave fa-2x text-success"></i>
-                                    </div>
+                                    <div><i class="fa fa-money-bill-wave fa-2x text-success"></i></div>
                                 </div>
                             </div>
                         </div>
@@ -134,42 +110,19 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">
-                                    SL
-                                </th>
-                                <th>
-                                    Product Code
-                                </th>
-                                <th>
-                                    Product Name
-                                </th>
-                                <th>
-                                    Category
-                                </th>
-                                <th>
-                                    Brand
-                                </th>
-                                <th>
-                                    Unit
-                                </th>
-                                <th class="text-end">
-                                    Current Stock
-                                </th>
-                                <th class="text-end">
-                                    Minimum Stock
-                                </th>
-                                <th class="text-end">
-                                    Purchase Price
-                                </th>
-                                <th class="text-end">
-                                    Sale Price
-                                </th>
-                                <th class="text-end">
-                                    Stock Value
-                                </th>
-                                <th width="130">
-                                    Status
-                                </th>
+                                <th width="60">SN</th>
+                                <th>Product Code</th>
+                                <th>Part No</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Product Name</th>
+                                <th>Unit</th>
+                                <th class="text-end">Current Stock</th>
+                                <th class="text-end">Minimum Stock</th>
+                                <th class="text-end">Purchase Price</th>
+                                <th class="text-end">Sale Price</th>
+                                <th class="text-end">Stock Value</th>
+                                <th width="130">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -179,33 +132,23 @@
                                 @endphp
                                 <tr>
                                     {{-- SL --}}
-                                    <td>
-                                        {{ $products->firstItem() + $loop->index }}
-                                    </td>
+                                    <td>{{ $products->firstItem() + $loop->index }}</td>
                                     {{-- PRODUCT CODE --}}
                                     <td>
-                                        <span class="fw-semibold">
-                                            {{ $product->product_code ?? ($product->sku ?? '-') }}
-                                        </span>
+                                        <span class="fw-semibold">{{ $product->product_code ?? '-' }}</span>
                                     </td>
-                                    {{-- PRODUCT NAME --}}
+                                    {{-- PRODUCT part no --}}
                                     <td>
-                                        <strong>
-                                            {{ $product->name }}
-                                        </strong>
+                                        <span class="fw-semibold">{{ $product->sku ?? '-' }}</span>
                                     </td>
                                     {{-- CATEGORY --}}
-                                    <td>
-                                        {{ $product->category->name ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->category->name ?? '-' }}</td>
                                     {{-- BRAND --}}
-                                    <td>
-                                        {{ $product->brand->name ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->brand->name ?? '-' }}</td>
+                                    {{-- PRODUCT NAME --}}
+                                    <td><strong>{{ $product->name }}</strong></td>
                                     {{-- UNIT --}}
-                                    <td>
-                                        {{ $product->unit ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->unit ?? '-' }}</td>
                                     {{-- CURRENT STOCK --}}
                                     <td class="text-end">
                                         @if ($product->current_stock <= 0)
@@ -220,23 +163,15 @@
                                     </td>
                                     {{-- MINIMUM STOCK --}}
                                     <td class="text-end">
-                                        <span class="fw-semibold">
-                                            {{ number_format($product->minimum_stock) }}
-                                        </span>
+                                        <span class="fw-semibold">{{ number_format($product->minimum_stock) }}</span>
                                     </td>
                                     {{-- PURCHASE PRICE --}}
-                                    <td class="text-end">
-                                        {{ number_format($product->purchase_price, 2) }}
-                                    </td>
+                                    <td class="text-end">{{ number_format($product->purchase_price, 2) }}</td>
                                     {{-- SALE PRICE --}}
-                                    <td class="text-end">
-                                        {{ number_format($product->sale_price, 2) }}
-                                    </td>
+                                    <td class="text-end">{{ number_format($product->sale_price, 2) }}</td>
                                     {{-- STOCK VALUE --}}
                                     <td class="text-end">
-                                        <strong>
-                                            {{ number_format($stockValue, 2) }}
-                                        </strong>
+                                        <strong>{{ number_format($stockValue, 2) }}</strong>
                                     </td>
                                     {{-- STATUS --}}
                                     <td>
@@ -255,16 +190,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center py-5">
+                                    <td colspan="13" class="text-center py-5">
                                         <i class="fa fa-circle-check fa-2x text-success mb-2"></i>
                                         <br>
-                                        <strong>
-                                            No Low Stock Products Found
-                                        </strong>
+                                        <strong>No Low Stock Products Found</strong>
                                         <br>
-                                        <small class="text-muted">
-                                            All received products are above their minimum stock level.
-                                        </small>
+                                        <small class="text-muted">All received products are above their minimum stock
+                                            level.</small>
                                     </td>
                                 </tr>
                             @endforelse
@@ -272,12 +204,8 @@
                         @if ($products->count())
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-end">
-                                        Page Total:
-                                    </th>
-                                    <th class="text-end">
-                                        {{ number_format($products->sum('current_stock')) }}
-                                    </th>
+                                    <th colspan="7" class="text-end">Page Total:</th>
+                                    <th class="text-end">{{ number_format($products->sum('current_stock')) }}</th>
                                     <th></th>
                                     <th></th>
                                     <th></th>

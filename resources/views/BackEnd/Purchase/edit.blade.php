@@ -87,6 +87,7 @@
             </div>
             <div class="text-end mt-3">
                 <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left me-2"></i>
                     Back
                 </a>
                 <button type="submit" class="btn btn-success">

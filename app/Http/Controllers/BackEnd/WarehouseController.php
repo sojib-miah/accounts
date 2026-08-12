@@ -32,6 +32,9 @@ class WarehouseController extends Controller
 
     public function show(Receipt $receipt)
     {
+        if ($receipt->status == 'Cancelled') {
+            return redirect()->route('warehouse.index')->with('error', 'Cancelled warehouse cannot be view.');
+        }
         $receipt->load([
             'supplier',
             'items.product',

@@ -33,36 +33,20 @@
                     <div class="col-md-6 text-end">
                         <table class="table table-borderless">
                             <tr>
-                                <th width="150">
-                                    Receipt No
-                                </th>
-                                <td>
-                                    {{ $purchase->receipt_no }}
-                                </td>
+                                <th width="150">Receipt No</th>
+                                <td>{{ $purchase->receipt_no }}</td>
                             </tr>
                             <tr>
-                                <th>
-                                    Purchase Date
-                                </th>
-                                <td>
-                                    {{ date('d-m-Y', strtotime($purchase->receipt_date)) }}
-                                </td>
+                                <th>Purchase Date</th>
+                                <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
                             </tr>
                             <tr>
-                                <th>
-                                    Supplier
-                                </th>
-                                <td>
-                                    {{ $purchase->supplier->name }}
-                                </td>
+                                <th>Supplier</th>
+                                <td>{{ $purchase->supplier->name }}</td>
                             </tr>
                             <tr>
-                                <th>
-                                    Payment Status
-                                </th>
-                                <td>
-                                    {{ $purchase->payment_status }}
-                                </td>
+                                <th>Payment Status</th>
+                                <td>{{ $purchase->payment_status }}</td>
                             </tr>
                         </table>
                     </div>
@@ -71,40 +55,26 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th width="60">
-                                    SL
-                                </th>
-                                <th>
-                                    Product
-                                </th>
-                                <th>
-                                    Serial No
-                                </th>
-                                <th>
-                                    Unit
-                                </th>
-                                <th class="text-end">
-                                    Qty
-                                </th>
-                                <th class="text-end">
-                                    Rate
-                                </th>
-                                <th class="text-end">
-                                    Amount
-                                </th>
+                                <th width="60">SN</th>
+                                <th>Product</th>
+                                <th>Part No</th>
+                                <th width='250'>Serial No</th>
+                                <th>Unit</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Rate</th>
+                                <th class="text-end">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($purchase->items as $item)
                                 <tr>
-                                    <td>
-                                        {{ $loop->iteration }}
-                                    </td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>
                                         {{ $item->product->product_code }}
                                         -
                                         {{ $item->product->name }}
                                     </td>
+                                    <td>{{ $item->product->sku }}</td>
                                     <td>
                                         @if ($item->serialNumbers->count())
                                             {{ $item->serialNumbers->pluck('serial_no')->implode(', ') }}
@@ -112,18 +82,10 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>
-                                        {{ $item->product->unit }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ $item->qty }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($item->rate, 2) }}
-                                    </td>
-                                    <td class="text-end">
-                                        {{ number_format($item->amount, 2) }}
-                                    </td>
+                                    <td>{{ $item->product->unit }}</td>
+                                    <td class="text-end">{{ number_format($item->qty) }}</td>
+                                    <td class="text-end">{{ number_format($item->rate, 2) }}</td>
+                                    <td class="text-end">{{ number_format($item->amount, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -131,71 +93,43 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-md-4 ms-auto">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>
-                                    Total Qty
-                                </th>
-                                <td class="text-end">
-                                    {{ $purchase->total_qty }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Sub Total
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($purchase->sub_total, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Discount
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($purchase->discount, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    VAT
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($purchase->vat, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Grand Total
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($purchase->total_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Paid
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($purchase->paid_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Due
-                                </th>
-                                <td class="text-end text-danger">
-                                    {{ number_format($purchase->due_amount, 2) }}
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="border">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Total Qty</th>
+                                    <td class="text-end">{{ $purchase->total_qty }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sub Total</th>
+                                    <td class="text-end">{{ number_format($purchase->sub_total, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Discount</th>
+                                    <td class="text-end">{{ number_format($purchase->discount, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>VAT</th>
+                                    <td class="text-end">{{ number_format($purchase->vat, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Grand Total</th>
+                                    <td class="text-end fw-bold">{{ number_format($purchase->total_amount, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Paid</th>
+                                    <td class="text-end">{{ number_format($purchase->paid_amount, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Due</th>
+                                    <td class="text-end text-danger">{{ number_format($purchase->due_amount, 2) }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 @if ($purchase->remarks)
                     <div class="mt-3">
-                        <strong>
-                            Remarks
-                        </strong>
+                        <strong>Remarks</strong>
                         <hr>
                         {{ $purchase->remarks }}
                     </div>

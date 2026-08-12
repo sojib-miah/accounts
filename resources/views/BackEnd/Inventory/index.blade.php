@@ -14,12 +14,10 @@
                     </h4>
                     <div>
                         <span class="badge bg-primary me-2">
-                            Products:
-                            {{ number_format($totalProducts) }}
+                            Products: {{ number_format($totalProducts) }}
                         </span>
                         <span class="badge bg-success">
-                            Qty:
-                            {{ number_format($totalQty, 2) }}
+                            Qty: {{ number_format($totalQty) }}
                         </span>
                     </div>
                 </div>
@@ -33,8 +31,7 @@
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-search me-1">
-                                </i>
+                                <i class="fa fa-search me-1"></i>
                                 Search
                             </button>
                             @if (request('search'))
@@ -49,36 +46,24 @@
                     <div class="col-md-4">
                         <div class="card border-primary shadow-sm">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Total Products
-                                </small>
-                                <h4 class="mb-0">
-                                    {{ number_format($totalProducts) }}
-                                </h4>
+                                <small class="text-muted">Total Products</small>
+                                <h4 class="mb-0">{{ number_format($totalProducts) }}</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="card border-success shadow-sm">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Total Received Qty
-                                </small>
-                                <h4 class="mb-0">
-                                    {{ number_format($totalQty) }}
-                                </h4>
+                                <small class="text-muted">Total Received Qty</small>
+                                <h4 class="mb-0">{{ number_format($totalQty) }}</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="card border-info shadow-sm">
                             <div class="card-body">
-                                <small class="text-muted">
-                                    Total Purchase Value
-                                </small>
-                                <h4 class="mb-0">
-                                    {{ number_format($totalValue, 2) }}
-                                </h4>
+                                <small class="text-muted">Total Purchase Value</small>
+                                <h4 class="mb-0">{{ number_format($totalValue, 2) }}</h4>
                             </div>
                         </div>
                     </div>
@@ -87,42 +72,17 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">
-                                    SL
-                                </th>
-                                <th>
-                                    Product Code
-                                </th>
-                                <th>
-                                    Part No
-                                </th>
-                                <th>
-                                    Product
-                                </th>
-                                <th>
-                                    Category
-                                </th>
-                                <th>
-                                    Brand
-                                </th>
-                                <th>
-                                    Unit
-                                </th>
-                                <th class="text-end">
-                                    Total Qty
-                                </th>
-                                <th class="text-end">
-                                    Total Stock
-                                </th>
-                                <th class="text-end">
-                                    Avg. Purchase Price
-                                </th>
-                                <th class="text-end">
-                                    Total Value
-                                </th>
-                                <th width="100" class="text-center">
-                                    Action
-                                </th>
+                                <th width="60">SN</th>
+                                <th>Product Code</th>
+                                <th>Part No</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Unit</th>
+                                <th class="text-end">Total Stock</th>
+                                <th class="text-end">Avg. Purchase Price</th>
+                                <th class="text-end">Total Value</th>
+                                <th width="100" class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -132,63 +92,34 @@
                                 @endphp
                                 <tr>
                                     {{-- SL --}}
-                                    <td>
-                                        {{ $products->firstItem() + $loop->index }}
-                                    </td>
+                                    <td>{{ $products->firstItem() + $loop->index }}</td>
                                     {{-- Product Code --}}
-                                    <td>
-                                        {{ $product->product_code ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->product_code ?? '-' }}</td>
                                     {{-- sku --}}
-                                    <td>
-                                        {{ $product->sku ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->sku ?? '-' }}</td>
                                     {{-- Product --}}
-                                    <td>
-                                        <strong>
-                                            {{ $product->name ?? '-' }}
-                                        </strong>
-                                    </td>
+                                    <td><strong>{{ $product->name ?? '-' }}</strong></td>
                                     {{-- Category --}}
-                                    <td>
-                                        {{ $product->category->name ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->category->name ?? '-' }}</td>
                                     {{-- Brand --}}
-                                    <td>
-                                        {{ $product->brand->name ?? '-' }}
-                                    </td>
+                                    <td>{{ $product->brand->name ?? '-' }}</td>
                                     {{-- Unit --}}
-                                    <td>
-                                        {{ $product->unit ?? '-' }}
-                                    </td>
-                                    {{-- Total Qty --}}
-                                    <td class="text-end">
-                                        <span class="badge bg-primary">
-                                            {{ number_format($row->total_qty) }}
-                                        </span>
-                                    </td>
+                                    <td>{{ $product->unit ?? '-' }}</td>
                                     {{-- stock  --}}
                                     <td class="text-end">
-                                        <span class="badge bg-primary">
-                                            {{ number_format($product->current_stock) }}
-                                        </span>
+                                        <span class="badge bg-primary">{{ number_format($product->current_stock) }}</span>
                                     </td>
                                     {{-- Average Rate --}}
-                                    <td class="text-end">
-                                        {{ number_format($row->average_rate, 2) }}
-                                    </td>
+                                    <td class="text-end">{{ number_format($row->average_rate, 2) }}</td>
                                     {{-- Total Value --}}
                                     <td class="text-end">
-                                        <strong>
-                                            {{ number_format($row->total_value, 2) }}
-                                        </strong>
+                                        <strong>{{ number_format($row->total_value, 2) }}</strong>
                                     </td>
                                     {{-- Action --}}
                                     <td class="text-center">
                                         <a href="{{ route('inventory.product.show', $product) }}"
                                             class="btn btn-primary btn-sm" title="View Product Details">
-                                            <i class="fa fa-eye me-1">
-                                            </i>
+                                            <i class="fa fa-eye me-1"></i>
                                             View
                                         </a>
                                     </td>
@@ -196,12 +127,9 @@
                             @empty
                                 <tr>
                                     <td colspan="12" class="text-center py-5">
-                                        <i class="fa fa-box-open fa-2x text-muted">
-                                        </i>
+                                        <i class="fa fa-box-open fa-2x text-muted"></i>
                                         <br>
-                                        <span class="text-muted">
-                                            No Inventory Found
-                                        </span>
+                                        <span class="text-muted">No Inventory Found</span>
                                     </td>
                                 </tr>
                             @endforelse

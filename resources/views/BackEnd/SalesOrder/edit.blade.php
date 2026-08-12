@@ -62,7 +62,6 @@
                                         </label>
                                         <select name="company_id" id="company_id" class="form-select select2" required>
                                             <option value="">Select Company</option>
-
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}"
                                                     {{ $receipt->company_id == $company->id ? 'selected' : '' }}>
@@ -83,7 +82,6 @@
                                         </label>
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
                                             <option value="">Select Branch</option>
-
                                             @foreach ($branches as $branch)
                                                 <option value="{{ $branch->id }}"
                                                     {{ $receipt->branch_id == $branch->id ? 'selected' : '' }}>
@@ -169,14 +167,10 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- ========================================= --}}
                         {{-- Income Item List --}}
-                        {{-- ========================================= --}}
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between">
-                                <h4>
-                                    Products
-                                </h4>
+                                <h4>Products</h4>
                                 <div>
                                     <button type="button" id="addRow" class="btn btn-primary">
                                         <i class="fa fa-plus me-2"></i>
@@ -189,33 +183,15 @@
                                     <table class="table table-bordered mb-0">
                                         <thead>
                                             <tr>
-                                                <th width="50">
-                                                    SL
-                                                </th>
-                                                <th width="300">
-                                                    Product
-                                                </th>
-                                                <th>
-                                                    Serial No
-                                                </th>
-                                                <th width="120">
-                                                    Stock
-                                                </th>
-                                                <th width="120">
-                                                    Qty
-                                                </th>
-                                                <th width="140">
-                                                    Sale Price
-                                                </th>
-                                                <th width="140">
-                                                    Amount
-                                                </th>
-                                                <th>
-                                                    Remarks
-                                                </th>
-                                                <th width="60">
-                                                    Action
-                                                </th>
+                                                <th width="50">SL</th>
+                                                <th width="300">Product</th>
+                                                <th>Serial No</th>
+                                                <th width="120">Stock</th>
+                                                <th width="120">Qty</th>
+                                                <th width="140">Sale Price</th>
+                                                <th width="140">Amount</th>
+                                                <th>Remarks</th>
+                                                <th width="60">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="salesBody"></tbody>
@@ -226,9 +202,7 @@
                         {{-- Total --}}
                         <div class="row mt-4">
                             <div class="col-md-8">
-                                <label>
-                                    Remarks
-                                </label>
+                                <label>Remarks</label>
                                 <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
                             </div>
                             <div class="col-md-4">
@@ -281,316 +255,126 @@
     </div>
 
     <div class="modal fade" id="serialModal" tabindex="-1" aria-hidden="true">
-
         <div class="modal-dialog modal-lg modal-dialog-centered">
-
             <div class="modal-content">
-
-
                 {{-- HEADER --}}
-
                 <div class="modal-header">
-
                     <h5 class="modal-title">
-
                         <i class="fa fa-barcode me-2"></i>
-
                         Select Serial Numbers
-
                     </h5>
-
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">
-                    </button>
-
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
-
                 {{-- BODY --}}
-
                 <div class="modal-body">
-
-
                     <div class="row mb-3">
-
                         <div class="col-md-6">
-
-                            <label class="fw-bold">
-                                Product
-                            </label>
-
+                            <label class="fw-bold">Product</label>
                             <input type="text" id="serialProductName" class="form-control" readonly>
-
                         </div>
-
-
                         <div class="col-md-2">
-
-                            <label class="fw-bold">
-                                Qty
-                            </label>
-
+                            <label class="fw-bold">Qty</label>
                             <input type="text" id="serialQty" class="form-control text-end" readonly>
-
                         </div>
-
-
                         <div class="col-md-2">
-
-                            <label class="fw-bold">
-                                Selected
-                            </label>
-
+                            <label class="fw-bold">Selected</label>
                             <input type="text" id="serialSelected" class="form-control text-end" value="0"
                                 readonly>
-
                         </div>
-
-
                         <div class="col-md-2">
-
-                            <label class="fw-bold">
-                                Available
-                            </label>
-
+                            <label class="fw-bold">Available</label>
                             <input type="text" id="serialAvailable" class="form-control text-end" value="0"
                                 readonly>
-
                         </div>
-
                     </div>
-
-
                     {{-- SEARCH --}}
-
                     <div class="mb-3">
-
                         <input type="text" id="serialSearch" class="form-control"
                             placeholder="Search serial number...">
-
                     </div>
-
-
                     {{-- SERIAL LIST --}}
-
                     <div id="serialList" class="border rounded p-3" style="max-height:350px; overflow-y:auto;">
-
                         <div class="text-center text-muted py-4">
-
                             <i class="fa fa-spinner fa-spin"></i>
-
                             Loading...
-
                         </div>
-
                     </div>
-
-
                     <div id="serialEmpty" class="text-center text-muted py-4 d-none">
-
                         <i class="fa fa-barcode fa-2x mb-2"></i>
-
                         <br>
-
                         No Serial Number Available
-
                     </div>
-
-
                 </div>
-
-
                 {{-- FOOTER --}}
-
                 <div class="modal-footer">
-
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
                         Cancel
-
                     </button>
-
-
                     <button type="button" class="btn btn-primary" id="saveSerialBtn">
-
                         <i class="fa fa-check me-1"></i>
-
                         Select Serial
-
                     </button>
-
                 </div>
-
-
             </div>
-
         </div>
-
     </div>
 
     <script type="text/template" id="salesRowTemplate">
-
-<tr>
-
-    {{-- SL --}}
-    <td class="sl text-center"></td>
-
-
-    {{-- PRODUCT --}}
-    <td>
-
-        <select
-            name="product_id[]"
-            class="form-select product select2"
-            required>
-
-            <option value="">
-                Select Product
-            </option>
-
-            @foreach($products as $product)
-
-                <option
-                    value="{{ $product->id }}"
-
-                    data-stock="{{ $product->current_stock }}"
-
-                    data-price="{{ $product->sale_price }}"
-
-                    data-unit="{{ $product->unit }}"
-
-                    data-code="{{ $product->product_code }}">
-
-                    {{ $product->product_code }}
-                    -
-                    {{ $product->name }}
-
-                    (Stock:
-                    {{ number_format($product->current_stock, 2) }})
-
-                </option>
-
-            @endforeach
-
-        </select>
-
-
-        
-
-    </td>
-
-    <td>
-        {{-- SERIAL BUTTON --}}
-
-        <div class="mt-2 d-flex align-items-center gap-2">
-
-            <button
-                type="button"
-                class="btn btn-info btn-sm serialBtn">
-
-                <i class="fa fa-barcode me-1"></i>
-
-                Serial
-
-                <span class="serialCount badge bg-light text-dark ms-1">
-                    0
-                </span>
-
-            </button>
-
-
-            {{-- IMPORTANT --}}
-            <input
-                type="hidden"
-                name="serial_json[]"
-                class="serial_json"
-                value="[]">
-
-
-            <small class="text-muted serialStatus">
-                No serial selected
-            </small>
-
-        </div>
-    </td>
-
-    {{-- STOCK --}}
-    <td>
-
-        <input
-            type="text"
-            class="form-control stock text-end"
-            readonly>
-
-    </td>
-
-
-    {{-- QTY --}}
-    <td>
-
-        <input
-            type="number"
-            min="1"
-            name="qty[]"
-            value="1"
-            class="form-control qty text-end"
-            required>
-
-    </td>
-
-
-    {{-- RATE --}}
-    <td>
-
-        <input
-            type="number"
-            step="0.01"
-            min="0"
-            name="rate[]"
-            class="form-control rate text-end"
-            required>
-
-    </td>
-
-
-    {{-- TOTAL --}}
-    <td>
-
-        <input
-            type="text"
-            class="form-control total text-end"
-            value="0.00"
-            readonly>
-
-    </td>
-
-
-    {{-- DETAILS --}}
-    <td>
-
-        <input
-            type="text"
-            name="details[]"
-            class="form-control details">
-
-    </td>
-
-
-    {{-- ACTION --}}
-    <td class="text-center">
-
-        <button
-            type="button"
-            class="btn btn-danger remove">
-
-            <i class="fa fa-trash"></i>
-
-        </button>
-
-    </td>
-
-</tr>
-
-</script>
+        <tr>
+            {{-- SL --}}
+            <td class="sl text-center"></td>
+            {{-- PRODUCT --}}
+            <td>
+                <select name="product_id[]" class="form-select product select2" required>
+                    <option value="">Select Product</option>
+                    @foreach($products as $product)
+                        <option value="{{ $product->id }}" data-stock="{{ $product->current_stock }}" data-price="{{ $product->sale_price }}" data-unit="{{ $product->unit }}" data-code="{{ $product->product_code }}">
+                            {{ $product->product_code }} - {{ $product->name }} (Stock: {{ number_format($product->current_stock, 2) }})
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                {{-- SERIAL BUTTON --}}
+                <div class="mt-2 d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-info btn-sm serialBtn">
+                        <i class="fa fa-barcode me-1"></i>
+                        Serial
+                        <span class="serialCount badge bg-light text-dark ms-1">0</span>
+                    </button>
+                    {{-- IMPORTANT --}}
+                    <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
+                    <small class="text-muted serialStatus">No serial selected</small>
+                </div>
+            </td>
+            {{-- STOCK --}}
+            <td>
+                <input type="text" class="form-control stock text-end" readonly>
+            </td>
+            {{-- QTY --}}
+            <td>
+                <input type="number" min="1" name="qty[]" value="1" class="form-control qty text-end" required>
+            </td>
+            {{-- RATE --}}
+            <td>
+                <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate text-end" required>
+            </td>
+            {{-- TOTAL --}}
+            <td>
+                <input type="text" class="form-control total text-end" value="0.00" readonly>
+            </td>
+            {{-- DETAILS --}}
+            <td>
+                <input type="text" name="details[]" class="form-control details">
+            </td>
+            {{-- ACTION --}}
+            <td class="text-center">
+                <button type="button" class="btn btn-danger remove">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    </script>
     <style>
         .select2 {
             width: 250px !important;

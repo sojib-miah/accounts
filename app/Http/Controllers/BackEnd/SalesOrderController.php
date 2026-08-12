@@ -811,24 +811,40 @@ class SalesOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'You are not allowed to access this product.'], 403);
             }
         }
-        $companyId = $user->company_id;
+
+        $companyId = $product->company_id ?? $user->company_id;
         $branchId = $request->branch_id;
-        $query = SerialNumber::query()
-            ->where('company_id', $companyId)
-            ->where('product_id', $product->id)
-            ->where('status', 'Available');
+        $query = SerialNumber::query()->where('product_id', $product->id)->where('status', 'Available');
+        if (!empty($companyId)) {
+            $query->where(function ($q) use ($companyId) {
+                $q->where('company_id', $companyId)
+                    ->orWhereNull('company_id');
+            });
+        }
         if (!empty($branchId)) {
-            $query->where('branch_id', $branchId);
+            $query->where(function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId)
+                    ->orWhereNull('branch_id');
+            });
         }
 
-        $serials = $query->orderBy('serial_no')->get(['id', 'serial_no', 'product_id', 'branch_id', 'status',]);
-
+        $serials = $query->orderBy('serial_no')
+            ->get([
+                'id',
+                'serial_no',
+                'product_id',
+                'company_id',
+                'branch_id',
+                'status',
+                'receipt_id',
+                'receipt_item_id',
+            ]);
         return response()->json([
             'success' => true,
             'product' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku,
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'sku'   => $product->sku,
                 'stock' => $product->current_stock,
             ],
             'serials' => $serials,
