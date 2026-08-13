@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="row">
+        <div class="row mt-3">
             <!-- LEFT SIDE -->
             <div class="col-lg-9">
                 <div class="card shadow-sm border-0">
@@ -189,7 +189,7 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th width="180">Total Qty</th>
-                                    <td class="text-end">{{ number_format($totalQty, 2) }}</td>
+                                    <td class="text-end">{{ number_format($totalQty) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Sub Total</th>

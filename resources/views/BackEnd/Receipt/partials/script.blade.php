@@ -23,10 +23,13 @@
                     .find('.select2, .select2-expense')
                     .each(function() {
 
-                        let $select = $(this);
+                        const $select = $(this);
 
-                        // Already initialized হলে destroy
-                        if ($select.hasClass('select2-hidden-accessible')) {
+                        if (
+                            $select.hasClass(
+                                'select2-hidden-accessible'
+                            )
+                        ) {
                             $select.select2('destroy');
                         }
 
@@ -37,7 +40,6 @@
                         });
 
                     });
-
             }
 
 
@@ -56,120 +58,270 @@
             |--------------------------------------------------------------------------
             */
 
-            $(document).on('change', '#company_id', function() {
+            $(document).on(
+                'change',
+                '#company_id',
+                function() {
 
-                const companyId = $(this).val();
+                    const companyId = $(this).val();
 
-                const option = $(this).find('option:selected');
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | COMPANY INFORMATION
-                |--------------------------------------------------------------------------
-                */
-
-                if (!companyId) {
-
-                    $('#company_name').text('Select Company');
-
-                } else {
-
-                    $('#company_name').text(
-                        option.data('name') || option.text().trim()
-                    );
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | RESET BRANCH
-                |--------------------------------------------------------------------------
-                */
-
-                const $branch = $('#branch_id');
-
-                $branch.val(null).trigger('change');
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SHOW ONLY COMPANY BRANCHES
-                |--------------------------------------------------------------------------
-                */
-
-                $branch.find('option').each(function() {
-
-                    const $option = $(this);
-
-                    const optionValue = $option.val();
-
-                    const branchCompanyId =
-                        $option.attr('data-company-id');
-
-
-                    // Placeholder
-                    if (!optionValue) {
-
-                        $option.prop('disabled', false);
-                        $option.show();
-
-                        return;
-
-                    }
+                    const $companyOption =
+                        $(this).find('option:selected');
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | Super Admin / Company matching
+                    | COMPANY INFORMATION
                     |--------------------------------------------------------------------------
                     */
 
-                    if (
-                        !companyId ||
-                        String(branchCompanyId) === String(companyId)
-                    ) {
+                    if (!companyId) {
 
-                        $option.prop('disabled', false);
-                        $option.show();
+                        $('#company_name').text('-');
 
-                    } else {
+                        resetBranch();
 
-                        $option.prop('disabled', true);
-                        $option.hide();
-
+                        return;
                     }
 
-                });
+
+                    $('#company_name').text(
+
+                        $companyOption.attr(
+                            'data-name'
+                        ) ||
+                        $companyOption.text().trim()
+
+                    );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | REINITIALIZE SELECT2
-                |--------------------------------------------------------------------------
-                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | RESET BRANCH
+                    |--------------------------------------------------------------------------
+                    */
 
-                if ($branch.hasClass('select2-hidden-accessible')) {
+                    resetBranch();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | BRANCH SELECT
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const $branch =
+                        $('#branch_id');
+
+
+                    $branch
+                        .empty()
+                        .append(
+                            '<option value="">Loading branches...</option>'
+                        )
+                        .prop(
+                            'disabled',
+                            true
+                        );
+
+
+                    refreshBranchSelect();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | LOAD BRANCHES
+                    |--------------------------------------------------------------------------
+                    | Existing route:
+                    |
+                    | /ajax/company/{company}/branches
+                    |--------------------------------------------------------------------------
+                    */
+
+                    let url =
+                        "{{ url('/admin/ajax/company') }}/" +
+                        companyId +
+                        "/branches";
+
+
+                    $.ajax({
+
+                        url: url,
+
+                        type: 'GET',
+
+                        dataType: 'json',
+
+                        success: function(response) {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | RESET OPTIONS
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $branch
+                                .empty()
+                                .append(
+                                    '<option value="">Select Branch</option>'
+                                );
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | BRANCHES
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                response.branches &&
+                                Array.isArray(
+                                    response.branches
+                                )
+                            ) {
+
+                                response.branches.forEach(
+                                    function(branch) {
+
+                                        const phone =
+                                            branch.phone_one ||
+                                            branch.phone_two ||
+                                            branch.phone ||
+                                            '';
+
+
+                                        $branch.append(
+
+                                            $('<option>', {
+
+                                                value: branch.id,
+
+                                                text: branch.name,
+
+                                                'data-company-id': branch.company_id,
+
+                                                'data-company-name': response.company ?
+                                                    response.company.name :
+                                                    '',
+
+                                                'data-name': branch.name || '',
+
+                                                'data-phone': phone,
+
+                                                'data-email': branch.email || '',
+
+                                                'data-address': branch.address || ''
+
+                                            })
+
+                                        );
+
+                                    }
+                                );
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | ENABLE BRANCH
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $branch.prop(
+                                'disabled',
+                                false
+                            );
+
+
+                            refreshBranchSelect();
+
+
+                            resetBranchInfo();
+
+                        },
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | AJAX ERROR
+                        |--------------------------------------------------------------------------
+                        */
+
+                        error: function(xhr) {
+
+                            console.error(
+                                'Branch Loading Error:',
+                                xhr.responseText
+                            );
+
+
+                            $branch
+                                .empty()
+                                .append(
+                                    '<option value="">Unable to load branches</option>'
+                                )
+                                .prop(
+                                    'disabled',
+                                    true
+                                );
+
+
+                            refreshBranchSelect();
+
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Error',
+
+                                text: 'Unable to load branches for this company.'
+
+                            });
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | REFRESH BRANCH SELECT2
+            |--------------------------------------------------------------------------
+            */
+
+            function refreshBranchSelect() {
+
+                const $branch =
+                    $('#branch_id');
+
+
+                if (
+                    $branch.hasClass(
+                        'select2-hidden-accessible'
+                    )
+                ) {
+
                     $branch.select2('destroy');
+
                 }
 
+
                 $branch.select2({
+
                     width: '100%',
+
                     allowClear: true,
+
                     placeholder: 'Select Branch'
+
                 });
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | RESET BRANCH INFORMATION
-                |--------------------------------------------------------------------------
-                */
-
-                resetBranchInfo();
-
-            });
+            }
 
 
             /*
@@ -178,63 +330,118 @@
             |--------------------------------------------------------------------------
             */
 
-            $(document).on('change', '#branch_id', function() {
+            $(document).on(
+                'change',
+                '#branch_id',
+                function() {
 
-                const $option =
-                    $(this).find('option:selected');
-
-                const branchId = $(this).val();
+                    const branchId =
+                        $(this).val();
 
 
-                if (!branchId) {
+                    const $option =
+                        $(this).find('option:selected');
 
-                    resetBranchInfo();
 
-                    return;
+                    /*
+                    |--------------------------------------------------------------------------
+                    | NO BRANCH
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (!branchId) {
+
+                        resetBranchInfo();
+
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | BRANCH INFORMATION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $('#branch_company_name').text(
+
+                        $option.attr(
+                            'data-company-name'
+                        ) || '-'
+
+                    );
+
+
+                    $('#branch_name').text(
+
+                        $option.attr(
+                            'data-name'
+                        ) ||
+                        $option.text().trim()
+
+                    );
+
+
+                    $('#branch_phone').text(
+
+                        $option.attr(
+                            'data-phone'
+                        ) || '-'
+
+                    );
+
+
+                    $('#branch_email').text(
+
+                        $option.attr(
+                            'data-email'
+                        ) || '-'
+
+                    );
+
+
+                    $('#branch_address').text(
+
+                        $option.attr(
+                            'data-address'
+                        ) || '-'
+
+                    );
 
                 }
+            );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | BRANCH INFORMATION
-                |--------------------------------------------------------------------------
-                */
+            /*
+            |--------------------------------------------------------------------------
+            | RESET BRANCH
+            |--------------------------------------------------------------------------
+            */
 
-                $('#branch_company_name').text(
-                    $option.attr('data-company-name') || '-'
-                );
+            function resetBranch() {
 
-                $('#branch_name').text(
-                    $option.attr('data-name') ||
-                    $option.text().trim()
-                );
-
-                $('#branch_phone').text(
-                    $option.attr('data-phone') || '-'
-                );
-
-                $('#branch_email').text(
-                    $option.attr('data-email') || '-'
-                );
-
-                $('#branch_address').text(
-                    $option.attr('data-address') || '-'
-                );
+                const $branch =
+                    $('#branch_id');
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | IMPORTANT
-                |--------------------------------------------------------------------------
-                | Product / serial related code থাকলে branch change করার পরে
-                | serial আবার reload করতে হবে।
-                |--------------------------------------------------------------------------
-                */
+                $branch
+                    .empty()
+                    .append(
+                        '<option value="">Select Branch</option>'
+                    )
+                    .val('')
+                    .prop(
+                        'disabled',
+                        true
+                    );
 
-                reloadAllSerialCounts();
 
-            });
+                refreshBranchSelect();
+
+
+                resetBranchInfo();
+
+            }
 
 
             /*
@@ -245,23 +452,18 @@
 
             function resetBranchInfo() {
 
-                $('#branch_company_name')
-                    .text(
-                        $('#company_id option:selected').attr('data-name') ||
-                        'Select Company'
-                    );
+                $('#branch_company_name').text(
+                    $('#company_id option:selected')
+                    .attr('data-name') || '-'
+                );
 
-                $('#branch_name')
-                    .text('-');
+                $('#branch_name').text('-');
 
-                $('#branch_phone')
-                    .text('-');
+                $('#branch_phone').text('-');
 
-                $('#branch_email')
-                    .text('-');
+                $('#branch_email').text('-');
 
-                $('#branch_address')
-                    .text('-');
+                $('#branch_address').text('-');
 
             }
 
@@ -272,45 +474,86 @@
             |--------------------------------------------------------------------------
             */
 
-            $(document).on('change', '#party_id', function() {
+            $(document).on(
+                'change',
+                '#party_id',
+                function() {
 
-                const $option =
-                    $(this).find('option:selected');
-
-                const partyId = $(this).val();
+                    const partyId =
+                        $(this).val();
 
 
-                if (!partyId) {
+                    const $option =
+                        $(this).find('option:selected');
 
-                    resetPartyInfo();
 
-                    return;
+                    /*
+                    |--------------------------------------------------------------------------
+                    | RESET
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (!partyId) {
+
+                        resetPartyInfo();
+
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PARTY INFORMATION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $('#party_name').text(
+
+                        $option.attr(
+                            'data-name'
+                        ) ||
+                        $option.text().trim()
+
+                    );
+
+
+                    $('#party_designation').text(
+
+                        $option.attr(
+                            'data-designation'
+                        ) || '-'
+
+                    );
+
+
+                    $('#party_phone').text(
+
+                        $option.attr(
+                            'data-phone'
+                        ) || '-'
+
+                    );
+
+
+                    $('#party_email').text(
+
+                        $option.attr(
+                            'data-email'
+                        ) || '-'
+
+                    );
+
+
+                    $('#party_address').text(
+
+                        $option.attr(
+                            'data-address'
+                        ) || '-'
+
+                    );
 
                 }
-
-
-                $('#party_name').text(
-                    $option.attr('data-name') ||
-                    $option.text().trim()
-                );
-
-                $('#party_designation').text(
-                    $option.attr('data-designation') || '-'
-                );
-
-                $('#party_phone').text(
-                    $option.attr('data-phone') || '-'
-                );
-
-                $('#party_email').text(
-                    $option.attr('data-email') || '-'
-                );
-
-                $('#party_address').text(
-                    $option.attr('data-address') || '-'
-                );
-
-            });
+            );
 
 
             /*
@@ -322,9 +565,13 @@
             function resetPartyInfo() {
 
                 $('#party_name').text('-');
+
                 $('#party_designation').text('-');
+
                 $('#party_phone').text('-');
+
                 $('#party_email').text('-');
+
                 $('#party_address').text('-');
 
             }
@@ -332,7 +579,7 @@
 
             /*
             |--------------------------------------------------------------------------
-            | ADD FIRST ROW
+            | ADD FIRST EXPENSE ROW
             |--------------------------------------------------------------------------
             */
 
@@ -345,11 +592,17 @@
             |--------------------------------------------------------------------------
             */
 
-            $('#addRow').on('click', function() {
+            $(document).on(
+                'click',
+                '#addRow',
+                function() {
 
-                addExpenseRow();
+                    addExpenseRow();
 
-            });
+                    calculateGrandTotal();
+
+                }
+            );
 
 
             /*
@@ -362,18 +615,14 @@
 
                 rowCounter++;
 
+
                 const template =
                     $('#expenseRowTemplate').html();
+
 
                 const $row =
                     $(template);
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | ROW ID
-                |--------------------------------------------------------------------------
-                */
 
                 $row.attr(
                     'data-row',
@@ -381,18 +630,13 @@
                 );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Append
-                |--------------------------------------------------------------------------
-                */
-
-                $('#expenseBody').append($row);
+                $('#expenseBody')
+                    .append($row);
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | Initialize Select2 ONLY in new row
+                | SELECT2 FOR NEW ROW
                 |--------------------------------------------------------------------------
                 */
 
@@ -401,7 +645,7 @@
 
                 /*
                 |--------------------------------------------------------------------------
-                | Update Serial Numbers
+                | ROW NUMBER
                 |--------------------------------------------------------------------------
                 */
 
@@ -410,18 +654,36 @@
 
                 /*
                 |--------------------------------------------------------------------------
-                | Remove button visibility
+                | REMOVE BUTTON
                 |--------------------------------------------------------------------------
                 */
 
                 updateRemoveButtons();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | INITIAL ROW TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                calculateRowTotal($row);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GRAND TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                calculateGrandTotal();
 
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | REMOVE ROW
+            | REMOVE EXPENSE ROW
             |--------------------------------------------------------------------------
             */
 
@@ -436,27 +698,42 @@
 
                     /*
                     |--------------------------------------------------------------------------
-                    | At least one row must remain
+                    | KEEP ONE ROW
                     |--------------------------------------------------------------------------
                     */
 
                     if (rows.length <= 1) {
 
                         Swal.fire({
+
                             icon: 'warning',
+
                             title: 'Cannot Remove',
+
                             text: 'At least one expense item is required.'
+
                         });
 
                         return;
-
                     }
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | REMOVE
+                    |--------------------------------------------------------------------------
+                    */
 
                     $(this)
                         .closest('.expense-row')
                         .remove();
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | UPDATE
+                    |--------------------------------------------------------------------------
+                    */
 
                     updateRowNumbers();
 
@@ -481,7 +758,9 @@
 
                         $(this)
                             .find('.serial-no')
-                            .text(index + 1);
+                            .text(
+                                index + 1
+                            );
 
                     });
 
@@ -490,7 +769,7 @@
 
             /*
             |--------------------------------------------------------------------------
-            | REMOVE BUTTON
+            | UPDATE REMOVE BUTTONS
             |--------------------------------------------------------------------------
             */
 
@@ -499,15 +778,24 @@
                 const rows =
                     $('#expenseBody .expense-row');
 
+
                 if (rows.length <= 1) {
 
-                    rows.find('.removeRow')
-                        .prop('disabled', true);
+                    rows
+                        .find('.removeRow')
+                        .prop(
+                            'disabled',
+                            true
+                        );
 
                 } else {
 
-                    rows.find('.removeRow')
-                        .prop('disabled', false);
+                    rows
+                        .find('.removeRow')
+                        .prop(
+                            'disabled',
+                            false
+                        );
 
                 }
 
@@ -528,16 +816,21 @@
                     const categoryId =
                         $(this).val();
 
+
                     const $row =
-                        $(this).closest('.expense-row');
+                        $(this)
+                        .closest('.expense-row');
+
 
                     const $accountHead =
-                        $row.find('.account-head');
+                        $row.find(
+                            '.account-head'
+                        );
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | RESET
+                    | RESET ACCOUNT HEAD
                     |--------------------------------------------------------------------------
                     */
 
@@ -546,12 +839,15 @@
                         .append(
                             '<option value="">Select Expense</option>'
                         )
-                        .prop('disabled', true);
+                        .prop(
+                            'disabled',
+                            true
+                        );
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | Select2 Refresh
+                    | SELECT2 RESET
                     |--------------------------------------------------------------------------
                     */
 
@@ -561,48 +857,67 @@
                         )
                     ) {
 
-                        $accountHead
-                            .trigger('change');
+                        $accountHead.select2(
+                            'destroy'
+                        );
 
                     }
 
 
+                    $accountHead.select2({
+
+                        width: '100%',
+
+                        allowClear: true,
+
+                        placeholder: 'Select Expense'
+
+                    });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | NO CATEGORY
+                    |--------------------------------------------------------------------------
+                    */
+
                     if (!categoryId) {
+
                         return;
                     }
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | Loading
+                    | LOADING
                     |--------------------------------------------------------------------------
                     */
 
                     $accountHead
+                        .empty()
                         .append(
                             '<option value="">Loading...</option>'
                         )
-                        .prop('disabled', true)
-                        .trigger('change');
+                        .prop(
+                            'disabled',
+                            true
+                        );
+
+
+                    $accountHead.trigger(
+                        'change'
+                    );
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | AJAX URL
-                    |--------------------------------------------------------------------------
-                    |
-                    | আপনার route:
-                    |
-                    | receipt.account-heads
-                    |
-                    | Example:
-                    | /admin/receipt/account-heads/{category}
-                    |
+                    | ACCOUNT HEAD URL
                     |--------------------------------------------------------------------------
                     */
 
                     let url =
                         "{{ route('ajax.account-head', ['category' => '__CATEGORY__']) }}";
+
 
                     url =
                         url.replace(
@@ -610,6 +925,12 @@
                             categoryId
                         );
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | AJAX ACCOUNT HEAD
+                    |--------------------------------------------------------------------------
+                    */
 
                     $.ajax({
 
@@ -621,6 +942,12 @@
 
                         success: function(response) {
 
+                            /*
+                            |--------------------------------------------------------------------------
+                            | RESET
+                            |--------------------------------------------------------------------------
+                            */
+
                             $accountHead
                                 .empty()
                                 .append(
@@ -628,83 +955,110 @@
                                 );
 
 
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Different possible response formats
-                            |--------------------------------------------------------------------------
-                            */
-
                             let accounts = [];
 
 
-                            if (Array.isArray(response)) {
+                            /*
+                            |--------------------------------------------------------------------------
+                            | RESPONSE DATA
+                            |--------------------------------------------------------------------------
+                            */
 
-                                accounts = response;
-
-                            } else if (
-                                Array.isArray(response.accountHeads)
+                            if (
+                                Array.isArray(
+                                    response
+                                )
                             ) {
 
                                 accounts =
-                                    response.accountHeads;
+                                    response;
 
                             } else if (
-                                Array.isArray(response.data)
+                                Array.isArray(
+                                    response.data
+                                )
                             ) {
 
                                 accounts =
                                     response.data;
+
+                            } else if (
+                                Array.isArray(
+                                    response.accountHeads
+                                )
+                            ) {
+
+                                accounts =
+                                    response.accountHeads;
 
                             }
 
 
                             /*
                             |--------------------------------------------------------------------------
-                            | Add Account Heads
+                            | ADD ACCOUNT HEADS
                             |--------------------------------------------------------------------------
                             */
 
-                            accounts.forEach(function(account) {
+                            accounts.forEach(
+                                function(account) {
 
-                                const id =
-                                    account.id;
-
-                                const name =
-                                    account.name ||
-                                    account.account_name ||
-                                    account.title;
+                                    const id =
+                                        account.id;
 
 
-                                if (id && name) {
+                                    const name =
+                                        account.name ||
+                                        account.account_name ||
+                                        account.title;
 
-                                    $accountHead.append(
 
-                                        $('<option>', {
+                                    if (
+                                        id &&
+                                        name
+                                    ) {
 
-                                            value: id,
+                                        $accountHead.append(
 
-                                            text: name
+                                            $('<option>', {
 
-                                        })
+                                                value: id,
 
-                                    );
+                                                text: name
+
+                                            })
+
+                                        );
+
+                                    }
 
                                 }
-
-                            });
+                            );
 
 
                             /*
                             |--------------------------------------------------------------------------
-                            | Enable
+                            | ENABLE
                             |--------------------------------------------------------------------------
                             */
 
                             $accountHead
-                                .prop('disabled', false)
-                                .trigger('change');
+                                .prop(
+                                    'disabled',
+                                    false
+                                )
+                                .trigger(
+                                    'change'
+                                );
 
                         },
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | ERROR
+                        |--------------------------------------------------------------------------
+                        */
 
                         error: function(xhr) {
 
@@ -719,14 +1073,23 @@
                                 .append(
                                     '<option value="">Unable to load Expense</option>'
                                 )
-                                .prop('disabled', true)
-                                .trigger('change');
+                                .prop(
+                                    'disabled',
+                                    true
+                                )
+                                .trigger(
+                                    'change'
+                                );
 
 
                             Swal.fire({
+
                                 icon: 'error',
+
                                 title: 'Error',
+
                                 text: 'Unable to load expense/account head.'
+
                             });
 
                         }
@@ -739,7 +1102,7 @@
 
             /*
             |--------------------------------------------------------------------------
-            | QTY / RATE CHANGE
+            | QTY / RATE INPUT
             |--------------------------------------------------------------------------
             */
 
@@ -749,9 +1112,45 @@
                 function() {
 
                     const $row =
-                        $(this).closest('.expense-row');
+                        $(this)
+                        .closest('.expense-row');
+
 
                     calculateRowTotal($row);
+
+                    calculateGrandTotal();
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DISCOUNT INPUT
+            |--------------------------------------------------------------------------
+            */
+
+            $(document).on(
+                'input',
+                '#discount',
+                function() {
+
+                    calculateGrandTotal();
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | VAT INPUT
+            |--------------------------------------------------------------------------
+            */
+
+            $(document).on(
+                'input',
+                '#vat',
+                function() {
 
                     calculateGrandTotal();
 
@@ -767,19 +1166,19 @@
 
             function calculateRowTotal($row) {
 
-                let qty =
+                const qty =
                     parseFloat(
                         $row.find('.qty').val()
                     ) || 0;
 
 
-                let rate =
+                const rate =
                     parseFloat(
                         $row.find('.rate').val()
                     ) || 0;
 
 
-                let total =
+                const total =
                     qty * rate;
 
 
@@ -793,258 +1192,507 @@
 
             /*
             |--------------------------------------------------------------------------
-            | CALCULATE GRAND TOTAL
+            | CALCULATE ALL TOTALS
             |--------------------------------------------------------------------------
             */
 
             function calculateGrandTotal() {
 
-                let grandTotal = 0;
+                let totalQty = 0;
 
+                let subTotal = 0;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | LOOP ROWS
+                |--------------------------------------------------------------------------
+                */
 
                 $('#expenseBody .expense-row')
                     .each(function() {
 
-                        let total =
+                        const $row =
+                            $(this);
+
+
+                        const qty =
                             parseFloat(
-                                $(this)
-                                .find('.total')
-                                .val()
+                                $row.find('.qty').val()
                             ) || 0;
 
 
-                        grandTotal += total;
+                        const rate =
+                            parseFloat(
+                                $row.find('.rate').val()
+                            ) || 0;
+
+
+                        const rowTotal =
+                            qty * rate;
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | ROW TOTAL
+                        |--------------------------------------------------------------------------
+                        */
+
+                        $row.find('.total')
+                            .val(
+                                rowTotal.toFixed(2)
+                            );
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | TOTAL QTY
+                        |--------------------------------------------------------------------------
+                        */
+
+                        totalQty += qty;
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | SUB TOTAL
+                        |--------------------------------------------------------------------------
+                        */
+
+                        subTotal += rowTotal;
 
                     });
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | Optional Grand Total field
+                | DISCOUNT
                 |--------------------------------------------------------------------------
                 */
 
-                $('#grandTotal')
+                let discount =
+                    parseFloat(
+                        $('#discount').val()
+                    ) || 0;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | DISCOUNT CANNOT EXCEED SUBTOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                if (discount < 0) {
+
+                    discount = 0;
+
+                    $('#discount').val(0);
+
+                }
+
+
+                if (discount > subTotal) {
+
+                    discount = subTotal;
+
+                    $('#discount').val(
+                        subTotal.toFixed(2)
+                    );
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | VAT
+                |--------------------------------------------------------------------------
+                */
+
+                let vatPercent =
+                    parseFloat(
+                        $('#vat').val()
+                    ) || 0;
+
+
+                if (vatPercent < 0) {
+
+                    vatPercent = 0;
+
+                    $('#vat').val(0);
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | AFTER DISCOUNT
+                |--------------------------------------------------------------------------
+                */
+
+                const afterDiscount =
+                    subTotal - discount;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | VAT AMOUNT
+                |--------------------------------------------------------------------------
+                */
+
+                const vatAmount =
+                    (
+                        afterDiscount *
+                        vatPercent
+                    ) / 100;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GRAND TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                const grandTotal =
+                    afterDiscount +
+                    vatAmount;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE TOTAL QTY
+                |--------------------------------------------------------------------------
+                */
+
+                $('#total_qty')
+                    .val(
+                        formatNumber(
+                            totalQty
+                        )
+                    );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE SUB TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                $('#sub_total')
+                    .val(
+                        subTotal.toFixed(2)
+                    );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE GRAND TOTAL
+                |--------------------------------------------------------------------------
+                */
+
+                $('#grand_total')
                     .val(
                         grandTotal.toFixed(2)
                     );
 
-                $('#grand_total')
-                    .text(
-                        grandTotal.toFixed(2)
-                    );
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | FORMAT NUMBER
+            |--------------------------------------------------------------------------
+            */
+
+            function formatNumber(number) {
+
+                if (
+                    Number.isInteger(number)
+                ) {
+
+                    return number.toString();
+
+                }
+
+                return number.toFixed(2);
 
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | SERIAL COUNT RELOAD
-            |--------------------------------------------------------------------------
-            |
-            | আপনার Sales page-এ product serial আছে।
-            | Expense page-এ এই function কাজ না করলেও সমস্যা নেই।
-            |
+            | FORM SUBMIT
             |--------------------------------------------------------------------------
             */
 
-            function reloadAllSerialCounts() {
+            $('#receiptForm').on(
+                'submit',
+                function(e) {
 
-                if (
-                    typeof window.reloadAllSerialCountsFunction ===
-                    'function'
-                ) {
+                    let valid = true;
 
-                    window.reloadAllSerialCountsFunction();
+                    let message = '';
 
-                }
-
-            }
+                    const items = [];
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | FORM SUBMIT VALIDATION
-            |--------------------------------------------------------------------------
-            */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | COMPANY
+                    |--------------------------------------------------------------------------
+                    */
 
-            $('form').on('submit', function(e) {
+                    if (!$('#company_id').val()) {
 
-                let valid = true;
+                        valid = false;
 
-                let message = '';
+                        message =
+                            'Please select Company.';
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Company
-                |--------------------------------------------------------------------------
-                */
-
-                if (!$('#company_id').val()) {
-
-                    valid = false;
-
-                    message =
-                        'Please select Company.';
-
-                }
+                    }
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Branch
-                |--------------------------------------------------------------------------
-                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | BRANCH
+                    |--------------------------------------------------------------------------
+                    */
 
-                if (
-                    valid &&
-                    !$('#branch_id').val()
-                ) {
+                    if (
+                        valid &&
+                        !$('#branch_id').val()
+                    ) {
 
-                    valid = false;
+                        valid = false;
 
-                    message =
-                        'Please select Branch.';
+                        message =
+                            'Please select Branch.';
 
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Party
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    valid &&
-                    !$('#party_id').val()
-                ) {
-
-                    valid = false;
-
-                    message =
-                        'Please select Party.';
-
-                }
+                    }
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Expense Rows
-                |--------------------------------------------------------------------------
-                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PARTY
+                    |--------------------------------------------------------------------------
+                    */
 
-                if (valid) {
+                    if (
+                        valid &&
+                        !$('#party_id').val()
+                    ) {
 
-                    $('#expenseBody .expense-row')
-                        .each(function() {
+                        valid = false;
 
-                            const category =
-                                $(this)
-                                .find('.category')
-                                .val();
+                        message =
+                            'Please select Party.';
 
-                            const accountHead =
-                                $(this)
-                                .find('.account-head')
-                                .val();
-
-                            const qty =
-                                parseFloat(
-                                    $(this)
-                                    .find('.qty')
-                                    .val()
-                                ) || 0;
-
-                            const rate =
-                                parseFloat(
-                                    $(this)
-                                    .find('.rate')
-                                    .val()
-                                ) || 0;
+                    }
 
 
-                            if (!category) {
+                    /*
+                    |--------------------------------------------------------------------------
+                    | EXPENSE ITEMS
+                    |--------------------------------------------------------------------------
+                    */
 
-                                valid = false;
+                    if (valid) {
 
-                                message =
-                                    'Please select Category.';
+                        $('#expenseBody .expense-row')
+                            .each(function() {
 
-                                return false;
-
-                            }
-
-
-                            if (!accountHead) {
-
-                                valid = false;
-
-                                message =
-                                    'Please select Expense.';
-
-                                return false;
-
-                            }
+                                const $row =
+                                    $(this);
 
 
-                            if (qty <= 0) {
-
-                                valid = false;
-
-                                message =
-                                    'Quantity must be greater than 0.';
-
-                                return false;
-
-                            }
+                                const category =
+                                    $row
+                                    .find('.category')
+                                    .val();
 
 
-                            if (rate < 0) {
+                                const accountHead =
+                                    $row
+                                    .find('.account-head')
+                                    .val();
 
-                                valid = false;
 
-                                message =
-                                    'Unit Price cannot be negative.';
+                                const qty =
+                                    parseFloat(
+                                        $row
+                                        .find('.qty')
+                                        .val()
+                                    ) || 0;
 
-                                return false;
 
-                            }
+                                const rate =
+                                    parseFloat(
+                                        $row
+                                        .find('.rate')
+                                        .val()
+                                    ) || 0;
+
+
+                                const details =
+                                    $row
+                                    .find('.details')
+                                    .val() || '';
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | CATEGORY
+                                |--------------------------------------------------------------------------
+                                */
+
+                                if (!category) {
+
+                                    valid = false;
+
+                                    message =
+                                        'Please select Category.';
+
+                                    return false;
+
+                                }
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | ACCOUNT HEAD
+                                |--------------------------------------------------------------------------
+                                */
+
+                                if (!accountHead) {
+
+                                    valid = false;
+
+                                    message =
+                                        'Please select Expense.';
+
+                                    return false;
+
+                                }
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | QTY
+                                |--------------------------------------------------------------------------
+                                */
+
+                                if (qty <= 0) {
+
+                                    valid = false;
+
+                                    message =
+                                        'Quantity must be greater than 0.';
+
+                                    return false;
+
+                                }
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | RATE
+                                |--------------------------------------------------------------------------
+                                */
+
+                                if (rate < 0) {
+
+                                    valid = false;
+
+                                    message =
+                                        'Unit Price cannot be negative.';
+
+                                    return false;
+
+                                }
+
+
+                                /*
+                                |--------------------------------------------------------------------------
+                                | PUSH ITEM
+                                |--------------------------------------------------------------------------
+                                */
+
+                                items.push({
+
+                                    category_id: category,
+
+                                    account_head_id: accountHead,
+
+                                    qty: qty,
+
+                                    rate: rate,
+
+                                    details: details
+
+                                });
+
+                            });
+
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | VALIDATION FAILED
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (!valid) {
+
+                        e.preventDefault();
+
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Required',
+
+                            text: message
 
                         });
 
+
+                        return false;
+
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | FINAL CALCULATION
+                    |--------------------------------------------------------------------------
+                    */
+
+                    calculateGrandTotal();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | STORE ITEMS JSON
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $('#items_json')
+                        .val(
+                            JSON.stringify(items)
+                        );
+
                 }
+            );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Stop Submit
-                |--------------------------------------------------------------------------
-                */
+            /*
+            |--------------------------------------------------------------------------
+            | INITIAL CALCULATION
+            |--------------------------------------------------------------------------
+            */
 
-                if (!valid) {
-
-                    e.preventDefault();
-
-
-                    Swal.fire({
-
-                        icon: 'warning',
-
-                        title: 'Required',
-
-                        text: message
-
-                    });
-
-
-                    return false;
-
-                }
-
-            });
-
+            calculateGrandTotal();
 
         });
     </script>

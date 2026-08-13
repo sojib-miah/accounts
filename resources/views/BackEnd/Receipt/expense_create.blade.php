@@ -81,11 +81,6 @@
                                         </div>
 
                                     </div>
-
-
-                                    {{-- =========================================================
-         BRANCH
-    ========================================================== --}}
                                     <div class="col-md-4">
 
                                         <label class="form-label">
@@ -99,7 +94,7 @@
                                                 Select Branch
                                             </option>
 
-                                            @foreach ($branches as $branch)
+                                            {{-- @foreach ($branches as $branch)
                                                 <option value="{{ $branch->id }}"
                                                     data-company-id="{{ $branch->company_id }}"
                                                     data-company-name="{{ $branch->company->name ?? '' }}"
@@ -111,7 +106,7 @@
                                                     {{ $branch->name }}
 
                                                 </option>
-                                            @endforeach
+                                            @endforeach --}}
 
                                         </select>
 
@@ -441,8 +436,7 @@
             type="number"
             name="qty[]"
             class="form-control qty text-end"
-            min="0.01"
-            step="0.01"
+            min="1"
             value="1"
             required
         >
@@ -460,7 +454,6 @@
             name="rate[]"
             class="form-control rate text-end"
             min="0"
-            step="0.01"
             value="0"
             required
         >
