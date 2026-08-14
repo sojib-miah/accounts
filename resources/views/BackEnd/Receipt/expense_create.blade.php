@@ -45,12 +45,7 @@
                                 </div>
                                 <hr>
                                 <div class="row">
-
-                                    {{-- =========================================================
-         COMPANY
-    ========================================================== --}}
                                     <div class="col-md-4">
-
                                         <label class="form-label">
                                             Company Name
                                             <span class="text-danger">*</span>
@@ -58,7 +53,6 @@
 
                                         <select name="company_id" id="company_id" class="form-select select2" required>
                                             <option value="">Select Company</option>
-
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}" data-name="{{ $company->name }}"
                                                     data-phone="{{ $company->phone ?? '' }}"
@@ -67,99 +61,55 @@
                                                     {{ $company->name }}
                                                 </option>
                                             @endforeach
-
                                         </select>
-
                                         {{-- COMPANY INFORMATION --}}
                                         <div class="mt-3">
-
                                             <p class="mb-1">
                                                 <b>Company Name :</b>
                                                 <span id="company_name">-</span>
                                             </p>
-
                                         </div>
-
                                     </div>
                                     <div class="col-md-4">
-
                                         <label class="form-label">
                                             Branch Name
                                             <span class="text-danger">*</span>
                                         </label>
-
                                         <select name="branch_id" id="branch_id" class="form-select select2" required>
-
                                             <option value="">
-                                                Select Branch
-                                            </option>
-
-                                            {{-- @foreach ($branches as $branch)
-                                                <option value="{{ $branch->id }}"
-                                                    data-company-id="{{ $branch->company_id }}"
-                                                    data-company-name="{{ $branch->company->name ?? '' }}"
-                                                    data-name="{{ $branch->name }}"
-                                                    data-phone="{{ $branch->phone_one ?? ($branch->phone ?? '') }}"
-                                                    data-email="{{ $branch->email ?? '' }}"
-                                                    data-address="{{ $branch->address ?? '' }}">
-
-                                                    {{ $branch->name }}
-
-                                                </option>
-                                            @endforeach --}}
-
+                                                Select Branch</option>
                                         </select>
-
-
                                         {{-- BRANCH INFORMATION --}}
                                         <div class="mt-3">
-
                                             <p class="mb-1">
                                                 <b>Company Name :</b>
                                                 <span id="branch_company_name">-</span>
                                             </p>
-
                                             <p class="mb-1">
                                                 <b>Branch Name :</b>
                                                 <span id="branch_name">-</span>
                                             </p>
-
                                             <p class="mb-1">
                                                 <b>Mobile :</b>
                                                 <span id="branch_phone">-</span>
                                             </p>
-
                                             <p class="mb-1">
                                                 <b>E-mail :</b>
                                                 <span id="branch_email">-</span>
                                             </p>
-
                                             <p class="mb-1">
                                                 <b>Address :</b>
                                                 <span id="branch_address">-</span>
                                             </p>
-
                                         </div>
-
                                     </div>
-
-
-                                    {{-- =========================================================
-         PARTY
-    ========================================================== --}}
                                     <div class="col-md-4">
-
                                         <label class="form-label">
                                             Party Name
                                             <span class="text-danger">*</span>
                                         </label>
-
                                         <select name="party_id" id="party_id" class="form-select select2" required>
-
-                                            <option value="">
-                                                Select Party
-                                            </option>
-
+                                            <option value="">Select Party</option>
                                             @foreach ($parties as $party)
                                                 <option value="{{ $party->id }}" data-name="{{ $party->name }}"
                                                     data-designation="{{ $party->designation ?? '' }}"

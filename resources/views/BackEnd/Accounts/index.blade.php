@@ -7,31 +7,23 @@
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 class="mb-0 fw-bold">
-                        Account Management
-                    </h4>
-                    <small class="text-muted">
-                        Cash, Bank, Mobile Banking & Other Accounts
-                    </small>
+                    <h4 class="mb-0 fw-bold">Account Management</h4>
+                    <small class="text-muted">Cash, Bank, Mobile Banking & Other Accounts</small>
                 </div>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('accounts.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Company Account">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
                         @if (request('search'))
                             <a href="{{ route('accounts.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('account-create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">
@@ -48,44 +40,22 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">
-                                        SN
-                                    </th>
-                                    <th>
-                                        Account Name
-                                    </th>
-                                    <th>
-                                        Address
-                                    </th>
-                                    <th>
-                                        Holder Name
-                                    </th>
-                                    <th>
-                                        Account Number
-                                    </th>
-                                    <th class="text-end">
-                                        Opening Balance
-                                    </th>
-                                    <th class="text-end">
-                                        Current Balance
-                                    </th>
-                                    <th>
-                                        Default
-                                    </th>
-                                    <th>
-                                        Status
-                                    </th>
-                                    <th width="170">
-                                        Action
-                                    </th>
+                                    <th width="60">SN</th>
+                                    <th>Bank Name</th>
+                                    <th>Address</th>
+                                    <th>Holder Name</th>
+                                    <th>Account Number</th>
+                                    <th class="text-end">Opening Balance</th>
+                                    <th class="text-end">Current Balance</th>
+                                    <th>Default</th>
+                                    <th>Status</th>
+                                    <th width="170">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($accounts as $account)
                                     <tr>
-                                        <td>
-                                            {{ $loop->iteration }}
-                                        </td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>
                                             <a href="{{ route('accounts.show', $account->id) }}"
                                                 class="fw-bold text-decoration-none">
@@ -93,40 +63,24 @@
                                             </a>
                                         </td>
                                         <td>{{ $account->address ?? '-' }}</td>
-                                        <td>
-                                            {{ $account->account_holder_name }}
-                                        </td>
-                                        <td>
-                                            {{ $account->account_number }}
-                                        </td>
+                                        <td>{{ $account->account_holder_name }}</td>
+                                        <td>{{ $account->account_number }}</td>
+                                        <td class="text-end">{{ number_format($account->opening_balance, 2) }}</td>
                                         <td class="text-end">
-                                            {{ number_format($account->opening_balance, 2) }}
-                                        </td>
-                                        <td class="text-end">
-                                            <strong>
-                                                {{ number_format($account->current_balance, 2) }}
-                                            </strong>
+                                            <strong>{{ number_format($account->current_balance, 2) }}</strong>
                                         </td>
                                         <td>
                                             @if ($account->default_status == 'Default')
-                                                <span class="badge bg-primary">
-                                                    Default
-                                                </span>
+                                                <span class="badge bg-primary">Default</span>
                                             @else
-                                                <span class="badge bg-secondary">
-                                                    No
-                                                </span>
+                                                <span class="badge bg-secondary">No</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($account->status == 'Active')
-                                                <span class="badge bg-success">
-                                                    Active
-                                                </span>
+                                                <span class="badge bg-success">Active</span>
                                             @else
-                                                <span class="badge bg-danger">
-                                                    Inactive
-                                                </span>
+                                                <span class="badge bg-danger">Inactive</span>
                                             @endif
                                         </td>
                                         <td>
@@ -157,9 +111,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">
-                                            No Account Found
-                                        </td>
+                                        <td colspan="10" class="text-center">No Account Found</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -188,7 +140,7 @@
                             {{-- Account Name --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Account Name
+                                    Bank Name
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="account_name" class="form-control"
@@ -233,9 +185,7 @@
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Opening Balance
-                                </label>
+                                <label class="form-label">Opening Balance</label>
                                 <input type="number" step="0.01" min="0" name="opening_balance"
                                     class="form-control">
                                 @error('opening_balance', 'add')
@@ -244,16 +194,10 @@
                             </div>
                             {{-- Default Status --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Default
-                                </label>
+                                <label class="form-label">Default</label>
                                 <select name="default_status" class="form-select select2">
-                                    <option value="Not Default">
-                                        Not Default
-                                    </option>
-                                    <option value="Default">
-                                        Default
-                                    </option>
+                                    <option value="Not Default">Not Default</option>
+                                    <option value="Default">Default</option>
                                 </select>
                                 @error('default_status', 'add')
                                     <small class="text-danger">{{ $message }}</small>
@@ -261,16 +205,10 @@
                             </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Status
-                                </label>
+                                <label class="form-label">Status</label>
                                 <select name="status" class="form-select select2">
-                                    <option value="Active">
-                                        Active
-                                    </option>
-                                    <option value="Inactive">
-                                        Inactive
-                                    </option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
                                 </select>
                                 @error('status', 'add')
                                     <small class="text-danger">{{ $message }}</small>
@@ -312,7 +250,7 @@
                             {{-- Account Name --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Account Name
+                                    Bank Name
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="account_name" id="edit_account_name" class="form-control"
@@ -323,9 +261,7 @@
                             </div>
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Address
-                                </label>
+                                <label class="form-label">Account Address</label>
                                 <input type="text" name="address" id="edit_address" class="form-control">
                                 @error('address', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
@@ -357,9 +293,7 @@
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Opening Balance
-                                </label>
+                                <label class="form-label">Opening Balance</label>
                                 <input type="number" step="0.01" min="0" name="opening_balance"
                                     id="edit_opening_balance" class="form-control">
                                 @error('opening_balance', 'edit')
@@ -368,16 +302,10 @@
                             </div>
                             {{-- Default Status --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Default Status
-                                </label>
+                                <label class="form-label">Default Status</label>
                                 <select name="default_status" id="edit_default_status" class="form-select select2">
-                                    <option value="Default">
-                                        Default
-                                    </option>
-                                    <option value="Not Default">
-                                        Not Default
-                                    </option>
+                                    <option value="Default">Default</option>
+                                    <option value="Not Default">Not Default</option>
                                 </select>
                                 @error('default_status', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
@@ -385,16 +313,10 @@
                             </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Status
-                                </label>
+                                <label class="form-label">Status</label>
                                 <select name="status" id="edit_status" class="form-select select2">
-                                    <option value="Active">
-                                        Active
-                                    </option>
-                                    <option value="Inactive">
-                                        Inactive
-                                    </option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
                                 </select>
                                 @error('status', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
@@ -416,45 +338,45 @@
             </div>
         </div>
     </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.editBtn').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        let id = this.dataset.id;
-                        document.getElementById('editAccountForm').action =
-                            "{{ url('/admin/accounts') }}/" + id;
-                        document.getElementById('edit_account_name').value = this.dataset.account_name;
-                        document.getElementById('edit_address').value = this.dataset.address;
-                        document.getElementById('edit_account_holder_name').value = this.dataset.holder;
-                        document.getElementById('edit_account_number').value = this.dataset.number;
-                        document.getElementById('edit_opening_balance').value = this.dataset.opening;
-                        $('#edit_default_status').val(this.dataset.default).trigger('change');
-                        $('#edit_status').val(this.dataset.status).trigger('change');
-                        let modal = new bootstrap.Modal(
-                            document.getElementById('editAccountModal')
-                        );
-                        modal.show();
-                    });
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.editBtn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    let id = this.dataset.id;
+                    document.getElementById('editAccountForm').action =
+                        "{{ url('/admin/accounts') }}/" + id;
+                    document.getElementById('edit_account_name').value = this.dataset.account_name;
+                    document.getElementById('edit_address').value = this.dataset.address;
+                    document.getElementById('edit_account_holder_name').value = this.dataset.holder;
+                    document.getElementById('edit_account_number').value = this.dataset.number;
+                    document.getElementById('edit_opening_balance').value = this.dataset.opening;
+                    $('#edit_default_status').val(this.dataset.default).trigger('change');
+                    $('#edit_status').val(this.dataset.status).trigger('change');
+                    let modal = new bootstrap.Modal(
+                        document.getElementById('editAccountModal')
+                    );
+                    modal.show();
                 });
             });
+        });
+    </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addAccountModal')).show();
+            });
         </script>
+    @endif
 
-        @if ($errors->add->any())
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    new bootstrap.Modal(document.getElementById('addAccountModal')).show();
-                });
-            </script>
-        @endif
-
-        @if ($errors->edit->any())
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    new bootstrap.Modal(document.getElementById('editAccountModal')).show();
-                });
-            </script>
-        @endif
-    @endpush
-@endsection
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editAccountModal')).show();
+            });
+        </script>
+    @endif
+@endpush

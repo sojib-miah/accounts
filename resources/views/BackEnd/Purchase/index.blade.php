@@ -76,13 +76,15 @@
                         <thead>
                             <tr>
                                 <th width="60">SN</th>
-                                <th>PO No</th>
                                 <th>Date</th>
+                                <th>PO No</th>
                                 <th>Supplier name</th>
-                                <th>Item Name</th>
                                 <th>Part No</th>
+                                <th>Item Name</th>
+                                <th>Description</th>
                                 <th class="text-end">Qty</th>
-                                <th class="text-end">Total Amount</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total Price</th>
                                 <th>Status</th>
                                 <th width="150">Action</th>
                             </tr>
@@ -91,9 +93,18 @@
                             @forelse($purchases as $purchase)
                                 <tr>
                                     <td>{{ $loop->iteration + ($purchases->firstItem() - 1) }}</td>
-                                    <td>{{ $purchase->receipt_no }}</td>
                                     <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
-                                    <td>{{ $purchase->supplier->name ?? '-' }}</td>
+                                    <td>{{ $purchase->receipt_no }}</td>
+                                    <td>{{ $purchase->supplier->company_name ?? '-' }}</td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->product->sku }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
@@ -106,13 +117,22 @@
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
-                                                {{ $item->product->sku }}@if (!$loop->last)
+                                                {{ $item->product->description }}@if (!$loop->last)
                                                     ,
                                                 @endif
                                             </div>
                                         @endforeach
                                     </td>
                                     <td class="text-end">{{ $purchase->total_qty }}</td>
+                                    <td>
+                                        @foreach ($purchase->items as $item)
+                                            <div>
+                                                {{ $item->rate }}@if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </td>
                                     <td class="text-end">{{ number_format($purchase->total_amount, 2) }}</td>
                                     <td>
                                         @if ($purchase->status == 'Completed')
@@ -173,7 +193,7 @@
                                 </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center">
+                                        <td colspan="12" class="text-center">
                                             No Purchase Found
                                         </td>
                                     </tr>

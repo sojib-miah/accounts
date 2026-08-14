@@ -5,16 +5,12 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-3 mb-3">
-                <label class="form-label">
-                    PO No
-                </label>
+                <label class="form-label">PO No</label>
                 <input type="text" class="form-control" value="{{ $purchase->receipt_no }}" readonly>
                 <input type="hidden" name="receipt_no" value="{{ $purchase->receipt_no }}">
             </div>
             <div class="col-md-3 mb-3">
-                <label class="form-label">
-                    Purchase Date
-                </label>
+                <label class="form-label">Purchase Date</label>
                 <input type="date" name="receipt_date"
                     class="form-control @error('receipt_date') is-invalid @enderror"
                     value="{{ old('receipt_date', $purchase->receipt_date) }}" required>
@@ -29,13 +25,11 @@
                     Supplier
                 </label>
                 <select name="party_id" class="form-select @error('party_id') is-invalid @enderror" required>
-                    <option value="">
-                        Select Supplier
-                    </option>
+                    <option value="">Select Supplier</option>
                     @foreach ($suppliers as $supplier)
                         <option value="{{ $supplier->id }}"
                             {{ old('party_id', $purchase->party_id) == $supplier->id ? 'selected' : '' }}>
-                            {{ $supplier->name }}
+                            {{ $supplier->company_name }}-{{ $supplier->name }}
                             @if ($supplier->phone)
                                 ({{ $supplier->phone }})
                             @endif

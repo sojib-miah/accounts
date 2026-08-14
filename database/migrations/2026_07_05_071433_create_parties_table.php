@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('party_id')->unique();
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('designation')->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('email')->nullable();

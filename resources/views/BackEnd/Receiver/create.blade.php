@@ -5,18 +5,14 @@
             <form action="{{ route('receiver.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        Add Customer Details
-                    </h5>
+                    <h5 class="modal-title">Add Customer Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <!-- company name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Company Name <span class="text-danger">*</span>
-                            </label>
+                            <label class="form-label">Company Name</label>
                             <input type="text" class="form-control" name="company_name"
                                 placeholder="Enter Company Name.">
                             @error('company_name', 'add')
@@ -25,20 +21,16 @@
                         </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Customer Name <span class="text-danger">*</span>
-                            </label>
+                            <label class="form-label">Customer Name</label>
                             <input type="text" name="name" class="form-control" value="{{ old('name') }}"
-                                placeholder="Enter Receiver Name" required>
+                                placeholder="Enter Receiver Name">
                             @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <!-- Designation -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Designation
-                            </label>
+                            <label class="form-label">Designation</label>
                             <input type="text" name="designation" class="form-control"
                                 placeholder="Enter designation" value="{{ old('designation') }}">
                             @error('designation', 'add')
@@ -47,9 +39,7 @@
                         </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Phone
-                            </label>
+                            <label class="form-label">Phone</label>
                             <input type="text" name="phone" class="form-control" placeholder="Enter Phone Number"
                                 value="{{ old('phone') }}">
                             @error('phone', 'add')
@@ -58,9 +48,7 @@
                         </div>
                         <!-- Email -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Email
-                            </label>
+                            <label class="form-label">Email</label>
                             <input type="email" name="email" class="form-control" placeholder="Enter Email Address"
                                 value="{{ old('email') }}">
                             @error('email', 'add')
@@ -69,16 +57,10 @@
                         </div>
                         <!-- Status -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Status
-                            </label>
+                            <label class="form-label">Status</label>
                             <select name="status" class="form-select select2">
-                                <option value="Active" selected>
-                                    Active
-                                </option>
-                                <option value="Inactive">
-                                    Inactive
-                                </option>
+                                <option value="Active" selected>Active</option>
+                                <option value="Inactive">Inactive</option>
                             </select>
                             @error('status', 'add')
                                 <small class="text-danger">{{ $message }}</small>
@@ -86,9 +68,7 @@
                         </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Address
-                            </label>
+                            <label class="form-label">Address</label>
                             <textarea name="address" class="form-control" rows="3" placeholder="Enter Address"></textarea>
                         </div>
                     </div>

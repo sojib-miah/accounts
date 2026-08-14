@@ -117,12 +117,6 @@ class ReceiptController extends Controller
         );
     }
 
-    private function generateReceiptNo()
-    {
-        $last = Receipt::orderByDesc('receipt_no')->first();
-        return $last ? ((int) $last->receipt_no + 1) : 10001;
-    }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -286,8 +280,7 @@ class ReceiptController extends Controller
 
             $receipt = Receipt::create([
 
-                'receipt_no' =>
-                $this->generateReceiptNo(),
+                'receipt_no' => random_int(100000, 999999),
 
                 'type' =>
                 $request->type,

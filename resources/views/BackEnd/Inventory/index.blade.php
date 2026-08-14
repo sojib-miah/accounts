@@ -75,13 +75,15 @@
                                 <th width="60">SN</th>
                                 <th>Product Code</th>
                                 <th>Part No</th>
-                                <th>Product</th>
                                 <th>Category</th>
                                 <th>Brand</th>
-                                <th>Unit</th>
+                                <th>Product Name</th>
+                                <th>Model No</th>
+                                <th>Description</th>
+                                <th>UOM</th>
                                 <th class="text-end">Total Stock</th>
                                 <th class="text-end">Avg. Purchase Price</th>
-                                <th class="text-end">Total Value</th>
+                                <th class="text-end">Total Price</th>
                                 <th width="100" class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -91,31 +93,22 @@
                                     $product = $row->product;
                                 @endphp
                                 <tr>
-                                    {{-- SL --}}
                                     <td>{{ $products->firstItem() + $loop->index }}</td>
-                                    {{-- Product Code --}}
                                     <td>{{ $product->product_code ?? '-' }}</td>
-                                    {{-- sku --}}
                                     <td>{{ $product->sku ?? '-' }}</td>
-                                    {{-- Product --}}
-                                    <td><strong>{{ $product->name ?? '-' }}</strong></td>
-                                    {{-- Category --}}
                                     <td>{{ $product->category->name ?? '-' }}</td>
-                                    {{-- Brand --}}
                                     <td>{{ $product->brand->name ?? '-' }}</td>
-                                    {{-- Unit --}}
+                                    <td><strong>{{ $product->name ?? '-' }}</strong></td>
+                                    <td>{{ $product->model_no ?? '-' }}</td>
+                                    <td>{{ $product->description ?? '-' }}</td>
                                     <td>{{ $product->unit ?? '-' }}</td>
-                                    {{-- stock  --}}
                                     <td class="text-end">
                                         <span class="badge bg-primary">{{ number_format($product->current_stock) }}</span>
                                     </td>
-                                    {{-- Average Rate --}}
                                     <td class="text-end">{{ number_format($row->average_rate, 2) }}</td>
-                                    {{-- Total Value --}}
                                     <td class="text-end">
                                         <strong>{{ number_format($row->total_value, 2) }}</strong>
                                     </td>
-                                    {{-- Action --}}
                                     <td class="text-center">
                                         <a href="{{ route('inventory.product.show', $product) }}"
                                             class="btn btn-primary btn-sm" title="View Product Details">

@@ -114,12 +114,13 @@
                                         <thead>
                                             <tr>
                                                 <th width="50">SL</th>
-                                                <th width="300">Product</th>
+                                                <th width="300">sku-Product name</th>
+                                                <th>Description</th>
                                                 <th width="150">Serial No</th>
                                                 <th width="120">Stock</th>
                                                 <th width="120">Qty</th>
-                                                <th width="150">Sale Price</th>
-                                                <th width="150">Amount</th>
+                                                <th width="150">Unit Price</th>
+                                                <th width="150">Total Price</th>
                                                 <th>Remarks</th>
                                                 <th width="60">Action</th>
                                             </tr>
@@ -268,6 +269,7 @@
                     @endforeach
                 </select>
             </td>
+            <td><input type="text" class="form-control description" readonly></td>
             {{-- SERIAL --}}
             <td class="text-center">
                 <button type="button" class="btn btn-info btn-sm serialBtn" disabled>

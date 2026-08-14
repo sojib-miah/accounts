@@ -10,21 +10,17 @@
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('receiver.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search Expense Receiver List">
-
+                            placeholder="Search Customer">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
                         @if (request('search'))
                             <a href="{{ route('receiver.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('receiver-list-create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReceiverModal">
@@ -60,13 +56,13 @@
                                 @forelse($parties as $party)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $party->party_id }}</td>
-                                        <td>{{ $party->company_name }}</td>
+                                        <td>{{ $party->party_id ?? '-' }}</td>
                                         <td>
                                             <a href="{{ route('income.party.profile', $party->id) }}">
-                                                {{ $party->name }}
+                                                {{ $party->company_name ?? '-' }}
                                             </a>
                                         </td>
+                                        <td>{{ $party->name ?? '-' }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>

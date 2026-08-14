@@ -6,18 +6,14 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        Edit Customer Details
-                    </h5>
+                    <h5 class="modal-title">Edit Customer Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <!-- company name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Company Name <span class="text-danger">*</span>
-                            </label>
+                            <label class="form-label">Company Name</label>
                             <input type="text" class="form-control" name="company_name" id="edit_company_name">
                             @error('company_name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -25,19 +21,15 @@
                         </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Customer Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="name" id="edit_name" class="form-control" required>
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" name="name" id="edit_name" class="form-control">
                             @error('name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <!-- designation -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Designation
-                            </label>
+                            <label class="form-label">Designation</label>
                             <input type="text" name="designation" id="edit_designation" class="form-control">
                             @error('designation', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -45,9 +37,7 @@
                         </div>
                         <!-- Phone -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Phone
-                            </label>
+                            <label class="form-label">Phone</label>
                             <input type="text" name="phone" id="edit_phone" class="form-control">
                             @error('phone', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -55,9 +45,7 @@
                         </div>
                         <!-- Email -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Email
-                            </label>
+                            <label class="form-label">Email</label>
                             <input type="email" name="email" id="edit_email" class="form-control">
                             @error('email', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
@@ -65,9 +53,7 @@
                         </div>
                         <!-- Status -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Status
-                            </label>
+                            <label class="form-label">Status</label>
                             <select name="status" id="edit_status" class="form-select select2">
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
@@ -78,9 +64,7 @@
                         </div>
                         <!-- Address -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Address
-                            </label>
+                            <label class="form-label">Address</label>
                             <textarea name="address" id="edit_address" rows="3" class="form-control"></textarea>
                             @error('address', 'edit')
                                 <small class="text-danger">{{ $message }}</small>

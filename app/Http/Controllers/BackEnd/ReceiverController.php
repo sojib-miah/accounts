@@ -33,11 +33,11 @@ class ReceiverController extends Controller
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'name'        => 'required|max:255',
+            'name'        => 'nullable|max:255',
             'phone'       => 'nullable|max:30',
             'email'       => 'nullable|email|max:255',
             'address'     => 'nullable|string',
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'designation' => 'nullable|string',
             'status'      => 'required|in:Active,Inactive',
         ]);
@@ -75,10 +75,10 @@ class ReceiverController extends Controller
     public function update(Request $request, Party $party)
     {
         $request->validateWithBag('edit', [
-            'name'    => 'required|max:255',
+            'name'    => 'nullable|max:255',
             'phone'   => 'nullable|max:30',
             'email'   => 'nullable|email|max:255',
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'address' => 'nullable|string',
             'designation' => 'nullable|string',
             'status'  => 'required|in:Active,Inactive',
