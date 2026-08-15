@@ -37,4 +37,9 @@ class Party extends Model
     {
         return $this->hasMany(Receipt::class);
     }
+
+    public function customerCompany()
+    {
+        return $this->belongsTo(CustomerCompany::class, 'customer_company_id');
+    }
 }

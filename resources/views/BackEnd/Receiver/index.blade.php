@@ -59,7 +59,7 @@
                                         <td>{{ $party->party_id ?? '-' }}</td>
                                         <td>
                                             <a href="{{ route('income.party.profile', $party->id) }}">
-                                                {{ $party->company_name ?? '-' }}
+                                                {{ $party->customerCompany->name ?? '-' }}
                                             </a>
                                         </td>
                                         <td>{{ $party->name ?? '-' }}</td>
@@ -91,7 +91,7 @@
                                                     data-name="{{ $party->name }}" data-phone="{{ $party->phone }}"
                                                     data-email="{{ $party->email }}" data-address="{{ $party->address }}"
                                                     data-status="{{ $party->status }}"
-                                                    data-company_name="{{ $party->company_name }}"
+                                                    data-customer_company_id="{{ $party->customer_company_id }}"
                                                     data-designation="{{ $party->designation }}">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
@@ -136,7 +136,9 @@
                 document.getElementById('edit_phone').value = this.dataset.phone;
                 document.getElementById('edit_email').value = this.dataset.email;
                 document.getElementById('edit_address').value = this.dataset.address;
-                document.getElementById('edit_company_name').value = this.dataset.company_name;
+                $('#edit_customer_company_id')
+                    .val(this.dataset.customer_company_id || '')
+                    .trigger('change');
                 $('#edit_status').val(this.dataset.status).trigger('change');
                 document.getElementById('editReceiverForm').action =
                     "{{ url('/admin/receiver') }}/" + this.dataset.id;

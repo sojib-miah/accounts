@@ -50,7 +50,9 @@
             let productId = $(this).val();
             if (!productId) {
                 row.find('.stock').val('');
+                row.find('.qty').val(1);
                 row.find('.rate').val(0);
+                row.find('.description').val('');
                 row.find('.serialBtn').prop('disabled', true);
                 row.find('.serial_json').val('[]');
                 row.find('.serialCountText').html('<small class="text-muted">No Serial</small>');
@@ -76,17 +78,23 @@
             row.find('.stock').val(stock);
             let price = parseFloat(option.data('price')) || 0;
             row.find('.rate').val(price);
+            let description = option.data('description') || '';
+            row.find('.description').val(description);
             row.find('.serial_json').val('[]');
             row.find('.serialCountText').html('<small class="text-muted">Loading...</small>');
             row.find('.serialBtn').prop('disabled', false);
-            loadSerialCount(row, productId);
             row.find('.qty').val(1);
+            loadSerialCount(row, productId);
             calculate();
             row.find('.qty').focus();
         });
 
         function loadSerialCount(row, productId) {
             let branchId = $('#branch_id').val();
+            if (!branchId) {
+                row.find('.serialCountText').html('<small class="text-warning">Select Branch</small>');
+                return;
+            }
             let url = "{{ route('ajax.product.availableSerials', ':product') }}";
             url = url.replace(':product', productId);
             $.ajax({
@@ -97,42 +105,26 @@
                 },
                 success: function(res) {
                     if (!res.success) {
-                        row.find(
-                            '.serialCountText'
-                        ).html(
-                            '<small class="text-danger">Error</small>'
-                        );
+                        row.find('.serialCountText').html('<small class="text-danger">' + 'Error' + '</small>');
                         return;
                     }
                     let count = parseInt(res.count) || 0;
-
                     if (count > 0) {
-                        row.find(
-                            '.serialCountText'
-                        ).html(
-                            '<small class="text-success">' + count + ' Available' + '</small>'
-                        );
+                        row.find('.serialCountText').html('<small class="text-success">' + count +
+                            ' Available' + '</small>');
                     } else {
-                        row.find(
-                            '.serialCountText'
-                        ).html(
-                            '<small class="text-muted">' +
-                            'No Serial' +
-                            '</small>'
-                        );
+                        row.find('.serialCountText').html('<small class="text-muted">' + 'No Serial' +
+                            '</small>');
                     }
                 },
-                error: function() {
-                    row.find(
-                        '.serialCountText'
-                    ).html(
-                        '<small class="text-danger">' +
-                        'Unable to load' +
-                        '</small>'
-                    );
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    row.find('.serialCountText').html('<small class="text-danger">' + 'Unable to load' +
+                        '</small>');
                 }
             });
         }
+
         $(document).on('click', '.serialBtn', function() {
             currentSerialRow = $(this).closest('tr');
             let productId = currentSerialRow.find('.product').val();

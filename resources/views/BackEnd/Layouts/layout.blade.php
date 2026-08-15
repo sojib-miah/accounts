@@ -75,6 +75,10 @@
             .swal2-toast .swal2-html-container {
                 font-size: 13px;
             }
+
+            body {
+                overflow-x: hidden;
+            }
         </style>
     </head>
 

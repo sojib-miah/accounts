@@ -213,15 +213,12 @@
                     <div class="modal-header">
                         <div>
                             <h5 class="modal-title mb-1">
-                                <i class="fa fa-barcode me-2">
-                                </i>
+                                <i class="fa fa-barcode me-2"></i>
                                 Serial Number
                             </h5>
-                            <small class="text-muted" id="modalProductName">
-                            </small>
+                            <small class="text-muted" id="modalProductName"></small>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal">
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     {{-- BODY --}}
                     <div class="modal-body">
@@ -229,69 +226,53 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <div class="border rounded p-3">
-                                    <small class="text-muted">
-                                        Product Qty
-                                    </small>
-                                    <h5 class="mb-0" id="modalQty">
-                                        0
-                                    </h5>
+                                    <small class="text-muted">Product Qty</small>
+                                    <h5 class="mb-0" id="modalQty">0</h5>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="border rounded p-3">
-                                    <small class="text-muted">
-                                        Serial Added
-                                    </small>
-                                    <h5 class="mb-0" id="serialCount">
-                                        0
-                                    </h5>
+                                    <small class="text-muted">Serial Added</small>
+                                    <h5 class="mb-0" id="serialCount">0</h5>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="border rounded p-3">
-                                    <small class="text-muted">
-                                        Status
-                                    </small>
-                                    <h5 class="mb-0" id="serialStatus">
-                                        No Serial
-                                    </h5>
+                                    <small class="text-muted">Status</small>
+                                    <h5 class="mb-0" id="serialStatus">No Serial</h5>
                                 </div>
                             </div>
                         </div>
-                        {{-- Add Serial --}}
+                        {{-- Add / Edit Serial --}}
                         <div class="input-group mb-3">
                             <input type="text" id="serialInput" class="form-control" placeholder="Enter Serial Number">
                             <button type="button" class="btn btn-primary" id="addSerial">
-                                <i class="fa fa-plus me-1">
-                                </i>
-                                Add
+                                <i class="fa fa-plus me-1"></i>
+                                <span id="serialActionText">Add</span>
+                            </button>
+                            {{-- Cancel Edit --}}
+                            <button type="button" class="btn btn-secondary d-none" id="cancelEditSerial">
+                                <i class="fa fa-times me-1"></i>
+                                Cancel
                             </button>
                         </div>
                         {{-- Serial Table --}}
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
+                        <div class="table-responsive" style="height: 300px;">
+                            <table class="table table-bordered table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th width="70">
-                                            SL
-                                        </th>
-                                        <th>
-                                            Serial Number
-                                        </th>
-                                        <th width="100" class="text-center">
-                                            Action
-                                        </th>
+                                        <th width="70">SL</th>
+                                        <th>Serial Number</th>
+                                        <th width="150" class="text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="serialList">
-                                </tbody>
+                                <tbody id="serialList"></tbody>
                             </table>
                         </div>
                         <div class="alert alert-warning mb-0">
-                            <i class="fa fa-info-circle me-1">
-                            </i>
-                            Serial Number Required. Serial Count অবশ্যই
-                            Product Qty-এর সমান হতে হবে।
+                            <i class="fa fa-info-circle me-1"></i>
+                            Serial Number Required.
+                            Serial Count অবশ্যই Product Qty-এর সমান হতে হবে।
                         </div>
                     </div>
                     {{-- FOOTER --}}
@@ -300,8 +281,7 @@
                             Close
                         </button>
                         <button type="button" class="btn btn-success" id="saveSerial">
-                            <i class="fa fa-save me-1">
-                            </i>
+                            <i class="fa fa-save me-1"></i>
                             Save Serial
                         </button>
                     </div>
@@ -318,7 +298,7 @@
                 let serialArray = [];
                 let originalSerialArray = [];
                 let serialSaved = false;
-
+                let editingIndex = null;
                 $(document).on('click', '.serialBtn', function() {
                     let button = $(this);
                     currentItemId = button.data('item-id');
@@ -330,7 +310,8 @@
                     } catch (e) {
                         serialArray = [];
                     }
-                    serialArray = serialArray.map(function(serial) {
+                    serialArray = serialArray
+                        .map(function(serial) {
                             return String(serial).trim().toUpperCase();
                         })
                         .filter(function(serial) {
@@ -338,70 +319,130 @@
                         });
                     originalSerialArray = [...serialArray];
                     serialSaved = false;
+                    editingIndex = null;
                     $('#modalProductName').text(productName);
                     $('#modalQty').text(currentQty);
+                    resetSerialInput();
                     renderSerialList();
-                    $('#serialInput').val('').focus();
+                    setTimeout(function() {
+                        $('#serialInput').focus();
+                    }, 300);
                 });
 
                 function renderSerialList() {
                     let html = '';
                     if (serialArray.length === 0) {
-                        html = `<tr><td colspan="3" class="text-center text-muted">No Serial Added</td></tr>`;
+                        html = `
+                                <tr>
+
+                                    <td colspan="3" class="text-center text-muted">
+                                        <i class="fa fa-barcode me-1"></i>No Serial Added</td>
+                                </tr>
+                            `;
+
                     } else {
                         serialArray.forEach(
                             function(serial, index) {
                                 html += `
-                        <tr>
-                            <td>
-                                ${index + 1}
-                            </td>
-                            <td>
-                                <strong>
-                                    ${escapeHtml(serial)}
-                                </strong>
-                            </td>
-                            <td
-                                class="text-center">
-                                <button
-                                    type="button"
-                                    class="btn btn-danger btn-sm removeSerial"
-                                    data-index="${index}">
-                                    <i
-                                        class="fa fa-trash">
-                                    </i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>
+                                        <strong>${escapeHtml(serial)}</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group"
+                                            role="group">
+                                            {{-- EDIT --}}
+                                            <button
+                                                type="button"
+                                                class="btn btn-warning btn-sm editSerial"
+                                                data-index="${index}"
+                                                title="Edit Serial">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            {{-- DELETE --}}
+                                            <button
+                                                type="button"
+                                                class="btn btn-danger btn-sm removeSerial"
+                                                data-index="${index}"
+                                                title="Delete Serial">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
                             }
                         );
                     }
                     $('#serialList').html(html);
                     $('#serialCount').text(serialArray.length);
-                    if (serialArray.length === 0) {
-                        $('#serialStatus').removeClass('text-success text-danger').addClass('text-warning').text(
-                            'No Serial');
-                    } else if (
-                        serialArray.length ===
-                        currentQty
-                    ) {
-                        $('#serialStatus').removeClass('text-warning text-danger').addClass('text-success').text(
-                            'Complete');
-                    } else {
-                        $('#serialStatus').removeClass('text-success text-warning').addClass('text-danger').text(
-                            'Incomplete');
-                    }
+                    updateSerialStatus();
+                }
 
+                function updateSerialStatus() {
+                    if (serialArray.length === 0) {
+                        $('#serialStatus')
+                            .removeClass('text-success text-danger')
+                            .addClass('text-warning')
+                            .text('No Serial');
+                        return;
+                    }
+                    if (serialArray.length === currentQty) {
+                        $('#serialStatus')
+                            .removeClass('text-warning text-danger')
+                            .addClass('text-success')
+                            .text('Complete');
+                    } else {
+                        $('#serialStatus')
+                            .removeClass('text-success text-warning')
+                            .addClass('text-danger')
+                            .text('Incomplete');
+                    }
                 }
                 $('#addSerial').on('click', function() {
-                    let serial = $('#serialInput').val().trim().toUpperCase();
+                    let serial =
+                        $('#serialInput').val().trim().toUpperCase();
                     if (serial === '') {
                         Swal.fire({
                             icon: 'warning',
+                            position: 'top-end',
                             title: 'Serial Required',
                             text: 'Please enter serial number.'
                         });
+                        $('#serialInput').focus();
+                        return;
+                    }
+                    if (editingIndex !== null) {
+                        let duplicate =
+                            serialArray.some(
+                                function(item, index) {
+                                    return (index !== editingIndex && String(item).toUpperCase() === serial);
+                                }
+                            );
+                        if (duplicate) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Duplicate Serial',
+                                text: 'This serial number is already added.'
+                            });
+                            $('#serialInput').focus();
+                            return;
+                        }
+                        serialArray[editingIndex] = serial;
+                        editingIndex = null;
+                        resetSerialInput();
+                        renderSerialList();
+                        Swal.fire({
+                            toast: true,
+                            icon: 'success',
+                            position: 'top-end',
+                            text: 'Serial number updated successfully.',
+                            timer: 1200,
+                            showConfirmButton: false,
+                            timerProgressBar: true
+                        });
+                        $('#serialInput').focus();
                         return;
                     }
                     if (serialArray.length >= currentQty) {
@@ -413,9 +454,7 @@
                         return;
                     }
                     let duplicate = serialArray.some(function(item) {
-                        return (
-                            String(item).toUpperCase() === serial
-                        );
+                        return (String(item).toUpperCase() === serial);
                     });
                     if (duplicate) {
                         Swal.fire({
@@ -430,37 +469,69 @@
                     renderSerialList();
                     $('#serialInput').val('').focus();
                 });
-                $('#serialInput').on(
-                    'keydown',
-                    function(e) {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            $('#addSerial').trigger('click');
-                        }
+                $(document).on('click', '.editSerial', function() {
+                    let index = parseInt($(this).data('index'));
+                    if (isNaN(index)) {
+                        return;
                     }
-                );
+                    if (!serialArray[index]) {
+                        return;
+                    }
+                    editingIndex = index;
+                    $('#serialInput')
+                        .val(serialArray[index]).focus();
+                    $('#serialActionText').text('Update');
+                    $('#addSerial').removeClass('btn-primary').addClass('btn-warning');
+                    $('#cancelEditSerial').removeClass('d-none');
+                    $('#serialInput').addClass('border-warning');
+                });
+                $('#cancelEditSerial').on('click', function() {
+                    resetSerialInput();
+                    $('#serialInput').focus();
+                });
                 $(document).on('click', '.removeSerial', function() {
                     let index = parseInt($(this).data('index'));
-                    if (
-                        isNaN(index)
-                    ) {
+                    if (isNaN(index)) {
                         return;
+                    }
+                    let serial = serialArray[index];
+                    if (editingIndex === index) {
+                        resetSerialInput();
                     }
                     Swal.fire({
                         icon: 'warning',
                         title: 'Remove Serial?',
-                        text: 'Are you sure you want to remove this serial?',
+                        html: 'Are you sure you want to remove<br>' + '<strong>' + escapeHtml(serial) +
+                            '</strong>?',
                         showCancelButton: true,
                         confirmButtonText: 'Yes, Remove',
                         cancelButtonText: 'Cancel'
-                    }).then(
-                        function(result) {
-                            if (result.isConfirmed) {
-                                serialArray.splice(index, 1);
-                                renderSerialList();
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            serialArray.splice(index, 1);
+                            if (editingIndex !== null) {
+                                if (editingIndex === index) {
+                                    resetSerialInput();
+                                } else if (
+                                    editingIndex > index
+                                ) {
+                                    editingIndex--;
+                                }
                             }
+                            renderSerialList();
                         }
-                    );
+                    });
+
+                });
+                $('#serialInput').on('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        $('#addSerial').trigger('click');
+                    }
+                    if (e.key === 'Escape' && editingIndex !== null) {
+                        e.preventDefault();
+                        resetSerialInput();
+                    }
                 });
                 $('#saveSerial').on('click', function() {
                     if (serialArray.length !== currentQty) {
@@ -473,24 +544,28 @@
                         });
                         return;
                     }
+
+                    let action =
+                        '{{ route('warehouse.serial.update', ['receipt' => $receipt->id, 'receiptItem' => '__ITEM__']) }}'
+                        .replace('__ITEM__', currentItemId);
                     let form = $('<form>', {
                         method: 'POST',
-                        action: '{{ route('warehouse.serial.update', [
-                            'receipt' => $receipt->id,
-                            'receiptItem' => '__ITEM__',
-                        ]) }}'
-                            .replace('__ITEM__', currentItemId)
+                        action: action
                     });
-                    form.append($('<input>', {
-                        type: 'hidden',
-                        name: '_token',
-                        value: '{{ csrf_token() }}'
-                    }));
+                    form.append(
+                        $('<input>', {
+                            type: 'hidden',
+                            name: '_token',
+                            value: '{{ csrf_token() }}'
+                        })
+                    );
                     form.append(
                         $('<input>', {
                             type: 'hidden',
                             name: 'serial_json',
-                            value: JSON.stringify(serialArray)
+                            value: JSON.stringify(
+                                serialArray
+                            )
                         })
                     );
                     $('body').append(form);
@@ -503,8 +578,17 @@
                     currentItemId = null;
                     currentQty = 0;
                     serialSaved = false;
-                    $('#serialInput').val('');
+                    editingIndex = null;
+                    resetSerialInput();
                 });
+
+                function resetSerialInput() {
+                    editingIndex = null;
+                    $('#serialInput').val('').removeClass('border-warning');
+                    $('#serialActionText').text('Add');
+                    $('#addSerial').removeClass('btn-warning').addClass('btn-primary');
+                    $('#cancelEditSerial').addClass('d-none');
+                }
 
                 function escapeHtml(text) {
                     return $('<div>').text(text).html();

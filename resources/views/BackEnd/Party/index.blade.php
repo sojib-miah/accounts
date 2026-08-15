@@ -60,7 +60,7 @@
                                                 {{ $party->name }}
                                             </a>
                                         </td>
-                                        <td>{{ $party->company_name }}</td>
+                                        <td>{{ $party->customerCompany->name ?? '-' }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
@@ -88,7 +88,7 @@
                                                     data-name="{{ $party->name }}" data-phone="{{ $party->phone }}"
                                                     data-email="{{ $party->email }}" data-address="{{ $party->address }}"
                                                     data-status="{{ $party->status }}"
-                                                    data-company_name="{{ $party->company_name }}"
+                                                    data-customer_company_id="{{ $party->customer_company_id }}"
                                                     data-designation="{{ $party->designation }}">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
@@ -132,7 +132,9 @@
                 document.getElementById('edit_designation').value = this.dataset.designation;
                 document.getElementById('edit_phone').value = this.dataset.phone;
                 document.getElementById('edit_email').value = this.dataset.email;
-                document.getElementById('edit_company_name').value = this.dataset.company_name;
+                $('#edit_customer_company_id')
+                    .val(this.dataset.customer_company_id || '')
+                    .trigger('change');
                 document.getElementById('edit_address').value = this.dataset.address;
                 $('#edit_status').val(this.dataset.status).trigger('change');
                 document.getElementById('editPartyForm').action =

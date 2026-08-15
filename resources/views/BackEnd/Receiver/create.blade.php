@@ -12,11 +12,20 @@
                     <div class="row">
                         <!-- company name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-control" name="company_name"
-                                placeholder="Enter Company Name.">
-                            @error('company_name', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                            <label class="form-label">
+                                Customer Company
+                            </label>
+                            <select name="customer_company_id" class="form-select select2" id="add_customer_company_id">
+                                <option value="">Select Customer Company</option>
+                                @foreach ($customerCompanies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ old('customer_company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('customer_company_id', 'add')
+                                <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <!-- Receiver Name -->

@@ -134,162 +134,101 @@
 
     }
 
-    $(document).on(
-        'change',
-        '.product',
-        function() {
+    $(document).on('change', '.product', function() {
 
-            let row =
-                $(this).closest('tr');
+        let row = $(this).closest('tr');
+        let option = $(this).find(':selected');
+        let productId = $(this).val();
 
-            let option =
-                $(this).find(':selected');
+        if (!productId) {
 
-            let productId =
-                $(this).val();
+            row.find('.stock').val('');
+            row.find('.rate').val('');
+            row.find('.qty').val(1);
+            row.find('.description').val('');
 
-            if (!productId) {
-
-                row.find('.stock')
-                    .val('');
-
-                row.find('.rate')
-                    .val('');
-
-                row.find('.qty')
-                    .val(1);
-
-                row.find('.total')
-                    .val('0.00');
-
-
-                clearSerials(row);
-
-
-                calculate();
-
-                return;
-            }
-
-            let count = 0;
-
-
-            $('.product').each(function() {
-
-                if (
-                    $(this).val() ==
-                    productId
-                ) {
-
-                    count++;
-
-                }
-
-            });
-
-
-            if (count > 1) {
-
-                Swal.fire({
-
-                    icon: 'warning',
-
-                    title: 'Duplicate Product',
-
-                    text: 'This product already exists.'
-
-                });
-
-
-                $(this)
-                    .val('')
-                    .trigger('change');
-
-
-                row.find('.stock')
-                    .val('');
-
-                row.find('.rate')
-                    .val('');
-
-                row.find('.qty')
-                    .val(1);
-
-                row.find('.total')
-                    .val('0.00');
-
-
-                clearSerials(row);
-
-
-                calculate();
-
-                return;
-            }
-
-            row.find('.stock')
-                .val(
-                    option.data('stock') ?? 0
-                );
-
-            row.find('.rate')
-                .val(
-                    option.data('price') ?? 0
-                );
-
-            row.find('.qty')
-                .val(1);
+            row.find('.total').val('0.00');
 
             clearSerials(row);
 
+            calculate();
+
+            return;
+        }
+
+        let count = 0;
+
+        $('.product').each(function() {
+
+            if ($(this).val() == productId) {
+                count++;
+            }
+
+        });
+
+        if (count > 1) {
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Duplicate Product',
+                text: 'This product already exists.'
+            });
+
+            $(this)
+                .val('')
+                .trigger('change');
+
+            row.find('.stock').val('');
+            row.find('.rate').val('');
+            row.find('.qty').val(1);
+            row.find('.description').val('');
+
+            row.find('.total').val('0.00');
+
+            clearSerials(row);
 
             calculate();
 
-
-            row.find('.qty')
-                .focus();
-
+            return;
         }
-    );
+        row.find('.stock').val(
+            option.data('stock') ?? 0
+        );
+        row.find('.rate').val(
+            option.data('price') ?? 0
+        );
+        row.find('.description').val(
+            option.data('description') ?? ''
+        );
+        row.find('.qty').val(1);
+        clearSerials(row);
 
+        calculate();
 
+        row.find('.qty').focus();
+
+    });
 
     function clearSerials(row) {
-
         row.find('.serial_json')
             .val('[]');
-
-
         updateSerialDisplay(row);
-
     }
 
     function updateSerialDisplay(row) {
-
         let serials = [];
-
-
         try {
-
             serials =
                 JSON.parse(
                     row.find('.serial_json').val() ||
                     '[]'
                 );
-
         } catch (e) {
-
             serials = [];
-
         }
-
-
         row.find('.serialCount')
             .text(serials.length);
-
-
         if (serials.length > 0) {
-
             row.find('.serialStatus')
                 .text(
                     serials.length +

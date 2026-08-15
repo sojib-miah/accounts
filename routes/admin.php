@@ -9,7 +9,7 @@ use App\Http\Controllers\BackEnd\CategoryController;
 use App\Http\Controllers\BackEnd\ChallanController;
 use App\Http\Controllers\BackEnd\CompanyController;
 use App\Http\Controllers\BackEnd\CompanyUserController;
-use App\Http\Controllers\BackEnd\ContactController;
+use App\Http\Controllers\BackEnd\CustomerCompanyController;
 use App\Http\Controllers\BackEnd\DashboardController;
 use App\Http\Controllers\BackEnd\IncomeCategoryController;
 use App\Http\Controllers\BackEnd\IncomeController;
@@ -248,4 +248,17 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
     Route::post('/warehouse/{receipt}/serial/{receiptItem}', [WarehouseController::class, 'updateSerial'])->name('warehouse.serial.update');
     Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
+
+    // customer company route
+    Route::get('/customer-company', [CustomerCompanyController::class, 'index'])->name('customer-company.index');
+    Route::post('/customer-company/store', [CustomerCompanyController::class, 'store'])->name('customer-company.store');
+    Route::get('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'show'])->name('customer-company.show');
+    Route::put('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'update'])->name('customer-company.update');
+    Route::delete('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'destroy'])->name('customer-company.destroy');
+
+    Route::get('/customer-expense', [CustomerCompanyController::class, 'expenseIndex'])->name('customer-expense.index');
+    Route::post('/customer-expense/store', [CustomerCompanyController::class, 'expenseStore'])->name('customer-expense.store');
+    Route::get('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseShow'])->name('customer-expense.show');
+    Route::put('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseUpdate'])->name('customer-expense.update');
+    Route::delete('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseDestroy'])->name('customer-expense.destroy');
 });

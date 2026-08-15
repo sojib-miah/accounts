@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('customer_company_id')->nullable()->constrained('customer_companies')->nullOnDelete();
             $table->string('party_id')->unique();
             $table->string('name')->nullable();
             $table->string('designation')->nullable();
             $table->string('phone', 30)->nullable();
             $table->string('email')->nullable();
-            $table->string('company_name')->nullable();
             $table->text('address')->nullable();
             $table->enum('type', ['Customer', 'Supplier', 'Income', 'Expense', 'Both']);
             $table->enum('status', ['Active', 'Inactive'])->default('Active');

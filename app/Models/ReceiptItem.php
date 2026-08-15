@@ -28,10 +28,6 @@ class ReceiptItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // public function serialNumbers()
-    // {
-    //     return $this->hasMany(SerialNumber::class);
-    // }
     public function serialNumbers()
     {
         return $this->hasMany(

@@ -3,8 +3,8 @@
 @section('title', 'Receipt Details')
 
 @section('content')
-    <div class="mx-5 py-3">
-        <div class="row">
+    <div class="p-5">
+        <div class="row mt-3">
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <ul class="mb-0">
@@ -135,9 +135,7 @@
                     </div>
                 </div>
 
-                {{-- ========================= --}}
                 {{-- Expense Receipt List --}}
-                {{-- ========================= --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding: 8px !important;">
                         <h3 class="mb-0 fw-bold">
@@ -167,33 +165,17 @@
                                             $totalQty += $item->qty;
                                         @endphp
                                         <tr>
-                                            <td class="text-center">
-                                                {{ $loop->iteration }}
-                                            </td>
-                                            <td>
-                                                {{ $item->category->name ?? '-' }}
-                                            </td>
-                                            <td>
-                                                {{ $item->accountHead->name ?? '-' }}
-                                            </td>
-                                            <td class="text-center">
-                                                {{ number_format($item->qty, 2) }}
-                                            </td>
-                                            <td class="text-end fw-bold">
-                                                {{ number_format($item->rate, 2) }}
-                                            </td>
-                                            <td class="text-end fw-bold">
-                                                {{ number_format($item->amount, 2) }}
-                                            </td>
-                                            <td>
-                                                {{ $item->details }}
-                                            </td>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>{{ $item->category->name ?? '-' }}</td>
+                                            <td>{{ $item->accountHead->name ?? '-' }}</td>
+                                            <td class="text-center">{{ number_format($item->qty) }}</td>
+                                            <td class="text-end fw-bold">{{ number_format($item->rate, 2) }}</td>
+                                            <td class="text-end fw-bold">{{ number_format($item->amount, 2) }}</td>
+                                            <td>{{ $item->details }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                No Item Found
-                                            </td>
+                                            <td colspan="7" class="text-center text-muted py-4">No Item Found</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -201,70 +183,43 @@
                         </div>
                     </div>
                 </div>
-                {{-- ========================= --}}
+
                 {{-- Total Section --}}
-                {{-- ========================= --}}
                 <div class="row mt-4">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="180">
-                                    Total Qty
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($totalQty, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Sub Total
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($receipt->sub_total, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    Discount
-                                </th>
-                                <td class="text-end text-danger">
-                                    {{ number_format($receipt->discount, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    VAT
-                                </th>
-                                <td class="text-end">
-                                    {{ number_format($receipt->vat, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-primary">
-                                <th>
-                                    Grand Total
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->total_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-success">
-                                <th>
-                                    Paid Amount
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->paid_amount, 2) }}
-                                </td>
-                            </tr>
-                            <tr class="table-danger">
-                                <th>
-                                    Due Amount
-                                </th>
-                                <td class="text-end fw-bold">
-                                    {{ number_format($receipt->due_amount, 2) }}
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="border">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="180">Total Qty</th>
+                                    <td class="text-end">{{ number_format($totalQty) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sub Total</th>
+                                    <td class="text-end">{{ number_format($receipt->sub_total, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Discount</th>
+                                    <td class="text-end text-danger">{{ number_format($receipt->discount, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>VAT</th>
+                                    <td class="text-end">{{ number_format($receipt->vat, 2) }}</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <th>Grand Total</th>
+                                    <td class="text-end fw-bold">{{ number_format($receipt->total_amount, 2) }}</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <th>Paid Amount</th>
+                                    <td class="text-end fw-bold">{{ number_format($receipt->paid_amount, 2) }}</td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <th>Due Amount</th>
+                                    <td class="text-end fw-bold">{{ number_format($receipt->due_amount, 2) }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -279,28 +234,20 @@
                     <div class="card-body text-center">
                         @if ($receipt->payment_status == 'Paid')
                             <i class="fa fa-check-circle fa-3x text-success mb-3"></i>
-                            <h2 class="text-success fw-bold">
-                                Paid
-                            </h2>
+                            <h2 class="text-success fw-bold">Paid</h2>
                         @elseif($receipt->payment_status == 'Partial')
                             <i class="fa fa-clock fa-3x text-warning mb-3"></i>
-                            <h2 class="text-warning fw-bold">
-                                Partial
-                            </h2>
+                            <h2 class="text-warning fw-bold">Partial</h2>
                         @else
                             <i class="fa fa-exclamation-circle fa-3x text-danger mb-3"></i>
-                            <h2 class="text-danger fw-bold">
-                                Pending
-                            </h2>
+                            <h2 class="text-danger fw-bold">Pending</h2>
                         @endif
                     </div>
                 </div>
                 {{-- Receipt Notes --}}
                 <div class="card shadow-sm border-0 mb-3">
                     <div class="card-header">
-                        <strong>
-                            Receipt Notes
-                        </strong>
+                        <strong>Receipt Notes</strong>
                         <span class="text-danger">*</span>
                     </div>
                     <div class="card-body">
@@ -347,9 +294,7 @@
                 {{-- Payment Summary --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header">
-                        <strong>
-                            Payment Summary
-                        </strong>
+                        <strong>Payment Summary</strong>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-bordered mb-0">
@@ -378,18 +323,14 @@
         </div>
     </div>
 
-    <!-- ========================================= -->
     <!-- Payment Modal -->
-    <!-- ========================================= -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('receipt.payment.store', $receipt->id) }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h4 class="modal-title">
-                            Bill Payment
-                        </h4>
+                        <h4 class="modal-title">Bill Payment</h4>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
@@ -397,36 +338,24 @@
                             <thead>
                                 <tr>
                                     <th>ITEMS</th>
-                                    <th class="text-end">
-                                        AMOUNT (TK)
-                                    </th>
+                                    <th class="text-end">AMOUNT (TK)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>
-                                        Total Due Amount
-                                    </td>
+                                    <td>Total Due Amount</td>
                                     <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->total_amount, 2) }}
-                                    </td>
+                                        {{ number_format($receipt->total_amount, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        Current Paid Amount
-                                    </td>
+                                    <td>Current Paid Amount</td>
                                     <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->paid_amount, 2) }}
-                                    </td>
+                                        {{ number_format($receipt->paid_amount, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        Remaining Due
-                                    </td>
+                                    <td>Remaining Due</td>
                                     <td id="remaining_due" class="text-end text-danger fw-bold">
-                                        {{ number_format($receipt->due_amount, 2) }}
-
-                                    </td>
+                                        {{ number_format($receipt->due_amount, 2) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -436,9 +365,7 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <select id="payment_type_id" name="payment_type_id" class="form-select select2" required>
-                                <option value="">
-                                    Select Type
-                                </option>
+                                <option value="">Select Type</option>
                                 @foreach ($paymentTypes as $type)
                                     <option value="{{ $type->id }}">
                                         {{ $type->name }}
@@ -456,26 +383,18 @@
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label>
-                                Payment Date
-                            </label>
+                            <label>Payment Date</label>
                             <input type="date" name="payment_date" class="form-control" value="{{ date('Y-m-d') }}"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label>
-                                Payment Note
-                            </label>
+                            <label>Payment Note</label>
                             <textarea name="note" rows="4" class="form-control" placeholder="Write a note..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Save
-                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>

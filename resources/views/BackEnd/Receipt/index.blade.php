@@ -73,6 +73,9 @@
                                     <th width="60">SN</th>
                                     <th class="text-center">RECEIPT ID</th>
                                     <th class="text-center">PAYEE Name</th>
+                                    <th class="text-center">Category</th>
+                                    <th class="text-center">Description</th>
+                                    <th class="text-center">Quantity</th>
                                     <th class="text-center">Created BY</th>
                                     <th class="text-center">DATE & TIME</th>
                                     <th class="text-center">STATUS</th>
@@ -83,25 +86,31 @@
                                 @forelse($receipts as $receipt)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        {{-- Receipt ID --}}
                                         <td class="text-center">
                                             <a href="{{ route('receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
                                                 {{ $receipt->receipt_no }}
                                             </a>
                                         </td>
-                                        {{-- Payee --}}
                                         <td class="text-center">
                                             <a href="{{ route('party.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
                                                 {{ $receipt->party->name }}
                                             </a>
                                         </td>
-                                        {{-- Receipt By --}}
+                                        <td class="text-center">
+                                            @foreach ($receipt->items as $item)
+                                                {{ $item->category->name }}
+                                            @endforeach
+                                        </td>
+                                        <td class="text-center">
+                                            @foreach ($receipt->items as $item)
+                                                {{ $item->accountHead->name }}
+                                            @endforeach
+                                        </td>
+                                        <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>
                                         <td class="text-center">{{ $receipt->creator->name ?? '-' }}</td>
-                                        {{-- Date Time --}}
                                         <td class="text-center">{{ $receipt->created_at->format('d-m-Y h:i A') }}</td>
-                                        {{-- Payment Status --}}
                                         <td class="text-center">
                                             @if ($receipt->payment_status == 'Paid')
                                                 <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
@@ -117,7 +126,6 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        {{-- Action --}}
                                         <td class="text-center">
                                             <div class="dropdown">
                                                 <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
@@ -164,7 +172,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">
+                                        <td colspan="10" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
                                             No Expense Receipt Found

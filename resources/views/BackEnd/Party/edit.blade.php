@@ -14,11 +14,19 @@
                         <!-- company Name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Company Name
+                                Customer Company
                             </label>
-                            <input type="text" name="company_name" class="form-control" id="edit_company_name">
-                            @error('company_name', 'edit')
-                                <small class="text-danger">{{ $message }}</small>
+                            <select name="customer_company_id" id="edit_customer_company_id"
+                                class="form-select select2">
+                                <option value="">Select Customer Company</option>
+                                @foreach ($customerCompanies as $company)
+                                    <option value="{{ $company->id }}">
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('customer_company_id', 'edit')
+                                <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <!-- Customer Name -->

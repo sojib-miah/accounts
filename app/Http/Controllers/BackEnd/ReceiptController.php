@@ -26,7 +26,7 @@ class ReceiptController extends Controller
     {
         $user = auth()->user();
 
-        $query = Receipt::with(['party', 'branch', 'creator'])
+        $query = Receipt::with(['party', 'branch', 'creator', 'items'])
             ->where('type', 'Expense')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
@@ -121,167 +121,68 @@ class ReceiptController extends Controller
     {
         $request->validate([
             'type' => 'required|in:Income,Expense,Challan',
-
             'company_id' => 'required|exists:companies,id',
-
             'branch_id' => 'required|exists:branches,id',
-
             'party_id' => 'required|exists:parties,id',
-
             'receipt_date' => 'required|date',
-
             'items' => 'required|string',
-
             'discount' => 'nullable|numeric|min:0',
-
             'vat' => 'nullable|numeric|min:0',
         ]);
-
         $user = Auth::user();
-
         if (!$user->hasRole('Super-Admin')) {
-
             if ((int) $request->company_id !== (int) $user->company_id) {
-
-                return back()
-                    ->withInput()
-                    ->with(
-                        'error',
-                        'You are not allowed to create expense for this company.'
-                    );
+                return back()->withInput()->with('error', 'You are not allowed to create expense for this company.');
             }
         }
         if (!$user->hasRole('Super-Admin')) {
-
-            $current = Receipt::where(
-                'company_id',
-                $user->company_id
-            )
-                ->where(
-                    'type',
-                    'Expense'
-                )
-                ->count();
-
-            if (
-                $message = PackageHelper::checkLimit(
-                    'expense_limit',
-                    $current
-                )
-            ) {
-                return back()
-                    ->withInput()
-                    ->with('error', $message);
+            $current = Receipt::where('company_id', $user->company_id)->where('type', 'Expense')->count();
+            if ($message = PackageHelper::checkLimit('expense_limit', $current)) {
+                return back()->withInput()->with('error', $message);
             }
         }
-
         DB::beginTransaction();
-
         try {
-            $items = json_decode(
-                $request->items,
-                true
-            );
-
-            if (
-                !is_array($items) ||
-                count($items) === 0
-            ) {
-
-                throw new \Exception(
-                    'Please add at least one expense item.'
-                );
+            $items = json_decode($request->items, true);
+            if (!is_array($items) || count($items) === 0) {
+                throw new \Exception('Please add at least one expense item.');
             }
-
             $totalQty = 0;
-
             $subTotal = 0;
-
             foreach ($items as $index => $item) {
-
                 $categoryId = $item['category_id'] ?? null;
-
                 $accountHeadId = $item['account_head_id'] ?? null;
-
-                $qty = (float) (
-                    $item['qty'] ?? 1
-                );
-
-                $rate = (float) (
-                    $item['rate'] ?? 0
-                );
-
-
+                $qty = (float) ($item['qty'] ?? 1);
+                $rate = (float) ($item['rate'] ?? 0);
                 if (!$categoryId) {
-
-                    throw new \Exception(
-                        'Category is required for item #' . ($index + 1)
-                    );
+                    throw new \Exception('Category is required for item #' . ($index + 1));
                 }
-
                 if (!$accountHeadId) {
-
-                    throw new \Exception(
-                        'Expense is required for item #' . ($index + 1)
-                    );
+                    throw new \Exception('Expense is required for item #' . ($index + 1));
                 }
-
                 if ($qty <= 0) {
-
-                    throw new \Exception(
-                        'Quantity must be greater than 0 for item #' . ($index + 1)
-                    );
+                    throw new \Exception('Quantity must be greater than 0 for item #' . ($index + 1));
                 }
-
                 if ($rate < 0) {
-
-                    throw new \Exception(
-                        'Rate cannot be negative for item #' . ($index + 1)
-                    );
+                    throw new \Exception('Rate cannot be negative for item #' . ($index + 1));
                 }
-
                 $amount = $qty * $rate;
-
                 $totalQty += $qty;
-
                 $subTotal += $amount;
             }
-
-            $discount = (float) (
-                $request->discount ?? 0
-            );
-
+            $discount = (float) ($request->discount ?? 0);
             if ($discount > $subTotal) {
-
-                throw new \Exception(
-                    'Discount cannot be greater than subtotal.'
-                );
+                throw new \Exception('Discount cannot be greater than subtotal.');
             }
-
-            $vatPercent = (float) (
-                $request->vat ?? 0
-            );
-
+            $vatPercent = (float) ($request->vat ?? 0);
             if ($vatPercent < 0) {
-
-                throw new \Exception(
-                    'VAT cannot be negative.'
-                );
+                throw new \Exception('VAT cannot be negative.');
             }
-
-            $afterDiscount =
-                $subTotal - $discount;
-
-            $vatAmount =
-                ($afterDiscount * $vatPercent) / 100;
-
-            $grandTotal =
-                $afterDiscount + $vatAmount;
-
+            $afterDiscount = $subTotal - $discount;
+            $vatAmount = ($afterDiscount * $vatPercent) / 100;
+            $grandTotal = $afterDiscount + $vatAmount;
             $receipt = Receipt::create([
-
                 'receipt_no' => random_int(100000, 999999),
-
                 'type' =>
                 $request->type,
 

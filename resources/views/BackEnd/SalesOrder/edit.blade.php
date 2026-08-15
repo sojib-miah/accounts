@@ -185,6 +185,7 @@
                                             <tr>
                                                 <th width="50">SL</th>
                                                 <th width="300">Product</th>
+                                                <th width="300">Description</th>
                                                 <th>Serial No</th>
                                                 <th width="120">Stock</th>
                                                 <th width="120">Qty</th>
@@ -321,53 +322,44 @@
 
     <script type="text/template" id="salesRowTemplate">
         <tr>
-            {{-- SL --}}
             <td class="sl text-center"></td>
-            {{-- PRODUCT --}}
             <td>
                 <select name="product_id[]" class="form-select product select2" required>
                     <option value="">Select Product</option>
                     @foreach($products as $product)
-                        <option value="{{ $product->id }}" data-stock="{{ $product->current_stock }}" data-price="{{ $product->sale_price }}" data-unit="{{ $product->unit }}" data-code="{{ $product->product_code }}">
+                        <option value="{{ $product->id }}" data-stock="{{ $product->current_stock }}" data-price="{{ $product->sale_price }}" data-unit="{{ $product->unit }}" data-code="{{ $product->product_code }}" data-description="{{ $product->description }}">
                             {{ $product->product_code }} - {{ $product->name }} (Stock: {{ number_format($product->current_stock, 2) }})
                         </option>
                     @endforeach
                 </select>
             </td>
+            <td><input type="text" name="description[]" class="form-control description" placeholder="Description"></td>
             <td>
-                {{-- SERIAL BUTTON --}}
                 <div class="mt-2 d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-info btn-sm serialBtn">
                         <i class="fa fa-barcode me-1"></i>
                         Serial
                         <span class="serialCount badge bg-light text-dark ms-1">0</span>
                     </button>
-                    {{-- IMPORTANT --}}
                     <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
                     <small class="text-muted serialStatus">No serial selected</small>
                 </div>
             </td>
-            {{-- STOCK --}}
             <td>
                 <input type="text" class="form-control stock text-end" readonly>
             </td>
-            {{-- QTY --}}
             <td>
                 <input type="number" min="1" name="qty[]" value="1" class="form-control qty text-end" required>
             </td>
-            {{-- RATE --}}
             <td>
                 <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate text-end" required>
             </td>
-            {{-- TOTAL --}}
             <td>
                 <input type="text" class="form-control total text-end" value="0.00" readonly>
             </td>
-            {{-- DETAILS --}}
             <td>
                 <input type="text" name="details[]" class="form-control details">
             </td>
-            {{-- ACTION --}}
             <td class="text-center">
                 <button type="button" class="btn btn-danger remove">
                     <i class="fa fa-trash"></i>
