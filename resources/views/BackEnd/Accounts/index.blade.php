@@ -41,10 +41,13 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
-                                    <th>Bank Name</th>
+                                    <th>Company</th>
+                                    <th>Branch</th>
+                                    <th>Account Name</th>
                                     <th>Address</th>
-                                    <th>Holder Name</th>
+                                    <th>Account Holder</th>
                                     <th>Account Number</th>
+                                    <th>Payment Type</th>
                                     <th class="text-end">Opening Balance</th>
                                     <th class="text-end">Current Balance</th>
                                     <th>Default</th>
@@ -56,6 +59,8 @@
                                 @forelse($accounts as $account)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $account->company->name ?? '-' }}</td>
+                                        <td>{{ $account->branch->name ?? '-' }}</td>
                                         <td>
                                             <a href="{{ route('accounts.show', $account->id) }}"
                                                 class="fw-bold text-decoration-none">
@@ -65,6 +70,7 @@
                                         <td>{{ $account->address ?? '-' }}</td>
                                         <td>{{ $account->account_holder_name }}</td>
                                         <td>{{ $account->account_number }}</td>
+                                        <td>{{ $account->paymentType->name ?? '-' }}</td>
                                         <td class="text-end">{{ number_format($account->opening_balance, 2) }}</td>
                                         <td class="text-end">
                                             <strong>{{ number_format($account->current_balance, 2) }}</strong>
