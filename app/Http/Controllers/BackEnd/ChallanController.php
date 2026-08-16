@@ -155,6 +155,7 @@ class ChallanController extends Controller
         $receipt->load([
             'company',
             'branch',
+            'customerCompany',
             'party',
             'creator',
             'items.category',

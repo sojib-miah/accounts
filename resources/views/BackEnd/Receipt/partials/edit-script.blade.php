@@ -100,6 +100,7 @@
                 placeholder: 'Select Branch'
             });
         }
+
         $(document).on('change', '#branch_id', function() {
             const branchId = $(this).val();
             const $option = $(this).find('option:selected');
@@ -110,139 +111,139 @@
             $('#company_name').text($option.attr('data-company-name') || '-');
             $('#branch_name').text($option.attr('data-name') || $option.text().trim());
             $('#branch_phone').text($option.attr('data-phone') || '-');
-            $('#branch_email').text(
+            $('#branch_email').text($option.attr('data-email') || '-');
+            $('#branch_address').text($option.attr('data-address') || '-');
+        });
 
-                $option.attr(
-                    'data-email'
-                ) || '-'
+        function resetBranch() {
+            const $branch = $('#branch_id');
+            $branch.empty().append('<option value="">Select Branch</option>').val('').prop('disabled', true);
+            refreshBranchSelect();
+            resetBranchInfo();
+        }
 
+        function resetBranchInfo() {
+            $('#company_name').text('-');
+            $('#branch_name').text('-');
+            $('#branch_phone').text('-');
+            $('#branch_email').text('-');
+            $('#branch_address').text('-');
+        }
+
+        $('#customer_company_id').on('change', function() {
+
+            let customerCompanyId = $(this).val();
+
+            $('#customer_company_name').text('');
+            $('#customer_company_phone').text('');
+            $('#customer_company_email').text('');
+            $('#customer_company_address').text('');
+
+            $('#party_id')
+                .html('<option value="">Select Party</option>')
+                .val('')
+                .trigger('change');
+
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
+
+            if (!customerCompanyId) {
+                return;
+            }
+
+            $.get(
+                "{{ url('/admin/ajax/customer-company') }}/" + customerCompanyId,
+                function(res) {
+
+                    if (res.success) {
+
+                        $('#customer_company_name')
+                            .text(res.data.name ?? '');
+
+                        $('#customer_company_phone')
+                            .text(res.data.phone ?? '');
+
+                        $('#customer_company_email')
+                            .text(res.data.email ?? '');
+
+                        $('#customer_company_address')
+                            .text(res.data.address ?? '');
+                    }
+                }
             );
 
+            $.get(
+                "{{ url('/admin/ajax/customer-expense') }}/" +
+                customerCompanyId +
+                "/parties",
+                function(res) {
 
-            $('#branch_address').text(
+                    if (res.success) {
 
-                $option.attr(
-                    'data-address'
-                ) || '-'
+                        let html =
+                            '<option value="">Select Party</option>';
 
+                        $.each(res.parties, function(i, party) {
+
+                            html += `
+                        <option value="${party.id}">
+                            ${party.name ?? '-'}
+                            ${party.designation ? ' - ' + party.designation : ''}
+                        </option>
+                    `;
+                        });
+
+                        $('#party_id')
+                            .html(html)
+                            .trigger('change');
+                    }
+                }
             );
 
         });
 
-        function resetBranch() {
+        $('#party_id').on('change', function() {
 
-            const $branch =
-                $('#branch_id');
+            let partyId = $(this).val();
 
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
 
-            $branch
-                .empty()
-                .append(
-                    '<option value="">Select Branch</option>'
-                )
-                .val('')
-                .prop(
-                    'disabled',
-                    true
-                );
-
-
-            refreshBranchSelect();
-
-
-            resetBranchInfo();
-
-        }
-
-
-        function resetBranchInfo() {
-
-            $('#company_name').text('-');
-
-            $('#branch_name').text('-');
-
-            $('#branch_phone').text('-');
-
-            $('#branch_email').text('-');
-
-            $('#branch_address').text('-');
-
-        }
-
-
-
-        $(document).on(
-            'change',
-            '#party_id',
-            function() {
-
-                const partyId =
-                    $(this).val();
-
-
-                const $option =
-                    $(this).find(
-                        'option:selected'
-                    );
-
-
-                if (!partyId) {
-
-                    resetPartyInfo();
-
-                    return;
-
-                }
-
-
-                $('#party_name').text(
-
-                    $option.attr(
-                        'data-name'
-                    ) ||
-                    $option.text().trim()
-
-                );
-
-
-                $('#party_designation').text(
-
-                    $option.attr(
-                        'data-designation'
-                    ) || '-'
-
-                );
-
-
-                $('#party_phone').text(
-
-                    $option.attr(
-                        'data-phone'
-                    ) || '-'
-
-                );
-
-
-                $('#party_email').text(
-
-                    $option.attr(
-                        'data-email'
-                    ) || '-'
-
-                );
-
-
-                $('#party_address').text(
-
-                    $option.attr(
-                        'data-address'
-                    ) || '-'
-
-                );
-
+            if (!partyId) {
+                return;
             }
-        );
 
+            $.get(
+                "{{ url('/admin/ajax/party') }}/" + partyId,
+                function(res) {
+
+                    if (res.success) {
+
+                        $('#party_name')
+                            .text(res.data.name ?? '-');
+
+                        $('#party_designation')
+                            .text(res.data.designation ?? '-');
+
+                        $('#party_phone')
+                            .text(res.data.phone ?? '-');
+
+                        $('#party_email')
+                            .text(res.data.email ?? '-');
+
+                        $('#party_address')
+                            .text(res.data.address ?? '-');
+                    }
+                }
+            );
+
+        });
 
         function resetPartyInfo() {
 
@@ -257,7 +258,6 @@
             $('#party_address').text('-');
 
         }
-
 
         if (receiptItems.length > 0) {
 
@@ -276,17 +276,10 @@
         }
 
 
-        $(document).on(
-            'click',
-            '#addRow',
-            function() {
-
-                addExpenseRow();
-
-                calculateGrandTotal();
-
-            }
-        );
+        $(document).on('click', '#addRow', function() {
+            addExpenseRow();
+            calculateGrandTotal();
+        });
 
 
 
@@ -557,42 +550,26 @@
 
         }
 
-        $(document).on(
-            'change',
-            '.category',
-            function() {
-
-                const categoryId =
-                    $(this).val();
-
-
-                const $row =
-                    $(this)
-                    .closest(
-                        '.expense-row'
-                    );
-
-                loadAccountHeads(
-                    $row,
-                    categoryId,
-                    null
+        $(document).on('change', '.category', function() {
+            const categoryId =
+                $(this).val();
+            const $row =
+                $(this)
+                .closest(
+                    '.expense-row'
                 );
+            loadAccountHeads(
+                $row,
+                categoryId,
+                null
+            );
+        });
 
-            }
-        );
-
-        function loadAccountHeads(
-            $row,
-            categoryId,
-            selectedAccountHeadId = null
-        ) {
-
+        function loadAccountHeads($row, categoryId, selectedAccountHeadId = null) {
             const $accountHead =
                 $row.find(
                     '.account-head'
                 );
-
-
             $accountHead
                 .empty()
                 .append(
@@ -602,39 +579,23 @@
                     'disabled',
                     true
                 );
-
-
             if (
                 $accountHead.hasClass(
                     'select2-hidden-accessible'
                 )
             ) {
-
                 $accountHead.select2(
                     'destroy'
                 );
-
             }
-
-
             $accountHead.select2({
-
                 width: '100%',
-
                 allowClear: true,
-
                 placeholder: 'Select Expense'
-
             });
-
-
             if (!categoryId) {
-
                 return;
-
             }
-
-
             $accountHead
                 .empty()
                 .append(
@@ -644,55 +605,33 @@
                     'disabled',
                     true
                 );
-
-
             $accountHead.trigger(
                 'change'
             );
-
-
-
             let url =
                 "{{ route('ajax.account-head', ['category' => '__CATEGORY__']) }}";
-
-
             url =
                 url.replace(
                     '__CATEGORY__',
                     categoryId
                 );
-
-
-
             $.ajax({
-
                 url: url,
-
                 type: 'GET',
-
                 dataType: 'json',
-
-
                 success: function(response) {
-
-
                     $accountHead
                         .empty()
                         .append(
                             '<option value="">Select Expense</option>'
                         );
-
-
                     let accounts = [];
-
-
                     if (
                         response &&
                         Array.isArray(
                             response.data
                         )
                     ) {
-
                         accounts =
                             response.data;
 
@@ -702,7 +641,6 @@
                             response.accountHeads
                         )
                     ) {
-
                         accounts =
                             response.accountHeads;
 
@@ -836,8 +774,6 @@
 
             }
         );
-
-
         $(document).on(
             'input',
             '#discount',
@@ -847,7 +783,6 @@
 
             }
         );
-
         $(document).on(
             'input',
             '#vat',
@@ -858,47 +793,21 @@
             }
         );
 
-
-        function calculateRowTotal(
-            $row
-        ) {
-
-            const qty =
-                parseFloat(
-                    $row.find(
-                        '.qty'
-                    ).val()
-                ) || 0;
-
-
-            const rate =
-                parseFloat(
-                    $row.find(
-                        '.rate'
-                    ).val()
-                ) || 0;
-
-
+        function calculateRowTotal($row) {
+            const qty = parseFloat($row.find('.qty').val()) || 0;
+            const rate = parseFloat($row.find('.rate').val()) || 0;
             const total =
                 qty * rate;
-
-
             $row.find(
                 '.total'
             ).val(
                 total.toFixed(2)
             );
-
         }
 
-
         function calculateGrandTotal() {
-
             let totalQty = 0;
-
             let subTotal = 0;
-
-
             $('#expenseBody .expense-row')
                 .each(function() {
 
@@ -1090,250 +999,241 @@
         }
 
 
-        $(document).on(
-            'click',
-            '.removeRow',
-            function() {
+        $(document).on('click', '.removeRow', function() {
 
-                const rows =
-                    $('#expenseBody .expense-row');
+            const rows =
+                $('#expenseBody .expense-row');
 
-                if (
-                    rows.length <= 1
-                ) {
+            if (
+                rows.length <= 1
+            ) {
 
-                    Swal.fire({
+                Swal.fire({
 
-                        icon: 'warning',
+                    icon: 'warning',
 
-                        title: 'Cannot Remove',
+                    title: 'Cannot Remove',
 
-                        text: 'At least one expense item is required.'
+                    text: 'At least one expense item is required.'
 
-                    });
+                });
 
-                    return;
-
-                }
-                $(this)
-                    .closest(
-                        '.expense-row'
-                    )
-                    .remove();
-
-                updateRowNumbers();
-
-                updateRemoveButtons();
-
-                calculateGrandTotal();
+                return;
 
             }
-        );
+            $(this)
+                .closest(
+                    '.expense-row'
+                )
+                .remove();
 
-        $('#receiptForm').on(
-            'submit',
-            function(e) {
+            updateRowNumbers();
 
-                let valid = true;
+            updateRemoveButtons();
 
-                let message = '';
+            calculateGrandTotal();
 
-                const items = [];
+        });
 
-                if (
-                    !$('#company_id').val()
-                ) {
+        $('#receiptForm').on('submit', function(e) {
 
-                    valid = false;
+            let valid = true;
 
-                    message =
-                        'Please select Company.';
+            let message = '';
 
-                }
+            const items = [];
 
-                if (
-                    valid &&
-                    !$('#branch_id').val()
-                ) {
+            if (
+                !$('#company_id').val()
+            ) {
 
-                    valid = false;
+                valid = false;
 
-                    message =
-                        'Please select Branch.';
+                message =
+                    'Please select Company.';
 
-                }
-                if (
-                    valid &&
-                    !$('#party_id').val()
-                ) {
+            }
 
-                    valid = false;
+            if (
+                valid &&
+                !$('#branch_id').val()
+            ) {
 
-                    message =
-                        'Please select Customer.';
+                valid = false;
 
-                }
+                message =
+                    'Please select Branch.';
 
-                if (valid) {
+            }
+            if (
+                valid &&
+                !$('#party_id').val()
+            ) {
 
-                    $('#expenseBody .expense-row')
-                        .each(function() {
+                valid = false;
 
-                            const $row =
-                                $(this);
+                message =
+                    'Please select Customer.';
+
+            }
+
+            if (valid) {
+
+                $('#expenseBody .expense-row')
+                    .each(function() {
+
+                        const $row =
+                            $(this);
 
 
-                            const categoryId =
+                        const categoryId =
+                            $row
+                            .find(
+                                '.category'
+                            )
+                            .val();
+
+
+                        const accountHeadId =
+                            $row
+                            .find(
+                                '.account-head'
+                            )
+                            .val();
+
+
+                        const qty =
+                            parseFloat(
                                 $row
                                 .find(
-                                    '.category'
+                                    '.qty'
                                 )
-                                .val();
+                                .val()
+                            ) || 0;
 
 
-                            const accountHeadId =
+                        const rate =
+                            parseFloat(
                                 $row
                                 .find(
-                                    '.account-head'
+                                    '.rate'
                                 )
-                                .val();
+                                .val()
+                            ) || 0;
 
 
-                            const qty =
-                                parseFloat(
-                                    $row
-                                    .find(
-                                        '.qty'
-                                    )
-                                    .val()
-                                ) || 0;
+                        const details =
+                            $row
+                            .find(
+                                '.details'
+                            )
+                            .val() || '';
+
+                        if (!categoryId) {
+
+                            valid = false;
+
+                            message =
+                                'Please select Category.';
+
+                            return false;
+
+                        }
+                        if (!accountHeadId) {
+
+                            valid = false;
+
+                            message =
+                                'Please select Expense.';
+
+                            return false;
+
+                        }
+
+                        if (
+                            qty <= 0
+                        ) {
+
+                            valid = false;
+
+                            message =
+                                'Quantity must be greater than 0.';
+
+                            return false;
+
+                        }
+
+                        if (
+                            rate < 0
+                        ) {
+
+                            valid = false;
+
+                            message =
+                                'Unit Price cannot be negative.';
+
+                            return false;
+
+                        }
+
+                        const amount =
+                            qty * rate;
 
 
-                            const rate =
-                                parseFloat(
-                                    $row
-                                    .find(
-                                        '.rate'
-                                    )
-                                    .val()
-                                ) || 0;
+                        items.push({
 
+                            category_id: categoryId,
 
-                            const details =
-                                $row
-                                .find(
-                                    '.details'
-                                )
-                                .val() || '';
+                            account_head_id: accountHeadId,
 
-                            if (!categoryId) {
+                            qty: qty,
 
-                                valid = false;
+                            rate: rate,
 
-                                message =
-                                    'Please select Category.';
+                            amount: amount,
 
-                                return false;
-
-                            }
-                            if (!accountHeadId) {
-
-                                valid = false;
-
-                                message =
-                                    'Please select Expense.';
-
-                                return false;
-
-                            }
-
-                            if (
-                                qty <= 0
-                            ) {
-
-                                valid = false;
-
-                                message =
-                                    'Quantity must be greater than 0.';
-
-                                return false;
-
-                            }
-
-                            if (
-                                rate < 0
-                            ) {
-
-                                valid = false;
-
-                                message =
-                                    'Unit Price cannot be negative.';
-
-                                return false;
-
-                            }
-
-                            const amount =
-                                qty * rate;
-
-
-                            items.push({
-
-                                category_id: categoryId,
-
-                                account_head_id: accountHeadId,
-
-                                qty: qty,
-
-                                rate: rate,
-
-                                amount: amount,
-
-                                details: details
-
-                            });
+                            details: details
 
                         });
 
-                }
-
-                if (!valid) {
-
-                    e.preventDefault();
-
-
-                    Swal.fire({
-
-                        icon: 'warning',
-
-                        title: 'Required',
-
-                        text: message
-
                     });
 
+            }
 
-                    return false;
+            if (!valid) {
 
-                }
+                e.preventDefault();
 
-                calculateGrandTotal();
 
-                $('#items_json')
-                    .val(
-                        JSON.stringify(
-                            items
-                        )
-                    );
+                Swal.fire({
 
-                return true;
+                    icon: 'warning',
+
+                    title: 'Required',
+
+                    text: message
+
+                });
+
+
+                return false;
 
             }
-        );
 
-        if (
-            receiptCompanyId
-        ) {
+            calculateGrandTotal();
+
+            $('#items_json')
+                .val(
+                    JSON.stringify(
+                        items
+                    )
+                );
+
+            return true;
+
+        });
+
+        if (receiptCompanyId) {
 
             $('#company_id')
                 .val(

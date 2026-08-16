@@ -143,6 +143,9 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/ajax/branch/{branch}', [ReceiptController::class, 'branchInfo'])->name('ajax.branch');
     Route::get('/ajax/party/{party}', [ReceiptController::class, 'partyInfo'])->name('ajax.party');
     Route::get('/ajax/company/{company}/branches', [ReceiptController::class, 'getBranches']);
+    Route::get('/ajax/customer-company/{customerCompany}/parties', [ReceiptController::class, 'customerCompanyParties'])->name('ajax.customer-company.parties');
+    Route::get('/ajax/customer-expense/{customerCompany}/parties', [ReceiptController::class, 'customerExpenseParties'])->name('ajax.customer-expense.parties');
+    Route::get('/ajax/customer-company/{customerCompany}', [ReceiptController::class, 'customerCompanyInfo'])->name('ajax.customer-company');
     Route::get('/ajax/account-head/{category}', [ReceiptController::class, 'accountHeads'])->name('ajax.account-head');
     Route::get('/party/{party}/profile', [ReceiptController::class, 'profile'])->name('party.profile');
     Route::post('/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('party.due.payment');

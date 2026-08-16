@@ -61,7 +61,7 @@
                         <hr>
                         <div class="row">
                             <!-- Company -->
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Company Name
                                     <span class="text-danger">*</span>
@@ -73,7 +73,7 @@
                                 </div>
                             </div>
                             <!-- Branch -->
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Branch Name
                                     <span class="text-danger">*</span>
@@ -100,8 +100,35 @@
                                     </p>
                                 </div>
                             </div>
-                            <!-- Party -->
-                            <div class="col-md-4">
+                            <!-- company customer -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">
+                                    Customer Company
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" readonly
+                                    value="{{ $receipt->customerCompany->name ?? '' }}">
+                                <div class="mt-3">
+                                    <p class="mb-1">
+                                        <b>Name:</b>
+                                        {{ $receipt->customerCompany->name ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>Mobile:</b>
+                                        {{ $receipt->customerCompany->phone ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>E-mail:</b>
+                                        {{ $receipt->customerCompany->email ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>Address:</b>
+                                        {{ $receipt->customerCompany->address ?? '' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- customer -->
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Customer Name
                                     <span class="text-danger">*</span>
@@ -135,9 +162,7 @@
                     </div>
                 </div>
 
-                {{-- ========================= --}}
                 {{-- Income Receipt List --}}
-                {{-- ========================= --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding: 8px !important;">
                         <h3 class="mb-0 fw-bold">
@@ -201,9 +226,8 @@
                         </div>
                     </div>
                 </div>
-                {{-- ========================= --}}
+
                 {{-- Total Section --}}
-                {{-- ========================= --}}
                 <div class="row mt-4">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">

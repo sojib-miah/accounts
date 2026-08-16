@@ -9,6 +9,7 @@ use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\CustomerCompany;
 use App\Models\Party;
 use App\Models\PaymentType;
 use App\Models\Receipt;
@@ -94,6 +95,9 @@ class ReceiptController extends Controller
             )
             ->orderBy('name')
             ->get();
+        $customerCompanies = CustomerCompany::where('status', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
         $categories = Category::where('type', 'Expense')
             ->where('status', 'Active')
@@ -106,15 +110,7 @@ class ReceiptController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view(
-            'BackEnd.Receipt.expense_create',
-            compact(
-                'companies',
-                'branches',
-                'parties',
-                'categories'
-            )
-        );
+        return view('BackEnd.Receipt.expense_create', compact('companies', 'branches', 'parties', 'categories', 'customerCompanies'));
     }
 
     public function store(Request $request)
@@ -123,6 +119,7 @@ class ReceiptController extends Controller
             'type' => 'required|in:Income,Expense,Challan',
             'company_id' => 'required|exists:companies,id',
             'branch_id' => 'required|exists:branches,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
             'items' => 'required|string',
@@ -183,53 +180,23 @@ class ReceiptController extends Controller
             $grandTotal = $afterDiscount + $vatAmount;
             $receipt = Receipt::create([
                 'receipt_no' => random_int(100000, 999999),
-                'type' =>
-                $request->type,
-
-                'company_id' =>
-                $request->company_id,
-
-                'branch_id' =>
-                $request->branch_id,
-
-                'party_id' =>
-                $request->party_id,
-
-                'receipt_date' =>
-                $request->receipt_date,
-
-                'remarks' =>
-                $request->remarks,
-
-                'total_qty' =>
-                $totalQty,
-
-                'sub_total' =>
-                $subTotal,
-
-                'discount' =>
-                $discount,
-
-                'vat' =>
-                $vatPercent,
-
-                'total_amount' =>
-                $grandTotal,
-
-                'paid_amount' =>
-                0,
-
-                'due_amount' =>
-                $grandTotal,
-
-                'payment_status' =>
-                'Pending',
-
-                'status' =>
-                'Completed',
-
-                'created_by' =>
-                $user->id,
+                'type' => $request->type,
+                'company_id' => $request->company_id,
+                'branch_id' => $request->branch_id,
+                'customer_company_id' => $request->customer_company_id,
+                'party_id' => $request->party_id,
+                'receipt_date' => $request->receipt_date,
+                'remarks' => $request->remarks,
+                'total_qty' => $totalQty,
+                'sub_total' => $subTotal,
+                'discount' => $discount,
+                'vat' => $vatPercent,
+                'total_amount' => $grandTotal,
+                'paid_amount' => 0,
+                'due_amount' => $grandTotal,
+                'payment_status' => 'Pending',
+                'status' => 'Completed',
+                'created_by' => $user->id,
             ]);
 
             foreach ($items as $item) {
@@ -299,6 +266,7 @@ class ReceiptController extends Controller
         $receipt->load([
             'company',
             'branch',
+            'customerCompany',
             'party',
             'creator',
             'items.category',
@@ -330,6 +298,9 @@ class ReceiptController extends Controller
         $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
+        $customerCompanies = CustomerCompany::where('status', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
         $categories = Category::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
@@ -354,7 +325,8 @@ class ReceiptController extends Controller
                 'parties',
                 'categories',
                 'receiptItems',
-                'companies'
+                'companies',
+                'customerCompanies'
             )
         );
     }
@@ -363,6 +335,7 @@ class ReceiptController extends Controller
     {
         $request->validate([
             'branch_id' => 'required|exists:branches,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
             'items' => 'required',
@@ -388,6 +361,7 @@ class ReceiptController extends Controller
             $grandTotal = $afterDiscount + $vatAmount;
             $receipt->update([
                 'branch_id' => $request->branch_id,
+                'customer_company_id' => $request->customer_company_id,
                 'party_id' => $request->party_id,
                 'receipt_date' => $request->receipt_date,
                 'remarks' => $request->remarks,
@@ -668,6 +642,108 @@ class ReceiptController extends Controller
                 'name'    => $company->name,
             ],
             'branches' => $branches,
+        ]);
+    }
+
+    public function customerCompanyParties(CustomerCompany $customerCompany)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('Super-Admin')) {
+
+            if ($customerCompany->created_by != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not allowed to access this customer company.'
+                ], 403);
+            }
+        }
+
+        $parties = Party::where('customer_company_id', $customerCompany->id)
+            ->where('type', 'Customer')
+            ->where('status', 'Active')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+            ->orderBy('name')
+            ->get([
+                'id',
+                'party_id',
+                'name',
+                'designation',
+                'phone',
+                'email',
+                'address',
+                'status',
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'parties' => $parties,
+        ]);
+    }
+
+    public function customerExpenseParties(CustomerCompany $customerCompany)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('Super-Admin')) {
+
+            if ($customerCompany->created_by != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not allowed to access this customer company.'
+                ], 403);
+            }
+        }
+
+        $parties = Party::where('customer_company_id', $customerCompany->id)
+            ->where('type', 'Expense')
+            ->where('status', 'Active')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+            ->orderBy('name')
+            ->get([
+                'id',
+                'party_id',
+                'name',
+                'designation',
+                'phone',
+                'email',
+                'address',
+                'status',
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'parties' => $parties,
+        ]);
+    }
+
+    public function customerCompanyInfo(CustomerCompany $customerCompany)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('Super-Admin')) {
+
+            if ($customerCompany->created_by != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized.'
+                ], 403);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id'      => $customerCompany->id,
+                'name'    => $customerCompany->name,
+                'phone'   => $customerCompany->phone,
+                'email'   => $customerCompany->email,
+                'address' => $customerCompany->address,
+            ]
         ]);
     }
 

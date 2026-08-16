@@ -1451,6 +1451,102 @@
 
         }
     );
+    $('#customer_company_id').change(function() {
+
+        let companyId = $(this).val();
+
+        $('#party_id')
+            .html('<option value="">Select Customer</option>')
+            .val('')
+            .trigger('change');
+
+        $('#customer_company_name').text('');
+        $('#customer_company_phone').text('');
+        $('#customer_company_email').text('');
+        $('#customer_company_address').text('');
+
+        if (companyId === '') {
+            return;
+        }
+
+        $.get(
+            '/admin/ajax/customer-company/' + companyId,
+            function(res) {
+
+                if (res.success) {
+
+                    $('#customer_company_name')
+                        .text(res.data.name ?? '');
+
+                    $('#customer_company_phone')
+                        .text(res.data.phone ?? '');
+
+                    $('#customer_company_email')
+                        .text(res.data.email ?? '');
+
+                    $('#customer_company_address')
+                        .text(res.data.address ?? '');
+                }
+            }
+        );
+
+        $.get(
+            '/admin/ajax/customer-company/' + companyId + '/parties',
+            function(res) {
+
+                if (!res.success) {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: res.message ?? 'Unable to load customers.'
+                    });
+
+                    return;
+                }
+
+                let html =
+                    '<option value="">Select Customer</option>';
+
+                if (res.parties.length === 0) {
+
+                    html =
+                        '<option value="">No Customer Found</option>';
+
+                } else {
+
+                    $.each(res.parties, function(i, party) {
+
+                        html += `
+                        <option value="${party.id}">
+                            ${party.name}
+                            ${party.party_id
+                                ? ' (' + party.party_id + ')'
+                                : ''}
+                        </option>
+                    `;
+                    });
+                }
+
+                $('#party_id')
+                    .html(html)
+                    .val('')
+                    .trigger('change');
+
+            }
+        ).fail(function(xhr) {
+
+            console.log(xhr);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Unable to load customers.'
+            });
+
+        });
+
+    });
 
     $('#branch_id').change(
         function() {

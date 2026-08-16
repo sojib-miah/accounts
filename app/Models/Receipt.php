@@ -25,10 +25,7 @@ class Receipt extends Model
 
     public function items()
     {
-        return $this->hasMany(
-            ReceiptItem::class,
-            'receipt_id'
-        );
+        return $this->hasMany(ReceiptItem::class, 'receipt_id');
     }
 
     public function payments()
@@ -59,5 +56,10 @@ class Receipt extends Model
     public function serialNumbers()
     {
         return $this->hasMany(SerialNumber::class);
+    }
+
+    public function customerCompany()
+    {
+        return $this->belongsTo(CustomerCompany::class, 'customer_company_id');
     }
 }

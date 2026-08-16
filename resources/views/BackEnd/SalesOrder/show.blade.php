@@ -10,12 +10,10 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Company Logo -->
                             <div class="col-md-6">
                                 <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : asset('default-favicon.ico') }}"
                                     height="55">
                             </div>
-                            <!-- Receipt Info -->
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
@@ -51,7 +49,7 @@
                         <hr>
                         <div class="row">
                             <!-- Company -->
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Company Name
                                     <span class="text-danger">*</span>
@@ -63,7 +61,7 @@
                                 </div>
                             </div>
                             <!-- Branch -->
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Branch Name
                                     <span class="text-danger">*</span>
@@ -90,8 +88,35 @@
                                     </p>
                                 </div>
                             </div>
-                            <!-- Party -->
-                            <div class="col-md-4">
+                            <!-- company customer -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">
+                                    Customer Company
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" readonly
+                                    value="{{ $receipt->customerCompany->name ?? '' }}">
+                                <div class="mt-3">
+                                    <p class="mb-1">
+                                        <b>Name:</b>
+                                        {{ $receipt->customerCompany->name ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>Mobile:</b>
+                                        {{ $receipt->customerCompany->phone ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>E-mail:</b>
+                                        {{ $receipt->customerCompany->email ?? '' }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <b>Address:</b>
+                                        {{ $receipt->customerCompany->address ?? '' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- customer -->
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">
                                     Customer Name
                                     <span class="text-danger">*</span>

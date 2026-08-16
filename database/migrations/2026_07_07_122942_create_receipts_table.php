@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('po_no')->nullable()->unique();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('branch_id')->nullable()->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('customer_company_id')->nullable()->constrained('customer_companies')->nullOnDelete();
             $table->foreignId('party_id')->constrained('parties')->cascadeOnUpdate()->restrictOnDelete();
             $table->date('receipt_date');
             $table->text('remarks')->nullable();

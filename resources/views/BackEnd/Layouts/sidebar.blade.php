@@ -26,7 +26,7 @@
         <!-- company -->
         @can('menu-company-list')
             <li
-                class="menu-item {{ request()->routeIs('company.*') || request()->routeIs('branch.*') || request()->routeIs('user.*') || request()->routeIs('payment-type.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('company.*') || request()->routeIs('branch.*') || request()->routeIs('user.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-brands fa-studiovinari me-3"></i>
                     Company
@@ -46,13 +46,6 @@
                             </a>
                         </li>
                     @endcan
-                    @can('payment-type-list')
-                        <li class="menu-item {{ request()->routeIs('payment-type.index') ? 'active' : '' }}">
-                            <a href="{{ route('payment-type.index') }}" class="menu-link">
-                                Payment Type
-                            </a>
-                        </li>
-                    @endcan
                     @can('company-user-list')
                         <li class="menu-item {{ request()->routeIs('user.index') ? 'active' : '' }}">
                             <a href="{{ route('user.index') }}" class="menu-link">
@@ -66,12 +59,20 @@
 
         <!-- Accounts -->
         @can('menu-account-list')
-            <li class="menu-item {{ request()->routeIs('accounts.*') ? 'active open' : '' }}">
+            <li
+                class="menu-item {{ request()->routeIs('accounts.*') || request()->routeIs('payment-type.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-person-circle-check me-3"></i>
                     Accounts
                 </a>
                 <ul class="menu-sub">
+                    @can('payment-type-list')
+                        <li class="menu-item {{ request()->routeIs('payment-type.index') ? 'active' : '' }}">
+                            <a href="{{ route('payment-type.index') }}" class="menu-link">
+                                Payment Type
+                            </a>
+                        </li>
+                    @endcan
                     @can('account-list')
                         <li class="menu-item {{ request()->routeIs('accounts.index') ? 'active' : '' }}">
                             <a href="{{ route('accounts.index') }}" class="menu-link">

@@ -45,7 +45,8 @@
                                 </div>
                                 <hr>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    {{-- company --}}
+                                    <div class="col-md-3">
                                         <label class="form-label">
                                             Company Name
                                             <span class="text-danger">*</span>
@@ -70,7 +71,8 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    {{-- branch  --}}
+                                    <div class="col-md-3">
                                         <label class="form-label">
                                             Branch Name
                                             <span class="text-danger">*</span>
@@ -104,22 +106,36 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <!-- customer company-->
+                                    <div class="col-md-3">
+                                        <label class="form-label">
+                                            Customer Company <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="customer_company_id" id="customer_company_id"
+                                            class="form-select select2" required>
+                                            <option value="">Select Customer</option>
+                                            @foreach ($customerCompanies as $company)
+                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="mt-3">
+                                            <p class="mb-1"><b>Name :</b> <span id="customer_company_name"></span></p>
+                                            <p class="mb-1"><b>Mobile :</b> <span id="customer_company_phone"></span>
+                                            </p>
+                                            <p class="mb-1"><b>E-mail :</b> <span id="customer_company_email"></span>
+                                            </p>
+                                            <p class="mb-1"><b>Address :</b> <span id="customer_company_address"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {{-- customer  --}}
+                                    <div class="col-md-3">
                                         <label class="form-label">
                                             Party Name
                                             <span class="text-danger">*</span>
                                         </label>
                                         <select name="party_id" id="party_id" class="form-select select2" required>
                                             <option value="">Select Party</option>
-                                            @foreach ($parties as $party)
-                                                <option value="{{ $party->id }}" data-name="{{ $party->name }}"
-                                                    data-designation="{{ $party->designation ?? '' }}"
-                                                    data-phone="{{ $party->phone ?? '' }}"
-                                                    data-email="{{ $party->email ?? '' }}"
-                                                    data-address="{{ $party->address ?? '' }}">
-                                                    {{ $party->name }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                         {{-- PARTY INFORMATION --}}
                                         <div class="mt-3">

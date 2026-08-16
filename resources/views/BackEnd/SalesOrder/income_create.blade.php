@@ -46,7 +46,7 @@
                                     <hr>
                                     <div class="row">
                                         {{-- company --}}
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Company Name <span
                                                     class="text-danger">*</span></label>
                                             <select name="company_id" id="company_id" class="form-select select2" required>
@@ -62,7 +62,7 @@
                                             </div>
                                         </div>
                                         <!-- Branch -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Branch Name <span class="text-danger">*</span></label>
                                             <select name="branch_id" id="branch_id" class="form-select select2" required>
                                                 <option value="">Select Branch</option>
@@ -76,13 +76,16 @@
                                             </div>
                                         </div>
                                         <!-- customer company-->
-                                        {{-- <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">
                                                 Customer Company <span class="text-danger">*</span>
                                             </label>
                                             <select name="customer_company_id" id="customer_company_id"
                                                 class="form-select select2" required>
                                                 <option value="">Select Customer</option>
+                                                @foreach ($customerCompanies as $company)
+                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                @endforeach
                                             </select>
                                             <div class="mt-3">
                                                 <p class="mb-1"><b>Name :</b> <span id="customer_company_name"></span></p>
@@ -93,19 +96,14 @@
                                                 <p class="mb-1"><b>Address :</b> <span
                                                         id="customer_company_address"></span></p>
                                             </div>
-                                        </div> --}}
+                                        </div>
                                         <!-- customer  -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">
                                                 Customer Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="party_id" id="party_id" class="form-select select2" required>
                                                 <option value="">Select Customer</option>
-                                                @foreach ($parties as $party)
-                                                    <option value="{{ $party->id }}">
-                                                        {{ $party->name }}
-                                                    </option>
-                                                @endforeach
                                             </select>
                                             <div class="mt-3">
                                                 <p class="mb-1"><b>Name :</b> <span id="party_name"></span></p>

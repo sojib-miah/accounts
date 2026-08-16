@@ -1,36 +1,16 @@
-CREATE TABLE `customer_companies` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NULL,
-    `email` VARCHAR(255) NULL,
-    `phone` VARCHAR(255) NULL,
-    `address` VARCHAR(255) NULL,
-    `created_by` BIGINT UNSIGNED NULL,
-    `updated_by` BIGINT UNSIGNED NULL,
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-
-    PRIMARY KEY (`id`),
-
-    CONSTRAINT `customer_companies_created_by_foreign`
-        FOREIGN KEY (`created_by`)
-        REFERENCES `users` (`id`)
-        ON DELETE SET NULL,
-
-    CONSTRAINT `customer_companies_updated_by_foreign`
-        FOREIGN KEY (`updated_by`)
-        REFERENCES `users` (`id`)
-        ON DELETE SET NULL
-);
-
-ALTER TABLE `customer_companies`
-ADD COLUMN `status` ENUM('Sales', 'Expense') NULL
-AFTER `address`;
-
-ALTER TABLE `parties`
+ALTER TABLE `receipts`
 ADD COLUMN `customer_company_id` BIGINT UNSIGNED NULL
 AFTER `company_id`,
-ADD CONSTRAINT `parties_customer_company_id_foreign`
+ADD CONSTRAINT `receipts_customer_company_id_foreign`
     FOREIGN KEY (`customer_company_id`)
     REFERENCES `customer_companies` (`id`)
     ON DELETE SET NULL;
 
+ALTER TABLE `accounts`
+ADD COLUMN `branch_id` BIGINT UNSIGNED NULL
+AFTER `company_id`,
+ADD CONSTRAINT `accounts_branch_id_foreign`
+    FOREIGN KEY (`branch_id`)
+    REFERENCES `branches` (`id`)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT;

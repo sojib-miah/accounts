@@ -8,6 +8,16 @@ class Account extends Model
 {
     protected $guarded = [];
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function paymentType()
     {
         return $this->belongsTo(PaymentType::class);

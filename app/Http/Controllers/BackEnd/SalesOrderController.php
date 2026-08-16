@@ -8,6 +8,7 @@ use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\CustomerCompany;
 use App\Models\Party;
 use App\Models\PaymentType;
 use App\Models\Product;
@@ -66,6 +67,9 @@ class SalesOrderController extends Controller
         $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
+        $customerCompanies = CustomerCompany::where('status', 'Sales')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
 
         $products = Product::with('category')
             ->where('status', 'Active')
@@ -79,7 +83,7 @@ class SalesOrderController extends Controller
             })
             ->orderBy('name')
             ->get();
-        return view('BackEnd.SalesOrder.income_create', compact('branches', 'parties', 'products', 'companies'));
+        return view('BackEnd.SalesOrder.income_create', compact('branches', 'parties', 'products', 'companies', 'customerCompanies'));
     }
 
     private function generateReceiptNo()
@@ -104,6 +108,7 @@ class SalesOrderController extends Controller
         $request->validate([
             'company_id'       => 'required|exists:companies,id',
             'branch_id'        => 'required|exists:branches,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id'         => 'required|exists:parties,id',
             'receipt_date'     => 'required|date',
             'product_id'       => 'required|array|min:1',
@@ -169,6 +174,7 @@ class SalesOrderController extends Controller
                 'type' => 'Sales-Order',
                 'company_id' => $companyId,
                 'branch_id' => $request->branch_id,
+                'customer_company_id' => $request->customer_company_id,
                 'party_id' => $request->party_id,
                 'receipt_date' => $request->receipt_date,
                 'remarks' => $request->remarks,
@@ -300,6 +306,7 @@ class SalesOrderController extends Controller
         $receipt->load([
             'company',
             'branch',
+            'customerCompany',
             'party',
             'creator',
             'items.product.category',
@@ -332,6 +339,9 @@ class SalesOrderController extends Controller
                 ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
         $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+        $customerCompanies = CustomerCompany::where('status', 'Sales')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
@@ -368,7 +378,7 @@ class SalesOrderController extends Controller
                 'serials' => $item->serialNumbers->pluck('serial_no')->values()->toArray(),
             ];
         })->values();
-        return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'products', 'receiptItems', 'companies', 'oldItems'));
+        return view('BackEnd.SalesOrder.edit', compact('receipt', 'branches', 'parties', 'products', 'receiptItems', 'companies', 'oldItems', 'customerCompanies'));
     }
 
     public function update(Request $request, Receipt $receipt)
@@ -376,6 +386,7 @@ class SalesOrderController extends Controller
         $request->validate([
             'company_id'       => 'nullable|exists:companies,id',
             'branch_id'        => 'required|exists:branches,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id'         => 'required|exists:parties,id',
             'receipt_date'     => 'required|date',
 
@@ -546,79 +557,56 @@ class SalesOrderController extends Controller
 
                 'company_id' => $companyId,
                 'branch_id' => $request->branch_id,
+                'customer_company_id' => $request->customer_company_id,
                 'party_id' => $request->party_id,
-
                 'receipt_date' => $request->receipt_date,
                 'remarks' => $request->remarks,
-
                 'total_qty' => $totalQty,
-
                 'sub_total' => $subTotal,
                 'discount' => $discount,
                 'vat' => $vatPercent,
-
                 'total_amount' => $grandTotal,
-
                 'paid_amount' => $paidAmount,
                 'due_amount' => $dueAmount,
-
                 'payment_status' => $paymentStatus,
-
                 'updated_by' => $userId,
             ]);
             $usedSerials = [];
-
             foreach ($productIds as $key => $productId) {
-
                 $product = Product::where('id', $productId)
                     ->lockForUpdate()
                     ->firstOrFail();
-
                 $qty = (float) $request->qty[$key];
-
                 $rate = (float) $request->rate[$key];
-
                 $amount = $qty * $rate;
-
                 $serialJson =
                     $request->serial_json[$key] ?? '[]';
-
                 $serials =
                     json_decode($serialJson, true);
-
                 if (!is_array($serials)) {
                     $serials = [];
                 }
-
-
                 $serials = collect($serials)
                     ->map(function ($serial) {
-
                         return strtoupper(
                             trim((string) $serial)
                         );
                     })
                     ->filter(function ($serial) {
-
                         return $serial !== '';
                     })
                     ->values()
                     ->toArray();
-
                 if (
                     count($serials)
                     !== count(array_unique($serials))
                 ) {
-
                     throw new \Exception(
                         'Duplicate serial number found for product: ' .
                             $product->name
                     );
                 }
-
-
                 foreach ($serials as $serial) {
-
                     if (
                         in_array(
                             $serial,
@@ -626,24 +614,19 @@ class SalesOrderController extends Controller
                             true
                         )
                     ) {
-
                         throw new \Exception(
                             "Serial Number {$serial} has been selected more than once."
                         );
                     }
-
                     $usedSerials[] = $serial;
                 }
-
                 $availableSerialQuery =
                     SerialNumber::where(
                         'product_id',
                         $productId
                     )
                     ->where('status', 'Available')
-
                     ->where(function ($query) use ($companyId) {
-
                         $query->where(
                             'company_id',
                             $companyId
@@ -651,9 +634,7 @@ class SalesOrderController extends Controller
                             'company_id'
                         );
                     })
-
                     ->where(function ($query) use ($request) {
-
                         $query->where(
                             'branch_id',
                             $request->branch_id
@@ -661,17 +642,13 @@ class SalesOrderController extends Controller
                             'branch_id'
                         );
                     });
-
-
                 $availableSerialCount =
                     $availableSerialQuery->count();
                 if ($availableSerialCount > 0) {
-
                     if (
                         count($serials)
                         != (int) $qty
                     ) {
-
                         throw new \Exception(
                             "Please select exactly " .
                                 (int) $qty .
@@ -681,12 +658,10 @@ class SalesOrderController extends Controller
                                 count($serials)
                         );
                     }
-
                     if (
                         count($serials)
                         > $availableSerialCount
                     ) {
-
                         throw new \Exception(
                             "Only " .
                                 $availableSerialCount .
@@ -696,38 +671,28 @@ class SalesOrderController extends Controller
                         );
                     }
                 } else {
-
                     throw new \Exception(
                         "No available serial number found for " .
                             $product->name .
                             " in the selected branch."
                     );
                 }
-
                 $receiptItem =
                     ReceiptItem::create([
-
                         'receipt_id' =>
                         $receipt->id,
-
                         'product_id' =>
                         $productId,
-
                         'qty' =>
                         $qty,
-
                         'rate' =>
                         $rate,
-
                         'amount' =>
                         $amount,
-
                         'details' =>
                         $request->details[$key] ?? null,
                     ]);
-
                 foreach ($serials as $serial) {
-
                     $serialRecord =
                         SerialNumber::where(
                             'product_id',
@@ -741,9 +706,7 @@ class SalesOrderController extends Controller
                             'status',
                             'Available'
                         )
-
                         ->where(function ($query) use ($companyId) {
-
                             $query->where(
                                 'company_id',
                                 $companyId
@@ -751,9 +714,7 @@ class SalesOrderController extends Controller
                                 'company_id'
                             );
                         })
-
                         ->where(function ($query) use ($request) {
-
                             $query->where(
                                 'branch_id',
                                 $request->branch_id
@@ -761,103 +722,71 @@ class SalesOrderController extends Controller
                                 'branch_id'
                             );
                         })
-
                         ->lockForUpdate()
                         ->first();
-
-
                     if (!$serialRecord) {
-
                         throw new \Exception(
                             "Serial Number {$serial} is no longer available."
                         );
                     }
                     $serialRecord->update([
-
                         'company_id' =>
                         $companyId,
-
                         'branch_id' =>
                         $request->branch_id,
-
                         'status' =>
                         'Sold',
-
                         'sale_date' =>
                         today(),
-
                         'receipt_id' =>
                         $receipt->id,
-
                         'receipt_item_id' =>
                         $receiptItem->id,
-
                         'updated_by' =>
                         $userId,
                     ]);
                 }
-
-
                 if (
                     $qty >
                     (float) $product->current_stock
                 ) {
-
                     throw new \Exception(
                         $product->name .
                             ' available stock is only ' .
                             $product->current_stock
                     );
                 }
-
-
                 $product->decrement(
                     'current_stock',
                     $qty
                 );
-
                 $product->refresh();
                 StockTransaction::create([
-
                     'company_id' =>
                     $companyId,
-
                     'branch_id' =>
                     $request->branch_id,
-
                     'product_id' =>
                     $product->id,
-
                     'receipt_id' =>
                     $receipt->id,
-
                     'transaction_type' =>
                     'Sale',
-
                     'stock_in' =>
                     0,
-
                     'stock_out' =>
                     $qty,
-
                     'balance' =>
                     $product->current_stock,
-
                     'transaction_date' =>
                     $request->receipt_date,
-
                     'remarks' =>
                     'Sales Order Update',
-
                     'created_by' =>
                     $userId,
                 ]);
             }
-
-
             DB::commit();
-
-
             return redirect()
                 ->route(
                     'sales.order.show',
@@ -868,9 +797,7 @@ class SalesOrderController extends Controller
                     'Sales Order Updated Successfully.'
                 );
         } catch (\Exception $e) {
-
             DB::rollBack();
-
             return back()
                 ->withInput()
                 ->with(

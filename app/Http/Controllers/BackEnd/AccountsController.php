@@ -7,7 +7,6 @@ use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\PaymentType;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,30 +16,81 @@ class AccountsController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = Account::with('paymentType')->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('account_name', 'like', "%{$search}%")
-                    ->orWhere('account_holder_name', 'like', "%{$search}%")
-                    ->orWhere('account_number', 'like', "%{$search}%")
-                    ->orWhere('opening_balance', 'like', "%{$search}%")
-                    ->orWhere('current_balance', 'like', "%{$search}%")
-                    ->orWhere('default_status', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%");
-            });
-        })->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->latest()->get();
-        return view('BackEnd.Accounts.index', compact('accounts'));
+        $user = Auth::user();
+        $accounts = Account::with([
+            'company',
+            'branch',
+            'paymentType',
+            'creator',
+            'updater'
+        ])
+            ->when($request->filled('search'), function ($query) use ($request) {
+
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+
+                    $q->where('account_name', 'like', "%{$search}%")
+                        ->orWhere('account_holder_name', 'like', "%{$search}%")
+                        ->orWhere('account_number', 'like', "%{$search}%")
+                        ->orWhere('opening_balance', 'like', "%{$search}%")
+                        ->orWhere('current_balance', 'like', "%{$search}%")
+                        ->orWhere('default_status', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%");
+                });
+            })
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+
+                $query->where('created_by', Auth::id());
+            })
+            ->latest()
+            ->get();
+
+        $companies = Company::when(
+            !$user->hasRole('Super-Admin'),
+            function ($query) use ($user) {
+                $query->where('id', $user->company_id);
+            }
+        )
+            ->orderBy('name')
+            ->get();
+
+        $branches = Branch::when(
+            !$user->hasRole('Super-Admin'),
+            function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('created_by', $user->id)
+                        ->orWhere('id', $user->branch_id);
+                });
+            }
+        )
+            ->orderBy('name')
+            ->get();
+
+        $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
+
+        return view('BackEnd.Accounts.index', compact('accounts', 'companies', 'branches', 'paymentTypes'));
     }
 
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
+            'company_id'          => 'required|exists:companies,id',
+            'branch_id'           => 'required|exists:branches,id',
             'account_name'        => 'required|string|max:255',
+            'address'             => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
             'account_number'      => 'required|string|max:255|unique:accounts,account_number',
             'opening_balance'     => 'required|numeric|min:0',
+            'payment_type_id'     => 'required|exists:payment_types,id',
             'default_status'      => 'required|in:Default,Not Default',
             'status'              => 'required|in:Active,Inactive',
         ]);
@@ -62,13 +112,15 @@ class AccountsController extends Controller
                     ]);
             }
             Account::create([
-                'company_id' => auth()->user()->company_id,
+                'company_id'          => $request->company_id,
+                'branch_id'           => $request->branch_id,
                 'account_name'        => $request->account_name,
-                'address'        => $request->address,
+                'address'             => $request->address,
                 'account_holder_name' => $request->account_holder_name,
                 'account_number'      => $request->account_number,
                 'opening_balance'     => $request->opening_balance,
                 'current_balance'     => $request->opening_balance,
+                'payment_type_id'     => $request->payment_type_id,
                 'default_status'      => $request->default_status,
                 'status'              => $request->status,
                 'created_by'          => auth()->id(),
@@ -112,10 +164,14 @@ class AccountsController extends Controller
     public function update(Request $request, Account $account)
     {
         $request->validateWithBag('edit', [
+            'company_id'          => 'required|exists:companies,id',
+            'branch_id'           => 'required|exists:branches,id',
             'account_name'        => 'required|max:255',
+            'address'             => 'required|string|max:255',
             'account_holder_name' => 'required|max:255',
             'account_number'      => 'required|max:255|unique:accounts,account_number,' . $account->id,
             'opening_balance'     => 'required|numeric|min:0',
+            'payment_type_id'     => 'required|exists:payment_types,id',
             'default_status'      => 'required|in:Default,Not Default',
             'status'              => 'required|in:Active,Inactive',
         ]);
@@ -139,9 +195,11 @@ class AccountsController extends Controller
             $difference = $request->opening_balance - $account->opening_balance;
             $currentBalance = $account->current_balance + $difference;
             $account->update([
+                'company_id'          => $request->company_id,
+                'branch_id'           => $request->branch_id,
                 'payment_type_id'     => $request->payment_type_id,
                 'account_name'        => $request->account_name,
-                'address'        => $request->address,
+                'address'             => $request->address,
                 'account_holder_name' => $request->account_holder_name,
                 'account_number'      => $request->account_number,
                 'opening_balance'     => $request->opening_balance,
