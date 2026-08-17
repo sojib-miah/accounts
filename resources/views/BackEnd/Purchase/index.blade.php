@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Purchase List</h4>
                 <div>
@@ -95,7 +95,7 @@
                                     <td>{{ $loop->iteration + ($purchases->firstItem() - 1) }}</td>
                                     <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
                                     <td>{{ $purchase->receipt_no }}</td>
-                                    <td>{{ $purchase->supplier->company_name ?? '-' }}</td>
+                                    <td>{{ $purchase->supplier->customerCompany->name ?? '-' }}</td>
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>

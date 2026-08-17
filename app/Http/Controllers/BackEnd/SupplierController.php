@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -23,14 +24,47 @@ class SupplierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $suppliers = Party::whereIn('type', ['Supplier', 'Both'])
-            ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
-                $query->where('created_by', auth()->id());
-            })->latest()->paginate(20);
+        $suppliers = Party::with([
+            'creator',
+            'updater',
+            'customerCompany'
+        ])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
 
-        return view('BackEnd.Supplier.index', compact('suppliers'));
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('party_id', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%")
+                        ->orWhere('type', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%")
+                        ->orWhereHas('customerCompany', function ($companyQuery) use ($search) {
+                            $companyQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->whereIn('type', ['Supplier', 'Both'])
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', Auth::id());
+            })
+            ->latest()
+            ->paginate(10);
+
+        $customerCompanies = CustomerCompany::when(
+            !Auth::user()->hasRole('Super-Admin'),
+            function ($query) {
+                $query->where('created_by', Auth::id());
+            }
+        )
+            ->where('status', 'Supplier')
+            ->orderBy('name')
+            ->get();
+
+        return view('BackEnd.Supplier.index', compact('suppliers', 'customerCompanies'));
     }
 
     /**
@@ -49,8 +83,8 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'customer_company_id' => 'nullable|exists:customer_companies,id',
             'name' => 'required|max:255',
-            'company_name' => 'required|max:255',
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'
@@ -58,12 +92,12 @@ class SupplierController extends Controller
 
         Party::create([
             'company_id' => Auth::user()->company_id,
+            'customer_company_id' => $request->customer_company_id,
             'party_id' => $this->generateSupplierId(),
             'name' => $request->name,
             'designation' => $request->designation,
             'phone' => $request->phone,
             'email' => $request->email,
-            'company_name' => $request->company_name,
             'address' => $request->address,
             'type' => 'Supplier',
             'status' => $request->status,
@@ -99,19 +133,19 @@ class SupplierController extends Controller
         abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
 
         $request->validate([
+            'customer_company_id' => 'nullable|exists:customer_companies,id',
             'name' => 'required|max:255',
-            'company_name' => 'required|max:255',
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'
         ]);
 
         $supplier->update([
+            'customer_company_id' => $request->customer_company_id,
             'name' => $request->name,
             'designation' => $request->designation,
             'phone' => $request->phone,
             'email' => $request->email,
-            'company_name' => $request->company_name,
             'address' => $request->address,
             'status' => $request->status,
             'updated_by' => Auth::id(),

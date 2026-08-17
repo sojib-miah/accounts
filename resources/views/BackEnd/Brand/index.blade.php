@@ -75,10 +75,10 @@
                                         {{ $brands->firstItem() + $loop->index }}
                                     </td>
                                     <td>
-                                        {{ $brand->name }}
+                                        {{ $brand->name ?? '-' }}
                                     </td>
                                     <td>
-                                        {{ $brand->description }}
+                                        {{ $brand->description ?? '-' }}
                                     </td>
                                     <td>
                                         @if ($brand->status == 'Active')

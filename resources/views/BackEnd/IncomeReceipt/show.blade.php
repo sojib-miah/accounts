@@ -103,7 +103,7 @@
                             <!-- company customer -->
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">
-                                    Customer Company
+                                    Customer Name
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control" readonly
@@ -130,7 +130,7 @@
                             <!-- customer -->
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">
-                                    Customer Name
+                                    Contact Name
                                     <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control" readonly

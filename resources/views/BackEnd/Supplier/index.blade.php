@@ -4,12 +4,27 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card">
+        <div class="card mt-3">
             <div class="card-header d-flex justify-content-between">
                 <h4>Supplier List</h4>
-                <div>
+                <div class="d-flex align-items-center gap-2">
+                    <form action="{{ route('supplier.index') }}" method="GET"
+                        class="d-flex justify-content-center align-items-center gap-2">
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search Customer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search me-1"></i>
+                            Search
+                        </button>
+                        @if (request('search'))
+                            <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
                     @can('supplier-create')
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSupplierModal">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#createSupplierModal">
                             <i class="fa fa-plus me-2"></i>
                             Add Supplier
                         </button>
@@ -26,9 +41,7 @@
                             <th>Name</th>
                             <th>Designation</th>
                             <th>Phone</th>
-                            <th>
-                                E-mail
-                            </th>
+                            <th>E-mail</th>
                             <th>Address</th>
                             <th>Created By</th>
                             <th>Create Date</th>
@@ -39,17 +52,17 @@
                     <tbody>
                         @forelse ($suppliers as $supplier)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $supplier->party_id }}</td>
-                                <td>{{ $supplier->company_name }}</td>
-                                <td>{{ $supplier->name }}</td>
-                                <td>{{ $supplier->designation }}</td>
+                                <td>{{ $loop->iteration ?? '-' }}</td>
+                                <td>{{ $supplier->party_id ?? '-' }}</td>
+                                <td>{{ $supplier->customerCompany->name ?? '-' }}</td>
+                                <td>{{ $supplier->name ?? '-' }}</td>
+                                <td>{{ $supplier->designation ?? '-' }}</td>
                                 <td>{{ $supplier->phone ?? '-' }}</td>
                                 <td>{{ $supplier->email ?? '-' }}</td>
                                 <td>{{ $supplier->address ?? '-' }}</td>
                                 <td>{{ $supplier->creator->name ?? '-' }}</td>
-                                <td>{{ $supplier->created_at }}</td>
-                                <td>{{ $supplier->status }}</td>
+                                <td>{{ $supplier->created_at ?? '-' }}</td>
+                                <td>{{ $supplier->status ?? '-' }}</td>
                                 <td>
                                     @can('supplier-edit')
                                         <button type="button" class="btn btn-warning btn-sm editSupplier"
@@ -90,7 +103,7 @@
                 type: 'GET',
                 success: function(data) {
                     $('#edit_supplier_id').val(data.id);
-                    $('#edit_company_name').val(data.company_name);
+                    $('#edit_customer_company_id').val(data.customer_company_id);
                     $('#edit_name').val(data.name);
                     $('#edit_designation').val(data.designation);
                     $('#edit_phone').val(data.phone);

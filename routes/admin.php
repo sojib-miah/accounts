@@ -29,6 +29,7 @@ use App\Http\Controllers\BackEnd\ReportController;
 use App\Http\Controllers\BackEnd\RoleController;
 use App\Http\Controllers\BackEnd\SalesOrderController;
 use App\Http\Controllers\BackEnd\SettingController;
+use App\Http\Controllers\BackEnd\SupplierCompanyCustomer;
 use App\Http\Controllers\BackEnd\SupplierController;
 use App\Http\Controllers\BackEnd\UserController;
 use App\Http\Controllers\BackEnd\WarehouseController;
@@ -264,4 +265,10 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseShow'])->name('customer-expense.show');
     Route::put('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseUpdate'])->name('customer-expense.update');
     Route::delete('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseDestroy'])->name('customer-expense.destroy');
+
+    Route::get('/supplier-company', [SupplierCompanyCustomer::class, 'index'])->name('supplier-company.index');
+    Route::post('/supplier-company/store', [SupplierCompanyCustomer::class, 'store'])->name('supplier-company.store');
+    Route::get('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'show'])->name('supplier-company.show');
+    Route::put('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'update'])->name('supplier-company.update');
+    Route::delete('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'destroy'])->name('supplier-company.destroy');
 });

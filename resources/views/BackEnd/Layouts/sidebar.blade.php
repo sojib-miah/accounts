@@ -119,12 +119,17 @@
         <!-- purchase -->
         @can('menu-purchase-list')
             <li
-                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') || request()->routeIs('supplier-company.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-basket-shopping me-3"></i>
                     Purchase
                 </a>
                 <ul class="menu-sub">
+                    <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
+                        <a href="{{ route('supplier-company.index') }}" class="menu-link">
+                            Supplier Company
+                        </a>
+                    </li>
                     @can('supplier-list')
                         <li class="menu-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
                             <a href="{{ route('supplier.index') }}" class="menu-link">

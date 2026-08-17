@@ -78,7 +78,7 @@
                                         <!-- customer company-->
                                         <div class="col-md-3">
                                             <label class="form-label">
-                                                Customer Company <span class="text-danger">*</span>
+                                                Customer Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="customer_company_id" id="customer_company_id"
                                                 class="form-select select2" required>
@@ -100,7 +100,7 @@
                                         <!-- customer  -->
                                         <div class="col-md-3">
                                             <label class="form-label">
-                                                Customer Name <span class="text-danger">*</span>
+                                                Contact Name <span class="text-danger">*</span>
                                             </label>
                                             <select name="party_id" id="party_id" class="form-select select2" required>
                                                 <option value="">Select Customer</option>
