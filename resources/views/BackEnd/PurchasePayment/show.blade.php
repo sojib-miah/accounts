@@ -39,7 +39,7 @@
                         <div class="col-md-3 mb-3">
                             <strong>Supplier Company</strong>
                             <div>
-                                {{ $receipt->customerCompany->name ?? '-' }}
+                                {{ $receipt->party->customerCompany->name ?? '-' }}
                             </div>
                         </div>
                         <div class="col-md-3 mb-3">

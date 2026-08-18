@@ -59,7 +59,7 @@
                                             {{ \Carbon\Carbon::parse($purchase->receipt_date)->format('d-m-Y') }}
                                         </td>
                                         <td>
-                                            {{ $purchase->customerCompany->name ?? '-' }}
+                                            {{ $purchase->party->customerCompany->name ?? '-' }}
                                         </td>
                                         <td>
                                             {{ $purchase->party->name ?? '-' }}
