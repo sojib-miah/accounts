@@ -92,17 +92,17 @@
                                         <td class="text-center">
                                             <a href="{{ route('sales.order.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
-                                                {{ $receipt->customerCompany->name }}
+                                                {{ $receipt->customerCompany->name ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->product->name }}
+                                                {{ $item->product->name ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->product->description }}
+                                                {{ $item->product->description ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>
