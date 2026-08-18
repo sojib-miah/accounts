@@ -334,7 +334,9 @@ class IncomeReceiptController extends Controller
             ->where('is_invoice', true);
 
         if ($request->filled('search')) {
+
             $search = $request->search;
+
             $receiptQuery->where(function ($q) use ($search) {
                 $q->where('receipt_no', 'like', "%{$search}%")
                     ->orWhere('inv_no', 'like', "%{$search}%")
@@ -343,13 +345,17 @@ class IncomeReceiptController extends Controller
         }
 
         if ($request->filled('status')) {
+
             $receiptQuery->where(
                 'payment_status',
                 $request->status
             );
         }
 
-        $receipts = $receiptQuery->latest()->paginate(20, ['*'], 'receipt_page')->withQueryString();
+        $receipts = $receiptQuery
+            ->latest()
+            ->paginate(20, ['*'], 'receipt_page')
+            ->withQueryString();
 
         $paymentQuery = ReceiptPayment::with([
             'receipt',
@@ -358,34 +364,62 @@ class IncomeReceiptController extends Controller
             'user'
         ])
             ->whereHas('receipt', function ($q) use ($party) {
+
                 $q->where('party_id', $party->id)
                     ->where('is_invoice', true);
             });
 
+
         if ($request->filled('payment_search')) {
+
             $search = $request->payment_search;
+
             $paymentQuery->where(function ($q) use ($search) {
+
                 $q->where('amount', 'like', "%{$search}%")
                     ->orWhere('note', 'like', "%{$search}%")
+
                     ->orWhereHas('receipt', function ($r) use ($search) {
+
                         $r->where('receipt_no', 'like', "%{$search}%")
                             ->orWhere('inv_no', 'like', "%{$search}%");
                     });
             });
         }
 
-        $payments = $paymentQuery->latest()->paginate(20, ['*'], 'payment_page')->withQueryString();
-        $invoice = Receipt::where('party_id', $party->id)->where('is_invoice', true);
+
+        $payments = $paymentQuery
+            ->latest()
+            ->paginate(20, ['*'], 'payment_page')
+            ->withQueryString();
+        $invoice = Receipt::where('party_id', $party->id)
+            ->where('is_invoice', true);
+
 
         $summary = [
             'receipt_count' => (clone $invoice)->count(),
-            'qty' => (clone $invoice)->sum('total_qty'),
-            'net' => (clone $invoice)->sum('total_amount'),
-            'paid' => (clone $invoice)->sum('paid_amount'),
-            'due' => (clone $invoice)->sum('due_amount'),
+            'qty'           => (clone $invoice)->sum('total_qty'),
+            'net'            => (clone $invoice)->sum('total_amount'),
+            'paid'           => (clone $invoice)->sum('paid_amount'),
+            'due'            => (clone $invoice)->sum('due_amount'),
         ];
 
-        $paymentTypes = PaymentType::where('status', 'Active')->orderBy('name')->get();
+        $paymentTypes = PaymentType::where('status', 'Active')
+            ->orderBy('name')
+            ->get();
+
+        $accounts = Account::where('status', 'Active')
+            ->where('current_balance', '>', 0)
+            ->with('paymentType')
+            ->when(
+                !Auth::user()->hasRole('Super-Admin'),
+                function ($query) {
+                    $query->where('created_by', Auth::id());
+                }
+            )
+            ->orderBy('account_name')
+            ->get();
+
 
         return view(
             'BackEnd.IncomeReceipt.profile',
@@ -394,73 +428,10 @@ class IncomeReceiptController extends Controller
                 'receipts',
                 'payments',
                 'summary',
-                'paymentTypes'
+                'paymentTypes',
+                'accounts'
             )
         );
-    }
-
-    public function duePayment(Request $request, Party $party)
-    {
-        $request->validate([
-            'payment_type_id' => 'required|exists:payment_types,id',
-            'payment_date'    => 'required|date',
-            'amount'          => 'required|numeric|min:0.01',
-            'note'            => 'nullable|string',
-        ]);
-        DB::beginTransaction();
-        try {
-            $amount = $request->amount;
-            $account = Account::where('default_status', 'Default')->first();
-            if (!$account) {
-                return back()->with('error', 'Default account not found.');
-            }
-            $receipts = Receipt::where('party_id', $party->id)->where('due_amount', '>', 0)->orderBy('receipt_date')->get();
-            foreach ($receipts as $receipt) {
-                if ($amount <= 0) {
-                    break;
-                }
-                $pay = min($amount, $receipt->due_amount);
-                ReceiptPayment::create([
-                    'receipt_id'      => $receipt->id,
-                    'payment_type_id' => $request->payment_type_id,
-                    'account_id'      => $account->id,
-                    'payment_date'    => $request->payment_date,
-                    'amount'          => $pay,
-                    'note'            => $request->note,
-                    'created_by'      => Auth::id(),
-                ]);
-                $receipt->paid_amount += $pay;
-                $receipt->due_amount -= $pay;
-                if ($receipt->due_amount <= 0) {
-                    $receipt->due_amount = 0;
-                    $receipt->payment_status = 'Paid';
-                } elseif ($receipt->paid_amount > 0) {
-                    $receipt->payment_status = 'Partial';
-                }
-                $receipt->save();
-                $account->current_balance -= $pay;
-                $account->save();
-                AccountTransaction::create([
-                    'company_id' => auth()->user()->company_id,
-                    'account_id'       => $account->id,
-                    'receipt_id'       => $receipt->id,
-                    'voucher_no'       => $receipt->receipt_no,
-                    'transaction_date' => $request->payment_date,
-                    'transaction_type' => 'Income',
-                    'purpose'          => 'Party Due Payment',
-                    'credit'           => 0,
-                    'debit'            => $pay,
-                    'balance'          => $account->current_balance,
-                    'created_by'       => Auth::id(),
-                ]);
-                $amount -= $pay;
-            }
-            DB::commit();
-            return redirect()->route('income.party.profile', $party->id)->with('success', 'Due payment completed successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', $e->getMessage());
-        }
     }
 
     public function paymentStore(Request $request, Receipt $receipt)

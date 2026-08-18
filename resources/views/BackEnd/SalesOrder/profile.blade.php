@@ -3,16 +3,16 @@
 @section('title', 'Sales Order Profile')
 
 @section('content')
-    <div class="mx-5 py-4">
-        <div class="row">
+    <div class="p-5">
+        <div class="row mt-3">
             <div class="col-lg-3">
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="text-center py-4">
-                            <img src="{{ asset('uploads/user.jpg') }}" class="rounded-circle border border-3 border-primary"
+                            <img src="{{ asset('uploads/user.jpg') }}" class="rounded-circle border-3 border-primary"
                                 style="width:100px;height:100px;object-fit:cover;">
                             <h4 class="mt-3 mb-0">
-                                {{ $party->name }}
+                                {{ $party->customerCompany->name ?? '' }}
                             </h4>
                             <small class="text-muted">
                                 {{ $party->type }}
@@ -33,6 +33,17 @@
                                     </td>
                                     <td class="mb-0 pb-0">
                                         {{ $party->id }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="mb-0 pb-0">
+                                        Company
+                                    </th>
+                                    <td class="mb-0 pb-0">
+                                        :
+                                    </td>
+                                    <td class="mb-0 pb-0">
+                                        {{ $party->customerCompany->name }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -159,10 +170,16 @@
                     </div>
                     <div class="card-footer">
                         @if ($summary['due'] > 0)
-                            <button class="btn btn-primary w-100 mt-2" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal"
                                 data-bs-target="#duePaymentModal">
+
                                 <i class="fa fa-money-bill-wave me-2"></i>
-                                Due Pay
+                                Receive Due Payment
+
+                                <span class="badge bg-light text-primary ms-2">
+                                    {{ number_format($summary['due'], 2) }} TK
+                                </span>
+
                             </button>
                         @else
                             <button class="btn btn-success w-100" disabled>
@@ -173,10 +190,8 @@
                     </div>
                 </div>
             </div>
-            <!-- ===================================== -->
-            <!-- Right Side -->
-            <!-- ===================================== -->
 
+            <!-- Right Side -->
             <div class="col-lg-9">
                 <div class="card shadow-sm">
                     <div class="card-header" style="padding: 8px !important;">
@@ -451,91 +466,159 @@
                         {{ $payments->links() }}
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- ========================================== -->
-                <!-- Due Payment Modal -->
-                <!-- ========================================== -->
-                <div class="modal fade" id="duePaymentModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <form action="{{ route('income.party.due.payment', $party->id) }}" method="POST">
-                                @csrf
-                                <div class="modal-header bg-primary text-white">
-                                    <h4 class="modal-title">
-                                        Due Payment
-                                    </h4>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
-                                    </button>
+    <!-- DUE PAYMENT MODAL -->
+    <div class="modal fade" id="duePaymentModal" tabindex="-1" aria-labelledby="duePaymentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <!-- HEADER -->
+                <div class="modal-header text-white">
+                    <div>
+                        <h5 class="modal-title mb-1" id="duePaymentModalLabel">
+                            <i class="fa fa-money-bill-wave me-2"></i>
+                            Receive Due Payment
+                        </h5>
+                        <small class="opacity-75">
+                            Customer:
+                            <strong>{{ $party->name }}</strong>
+                        </small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                    </button>
+                </div>
+                <form action="{{ route('sales.order.due.payment', $party->id) }}" method="POST" id="duePaymentForm">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="border rounded p-3">
+                                    <small class="text-muted">
+                                        Total Invoice
+                                    </small>
+                                    <h5 class="mb-0 mt-1">
+                                        {{ number_format($summary['net'], 2) }}
+                                        TK
+                                    </h5>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="alert alert-info">
-                                        <h5 class="mb-0">
-                                            Current Due :
-                                            <strong class="float-end">
-                                                {{ number_format($summary['due'], 2) }} TK
-                                            </strong>
-                                        </h5>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label">
-                                                Payment Type
-                                            </label>
-                                            <select name="payment_type_id" class="form-select" required>
-                                                <option value="">
-                                                    Select Payment Type
-                                                </option>
-                                                @foreach ($paymentTypes as $type)
-                                                    <option value="{{ $type->id }}">
-                                                        {{ $type->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">
-                                                Payment Date
-                                            </label>
-                                            <input type="date" name="payment_date" value="{{ date('Y-m-d') }}"
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">
-                                                Pay Amount
-                                            </label>
-                                            <input type="number" step="0.01" min="1"
-                                                max="{{ $summary['due'] }}" value="{{ $summary['due'] }}"
-                                                id="pay_amount" name="amount" class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">
-                                                Remaining Due
-                                            </label>
-                                            <input type="text" id="remaining_due" class="form-control bg-light"
-                                                readonly value="{{ number_format($summary['due'], 2) }}">
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="form-label">
-                                            Note
-                                        </label>
-                                        <textarea name="note" rows="4" class="form-control" placeholder="Write payment note..."></textarea>
-                                    </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3">
+                                    <small class="text-muted">
+                                        Total Paid
+                                    </small>
+                                    <h5 class="mb-0 mt-1 text-success">
+                                        {{ number_format($summary['paid'], 2) }}
+                                        TK
+                                    </h5>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        Close
-                                    </button>
-                                    <button type="submit" class="btn btn-success">
-                                        Save Payment
-                                    </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3">
+                                    <small class="text-danger">
+                                        Total Due
+                                    </small>
+                                    <h5 class="mb-0 mt-1 text-danger">
+                                        {{ number_format($summary['due'], 2) }}
+                                        TK
+                                    </h5>
                                 </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Payment Type
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="payment_type_id" id="due_payment_type_id" class="form-select select2" required>
+                                <option value="">
+                                    Select Payment Type
+                                </option>
+                                @foreach ($paymentTypes as $type)
+                                    <option value="{{ $type->id }}">
+                                        {{ $type->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Receive Account
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="account_id" id="due_account_id" class="form-select select2" required>
+                                <option value="">
+                                    Select Account
+                                </option>
+                                @foreach ($accounts as $account)
+                                    <option value="{{ $account->id }}"
+                                        data-payment-type="{{ $account->payment_type_id }}"
+                                        data-balance="{{ $account->current_balance }}">
+                                        {{ $account->account_name }}
+                                        -
+                                        {{ $account->account_number }}
+                                        ({{ number_format($account->current_balance, 2) }}
+                                        TK)
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div id="due_account_balance" class="mt-2">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Payment Amount
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <input type="number" name="amount" id="due_payment_amount" class="form-control"
+                                    step="0.01" min="0.01" max="{{ $summary['due'] }}"
+                                    value="{{ $summary['due'] }}" required>
+                                <span class="input-group-text">
+                                    TK
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                Maximum payable:
+                                <strong>
+                                    {{ number_format($summary['due'], 2) }}
+                                    TK
+                                </strong>
+                            </small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Payment Date
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="payment_date" class="form-control" value="{{ date('Y-m-d') }}"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Payment Note
+                            </label>
+                            <textarea name="note" class="form-control" rows="3" placeholder="Write payment note..."></textarea>
+                        </div>
+                        <div id="due_payment_warning" class="alert alert-warning d-none mb-0">
+                            <i class="fa fa-triangle-exclamation me-2"></i>
+                            <span></span>
                         </div>
                     </div>
-                </div>
+                    <!-- FOOTER -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" id="due_payment_submit" class="btn btn-primary">
+                            <i class="fa fa-check-circle me-2"></i>
+                            Receive Payment
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -543,22 +626,385 @@
 
 @push('scripts')
     <script>
-        $(function() {
-            $('#pay_amount').keyup(function() {
-                let due = {{ $summary['due'] }};
-                let pay = parseFloat($(this).val()) || 0;
-                if (pay > due) {
-                    pay = due;
-                    $(this).val(pay);
-                }
-                let remain = due - pay;
-                if (remain < 0) {
-                    remain = 0;
-                }
-                $('#remaining_due').val(
-                    remain.toFixed(2)
-                );
+        $(document).ready(function() {
+            $(document).on('change', '#due_payment_type_id', function() {
+
+                let paymentTypeId = $(this).val();
+
+                let accountSelect = $('#due_account_id');
+
+                accountSelect.val('').trigger('change');
+
+
+                accountSelect.find('option').each(function() {
+
+                    let option = $(this);
+
+
+                    // Placeholder
+                    if (!option.val()) {
+
+                        option.show();
+
+                        return;
+                    }
+
+
+                    let accountPaymentType =
+                        String(option.data('payment-type'));
+
+
+                    if (
+                        paymentTypeId &&
+                        accountPaymentType === String(paymentTypeId)
+                    ) {
+
+                        option.show();
+
+                    } else {
+
+                        option.hide();
+
+                    }
+
+                });
+
+
+                $('#due_account_balance').html('');
+
+                validateDuePayment();
+
             });
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Account Change
+            |--------------------------------------------------------------------------
+            */
+
+            $(document).on('change', '#due_account_id', function() {
+
+                let option = $(this).find(':selected');
+
+                let balance =
+                    parseFloat(option.data('balance')) || 0;
+
+
+                if (!$(this).val()) {
+
+                    $('#due_account_balance').html('');
+
+                    validateDuePayment();
+
+                    return;
+                }
+
+
+                $('#due_account_balance').html(`
+
+            <div class="alert alert-info py-2 mb-0">
+
+                <i class="fa fa-wallet me-2"></i>
+
+                Available Balance:
+
+                <strong>
+                    ${balance.toLocaleString('en-BD', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })} TK
+                </strong>
+
+            </div>
+
+        `);
+
+
+                validateDuePayment();
+
+            });
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Amount Change
+            |--------------------------------------------------------------------------
+            */
+
+            $(document).on(
+                'input',
+                '#due_payment_amount',
+                function() {
+
+                    validateDuePayment();
+
+                }
+            );
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Validate Payment
+            |--------------------------------------------------------------------------
+            */
+
+            function validateDuePayment() {
+
+                let account =
+                    $('#due_account_id').find(':selected');
+
+
+                let amount =
+                    parseFloat($('#due_payment_amount').val()) || 0;
+
+
+                let due =
+                    parseFloat('{{ $summary['due'] }}') || 0;
+
+
+                let balance =
+                    parseFloat(account.data('balance')) || 0;
+
+
+                let warning =
+                    $('#due_payment_warning');
+
+
+                let submit =
+                    $('#due_payment_submit');
+
+
+                warning.addClass('d-none');
+
+                submit.prop('disabled', false);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Amount > Due
+                |--------------------------------------------------------------------------
+                */
+
+                if (amount > due) {
+
+                    warning
+                        .removeClass('d-none')
+                        .find('span')
+                        .text(
+                            'Payment amount cannot be greater than total due amount.'
+                        );
+
+                    submit.prop('disabled', true);
+
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Amount > Account Balance
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $('#due_account_id').val() &&
+                    amount > balance
+                ) {
+
+                    warning
+                        .removeClass('d-none')
+                        .find('span')
+                        .text(
+                            'Payment amount cannot be greater than available account balance.'
+                        );
+
+                    submit.prop('disabled', true);
+
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | No Account
+                |--------------------------------------------------------------------------
+                */
+
+                if (!$('#due_account_id').val()) {
+
+                    warning
+                        .removeClass('d-none')
+                        .find('span')
+                        .text(
+                            'Please select a receive account.'
+                        );
+
+                    submit.prop('disabled', true);
+
+                    return;
+                }
+
+            }
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Form Submit Safety
+            |--------------------------------------------------------------------------
+            */
+
+            $('#duePaymentForm').on('submit', function(e) {
+
+                let account =
+                    $('#due_account_id').find(':selected');
+
+
+                let amount =
+                    parseFloat($('#due_payment_amount').val()) || 0;
+
+
+                let due =
+                    parseFloat('{{ $summary['due'] }}') || 0;
+
+
+                let balance =
+                    parseFloat(account.data('balance')) || 0;
+
+
+                if (!$('#due_payment_type_id').val()) {
+
+                    e.preventDefault();
+
+                    Swal.fire(
+                        'Payment Type Required',
+                        'Please select a payment type.',
+                        'warning'
+                    );
+
+                    return;
+                }
+
+
+                if (!$('#due_account_id').val()) {
+
+                    e.preventDefault();
+
+                    Swal.fire(
+                        'Account Required',
+                        'Please select an account.',
+                        'warning'
+                    );
+
+                    return;
+                }
+
+
+                if (amount <= 0) {
+
+                    e.preventDefault();
+
+                    Swal.fire(
+                        'Invalid Amount',
+                        'Please enter a valid payment amount.',
+                        'warning'
+                    );
+
+                    return;
+                }
+
+
+                if (amount > due) {
+
+                    e.preventDefault();
+
+                    Swal.fire(
+                        'Invalid Amount',
+                        'Payment amount cannot exceed total due.',
+                        'warning'
+                    );
+
+                    return;
+                }
+
+
+                if (amount > balance) {
+
+                    e.preventDefault();
+
+                    Swal.fire(
+                        'Insufficient Balance',
+                        'Account balance is not sufficient for this payment.',
+                        'error'
+                    );
+
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Confirm
+                |--------------------------------------------------------------------------
+                */
+
+                e.preventDefault();
+
+
+                Swal.fire({
+
+                    title: 'Confirm Payment',
+
+                    html: `
+
+                <div class="text-start">
+
+                    <p class="mb-2">
+                        <strong>Customer:</strong>
+                        {{ $party->name }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Amount:</strong>
+                        ${amount.toFixed(2)} TK
+                    </p>
+
+                    <p class="mb-0">
+                        <strong>Account:</strong>
+                        ${account.text()}
+                    </p>
+
+                </div>
+
+            `,
+
+                    icon: 'question',
+
+                    showCancelButton: true,
+
+                    confirmButtonText: '<i class="fa fa-check me-1"></i> Confirm Payment',
+
+                    cancelButtonText: 'Cancel',
+
+                    reverseButtons: true
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        $('#duePaymentForm')[0].submit();
+
+                    }
+
+                });
+
+            });
+
+
         });
     </script>
 @endpush

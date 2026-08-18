@@ -199,7 +199,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
     Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
     Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
-    Route::post('/income/party/{party}/due-payment', [IncomeReceiptController::class, 'duePayment'])->name('income.party.due.payment');
     Route::post('/income/{receipt}/payment', [IncomeReceiptController::class, 'paymentStore'])->name('income.receipt.payment.store');
 
     // report 
