@@ -23,6 +23,7 @@ use App\Http\Controllers\BackEnd\PermissionController;
 use App\Http\Controllers\BackEnd\ProductCategoryController;
 use App\Http\Controllers\BackEnd\ProductController;
 use App\Http\Controllers\BackEnd\PurchaseController;
+use App\Http\Controllers\BackEnd\PurchasePaymentController;
 use App\Http\Controllers\BackEnd\ReceiptController;
 use App\Http\Controllers\BackEnd\ReceiverController;
 use App\Http\Controllers\BackEnd\ReportController;
@@ -199,6 +200,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
     Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
     Route::post('/income/party/{party}/due-payment', [IncomeReceiptController::class, 'duePayment'])->name('income.party.due.payment');
+    Route::post('/income/{receipt}/payment', [IncomeReceiptController::class, 'paymentStore'])->name('income.receipt.payment.store');
 
     // report 
     Route::get('/dashboard/pdf', [ReportController::class, 'pdf'])->name('dashboard.pdf');
@@ -226,9 +228,16 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     // product Route 
     Route::resource('product', ProductController::class);
 
+    // purchase payment route 
+    Route::get('/purchase/make-payment', [PurchasePaymentController::class, 'index'])->name('purchase.payment.index');
+    Route::get('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'show'])->name('purchase.payment.show');
+    Route::post('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'store'])->name('purchase.payment.store');
+    Route::get('/ajax/payment-type/{paymentType}/accounts', [PurchasePaymentController::class, 'paymentTypeAccounts'])->name('ajax.payment-type.accounts');
+
     // purchase route 
     Route::resource('purchase', PurchaseController::class);
     Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+    Route::get('/ajax/supplier-company/{customerCompany}/parties', [PurchaseController::class, 'supplierCompanyParties'])->name('ajax.supplier-company.parties');
 
     // product category route 
     Route::resource('product-category', ProductCategoryController::class);

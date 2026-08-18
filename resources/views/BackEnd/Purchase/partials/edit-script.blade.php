@@ -174,6 +174,7 @@
             let option = current.find(':selected');
             row.find('.unit').val(option.data('unit') || '');
             row.find('.stock').val(option.data('stock') ?? '');
+            row.find('.description').val(option.data('description') ?? '');
 
             if (option.data('rate') !== undefined) {
                 row.find('.rate').val(option.data('rate'));
@@ -475,5 +476,117 @@
             }
         });
         calculateSummary();
+    });
+    $(document).ready(function() {
+
+        let selectedPartyId = "{{ old('party_id', $purchase->party_id) }}";
+
+        function loadSupplierParties(customerCompanyId, selectedPartyId = '') {
+
+            let partySelect = $('#party_id');
+
+            partySelect.html(
+                '<option value="">Loading Supplier...</option>'
+            );
+
+            if (!customerCompanyId) {
+
+                partySelect.html(
+                    '<option value="">Select Supplier</option>'
+                );
+
+                partySelect.trigger('change');
+
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/admin/ajax/supplier-company') }}/" +
+                    customerCompanyId +
+                    "/parties",
+
+                type: "GET",
+
+                success: function(response) {
+
+                    partySelect.empty();
+
+                    partySelect.append(
+                        '<option value="">Select Supplier</option>'
+                    );
+
+                    if (response.success && response.parties.length > 0) {
+
+                        $.each(response.parties, function(index, party) {
+
+                            let selected =
+                                party.id == selectedPartyId ?
+                                'selected' :
+                                '';
+
+                            let text = party.name;
+
+                            if (party.phone) {
+                                text += ' (' + party.phone + ')';
+                            }
+
+                            partySelect.append(
+                                '<option value="' +
+                                party.id +
+                                '" ' +
+                                selected +
+                                '>' +
+                                text +
+                                '</option>'
+                            );
+                        });
+
+                    } else {
+
+                        partySelect.append(
+                            '<option value="">No Supplier Found</option>'
+                        );
+                    }
+
+                    partySelect.trigger('change');
+                },
+
+                error: function(xhr) {
+
+                    partySelect.html(
+                        '<option value="">Unable to load Supplier</option>'
+                    );
+
+                    partySelect.trigger('change');
+
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+
+        // Company change
+        $('#customer_company_id').on('change', function() {
+
+            let customerCompanyId = $(this).val();
+
+            loadSupplierParties(
+                customerCompanyId,
+                ''
+            );
+        });
+
+
+        // Edit page initial load
+        let customerCompanyId = $('#customer_company_id').val();
+
+        if (customerCompanyId) {
+
+            loadSupplierParties(
+                customerCompanyId,
+                selectedPartyId
+            );
+        }
+
     });
 </script>

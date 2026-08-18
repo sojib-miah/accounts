@@ -8,6 +8,11 @@ class ReceiptPayment extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'payment_date' => 'date',
+        'amount' => 'decimal:2',
+    ];
+
     public function receipt()
     {
         return $this->belongsTo(Receipt::class);
@@ -33,10 +38,15 @@ class ReceiptPayment extends Model
         return $this->hasOneThrough(
             Party::class,
             Receipt::class,
-            'id',        // Foreign key on receipts
-            'id',        // Foreign key on parties
-            'receipt_id', // Local key on receipt_payments
-            'party_id'   // Local key on receipts
+            'id',
+            'id',
+            'receipt_id',
+            'party_id'
         );
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

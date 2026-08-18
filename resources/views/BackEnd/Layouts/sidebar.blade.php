@@ -119,7 +119,7 @@
         <!-- purchase -->
         @can('menu-purchase-list')
             <li
-                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') || request()->routeIs('supplier-company.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') || request()->routeIs('supplier-company.*') || request()->routeIs('purchase.payment.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-basket-shopping me-3"></i>
                     Purchase
@@ -144,6 +144,11 @@
                             </a>
                         </li>
                     @endcan
+                    <li class="menu-item {{ request()->routeIs('purchase.payment.index') ? 'active' : '' }}">
+                        <a href="{{ route('purchase.payment.index') }}" class="menu-link">
+                            Make Payment
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endcan

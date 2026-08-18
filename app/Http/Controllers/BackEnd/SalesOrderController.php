@@ -27,7 +27,7 @@ class SalesOrderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Receipt::with(['party', 'branch', 'creator', 'items'])
+        $query = Receipt::with(['party', 'branch', 'creator', 'items', 'customerCompany'])
             ->whereIn('type', ['Sales-Order', 'Income', 'Challan'])
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
@@ -315,10 +315,16 @@ class SalesOrderController extends Controller
             'payments.paymentType',
             'payments.user',
         ]);
-
         $paymentTypes = PaymentType::where('status', 'Active')->get();
+        $accounts = Account::where('status', 'Active')
+            ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('company_id', Auth::user()->company_id)
+                    ->where('branch_id', Auth::user()->branch_id);
+            })
+            ->orderBy('account_name')
+            ->get();
 
-        return view('BackEnd.SalesOrder.show', compact('receipt', 'paymentTypes'));
+        return view('BackEnd.SalesOrder.show', compact('receipt', 'paymentTypes', 'accounts'));
     }
 
     public function edit(Receipt $receipt)

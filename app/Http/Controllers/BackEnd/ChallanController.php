@@ -23,7 +23,7 @@ class ChallanController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Receipt::with(['party', 'branch', 'creator', 'items'])->where('is_challan', true)->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+        $query = Receipt::with(['party', 'branch', 'creator', 'items', 'customerCompany'])->where('is_challan', true)->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
             $query->where('created_by', $user->id);
         });
         // Search

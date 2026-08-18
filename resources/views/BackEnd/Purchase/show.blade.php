@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card shadow">
+        <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between">
                 <h4>Purchase Details</h4>
                 <div>
@@ -34,19 +34,23 @@
                         <table class="table table-borderless">
                             <tr>
                                 <th width="150">Receipt No</th>
-                                <td>{{ $purchase->receipt_no }}</td>
+                                <td>{{ $purchase->receipt_no ?? '' }}</td>
                             </tr>
                             <tr>
                                 <th>Purchase Date</th>
                                 <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
                             </tr>
                             <tr>
-                                <th>Supplier</th>
-                                <td>{{ $purchase->supplier->name }}</td>
+                                <th>Supplier Company</th>
+                                <td>{{ $purchase->customerCompany->name ?? '' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Supplier Name</th>
+                                <td>{{ $purchase->supplier->name ?? '' }}</td>
                             </tr>
                             <tr>
                                 <th>Payment Status</th>
-                                <td>{{ $purchase->payment_status }}</td>
+                                <td>{{ $purchase->payment_status ?? '' }}</td>
                             </tr>
                         </table>
                     </div>
@@ -56,7 +60,8 @@
                         <thead>
                             <tr>
                                 <th width="60">SN</th>
-                                <th>Product</th>
+                                <th>Product Name</th>
+                                <th>Description</th>
                                 <th>Part No</th>
                                 <th width='250'>Serial No</th>
                                 <th>Unit</th>
@@ -70,11 +75,12 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $item->product->product_code }}
+                                        {{ $item->product->product_code ?? '-' }}
                                         -
-                                        {{ $item->product->name }}
+                                        {{ $item->product->name ?? '-' }}
                                     </td>
-                                    <td>{{ $item->product->sku }}</td>
+                                    <td>{{ $item->product->description ?? '-' }}</td>
+                                    <td>{{ $item->product->sku ?? '-' }}</td>
                                     <td>
                                         @if ($item->serialNumbers->count())
                                             {{ $item->serialNumbers->pluck('serial_no')->implode(', ') }}
@@ -82,7 +88,7 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>{{ $item->product->unit }}</td>
+                                    <td>{{ $item->product->unit ?? '-' }}</td>
                                     <td class="text-end">{{ number_format($item->qty) }}</td>
                                     <td class="text-end">{{ number_format($item->rate, 2) }}</td>
                                     <td class="text-end">{{ number_format($item->amount, 2) }}</td>

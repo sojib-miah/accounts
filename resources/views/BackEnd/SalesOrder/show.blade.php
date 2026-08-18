@@ -383,81 +383,189 @@
         </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('receipt.payment.store', $receipt->id) }}" method="POST">
+    <!-- Beautiful Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <form action="{{ route('income.receipt.payment.store', $receipt->id) }}" method="POST"
+                    id="paymentForm">
                     @csrf
-                    <div class="modal-header">
-                        <h4 class="modal-title">Bill Payment</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <!-- Header -->
+                    <div class="modal-header text-white border-0 px-4 py-3">
+
+                        <div>
+                            <h4 class="modal-title fw-bold mb-1" id="paymentModalLabel">
+                                <i class="fa fa-money-bill-wave me-2"></i>
+                                Bill Payment
+                            </h4>
+
+                            <small class="opacity-75">
+                                Receipt No: {{ $receipt->receipt_no }}
+                            </small>
+                        </div>
+
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close">
+                        </button>
+
                     </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>ITEMS</th>
-                                    <th class="text-end">AMOUNT (TK)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Total Due Amount</td>
-                                    <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->total_amount, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Current Paid Amount</td>
-                                    <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->paid_amount, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Remaining Due</td>
-                                    <td id="remaining_due" class="text-end text-danger fw-bold">
-                                        {{ number_format($receipt->due_amount, 2) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="mb-3">
-                            <label>
-                                Payment Type
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select id="payment_type_id" name="payment_type_id" class="form-select select2" required>
-                                <option value="">Select Type</option>
-                                @foreach ($paymentTypes as $type)
-                                    <option value="{{ $type->id }}">
-                                        {{ $type->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                    <!-- Body -->
+                    <div class="modal-body p-4">
+                        <!-- Payment Summary -->
+                        <div class="row g-3 mb-4">
+                            <!-- Total -->
+                            <div class="col-md-4">
+                                <div class="payment-summary-card border shadow rounded-3 p-3 h-100">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="icon-box bg-primary-subtle text-primary">
+                                            <i class="fa fa-file-invoice-dollar"></i>
+                                        </div>
+                                        <span class="text-muted ms-2">
+                                            Total Amount
+                                        </span>
+                                    </div>
+                                    <h4 class="fw-bold mb-0">
+                                        {{ number_format($receipt->total_amount, 2) }}
+                                        <small class="fs-6 text-muted">TK</small>
+                                    </h4>
+                                </div>
+                            </div>
+                            <!-- Paid -->
+                            <div class="col-md-4">
+                                <div class="payment-summary-card shadow border rounded-3 p-3 h-100">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="icon-box bg-success-subtle text-success">
+                                            <i class="fa fa-check-circle"></i>
+                                        </div>
+                                        <span class="text-muted ms-2">
+                                            Paid Amount
+                                        </span>
+                                    </div>
+                                    <h4 class="fw-bold text-success mb-0">
+                                        {{ number_format($receipt->paid_amount, 2) }}
+                                        <small class="fs-6 text-muted">TK</small>
+                                    </h4>
+                                </div>
+                            </div>
+                            <!-- Due -->
+                            <div class="col-md-4">
+                                <div class="payment-summary-card shadow border border-danger rounded-3 p-3 h-100">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="icon-box bg-danger-subtle text-danger">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </div>
+                                        <span class="text-muted ms-2">
+                                            Remaining Due
+                                        </span>
+                                    </div>
+                                    <h4 class="fw-bold text-danger mb-0">
+                                        {{ number_format($receipt->due_amount, 2) }}
+                                        <small class="fs-6 text-muted">TK</small>
+                                    </h4>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label>
-                                Paid Amount
-                                <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" step="0.01" min="1" max="{{ $receipt->due_amount }}"
-                                id="paid_amount" name="amount" class="form-control" value="{{ $receipt->due_amount }}"
-                                required>
+                        <!-- Payment Information -->
+                        <div class="card border-0 shadow rounded-3">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-4">
+                                    <i class="fa fa-credit-card me-2 text-primary"></i>
+                                    Payment Information
+                                </h6>
+                                <div class="row g-3">
+                                    <!-- Payment Type -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Payment Type
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="payment_type_id" name="payment_type_id" class="form-select select2"
+                                            required>
+                                            <option value="">
+                                                Select Payment Type
+                                            </option>
+                                            @foreach ($paymentTypes as $type)
+                                                <option value="{{ $type->id }}">
+                                                    {{ $type->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <!-- Account -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Account
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="account_id" name="account_id" class="form-select select2" required>
+                                            <option value="">
+                                                Select Account
+                                            </option>
+                                        </select>
+                                        <div id="account_balance" class="mt-2 small text-muted">
+                                        </div>
+                                    </div>
+                                    <!-- Paid Amount -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Payment Amount
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                TK
+                                            </span>
+                                            <input type="number" step="0.01" min="1"
+                                                max="{{ $receipt->due_amount }}" id="paid_amount" name="amount"
+                                                class="form-control fw-bold" value="{{ $receipt->due_amount }}" required>
+                                        </div>
+                                        <small class="text-muted">
+                                            Maximum payable:
+                                            <strong>
+                                                {{ number_format($receipt->due_amount, 2) }} TK
+                                            </strong>
+                                        </small>
+                                    </div>
+                                    <!-- Payment Date -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            Payment Date
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" name="payment_date" class="form-control"
+                                            value="{{ date('Y-m-d') }}" required>
+                                    </div>
+                                    <!-- Note -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">
+                                            Payment Note
+                                        </label>
+                                        <textarea name="note" rows="3" class="form-control" placeholder="Write a payment note..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label>Payment Date</label>
-                            <input type="date" name="payment_date" class="form-control" value="{{ date('Y-m-d') }}"
-                                required>
-                        </div>
-                        <div class="mb-3">
-                            <label>Payment Note</label>
-                            <textarea name="note" rows="4" class="form-control" placeholder="Write a note..."></textarea>
+                        <!-- Payment Warning -->
+                        <div class="alert alert-warning d-flex align-items-start mt-4 mb-0">
+                            <i class="fa fa-info-circle fs-5 me-3 mt-1"></i>
+                            <div>
+                                <strong>Payment Information</strong>
+                                <div class="small mt-1">
+                                    Please make sure the selected account has sufficient
+                                    balance before submitting the payment.
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <!-- Footer -->
+                    <div class="modal-footer border-0 px-4 py-3">
+                        <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">
+                            <i class="fa fa-times me-1"></i>
                             Cancel
                         </button>
-                        <button type="submit" class="btn btn-primary">
-                            Save
+                        <button type="submit" class="btn btn-primary px-4" id="paymentSubmitBtn">
+                            <i class="fa fa-check-circle me-1"></i>
+                            Confirm Payment
                         </button>
                     </div>
                 </form>
@@ -465,3 +573,186 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        #paymentModal .modal-content {
+            border-radius: 18px;
+        }
+
+        #paymentModal .modal-header {
+            min-height: 80px;
+        }
+
+        #paymentModal .form-control,
+        #paymentModal .form-select {
+            min-height: 44px;
+            border-radius: 8px;
+        }
+
+        #paymentModal textarea.form-control {
+            min-height: 90px;
+        }
+
+        .payment-summary-card {
+            transition: all .2s ease;
+        }
+
+        .payment-summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .06);
+        }
+
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        #account_balance {
+            padding-left: 3px;
+        }
+
+        #paymentSubmitBtn {
+            min-width: 170px;
+            min-height: 44px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+
+            // Payment Type Change
+            $(document).on('change', '#payment_type_id', function() {
+
+                let paymentTypeId = $(this).val();
+
+                let accountSelect = $('#account_id');
+                let balanceText = $('#account_balance');
+
+                // Reset account
+                accountSelect.empty();
+
+                balanceText.html('');
+
+                if (paymentTypeId === '') {
+
+                    accountSelect
+                        .append('<option value="">Select Payment Type First</option>')
+                        .trigger('change');
+
+                    return;
+                }
+
+                // Loading
+                accountSelect
+                    .append('<option value="">Loading accounts...</option>')
+                    .trigger('change');
+
+                $.ajax({
+
+                    url: "{{ url('/admin/ajax/payment-type') }}/" + paymentTypeId + "/accounts",
+
+                    type: "GET",
+
+                    success: function(response) {
+
+                        accountSelect.empty();
+
+                        if (response.success && response.accounts.length > 0) {
+
+                            accountSelect.append(
+                                '<option value="">Select Account</option>'
+                            );
+
+                            $.each(response.accounts, function(index, account) {
+
+                                accountSelect.append(
+
+                                    $('<option>', {
+                                        value: account.id,
+                                        text: account.account_name +
+                                            ' - ' +
+                                            account.account_number
+                                    })
+                                    .attr('data-balance', account.current_balance)
+                                    .attr('data-payment-type', account
+                                        .payment_type_id)
+
+                                );
+
+                            });
+
+                        } else {
+
+                            accountSelect.append(
+                                '<option value="">No account available</option>'
+                            );
+
+                        }
+
+                        accountSelect.trigger('change');
+
+                    },
+
+                    error: function(xhr) {
+
+                        accountSelect.empty();
+
+                        accountSelect.append(
+                            '<option value="">Unable to load accounts</option>'
+                        );
+
+                        accountSelect.trigger('change');
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Unable to load accounts.'
+                        });
+
+                    }
+
+                });
+
+            });
+
+
+            // Account Change
+            $(document).on('change', '#account_id', function() {
+
+                let option = $(this).find(':selected');
+
+                let balance = parseFloat(
+                    option.attr('data-balance') || 0
+                );
+
+                if ($(this).val() === '') {
+
+                    $('#account_balance').html('');
+
+                    return;
+                }
+
+                $('#account_balance').html(
+                    'Available Balance: ' +
+                    '<strong class="' +
+                    (balance > 0 ? 'text-success' : 'text-danger') +
+                    '">' +
+                    balance.toFixed(2) +
+                    ' TK</strong>'
+                );
+
+            });
+
+        });
+    </script>
+@endpush

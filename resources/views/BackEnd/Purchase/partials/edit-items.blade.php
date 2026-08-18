@@ -2,7 +2,8 @@
     <table class="table table-bordered table-hover align-middle">
         <thead>
             <tr>
-                <th width="25%">Product</th>
+                <th width="10%">Product</th>
+                <th width="15%">Description</th>
                 <th width="10%">Serial No</th>
                 <th width="10%">Unit</th>
                 <th width="10%">Stock</th>
@@ -24,12 +25,17 @@
                                 <option value="{{ $product->id }}" data-unit="{{ $product->unit }}"
                                     data-stock="{{ $product->current_stock }}"
                                     data-rate="{{ $product->purchase_price }}"
+                                    data-description="{{ $product->description }}"
                                     {{ $item->product_id == $product->id ? 'selected' : '' }}>
                                     {{ $product->sku }}
                                     - {{ $product->name }}
                                 </option>
                             @endforeach
                         </select>
+                    </td>
+                    <td>
+                        <input type="text" name="description[]" value="{{ $item->product->description }}"
+                            class="form-control description" readonly>
                     </td>
                     <td>
                         <button type="button" class="btn btn-info serialBtn">
@@ -84,11 +90,14 @@
                     value="{{ $product->id }}"
                     data-unit="{{ $product->unit }}"
                     data-stock="{{ $product->current_stock }}"
-                    data-rate="{{ $product->purchase_price }}">
+                    data-rate="{{ $product->purchase_price }}" data-description="{{ $product->description }}">
                     {{ $product->sku }} - {{ $product->name }}
                 </option>
             @endforeach
         </select>
+    </td>
+    <td>
+        <input type="text" name="description[]" class="form-control description" readonly>
     </td>
     <td>
         <button type="button" class="btn btn-info serialBtn">

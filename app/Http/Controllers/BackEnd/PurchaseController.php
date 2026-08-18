@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerCompany;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\Receipt;
@@ -92,7 +93,10 @@ class PurchaseController extends Controller
                     ->where('created_by', Auth::id());
             });
         })->orderBy('name')->get();
-        return view('BackEnd.Purchase.create', compact('receiptNo', 'suppliers', 'products'));
+        $customerCompanies = CustomerCompany::where('status', 'Supplier')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+        return view('BackEnd.Purchase.create', compact('receiptNo', 'suppliers', 'products', 'customerCompanies'));
     }
 
     /**
@@ -102,6 +106,7 @@ class PurchaseController extends Controller
     {
         $request->validate([
             'receipt_date'      => 'required|date',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id'          => 'required|exists:parties,id',
             'product_id'        => 'required|array|min:1',
             'product_id.*'      => 'required|exists:products,id',
@@ -126,6 +131,7 @@ class PurchaseController extends Controller
                 'type'         => 'Purchase-Order',
                 'company_id'   => $companyId,
                 'branch_id'    => $branchId,
+                'customer_company_id' => $request->customer_company_id,
                 'party_id'     => $request->party_id,
                 'receipt_date' => $request->receipt_date,
                 'remarks'      => $request->remarks,
@@ -258,6 +264,7 @@ class PurchaseController extends Controller
             'branch',
             'items.product',
             'items.serialNumbers',
+            'customerCompany'
         ]);
 
         return view('BackEnd.Purchase.show', compact('purchase'));
@@ -281,7 +288,10 @@ class PurchaseController extends Controller
                     ->where('created_by', Auth::id());
             });
         })->orderBy('name')->get();
-        return view('BackEnd.Purchase.edit', compact('purchase', 'suppliers', 'products'));
+        $customerCompanies = CustomerCompany::where('status', 'Supplier')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+            $query->where('created_by', Auth::id());
+        })->get();
+        return view('BackEnd.Purchase.edit', compact('purchase', 'suppliers', 'products', 'customerCompanies'));
     }
 
     /**
@@ -291,6 +301,7 @@ class PurchaseController extends Controller
     {
         $request->validate([
             'receipt_date'      => 'required|date',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'party_id'          => 'required|exists:parties,id',
             'product_id'        => 'required|array|min:1',
             'product_id.*'      => 'required|exists:products,id',
@@ -322,6 +333,7 @@ class PurchaseController extends Controller
             SerialNumber::where('receipt_id', $purchase->id)->delete();
             $purchase->items()->delete();
             $purchase->update([
+                'customer_company_id' => $request->customer_company_id,
                 'party_id'     => $request->party_id,
                 'receipt_date' => $request->receipt_date,
                 'remarks'      => $request->remarks,
@@ -483,5 +495,46 @@ class PurchaseController extends Controller
             DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    public function supplierCompanyParties(CustomerCompany $customerCompany)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('Super-Admin')) {
+
+            if ($customerCompany->created_by != $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not allowed to access this supplier company.'
+                ], 403);
+            }
+        }
+
+        $parties = Party::where('customer_company_id', $customerCompany->id)
+            ->whereIn('type', ['Supplier', 'Both'])
+            ->where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get([
+                'id',
+                'party_id',
+                'name',
+                'designation',
+                'phone',
+                'email',
+                'address',
+                'status',
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'parties' => $parties,
+        ]);
     }
 }

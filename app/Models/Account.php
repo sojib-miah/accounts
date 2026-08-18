@@ -37,4 +37,9 @@ class Account extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function payments()
+    {
+        return $this->hasMany(ReceiptPayment::class);
+    }
 }

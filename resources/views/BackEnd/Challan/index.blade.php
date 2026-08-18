@@ -3,8 +3,8 @@
 @section('title', 'Challan')
 
 @section('content')
-    <div class="py-4">
-        <div class="mx-5">
+    <div class="p-5">
+        <div class="mt-3">
             <div class="mb-3">
                 <h2 class="fw-bold mb-0">
                     Challan List
@@ -95,7 +95,7 @@
                                                 {{ $receipt->dm_no }}
                                             </a>
                                         </td>
-                                        <td class="text-center">{{ $receipt->party->name }}</td>
+                                        <td class="text-center">{{ $receipt->customerCompany->name }}</td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
                                                 {{ $item->product->name }}

@@ -320,6 +320,7 @@
         let value = current.val();
         let row = current.closest('tr');
         if (value === '') {
+            row.find('.description').val('');
             row.find('.unit').val('');
             row.find('.stock').val('');
             row.find('.rate').val('');
@@ -368,8 +369,10 @@
         let unit = option.data('unit');
         let stock = option.data('stock');
         let rate = option.data('rate');
+        let description = option.data('description');
         row.find('.unit').val(unit || '');
         row.find('.stock').val(stock ?? '');
+        row.find('.description').val(description || '');
         if (
             rate !== undefined &&
             rate !== null
@@ -641,5 +644,85 @@
                 }
             );
         calculateSummary();
+    });
+    $('#customer_company_id').on('change', function() {
+
+        let customerCompanyId = $(this).val();
+
+        let partySelect = $('#party_id');
+
+        partySelect.empty();
+
+        partySelect.append(
+            '<option value="">Select Supplier</option>'
+        );
+
+        if (!customerCompanyId) {
+
+            partySelect
+                .val('')
+                .trigger('change');
+
+            return;
+        }
+
+        $.ajax({
+
+            url: '/admin/ajax/supplier-company/' +
+                customerCompanyId +
+                '/parties',
+
+            type: 'GET',
+
+            beforeSend: function() {
+
+                partySelect.prop('disabled', true);
+
+            },
+
+            success: function(res) {
+
+                if (res.success) {
+
+                    $.each(res.parties, function(index, party) {
+
+                        partySelect.append(
+                            $('<option>', {
+                                value: party.id,
+                                text: party.name +
+                                    (party.designation ?
+                                        ' - ' + party.designation :
+                                        '')
+                            })
+                        );
+
+                    });
+
+                }
+
+            },
+
+            error: function(xhr) {
+
+                console.log(xhr.responseText);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Unable to load suppliers.'
+                });
+
+            },
+
+            complete: function() {
+
+                partySelect.prop('disabled', false);
+
+                partySelect.trigger('change');
+
+            }
+
+        });
+
     });
 </script>

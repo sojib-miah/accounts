@@ -16,7 +16,7 @@
                         <!-- company name -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">
-                                Customer Company
+                                Supplier Company
                             </label>
                             <select name="customer_company_id" class="form-select select2" id="add_customer_company_id">
                                 <option value="">Select Supplier Company</option>
