@@ -28,10 +28,7 @@ class PurchasePaymentController extends Controller
             'branch',
         ])
             ->where('type', 'Purchase-Order')
-            ->where('status', 'Completed')
-            ->where('due_amount', '>', 0)
-
-            ->when(
+            ->where('status', 'Completed')->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
                     $query->where('company_id', $user->company_id)
