@@ -97,56 +97,78 @@ class PaymentDetailesController extends Controller
     public function incomeInvoice(Request $request)
     {
         $user = Auth::user();
+        $baseQuery = Receipt::where('type', 'Sales-Order')
+            ->where('is_invoice', true)
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            );
 
-        $query = Receipt::with([
+        $query = (clone $baseQuery)->with([
             'party',
+            'company',
             'branch',
             'items.accountHead',
+            'items.product',
             'payments.paymentType',
-            'creator'
-        ])
-            ->where('type', 'Income')
-            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
-                $query->where('created_by', $user->id);
-            });
+            'payments.account',
+            'creator',
+        ]);
 
-        // Search
         if ($request->filled('search')) {
 
-            $search = $request->search;
+            $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
 
                 $q->where('receipt_no', 'like', "%{$search}%")
+                    ->orWhere('inv_no', 'like', "%{$search}%")
+                    ->orWhere('so_no', 'like', "%{$search}%")
+                    ->orWhere('remarks', 'like', "%{$search}%")
 
                     ->orWhereHas('party', function ($party) use ($search) {
-                        $party->where('name', 'like', "%{$search}%");
+
+                        $party->where('name', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
 
-        // Payment Status
         if ($request->filled('payment_status')) {
-            $query->where('payment_status', $request->payment_status);
+
+            $query->where(
+                'payment_status',
+                $request->payment_status
+            );
         }
 
-        // Date Filter
         if ($request->filled('from_date')) {
-            $query->whereDate('receipt_date', '>=', $request->from_date);
+
+            $query->whereDate(
+                'receipt_date',
+                '>=',
+                $request->from_date
+            );
         }
 
         if ($request->filled('to_date')) {
-            $query->whereDate('receipt_date', '<=', $request->to_date);
-        }
 
-        $receipts = $query->latest()
+            $query->whereDate(
+                'receipt_date',
+                '<=',
+                $request->to_date
+            );
+        }
+        $receipts = $query
+            ->latest('receipt_date')
+            ->latest('id')
             ->paginate(20)
             ->withQueryString();
 
-        $summary = Receipt::where('type', 'Income')
-            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
-                $query->where('created_by', $user->id);
-            });
+        $summary = clone $baseQuery;
 
         $todayIncome = (clone $summary)
             ->whereDate('receipt_date', today())
@@ -161,9 +183,30 @@ class PaymentDetailesController extends Controller
             ->whereYear('receipt_date', now()->year)
             ->sum('total_amount');
 
-        $totalIncome = (clone $summary)->sum('total_amount');
-        $totalPaid   = (clone $summary)->sum('paid_amount');
-        $totalDue    = (clone $summary)->sum('due_amount');
+        $totalIncome = (clone $summary)
+            ->sum('total_amount');
+
+        $totalPaid = (clone $summary)
+            ->sum('paid_amount');
+
+        $totalDue = (clone $summary)
+            ->sum('due_amount');
+
+        $totalInvoice = (clone $summary)
+            ->count();
+
+        $paidInvoice = (clone $summary)
+            ->where('payment_status', 'Paid')
+            ->count();
+
+        $partialInvoice = (clone $summary)
+            ->where('payment_status', 'Partial')
+            ->count();
+
+        $pendingInvoice = (clone $summary)
+            ->where('payment_status', 'Pending')
+            ->count();
+
 
         return view(
             'BackEnd.Report.income_invoice',
@@ -174,7 +217,11 @@ class PaymentDetailesController extends Controller
                 'yearIncome',
                 'totalIncome',
                 'totalPaid',
-                'totalDue'
+                'totalDue',
+                'totalInvoice',
+                'paidInvoice',
+                'partialInvoice',
+                'pendingInvoice'
             )
         );
     }

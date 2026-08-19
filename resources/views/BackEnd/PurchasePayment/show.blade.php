@@ -154,7 +154,7 @@
                                             Select Payment Type
                                         </option>
                                         @foreach ($paymentTypes as $type)
-                                            <option value="{{ $type->id }}">
+                                            <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}">
                                                 {{ $type->name }}
                                             </option>
                                         @endforeach
@@ -283,28 +283,57 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-
             $('#payment_type_id').on('change', function() {
 
                 let paymentTypeId = $(this).val();
 
+                let selectedOption = $(this).find(':selected');
+
+                let paymentTypeName = String(
+                    selectedOption.data('name') || ''
+                ).trim().toLowerCase();
+
+                let isCash = paymentTypeName === 'cash';
+
                 let accountSelect = $('#account_id');
+                let accountBalance = $('#accountBalance');
 
-                $('#accountBalance').html('');
+                accountBalance.html('');
+                if (isCash) {
 
-                accountSelect.html(
-                    '<option value="">Loading Account...</option>'
-                );
+                    accountSelect
+                        .html('<option value="">Cash Payment</option>')
+                        .val('')
+                        .prop('required', false)
+                        .prop('disabled', true)
+                        .trigger('change.select2');
 
-                if (!paymentTypeId) {
-
-                    accountSelect.html(
-                        '<option value="">Select Account</option>'
-                    );
+                    accountBalance.html(`
+                <div class="alert alert-success py-2 mb-0">
+                    <i class="fa fa-money-bill-wave me-1"></i>
+                    <strong>Cash Payment</strong>
+                    — No account is required.
+                </div>
+            `);
 
                     return;
                 }
+                if (!paymentTypeId) {
 
+                    accountSelect
+                        .html('<option value="">Select Account</option>')
+                        .val('')
+                        .prop('required', true)
+                        .prop('disabled', true)
+                        .trigger('change.select2');
+
+                    return;
+                }
+                accountSelect
+                    .prop('disabled', false)
+                    .prop('required', true)
+                    .html('<option value="">Loading Account...</option>')
+                    .trigger('change.select2');
 
                 $.ajax({
 
@@ -322,247 +351,247 @@
                             '<option value="">Select Account</option>'
                         );
 
-
                         if (
                             response.success &&
-                            response.accounts.length
+                            response.accounts &&
+                            response.accounts.length > 0
                         ) {
 
                             $.each(
                                 response.accounts,
                                 function(index, account) {
 
-                                    let balance =
-                                        parseFloat(
-                                            account.current_balance
-                                        ) || 0;
+                                    let balance = parseFloat(
+                                        account.current_balance
+                                    ) || 0;
 
-                                    accountSelect.append(
+                                    let defaultText =
+                                        account.default_status === 'Default' ?
+                                        ' - Default' :
+                                        '';
 
-                                        '<option ' +
-                                        'value="' +
-                                        account.id +
-                                        '" ' +
-                                        'data-balance="' +
-                                        balance +
-                                        '">' +
-
-                                        account.account_name +
-
-                                        ' - ' +
-
-                                        account.account_number +
-
-                                        ' | Balance: ' +
-
-                                        balance.toFixed(2) +
-
-                                        '</option>'
-
-                                    );
+                                    accountSelect.append(`
+                                <option
+                                    value="${account.id}"
+                                    data-balance="${balance}"
+                                >
+                                    ${account.account_name}
+                                    -
+                                    ${account.account_number}
+                                    ${defaultText}
+                                    | Balance: ${balance.toFixed(2)}
+                                </option>
+                            `);
 
                                 }
                             );
 
                         } else {
 
-                            accountSelect.append(
-                                '<option value="">No Account Found</option>'
-                            );
+                            accountSelect.append(`
+                        <option value="">
+                            No Account Found
+                        </option>
+                    `);
 
+                            accountBalance.html(`
+                        <div class="alert alert-warning py-2 mb-0">
+                            <i class="fa fa-exclamation-triangle me-1"></i>
+                            No active account found for this payment type.
+                        </div>
+                    `);
                         }
-
+                        accountSelect.trigger('change.select2');
                     },
 
                     error: function() {
 
-                        accountSelect.html(
-                            '<option value="">Unable to load Account</option>'
-                        );
+                        accountSelect
+                            .html(`
+                        <option value="">
+                            Unable to load Account
+                        </option>
+                    `)
+                            .trigger('change.select2');
 
+                        accountBalance.html(`
+                    <div class="alert alert-danger py-2 mb-0">
+                        <i class="fa fa-times-circle me-1"></i>
+                        Unable to load payment accounts.
+                    </div>
+                `);
                     }
 
                 });
 
             });
-
-
             $('#account_id').on('change', function() {
+
+                let accountId = $(this).val();
 
                 let option = $(this).find(':selected');
 
-                let balance =
-                    parseFloat(
-                        option.data('balance')
-                    ) || 0;
+                let balance = parseFloat(
+                    option.data('balance')
+                ) || 0;
 
-                let paymentAmount =
-                    parseFloat(
-                        $('#payment_amount').val()
-                    ) || 0;
-
-
-                if (!$(this).val()) {
+                let paymentAmount = parseFloat(
+                    $('#payment_amount').val()
+                ) || 0;
+                if (!accountId) {
 
                     $('#accountBalance').html('');
 
                     return;
                 }
-
-
-                let html = '';
-
                 if (balance >= paymentAmount) {
 
-                    html =
-                        '<div class="alert alert-success py-2 mb-0">' +
-
-                        '<i class="fa fa-check-circle me-1"></i>' +
-
-                        'Available Balance: <strong>৳ ' +
-
-                        balance.toFixed(2) +
-
-                        '</strong>' +
-
-                        '</div>';
+                    $('#accountBalance').html(`
+                <div class="alert alert-success py-2 mb-0">
+                    <i class="fa fa-check-circle me-1"></i>
+                    Available Balance:
+                    <strong>৳ ${balance.toFixed(2)}</strong>
+                </div>
+            `);
 
                 } else {
-
-                    html =
-                        '<div class="alert alert-danger py-2 mb-0">' +
-
-                        '<i class="fa fa-exclamation-triangle me-1"></i>' +
-
-                        'Insufficient Balance. Available: <strong>৳ ' +
-
-                        balance.toFixed(2) +
-
-                        '</strong>' +
-
-                        '</div>';
-
+                    $('#accountBalance').html(`
+                <div class="alert alert-danger py-2 mb-0">
+                    <i class="fa fa-exclamation-triangle me-1"></i>
+                    Insufficient Balance.
+                    Available:
+                    <strong>৳ ${balance.toFixed(2)}</strong>
+                </div>
+            `);
                 }
 
-
-                $('#accountBalance').html(html);
-
             });
+            $('#payment_amount').on('input change', function() {
+                let paymentTypeName = String(
+                    $('#payment_type_id option:selected').data('name') || ''
+                ).trim().toLowerCase();
 
-            $('#payment_amount').on('input', function() {
+                if (paymentTypeName === 'cash') {
+                    return;
+                }
 
                 $('#account_id').trigger('change');
 
             });
-
             $('#paymentForm').on('submit', function(e) {
 
-                let account =
-                    $('#account_id option:selected');
+                e.preventDefault();
 
-                let balance =
-                    parseFloat(
-                        account.data('balance')
-                    ) || 0;
+                let form = this;
 
-                let amount =
-                    parseFloat(
-                        $('#payment_amount').val()
-                    ) || 0;
+                let paymentType = $('#payment_type_id');
 
-                let due =
-                    parseFloat(
-                        "{{ $receipt->due_amount }}"
-                    ) || 0;
+                let paymentTypeId = paymentType.val();
 
+                let paymentTypeName = String(
+                    paymentType.find(':selected').data('name') || ''
+                ).trim().toLowerCase();
 
-                if (!$('#payment_type_id').val()) {
+                let isCash = paymentTypeName === 'cash';
 
-                    e.preventDefault();
+                let accountId = $('#account_id').val();
+
+                let account = $('#account_id option:selected');
+
+                let balance = parseFloat(
+                    account.data('balance')
+                ) || 0;
+
+                let amount = parseFloat(
+                    $('#payment_amount').val()
+                ) || 0;
+
+                let due = parseFloat(
+                    "{{ $receipt->due_amount }}"
+                ) || 0;
+                if (!paymentTypeId) {
 
                     Swal.fire({
                         icon: 'warning',
                         title: 'Payment Type Required',
-                        text: 'Please select a payment type.'
+                        text: 'Please select a payment type.',
+                        confirmButtonText: 'OK'
                     });
 
                     return false;
                 }
-
-
-                if (!$('#account_id').val()) {
-
-                    e.preventDefault();
+                if (!isCash && !accountId) {
 
                     Swal.fire({
                         icon: 'warning',
                         title: 'Account Required',
-                        text: 'Please select an account.'
+                        text: 'Please select an account for this payment type.',
+                        confirmButtonText: 'OK'
                     });
 
                     return false;
                 }
-
-
                 if (amount <= 0) {
-
-                    e.preventDefault();
 
                     Swal.fire({
                         icon: 'warning',
                         title: 'Invalid Amount',
-                        text: 'Payment amount must be greater than zero.'
+                        text: 'Payment amount must be greater than zero.',
+                        confirmButtonText: 'OK'
                     });
 
                     return false;
                 }
-
-
                 if (amount > due) {
-
-                    e.preventDefault();
 
                     Swal.fire({
                         icon: 'error',
                         title: 'Amount Exceeds Due',
-                        text: 'Maximum payment allowed is ৳ ' +
-                            due.toFixed(2)
+                        html: 'Maximum payment allowed is ' +
+                            '<strong>৳ ' +
+                            due.toFixed(2) +
+                            '</strong>',
+                        confirmButtonText: 'OK'
                     });
 
                     return false;
                 }
-
-
-                if (balance < amount) {
-
-                    e.preventDefault();
+                if (!isCash && balance < amount) {
 
                     Swal.fire({
                         icon: 'error',
                         title: 'Insufficient Balance',
-
                         html: 'Account Balance: <strong>৳ ' +
                             balance.toFixed(2) +
                             '</strong><br>' +
 
                             'Payment Amount: <strong>৳ ' +
                             amount.toFixed(2) +
-                            '</strong>'
+                            '</strong>',
+                        confirmButtonText: 'OK'
                     });
 
                     return false;
                 }
-
-
                 Swal.fire({
 
                     title: 'Confirm Payment',
 
-                    html: 'Payment Amount: <strong>৳ ' +
-                        amount.toFixed(2) +
-                        '</strong><br><br>' +
+                    html: 'Payment Type: <strong>' +
+                        paymentType.find(':selected').text().trim() +
+                        '</strong><br>' +
 
-                        'Are you sure you want to make this payment?',
+                        'Payment Amount: <strong>৳ ' +
+                        amount.toFixed(2) +
+                        '</strong>' +
+
+                        (
+                            isCash ?
+                            '<br><small class="text-muted">Cash payment — No account will be affected.</small>' :
+                            '<br>Account Balance: <strong>৳ ' +
+                            balance.toFixed(2) +
+                            '</strong>'
+                        ),
 
                     icon: 'question',
 
@@ -570,25 +599,23 @@
 
                     confirmButtonText: 'Yes, Make Payment',
 
-                    cancelButtonText: 'Cancel'
+                    cancelButtonText: 'Cancel',
+
+                    reverseButtons: true
 
                 }).then(function(result) {
 
                     if (result.isConfirmed) {
-
                         $('#payButton')
                             .prop('disabled', true)
                             .html(
                                 '<i class="fa fa-spinner fa-spin me-1"></i>' +
                                 ' Processing...'
                             );
-
-                        $('#paymentForm')[0].submit();
-
+                        form.submit();
                     }
 
                 });
-
 
                 return false;
 

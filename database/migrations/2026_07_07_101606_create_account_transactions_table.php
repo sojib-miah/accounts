@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('account_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('account_id')->nullable()->constrained()->cascadeOnDelete();
             $table->date('transaction_date');
             $table->string('voucher_no');
             $table->enum('transaction_type', ['Income', 'Expense', 'Sales-Order', 'Purchase-Order']);

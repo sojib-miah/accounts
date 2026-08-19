@@ -58,7 +58,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $head->category->name ?? '-' }}</td>
-                                        <td>{{ $head->name }}</td>
+                                        <td>{{ $head->name ?? '-' }}</td>
                                         <td>
                                             @if ($head->type == 'Income')
                                                 <span class="badge bg-success">
@@ -85,7 +85,7 @@
                                             {{ $head->creator->name ?? '-' }}
                                         </td>
                                         <td>
-                                            {{ $head->created_at->format('d M Y h:i A') }}
+                                            {{ date('d-m-Y', strtotime($head->created_at)) ?? '-' }}
                                         </td>
                                         <td>
                                             @can('expense-list-edit')

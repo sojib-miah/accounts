@@ -138,7 +138,8 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::put('/receipt/{receipt}', [ReceiptController::class, 'update'])->name('receipt.update');
     Route::delete('/receipt/{receipt}', [ReceiptController::class, 'destroy'])->name('receipt.destroy');
     Route::post('/receipt/{receipt}/cancel', [ReceiptController::class, 'cancel'])->name('receipt.cancel');
-    Route::post('/receipt/{receipt}/payment', [ReceiptController::class, 'paymentStore'])->name('receipt.payment.store');
+    Route::post('/expense/{receipt}/payment', [ReceiptController::class, 'expensePaymentStore'])->name('expense.payment.store');
+    Route::get('/expense/payment/accounts/{paymentType}', [ReceiptController::class, 'paymentAccounts'])->name('expense.payment.accounts');
     Route::get('/receipt/{receipt}/payments', [ReceiptController::class, 'paymentHistory'])->name('receipt.payment.history');
     Route::get('/receipt/{receipt}/print', [ReceiptController::class, 'print'])->name('receipt.print');
     Route::get('/receipt/{receipt}/pdf', [ReceiptController::class, 'pdf'])->name('receipt.pdf');

@@ -2,163 +2,158 @@
 
 @section('content')
     <div class="p-5">
+        <div class="mt-3">
+            {{-- HEADER --}}
+            <div class="d-flex justify-content-between align-items-center mb-3">
 
-        {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="mb-0">
+                        Customer Company
+                    </h4>
 
-            <div>
-                <h4 class="mb-0">
-                    Customer Company
-                </h4>
+                    <small class="text-muted">
+                        Manage customer companies
+                    </small>
+                </div>
 
-                <small class="text-muted">
-                    Manage customer companies
-                </small>
+                <button type="button" class="btn btn-primary" id="addCustomerCompany">
+
+                    <i class="fa fa-plus me-1"></i>
+                    Add Customer Company
+
+                </button>
+
             </div>
+            {{-- TABLE --}}
+            <div class="card">
 
-            <button type="button" class="btn btn-primary" id="addCustomerCompany">
+                <div class="card-body">
 
-                <i class="fa fa-plus me-1"></i>
-                Add Customer Company
+                    <div class="table-responsive">
 
-            </button>
+                        <table class="table table-bordered table-hover align-middle" id="customerCompanyTable">
 
-        </div>
-
-
-        {{-- TABLE --}}
-        <div class="card">
-
-            <div class="card-body">
-
-                <div class="table-responsive">
-
-                    <table class="table table-bordered table-hover align-middle" id="customerCompanyTable">
-
-                        <thead>
-
-                            <tr>
-
-                                <th width="60">
-                                    SL
-                                </th>
-
-                                <th>
-                                    Company Name
-                                </th>
-
-                                <th>
-                                    Email
-                                </th>
-
-                                <th>
-                                    Phone
-                                </th>
-
-                                <th>
-                                    Address
-                                </th>
-
-                                <th width="100">
-                                    Status
-                                </th>
-
-                                <th width="130">
-                                    Action
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            @forelse($customerCompanies as $key => $company)
-                                <tr id="row-{{ $company->id }}">
-
-                                    <td>
-                                        {{ $key + 1 }}
-                                    </td>
-
-                                    <td>
-                                        <strong>
-                                            {{ $company->name }}
-                                        </strong>
-                                    </td>
-
-                                    <td>
-                                        {{ $company->email ?: '-' }}
-                                    </td>
-
-                                    <td>
-                                        {{ $company->phone ?: '-' }}
-                                    </td>
-
-                                    <td>
-                                        {{ $company->address ?: '-' }}
-                                    </td>
-
-                                    <td>
-
-                                        @if ($company->status === 'Sales')
-                                            <span class="badge bg-success">
-                                                Sales
-                                            </span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">
-                                                Expense
-                                            </span>
-                                        @endif
-
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button type="button" class="btn btn-sm btn-info editCompany"
-                                            data-id="{{ $company->id }}">
-
-                                            <i class="fa fa-edit"></i>
-
-                                        </button>
-
-
-                                        <button type="button" class="btn btn-sm btn-danger deleteCompany"
-                                            data-id="{{ $company->id }}" data-name="{{ $company->name }}">
-
-                                            <i class="fa fa-trash"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            @empty
+                            <thead>
 
                                 <tr>
 
-                                    <td colspan="7" class="text-center text-muted py-4">
-                                        No Customer Company Found
-                                    </td>
+                                    <th width="60">
+                                        SL
+                                    </th>
+
+                                    <th>
+                                        Company Name
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Address
+                                    </th>
+
+                                    <th width="100">
+                                        Status
+                                    </th>
+
+                                    <th width="130">
+                                        Action
+                                    </th>
 
                                 </tr>
-                            @endforelse
 
-                        </tbody>
+                            </thead>
 
-                    </table>
+                            <tbody>
+
+                                @forelse($customerCompanies as $key => $company)
+                                    <tr id="row-{{ $company->id }}">
+
+                                        <td>
+                                            {{ $key + 1 }}
+                                        </td>
+
+                                        <td>
+                                            <strong>
+                                                {{ $company->name }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            {{ $company->email ?: '-' }}
+                                        </td>
+
+                                        <td>
+                                            {{ $company->phone ?: '-' }}
+                                        </td>
+
+                                        <td>
+                                            {{ $company->address ?: '-' }}
+                                        </td>
+
+                                        <td>
+
+                                            @if ($company->status === 'Sales')
+                                                <span class="badge bg-success">
+                                                    Sales
+                                                </span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">
+                                                    Expense
+                                                </span>
+                                            @endif
+
+                                        </td>
+
+                                        <td class="text-center">
+
+                                            <button type="button" class="btn btn-sm btn-info editCompany"
+                                                data-id="{{ $company->id }}">
+
+                                                <i class="fa fa-edit"></i>
+
+                                            </button>
+
+
+                                            <button type="button" class="btn btn-sm btn-danger deleteCompany"
+                                                data-id="{{ $company->id }}" data-name="{{ $company->name }}">
+
+                                                <i class="fa fa-trash"></i>
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            No Customer Company Found
+                                        </td>
+
+                                    </tr>
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
 
             </div>
-
         </div>
-
     </div>
-
-
     {{-- ADD / EDIT MODAL --}}
-
     <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">

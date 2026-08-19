@@ -3,8 +3,8 @@
 @section('title', 'Expense Receipt')
 
 @section('content')
-    <div class="py-4">
-        <div class="mx-5">
+    <div class="p-5">
+        <div class="mt-3">
             {{-- Page Header --}}
             <div class="mb-3">
                 <h2 class="fw-bold mb-0">
@@ -95,7 +95,7 @@
                                         <td class="text-center">
                                             <a href="{{ route('party.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
-                                                {{ $receipt->party->name }}
+                                                {{ $receipt->party->customerCompany->name }}
                                             </a>
                                         </td>
                                         <td class="text-center">

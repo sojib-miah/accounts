@@ -86,24 +86,24 @@
                                         <td class="text-center">
                                             <a href="{{ route('challan.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->so_no }}
+                                                {{ $receipt->so_no ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('challan.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->dm_no }}
+                                                {{ $receipt->dm_no ?? '-' }}
                                             </a>
                                         </td>
-                                        <td class="text-center">{{ $receipt->customerCompany->name }}</td>
+                                        <td class="text-center">{{ $receipt->customerCompany->name ?? '-' }}</td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->product->name }}
+                                                {{ $item->product->name ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->product->description }}
+                                                {{ $item->product->description ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>

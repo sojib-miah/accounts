@@ -528,6 +528,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Payment Type -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
                                 Payment Type
@@ -538,35 +539,24 @@
                                     Select Payment Type
                                 </option>
                                 @foreach ($paymentTypes as $type)
-                                    <option value="{{ $type->id }}">
+                                    <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}">
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="mb-3">
+                        <!-- Account -->
+                        <div class="mb-3" id="due_account_wrapper" style="display: none;">
                             <label class="form-label fw-semibold">
                                 Receive Account
                                 <span class="text-danger">*</span>
                             </label>
-                            <select name="account_id" id="due_account_id" class="form-select select2" required>
+                            <select name="account_id" id="due_account_id" class="form-select select2" disabled>
                                 <option value="">
                                     Select Account
                                 </option>
-                                @foreach ($accounts as $account)
-                                    <option value="{{ $account->id }}"
-                                        data-payment-type="{{ $account->payment_type_id }}"
-                                        data-balance="{{ $account->current_balance }}">
-                                        {{ $account->account_name }}
-                                        -
-                                        {{ $account->account_number }}
-                                        ({{ number_format($account->current_balance, 2) }}
-                                        TK)
-                                    </option>
-                                @endforeach
                             </select>
-                            <div id="due_account_balance" class="mt-2">
-                            </div>
+                            <div id="due_account_balance" class="mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
@@ -575,8 +565,7 @@
                             </label>
                             <div class="input-group input-group-lg">
                                 <input type="number" name="amount" id="due_payment_amount" class="form-control"
-                                    step="0.01" min="0.01" max="{{ $summary['due'] }}"
-                                    value="{{ $summary['due'] }}" required>
+                                    min="1" max="{{ $summary['due'] }}" value="{{ $summary['due'] }}" required>
                                 <span class="input-group-text">
                                     TK
                                 </span>
@@ -631,72 +620,166 @@
 
                 let paymentTypeId = $(this).val();
 
+                let selectedOption = $(this).find(':selected');
+
+                let paymentTypeName =
+                    String(selectedOption.data('name') || '').toLowerCase();
+
+                let isCash = paymentTypeName === 'cash';
+
+                let accountWrapper = $('#due_account_wrapper');
                 let accountSelect = $('#due_account_id');
+                let balanceBox = $('#due_account_balance');
 
-                accountSelect.val('').trigger('change');
+                accountSelect
+                    .empty()
+                    .append('<option value="">Select Account</option>')
+                    .val('')
+                    .trigger('change');
+
+                balanceBox.html('');
+
+                if (!paymentTypeId) {
+
+                    accountWrapper.hide();
+
+                    accountSelect
+                        .prop('disabled', true)
+                        .prop('required', false);
+
+                    return;
+                }
+                if (isCash) {
+
+                    accountWrapper.hide();
+
+                    accountSelect
+                        .prop('disabled', true)
+                        .prop('required', false)
+                        .val('');
+
+                    balanceBox.html('');
+
+                    return;
+                }
+
+                accountWrapper.show();
+
+                accountSelect
+                    .prop('disabled', false)
+                    .prop('required', true);
+
+                accountSelect
+                    .empty()
+                    .append(
+                        '<option value="">Loading accounts...</option>'
+                    );
 
 
-                accountSelect.find('option').each(function() {
+                $.ajax({
 
-                    let option = $(this);
+                    url: "{{ url('/admin/ajax/payment-type') }}/" +
+                        paymentTypeId +
+                        "/accounts",
+
+                    type: "GET",
+
+                    success: function(response) {
+
+                        accountSelect.empty();
+
+                        accountSelect.append(
+                            '<option value="">Select Account</option>'
+                        );
 
 
-                    // Placeholder
-                    if (!option.val()) {
+                        if (
+                            response.success &&
+                            response.accounts &&
+                            response.accounts.length > 0
+                        ) {
 
-                        option.show();
+                            $.each(
+                                response.accounts,
+                                function(index, account) {
 
-                        return;
-                    }
+                                    let balance =
+                                        parseFloat(
+                                            account.current_balance
+                                        ) || 0;
 
 
-                    let accountPaymentType =
-                        String(option.data('payment-type'));
+                                    accountSelect.append(
+                                        $('<option>', {
+                                            value: account.id,
+                                            text: account.account_name +
+                                                ' - ' +
+                                                account.account_number +
+                                                ' (' +
+                                                balance.toFixed(2) +
+                                                ' TK)'
+                                        })
+                                        .attr(
+                                            'data-balance',
+                                            balance
+                                        )
+                                        .attr(
+                                            'data-payment-type',
+                                            account.payment_type_id
+                                        )
+                                    );
+
+                                }
+                            );
 
 
-                    if (
-                        paymentTypeId &&
-                        accountPaymentType === String(paymentTypeId)
-                    ) {
+                        } else {
 
-                        option.show();
+                            accountSelect.append(
+                                '<option value="">No Account Found</option>'
+                            );
 
-                    } else {
+                        }
 
-                        option.hide();
+                        accountSelect.trigger('change');
+
+                    },
+
+                    error: function() {
+
+                        accountSelect
+                            .empty()
+                            .append(
+                                '<option value="">Unable to load accounts</option>'
+                            )
+                            .trigger('change');
+
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Account Loading Failed',
+                            text: 'Unable to load accounts for the selected payment type.'
+                        });
 
                     }
 
                 });
 
-
-                $('#due_account_balance').html('');
-
-                validateDuePayment();
-
             });
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Account Change
-            |--------------------------------------------------------------------------
-            */
 
             $(document).on('change', '#due_account_id', function() {
 
                 let option = $(this).find(':selected');
 
                 let balance =
-                    parseFloat(option.data('balance')) || 0;
+                    parseFloat(
+                        option.attr('data-balance') || 0
+                    ) || 0;
 
 
                 if (!$(this).val()) {
 
                     $('#due_account_balance').html('');
-
-                    validateDuePayment();
 
                     return;
                 }
@@ -721,289 +804,7 @@
 
         `);
 
-
-                validateDuePayment();
-
             });
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Amount Change
-            |--------------------------------------------------------------------------
-            */
-
-            $(document).on(
-                'input',
-                '#due_payment_amount',
-                function() {
-
-                    validateDuePayment();
-
-                }
-            );
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Validate Payment
-            |--------------------------------------------------------------------------
-            */
-
-            function validateDuePayment() {
-
-                let account =
-                    $('#due_account_id').find(':selected');
-
-
-                let amount =
-                    parseFloat($('#due_payment_amount').val()) || 0;
-
-
-                let due =
-                    parseFloat('{{ $summary['due'] }}') || 0;
-
-
-                let balance =
-                    parseFloat(account.data('balance')) || 0;
-
-
-                let warning =
-                    $('#due_payment_warning');
-
-
-                let submit =
-                    $('#due_payment_submit');
-
-
-                warning.addClass('d-none');
-
-                submit.prop('disabled', false);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Amount > Due
-                |--------------------------------------------------------------------------
-                */
-
-                if (amount > due) {
-
-                    warning
-                        .removeClass('d-none')
-                        .find('span')
-                        .text(
-                            'Payment amount cannot be greater than total due amount.'
-                        );
-
-                    submit.prop('disabled', true);
-
-                    return;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Amount > Account Balance
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    $('#due_account_id').val() &&
-                    amount > balance
-                ) {
-
-                    warning
-                        .removeClass('d-none')
-                        .find('span')
-                        .text(
-                            'Payment amount cannot be greater than available account balance.'
-                        );
-
-                    submit.prop('disabled', true);
-
-                    return;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | No Account
-                |--------------------------------------------------------------------------
-                */
-
-                if (!$('#due_account_id').val()) {
-
-                    warning
-                        .removeClass('d-none')
-                        .find('span')
-                        .text(
-                            'Please select a receive account.'
-                        );
-
-                    submit.prop('disabled', true);
-
-                    return;
-                }
-
-            }
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Form Submit Safety
-            |--------------------------------------------------------------------------
-            */
-
-            $('#duePaymentForm').on('submit', function(e) {
-
-                let account =
-                    $('#due_account_id').find(':selected');
-
-
-                let amount =
-                    parseFloat($('#due_payment_amount').val()) || 0;
-
-
-                let due =
-                    parseFloat('{{ $summary['due'] }}') || 0;
-
-
-                let balance =
-                    parseFloat(account.data('balance')) || 0;
-
-
-                if (!$('#due_payment_type_id').val()) {
-
-                    e.preventDefault();
-
-                    Swal.fire(
-                        'Payment Type Required',
-                        'Please select a payment type.',
-                        'warning'
-                    );
-
-                    return;
-                }
-
-
-                if (!$('#due_account_id').val()) {
-
-                    e.preventDefault();
-
-                    Swal.fire(
-                        'Account Required',
-                        'Please select an account.',
-                        'warning'
-                    );
-
-                    return;
-                }
-
-
-                if (amount <= 0) {
-
-                    e.preventDefault();
-
-                    Swal.fire(
-                        'Invalid Amount',
-                        'Please enter a valid payment amount.',
-                        'warning'
-                    );
-
-                    return;
-                }
-
-
-                if (amount > due) {
-
-                    e.preventDefault();
-
-                    Swal.fire(
-                        'Invalid Amount',
-                        'Payment amount cannot exceed total due.',
-                        'warning'
-                    );
-
-                    return;
-                }
-
-
-                if (amount > balance) {
-
-                    e.preventDefault();
-
-                    Swal.fire(
-                        'Insufficient Balance',
-                        'Account balance is not sufficient for this payment.',
-                        'error'
-                    );
-
-                    return;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Confirm
-                |--------------------------------------------------------------------------
-                */
-
-                e.preventDefault();
-
-
-                Swal.fire({
-
-                    title: 'Confirm Payment',
-
-                    html: `
-
-                <div class="text-start">
-
-                    <p class="mb-2">
-                        <strong>Customer:</strong>
-                        {{ $party->name }}
-                    </p>
-
-                    <p class="mb-2">
-                        <strong>Amount:</strong>
-                        ${amount.toFixed(2)} TK
-                    </p>
-
-                    <p class="mb-0">
-                        <strong>Account:</strong>
-                        ${account.text()}
-                    </p>
-
-                </div>
-
-            `,
-
-                    icon: 'question',
-
-                    showCancelButton: true,
-
-                    confirmButtonText: '<i class="fa fa-check me-1"></i> Confirm Payment',
-
-                    cancelButtonText: 'Cancel',
-
-                    reverseButtons: true
-
-                }).then((result) => {
-
-                    if (result.isConfirmed) {
-
-                        $('#duePaymentForm')[0].submit();
-
-                    }
-
-                });
-
-            });
-
 
         });
     </script>

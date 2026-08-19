@@ -83,7 +83,7 @@
                                             {{ $category->creator->name ?? '-' }}
                                         </td>
                                         <td>
-                                            {{ $category->created_at->format('d M Y h:i A') }}
+                                            {{ date('d-m-Y', strtotime($category->created_at)) }}
                                         </td>
                                         <td>
                                             @can('expense-category-list-edit')

@@ -61,7 +61,7 @@
                                 <td>{{ $supplier->email ?? '-' }}</td>
                                 <td>{{ $supplier->address ?? '-' }}</td>
                                 <td>{{ $supplier->creator->name ?? '-' }}</td>
-                                <td>{{ $supplier->created_at ?? '-' }}</td>
+                                <td>{{ date('d-m-Y', strtotime($supplier->created_at)) ?? '-' }}</td>
                                 <td>{{ $supplier->status ?? '-' }}</td>
                                 <td>
                                     @can('supplier-edit')

@@ -5,16 +5,6 @@
 @section('content')
     <div class="p-5">
         <div class="row mt-3">
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
             <!-- LEFT SIDE -->
             <div class="col-lg-9">
                 <div class="card shadow-sm border-0">
@@ -284,7 +274,8 @@
                 {{-- Action Buttons --}}
                 <div class="d-grid gap-2">
                     @if ($receipt->payment_status != 'Paid')
-                        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                        <button class="btn btn-primary btn-lg" data-bs-toggle="modal"
+                            data-bs-target="#expensePaymentModal">
                             <i class="fa fa-money-bill-wave me-2"></i>
                             Bill Pay
                         </button>
@@ -350,49 +341,96 @@
         </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('receipt.payment.store', $receipt->id) }}" method="POST">
+    <!-- Expense Payment Modal -->
+    <div class="modal fade" id="expensePaymentModal" tabindex="-1" aria-labelledby="expensePaymentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('expense.payment.store', $receipt->id) }}" method="POST"
+                    id="expensePaymentForm">
                     @csrf
-                    <div class="modal-header">
-                        <h4 class="modal-title">Bill Payment</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <!-- HEADER -->
+                    <div class="modal-header text-white">
+                        <div>
+                            <h4 class="modal-title mb-1" id="expensePaymentModalLabel">
+                                <i class="fa fa-money-bill-wave me-2"></i>
+                                Expense Payment
+                            </h4>
+                            <small class="opacity-75">
+                                Payment against Receipt
+                                <strong>
+                                    {{ $receipt->receipt_no }}
+                                </strong>
+                            </small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>ITEMS</th>
-                                    <th class="text-end">AMOUNT (TK)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Total Due Amount</td>
-                                    <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->total_amount, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Current Paid Amount</td>
-                                    <td class="text-end text-primary fw-bold">
-                                        {{ number_format($receipt->paid_amount, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Remaining Due</td>
-                                    <td id="remaining_due" class="text-end text-danger fw-bold">
-                                        {{ number_format($receipt->due_amount, 2) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- BODY -->
+                    <div class="modal-body p-4">
+                        <!-- PAYMENT SUMMARY -->
+                        <div class="row g-3 mb-4">
+                            <!-- TOTAL -->
+                            <div class="col-md-4">
+                                <div class="card border-0 h-100">
+                                    <div class="card-body">
+                                        <small class="text-muted">
+                                            Total Expense
+                                        </small>
+                                        <h4 class="fw-bold text-dark mb-0">
+                                            {{ number_format($receipt->total_amount, 2) }}
+                                            <small class="fs-6">
+                                                TK
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- PAID -->
+                            <div class="col-md-4">
+                                <div class="card border-0 h-100">
+                                    <div class="card-body">
+                                        <small class="text-success">
+                                            Already Paid
+                                        </small>
+                                        <h4 class="fw-bold text-success mb-0">
+                                            {{ number_format($receipt->paid_amount, 2) }}
+                                            <small class="fs-6">
+                                                TK
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- DUE -->
+                            <div class="col-md-4">
+                                <div class="card border-0 h-100">
+                                    <div class="card-body">
+                                        <small class="text-danger">
+                                            Remaining Due
+                                        </small>
+                                        <h4 class="fw-bold text-danger mb-0" id="expense_remaining_due">
+                                            {{ number_format($receipt->due_amount, 2) }}
+                                            <small class="fs-6">
+                                                TK
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- PAYMENT TYPE -->
                         <div class="mb-3">
-                            <label>
+                            <label class="form-label fw-semibold">
                                 Payment Type
-                                <span class="text-danger">*</span>
+                                <span class="text-danger">
+                                    *
+                                </span>
                             </label>
-                            <select id="payment_type_id" name="payment_type_id" class="form-select select2" required>
-                                <option value="">Select Type</option>
+                            <select id="expense_payment_type_id" name="payment_type_id" class="form-select select2"
+                                required>
+                                <option value="">
+                                    Select Payment Type
+                                </option>
                                 @foreach ($paymentTypes as $type)
                                     <option value="{{ $type->id }}">
                                         {{ $type->name }}
@@ -400,31 +438,242 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label>
-                                Paid Amount
-                                <span class="text-danger">*</span>
+                        <!-- ACCOUNT -->
+                        <div class="mb-3" id="expense_account_wrapper">
+                            <label class="form-label fw-semibold">
+                                Payment Account
                             </label>
-                            <input type="number" step="0.01" min="1" max="{{ $receipt->due_amount }}"
-                                id="paid_amount" name="amount" class="form-control" value="{{ $receipt->due_amount }}"
-                                required>
+
+                            <select id="expense_account_id" name="account_id" class="form-select select2">
+                                <option value="">Select Account</option>
+                            </select>
+
+                            <div id="expense_account_balance" class="mt-2">
+                                <span class="text-muted">
+                                    Select an account to see available balance.
+                                </span>
+                            </div>
                         </div>
+
+                        <!-- AMOUNT -->
                         <div class="mb-3">
-                            <label>Payment Date</label>
+                            <label class="form-label fw-semibold">
+                                Payment Amount
+                                <span class="text-danger">
+                                    *
+                                </span>
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    TK
+                                </span>
+                                <input type="number" name="amount" id="expense_paid_amount"
+                                    class="form-control fw-bold" step="0.01" min="0.01"
+                                    max="{{ $receipt->due_amount }}" value="{{ $receipt->due_amount }}" required>
+                            </div>
+                            <small class="text-muted">
+                                Maximum payment:
+                                <strong>
+                                    {{ number_format($receipt->due_amount, 2) }} TK
+                                </strong>
+                            </small>
+                        </div>
+                        <!-- DATE -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Payment Date
+                                <span class="text-danger">
+                                    *
+                                </span>
+                            </label>
                             <input type="date" name="payment_date" class="form-control" value="{{ date('Y-m-d') }}"
                                 required>
                         </div>
+                        <!-- NOTE -->
                         <div class="mb-3">
-                            <label>Payment Note</label>
-                            <textarea name="note" rows="4" class="form-control" placeholder="Write a note..."></textarea>
+                            <label class="form-label fw-semibold">
+                                Payment Note
+                            </label>
+                            <textarea name="note" rows="3" class="form-control" placeholder="Write payment note..."></textarea>
+                        </div>
+                        <!-- WARNING -->
+                        <div id="expense_payment_warning" class="alert alert-warning d-none mb-0">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            <span></span>
                         </div>
                     </div>
+                    <!-- FOOTER -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" id="expensePaymentSubmit" class="btn btn-danger px-4">
+                            <i class="fa fa-check-circle me-2"></i>
+                            Confirm Payment
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $('#expense_payment_type_id').on('change', function() {
+
+                let paymentTypeId = $(this).val();
+
+                let accountWrapper = $('#expense_account_wrapper');
+                let accountSelect = $('#expense_account_id');
+                let balanceBox = $('#expense_account_balance');
+
+                // Reset
+                accountSelect.empty().append(
+                    '<option value="">Select Account</option>'
+                );
+
+                accountSelect.val('').trigger('change');
+
+                balanceBox.html(`
+            <span class="text-muted">
+                Select an account to see available balance.
+            </span>
+        `);
+
+                // No payment type selected
+                if (!paymentTypeId) {
+
+                    accountWrapper.hide();
+
+                    accountSelect.prop('disabled', true);
+                    accountSelect.prop('required', false);
+
+                    return;
+                }
+
+                // Show Account
+                accountWrapper.show();
+
+                accountSelect.prop('disabled', false);
+                // accountSelect.prop('required', true);
+
+                // Loading
+                accountSelect.empty().append(
+                    '<option value="">Loading accounts...</option>'
+                );
+
+                $.ajax({
+
+                    url: "{{ url('/admin/expense/payment/accounts') }}/" + paymentTypeId,
+
+                    type: "GET",
+
+                    success: function(accounts) {
+
+                        accountSelect.empty();
+
+                        if (accounts.length === 0) {
+
+                            accountSelect.append(
+                                '<option value="">No account available</option>'
+                            );
+
+                            balanceBox.html(`
+                        <div class="alert alert-warning py-2 mb-0">
+                            <i class="fa fa-exclamation-triangle me-1"></i>
+                            No active account found for this payment type.
+                        </div>
+                    `);
+
+                            return;
+                        }
+
+                        accountSelect.append(
+                            '<option value="">Select Account</option>'
+                        );
+
+                        $.each(accounts, function(index, account) {
+
+                            let defaultText =
+                                account.default_status === 'Default' ?
+                                ' - Default' :
+                                '';
+
+                            accountSelect.append(`
+                        <option
+                            value="${account.id}"
+                            data-balance="${account.current_balance}"
+                            data-account-name="${account.account_name}"
+                            data-account-number="${account.account_number}">
+                            
+                            ${account.account_name}
+                            (${account.account_number})
+                            ${defaultText}
+
+                        </option>
+                    `);
+
+                        });
+
+                        // Select2 refresh
+                        accountSelect.trigger('change.select2');
+                    },
+
+                    error: function() {
+
+                        accountSelect.empty().append(
+                            '<option value="">Failed to load accounts</option>'
+                        );
+
+                        balanceBox.html(`
+                    <div class="alert alert-danger py-2 mb-0">
+                        <i class="fa fa-times-circle me-1"></i>
+                        Failed to load payment accounts.
+                    </div>
+                `);
+
+                    }
+
+                });
+
+            });
+
+
+            // Account Change
+            $('#expense_account_id').on('change', function() {
+
+                let option = $(this).find(':selected');
+
+                let balance = parseFloat(
+                    option.data('balance') || 0
+                );
+
+                if (!$(this).val()) {
+
+                    $('#expense_account_balance').html(`
+                <span class="text-muted">
+                    Select an account to see available balance.
+                </span>
+            `);
+
+                    return;
+                }
+
+                $('#expense_account_balance').html(`
+            <div class="alert alert-info py-2 mb-0">
+                <i class="fa fa-wallet me-1"></i>
+                Available Balance:
+                <strong>
+                    ${balance.toFixed(2)} TK
+                </strong>
+            </div>
+        `);
+
+            });
+
+        });
+    </script>
+@endpush

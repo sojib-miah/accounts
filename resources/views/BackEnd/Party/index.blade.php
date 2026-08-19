@@ -38,8 +38,8 @@
                                 <tr>
                                     <th width="60">SN</th>
                                     <th>Customer ID</th>
-                                    <th>Customer Name</th>
                                     <th>Company Name</th>
+                                    <th>Customer Name</th>
                                     <th>Designation</th>
                                     <th>Phone</th>
                                     <th>E-mail</th>
@@ -54,13 +54,13 @@
                                 @forelse($parties as $party)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $party->party_id }}</td>
+                                        <td>{{ $party->party_id ?? '-' }}</td>
                                         <td>
                                             <a href="{{ route('party.profile', $party->id) }}">
-                                                {{ $party->name }}
+                                                {{ $party->customerCompany->name ?? '-' }}
                                             </a>
                                         </td>
-                                        <td>{{ $party->customerCompany->name ?? '-' }}</td>
+                                        <td>{{ $party->name ?? '-' }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
