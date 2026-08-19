@@ -89,23 +89,23 @@
                                         <td class="text-center">
                                             <a href="{{ route('receipt.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
-                                                {{ $receipt->receipt_no }}
+                                                {{ $receipt->receipt_no ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('party.profile', $receipt->party_id) }}"
                                                 class="text-decoration-none">
-                                                {{ $receipt->party->customerCompany->name }}
+                                                {{ $receipt->party->customerCompany->name ?? '-' }}
                                             </a>
                                         </td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->category->name }}
+                                                {{ $item->category->name ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">
                                             @foreach ($receipt->items as $item)
-                                                {{ $item->accountHead->name }}
+                                                {{ $item->accountHead->name ?? '-' }}
                                             @endforeach
                                         </td>
                                         <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>

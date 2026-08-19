@@ -9,7 +9,7 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="text-center py-4">
-                            <img src="{{ asset('uploads/user.jpg') }}" class="rounded-circle border border-3 border-primary"
+                            <img src="{{ asset('uploads/user.jpg') }}" class="rounded-circle border border-primary"
                                 style="width:100px;height:100px;object-fit:cover;">
                             <h4 class="mt-3 mb-0">
                                 {{ $party->customerCompany->name }}
