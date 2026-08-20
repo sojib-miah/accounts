@@ -9,11 +9,37 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierCompanyCustomer extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $customerCompanies = CustomerCompany::where('status', 'Supplier')->latest()->get();
-        return view('BackEnd.SupplierCustomer.index', compact('customerCompanies'));
+
+        $customerCompanies = CustomerCompany::query()
+            ->where('status', 'Supplier')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
+                });
+            })
+
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view(
+            'BackEnd.SupplierCustomer.index',
+            compact('customerCompanies')
+        );
     }
 
     public function store(Request $request)

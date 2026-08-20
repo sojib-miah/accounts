@@ -16,10 +16,6 @@
                         <i class="fa fa-edit me-2"></i>
                         Edit
                     </a>
-                    <button onclick="window.print()" class="btn btn-primary">
-                        <i class="fa-solid fa-print me-2"></i>
-                        Print
-                    </button>
                 </div>
             </div>
             <div class="card-body">

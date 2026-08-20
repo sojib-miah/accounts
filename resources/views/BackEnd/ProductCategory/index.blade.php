@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card">
+        <div class="card mt-3">
             <div class="card-header d-flex justify-content-between">
                 <h4>Product Category</h4>
                 <div>

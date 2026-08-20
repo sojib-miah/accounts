@@ -18,9 +18,9 @@ class UserSeeder extends Seeder
         ]);
 
         // create role if not exists
-        Role::firstOrCreate(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'super-admin']);
 
         // assign role
-        $admin->assignRole('admin');
+        $admin->assignRole('super-admin');
     }
 }

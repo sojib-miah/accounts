@@ -2,155 +2,90 @@
 
 @section('content')
     <div class="p-5">
-
-        {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-3">
-
-            <div>
-                <h4 class="mb-0">
-                    Supplier Company
-                </h4>
-
-                <small class="text-muted">
-                    Manage Supplier companies
-                </small>
-            </div>
-
-            <button type="button" class="btn btn-primary" id="addCustomerCompany">
-
-                <i class="fa fa-plus me-1"></i>
-                Add Supplier Company
-
-            </button>
-
-        </div>
-
-
-        {{-- TABLE --}}
-        <div class="card">
-
-            <div class="card-body">
-
-                <div class="table-responsive">
-
-                    <table class="table table-bordered table-hover align-middle" id="customerCompanyTable">
-
-                        <thead>
-
-                            <tr>
-
-                                <th width="60">
-                                    SL
-                                </th>
-
-                                <th>
-                                    Company Name
-                                </th>
-
-                                <th>
-                                    Email
-                                </th>
-
-                                <th>
-                                    Phone
-                                </th>
-
-                                <th>
-                                    Address
-                                </th>
-
-                                <th width="100">
-                                    Status
-                                </th>
-
-                                <th width="130">
-                                    Action
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            @forelse($customerCompanies as $key => $company)
-                                <tr id="row-{{ $company->id }}">
-
-                                    <td>
-                                        {{ $key + 1 }}
-                                    </td>
-
-                                    <td>
-                                        <strong>
-                                            {{ $company->name }}
-                                        </strong>
-                                    </td>
-
-                                    <td>
-                                        {{ $company->email ?: '-' }}
-                                    </td>
-
-                                    <td>
-                                        {{ $company->phone ?: '-' }}
-                                    </td>
-
-                                    <td>
-                                        {{ $company->address ?: '-' }}
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-success">
-                                            {{ $company->status ?: '-' }}
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button type="button" class="btn btn-sm btn-info editCompany"
-                                            data-id="{{ $company->id }}">
-
-                                            <i class="fa fa-edit"></i>
-
-                                        </button>
-
-
-                                        <button type="button" class="btn btn-sm btn-danger deleteCompany"
-                                            data-id="{{ $company->id }}" data-name="{{ $company->name }}">
-
-                                            <i class="fa fa-trash"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            @empty
-
-                                <tr>
-
-                                    <td colspan="7" class="text-center text-muted py-4">
-                                        No Supplier Company Found
-                                    </td>
-
-                                </tr>
-                            @endforelse
-
-                        </tbody>
-
-                    </table>
-
+        <div class="mt-3">
+            {{-- HEADER --}}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="mb-0">Supplier Company</h4>
+                    <small class="text-muted">Manage Supplier companies</small>
                 </div>
-
+                <div class="d-flex gap-3 align-items-center">
+                    <form action="{{ route('supplier.index') }}" method="GET" class="d-flex gap-2">
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search supplier...">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search me-1"></i>
+                            Search
+                        </button>
+                        <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
+                            <i class="fa fa-refresh me-1"></i>
+                            Reset
+                        </a>
+                    </form>
+                    <button type="button" class="btn btn-primary" id="addCustomerCompany">
+                        <i class="fa fa-plus me-1"></i>
+                        Add Supplier Company
+                    </button>
+                </div>
             </div>
-
+            {{-- TABLE --}}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle" id="customerCompanyTable">
+                            <thead>
+                                <tr>
+                                    <th width="60">SN</th>
+                                    <th>Company Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th width="100">Status</th>
+                                    <th width="130">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($customerCompanies as $key => $company)
+                                    <tr id="row-{{ $company->id }}">
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>
+                                            <strong>{{ $company->name }}</strong>
+                                        </td>
+                                        <td>{{ $company->email ?: '-' }}</td>
+                                        <td>{{ $company->phone ?: '-' }}</td>
+                                        <td>{{ $company->address ?: '-' }}</td>
+                                        <td>
+                                            <span class="badge bg-success">{{ $company->status ?: '-' }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-info editCompany"
+                                                data-id="{{ $company->id }}">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger deleteCompany"
+                                                data-id="{{ $company->id }}" data-name="{{ $company->name }}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            No Supplier Company Found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        <div class="mt-3">
+                            {{ $customerCompanies->links() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
-
-
     {{-- ADD / EDIT MODAL --}}
-
     <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">

@@ -103,4 +103,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(CompanyPackage::class);
     }
+
+    public function package()
+    {
+        return $this->hasOne(CompanyPackage::class)
+            ->latestOfMany();
+    }
 }

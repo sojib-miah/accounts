@@ -19,27 +19,26 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {{-- Product --}}
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-2 mb-3">
                         <label class="fw-bold">Product</label>
                         <input class="form-control" readonly value="{{ $product->name }}">
                     </div>
-                    {{-- SKU --}}
+                    <div class="col-md-2 mb-3">
+                        <label class="fw-bold">Description</label>
+                        <input class="form-control" readonly value="{{ $product->description }}">
+                    </div>
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">SKU</label>
                         <input class="form-control" readonly value="{{ $product->sku ?? '-' }}">
                     </div>
-                    {{-- Category --}}
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">Category</label>
                         <input class="form-control" readonly value="{{ $product->category->name ?? '-' }}">
                     </div>
-                    {{-- Brand --}}
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">Brand</label>
                         <input class="form-control" readonly value="{{ $product->brand->name ?? '-' }}">
                     </div>
-                    {{-- Unit --}}
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">Unit</label>
                         <input class="form-control" readonly value="{{ $product->unit ?? '-' }}">
@@ -112,6 +111,7 @@
                                 <th width="60">SN</th>
                                 <th>PO No</th>
                                 <th>Receive Date</th>
+                                <th>Supplier Company</th>
                                 <th>Supplier</th>
                                 <th class="text-end">Qty</th>
                                 <th class="text-end">Stock</th>
@@ -132,6 +132,7 @@
                                             -
                                         @endif
                                     </td>
+                                    <td>{{ $item->receipt->customerCompany->name ?? '-' }}</td>
                                     <td>{{ $item->receipt->supplier->name ?? '-' }}</td>
                                     <td class="text-end">{{ number_format($item->qty) }}</td>
                                     <td class="text-end">{{ number_format($item->product->current_stock) }}</td>

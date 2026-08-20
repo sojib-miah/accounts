@@ -167,6 +167,13 @@ class PermissionSeeder extends Seeder
             'inventory-list',
             'inventory-lowstock-list',
             'inventory-report-list',
+            'brand-list',
+            'supplier-company-list',
+            'make-payment-list',
+            'menu-warehouse-list',
+            'warehouse-list',
+            'receiver-company-list',
+            'payee-company-list',
         ];
 
         foreach ($permissions as $permission) {

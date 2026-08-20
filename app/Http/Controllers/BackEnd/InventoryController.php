@@ -76,7 +76,7 @@ class InventoryController extends Controller
     {
         $user = auth()->user();
         $product->load(['category', 'brand',]);
-        $query = ReceiptItem::with(['receipt.supplier', 'receipt.branch', 'serialNumbers',])
+        $query = ReceiptItem::with(['receipt.supplier', 'receipt.customerCompany', 'receipt.branch', 'serialNumbers',])
             ->where('product_id', $product->id)
             ->whereHas('receipt', function ($q) use ($user) {
                 $q->where('type', 'Purchase-Order')

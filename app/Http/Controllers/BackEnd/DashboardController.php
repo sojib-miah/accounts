@@ -21,10 +21,12 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        $isSuperAdmin = $user->hasRole('Super-Admin');
         $receiptQuery = Receipt::query();
 
-        if (!$user->hasRole('Super-Admin')) {
-            $receiptQuery->where('company_id', $user->company_id);
+        if (!$isSuperAdmin) {
+            $receiptQuery->where('created_by', $user->id);
         }
 
         $today = Carbon::today();
@@ -91,45 +93,50 @@ class DashboardController extends Controller
         $accountQuery = Account::query()
             ->where('status', 'Active');
 
-        if (!$user->hasRole('Super-Admin')) {
-            $accountQuery->where('company_id', $user->company_id);
+        if (!$isSuperAdmin) {
+            $accountQuery->where('created_by', $user->id);
         }
 
         $currentBalance = (float) $accountQuery
             ->sum('current_balance');
 
+        $totalAccount = (clone $accountQuery)->count();
+
         $partyQuery = Party::query();
 
-        if (!$user->hasRole('Super-Admin')) {
-            $partyQuery->where('company_id', $user->company_id);
+        if (!$isSuperAdmin) {
+            $partyQuery->where('created_by', $user->id);
         }
 
         $totalCustomer = (clone $partyQuery)
-            ->whereIn('type', ['Income', 'Both'])
+            ->whereIn('type', [
+                'Customer',
+                'Both'
+            ])
             ->count();
 
         $totalSupplier = (clone $partyQuery)
-            ->whereIn('type', ['Expense', 'Both'])
+            ->whereIn('type', [
+                'Supplier',
+                'Both'
+            ])
             ->count();
 
-        $totalBranch = Branch::query();
+        $branchQuery = Branch::query();
 
-        if (!$user->hasRole('Super-Admin')) {
-            $totalBranch->where('company_id', $user->company_id);
+        if (!$isSuperAdmin) {
+            $branchQuery->where('created_by', $user->id);
         }
 
-        $totalBranch = $totalBranch->count();
-
-        $totalAccount = (clone $accountQuery)->count();
+        $totalBranch = $branchQuery->count();
 
         $totalReceipt = (clone $receiptQuery)->count();
 
         $paymentQuery = ReceiptPayment::query();
 
-        if (!$user->hasRole('Super-Admin')) {
-            $paymentQuery->whereHas('receipt', function ($query) use ($user) {
-                $query->where('company_id', $user->company_id);
-            });
+        if (!$isSuperAdmin) {
+
+            $paymentQuery->where('created_by', $user->id);
         }
 
         $totalPayment = $paymentQuery->count();
@@ -169,6 +176,7 @@ class DashboardController extends Controller
             ])
             ->sum('total_amount');
 
+
         if ($previousMonthIncome > 0) {
 
             $incomeGrowth =
@@ -185,6 +193,7 @@ class DashboardController extends Controller
                 $previousMonthEnd
             ])
             ->sum('total_amount');
+
 
         if ($previousMonthExpense > 0) {
 
@@ -205,6 +214,7 @@ class DashboardController extends Controller
             ->groupBy('party_id')
             ->orderByDesc('total')
             ->limit(10);
+
 
         $topCustomers = $topCustomersQuery
             ->with('party:id,name')
@@ -227,6 +237,7 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->limit(10);
 
+
         $topSuppliers = $topSuppliersQuery
             ->with('party:id,name')
             ->get()
@@ -237,19 +248,16 @@ class DashboardController extends Controller
                     'total' => (float) $item->total,
                 ];
             });
-
         $topIncomeReceipts = (clone $salesQuery)
             ->with('party:id,name')
             ->orderByDesc('total_amount')
             ->limit(10)
             ->get();
-
         $topExpenseReceipts = (clone $expenseQuery)
             ->with('party:id,name')
             ->orderByDesc('total_amount')
             ->limit(10)
             ->get();
-
         $recentReceipts = (clone $receiptQuery)
             ->with('party:id,name')
             ->whereIn('type', [
@@ -259,94 +267,94 @@ class DashboardController extends Controller
             ->latest('id')
             ->limit(10)
             ->get();
-
         $recentPayments = ReceiptPayment::query()
             ->with([
                 'receipt:id,receipt_no,company_id',
                 'paymentType:id,name'
             ])
             ->when(
-                !$user->hasRole('Super-Admin'),
+                !$isSuperAdmin,
                 function ($query) use ($user) {
-                    $query->whereHas('receipt', function ($q) use ($user) {
-                        $q->where('company_id', $user->company_id);
-                    });
+
+                    $query->where('created_by', $user->id);
                 }
             )
             ->latest('id')
             ->limit(10)
             ->get();
-
         $recentTransactions = AccountTransaction::query()
             ->with('account:id,account_name')
             ->when(
-                !$user->hasRole('Super-Admin'),
+                !$isSuperAdmin,
                 function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
+
+                    $query->where('created_by', $user->id);
                 }
             )
             ->latest('id')
             ->limit(10)
             ->get();
-
         $package = null;
 
         if (method_exists($user, 'package')) {
+
             $package = $user->package()
                 ->with('package')
                 ->latest()
                 ->first();
         }
+        return view(
+            'BackEnd.Dashboard.dashboard',
+            compact(
 
-        return view('BackEnd.Dashboard.dashboard', compact(
+                'package',
 
-            'package',
+                // Today
+                'todayIncome',
+                'todayExpense',
+                'todayProfit',
 
-            // Today
-            'todayIncome',
-            'todayExpense',
-            'todayProfit',
+                // Month
+                'monthIncome',
+                'monthExpense',
 
-            // Month
-            'monthIncome',
-            'monthExpense',
+                // Total
+                'totalIncome',
+                'totalExpense',
+                'grossProfit',
 
-            // Total
-            'totalIncome',
-            'totalExpense',
-            'grossProfit',
+                // Balance
+                'currentBalance',
+                'totalReceivable',
+                'totalPayable',
 
-            // Balance
-            'currentBalance',
-            'totalReceivable',
-            'totalPayable',
+                // Counts
+                'totalCustomer',
+                'totalSupplier',
+                'totalBranch',
+                'totalAccount',
+                'totalReceipt',
+                'totalPayment',
 
-            // Counts
-            'totalCustomer',
-            'totalSupplier',
-            'totalBranch',
-            'totalAccount',
-            'totalReceipt',
-            'totalPayment',
+                // Summary
+                'paymentSummary',
+                'receiptSummary',
 
-            // Summary
-            'paymentSummary',
-            'receiptSummary',
+                // Growth
+                'incomeGrowth',
+                'expenseGrowth',
 
-            // Growth
-            'incomeGrowth',
-            'expenseGrowth',
+                // Top
+                'topCustomers',
+                'topSuppliers',
+                'topIncomeReceipts',
+                'topExpenseReceipts',
 
-            // Top
-            'topCustomers',
-            'topSuppliers',
-            'topIncomeReceipts',
-            'topExpenseReceipts',
-
-            // Recent
-            'recentReceipts',
-            'recentPayments',
-            'recentTransactions'
-        ));
+                // Recent
+                'recentReceipts',
+                'recentPayments',
+                'recentTransactions'
+            )
+        );
     }
 }

@@ -70,6 +70,7 @@
                                 <th width="50">SL</th>
                                 <th>Product Code</th>
                                 <th>Product</th>
+                                <th>Description</th>
                                 <th>Part No</th>
                                 <th>Serial Number</th>
                                 <th width="100">Unit</th>
@@ -96,6 +97,7 @@
                                     <td>{{ $item->product->product_code ?? ($item->product->sku ?? '-') }}</td>
                                     {{-- Product --}}
                                     <td><strong>{{ $item->product->name }}</strong></td>
+                                    <td><strong>{{ $item->product->description }}</strong></td>
                                     {{-- part no --}}
                                     <td>
                                         <div>
@@ -130,36 +132,32 @@
                                             @endif
                                         </button>
                                     </td>
-                                    {{-- Unit --}}
                                     <td>{{ $item->product->unit }}</td>
-                                    {{-- Qty --}}
                                     <td class="text-end">{{ number_format($item->qty) }}</td>
-                                    {{-- Rate --}}
                                     <td class="text-end">{{ number_format($item->rate, 2) }}</td>
-                                    {{-- Amount --}}
                                     <td class="text-end">{{ number_format($item->amount, 2) }}</td>
                                 </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center text-danger">No Product Found.</td>
+                                        <td colspan="10" class="text-center text-danger">No Product Found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" class="text-end">Total</th>
+                                    <th colspan="7" class="text-end">Total</th>
                                     <th class="text-end">{{ number_format($totalQty) }}</th>
                                     <th></th>
                                     <th class="text-end">{{ number_format($totalAmount, 2) }}</th>
                                     <th></th>
                                 </tr>
                                 <tr>
-                                    <th colspan="8" class="text-end">Discount</th>
+                                    <th colspan="9" class="text-end">Discount</th>
                                     <th class="text-end">{{ number_format($receipt->discount ?? 0, 2) }}</th>
                                     <th></th>
                                 </tr>
                                 <tr>
-                                    <th colspan="8" class="text-end">
+                                    <th colspan="9" class="text-end">
                                         VAT
                                         ({{ $receipt->vat ?? 0 }}%)
                                     </th>
@@ -169,7 +167,7 @@
                                     <th></th>
                                 </tr>
                                 <tr>
-                                    <th colspan="8" class="text-end">Grand Total</th>
+                                    <th colspan="9" class="text-end">Grand Total</th>
                                     <th class="text-end">
                                         {{ number_format($receipt->total_amount ?? 0, 2) }}
                                     </th>

@@ -7,24 +7,44 @@
         <div class="d-flex justify-content-end align-items-center mt-3">
             <div class="card shadow-sm">
                 <div class="card-body" style="padding: 10px;">
+
                     <p class="text-primary mb-0">
                         <strong>Package:</strong>
                         {{ $package?->package?->name ?? 'No Package' }}
                     </p>
+
                     <p class="mb-0">
                         <strong>Start:</strong>
-                        {{ $package?->start_date?->format('d M Y') }}
+                        {{ $package?->start_date?->format('d M Y') ?? '-' }}
                     </p>
+
                     <p class="mb-0">
                         <strong>Expire:</strong>
-                        {{ $package?->package?->end_date?->format('d M Y') }}
+                        {{ $package?->expire_date?->format('d M Y') ?? '-' }}
                     </p>
+
                     <p class="mb-0">
                         <strong>Status:</strong>
-                        <span class="badge bg-success">
-                            {{ $package?->status ?? 'Inactive' }}
-                        </span>
+
+                        @if ($package?->status === 'Active')
+                            <span class="badge bg-success">
+                                Active
+                            </span>
+                        @elseif ($package?->status === 'Expired')
+                            <span class="badge bg-danger">
+                                Expired
+                            </span>
+                        @elseif ($package?->status === 'Cancelled')
+                            <span class="badge bg-secondary">
+                                Cancelled
+                            </span>
+                        @else
+                            <span class="badge bg-warning text-dark">
+                                Inactive
+                            </span>
+                        @endif
                     </p>
+
                 </div>
             </div>
         </div>

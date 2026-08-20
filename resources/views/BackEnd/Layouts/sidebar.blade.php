@@ -100,11 +100,13 @@
                             </a>
                         </li>
                     @endcan
-                    <li class="menu-item {{ request()->routeIs('brand.index') ? 'active' : '' }}">
-                        <a href="{{ route('brand.index') }}" class="menu-link">
-                            Brand List
-                        </a>
-                    </li>
+                    @can('brand-list')
+                        <li class="menu-item {{ request()->routeIs('brand.index') ? 'active' : '' }}">
+                            <a href="{{ route('brand.index') }}" class="menu-link">
+                                Brand List
+                            </a>
+                        </li>
+                    @endcan
                     @can('product-list')
                         <li class="menu-item {{ request()->routeIs('product.index') ? 'active' : '' }}">
                             <a href="{{ route('product.index') }}" class="menu-link">
@@ -125,11 +127,13 @@
                     Purchase
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
-                        <a href="{{ route('supplier-company.index') }}" class="menu-link">
-                            Supplier Company
-                        </a>
-                    </li>
+                    @can('supplier-company-list')
+                        <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
+                            <a href="{{ route('supplier-company.index') }}" class="menu-link">
+                                Supplier Company
+                            </a>
+                        </li>
+                    @endcan
                     @can('supplier-list')
                         <li class="menu-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
                             <a href="{{ route('supplier.index') }}" class="menu-link">
@@ -144,29 +148,35 @@
                             </a>
                         </li>
                     @endcan
-                    <li class="menu-item {{ request()->routeIs('purchase.payment.index') ? 'active' : '' }}">
-                        <a href="{{ route('purchase.payment.index') }}" class="menu-link">
-                            Make Payment
-                        </a>
-                    </li>
+                    @can('make-payment-list')
+                        <li class="menu-item {{ request()->routeIs('purchase.payment.index') ? 'active' : '' }}">
+                            <a href="{{ route('purchase.payment.index') }}" class="menu-link">
+                                Make Payment
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
             </li>
         @endcan
 
         <!-- warehouse -->
-        <li class="menu-item {{ request()->routeIs('warehouse.*') ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="fa fa-warehouse me-3"></i>
-                Warehouse
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ request()->routeIs('warehouse.index') ? 'active' : '' }}">
-                    <a href="{{ route('warehouse.index') }}" class="menu-link">
-                        Warehouse List
-                    </a>
-                </li>
-            </ul>
-        </li>
+        @can('menu-warehouse-list')
+            <li class="menu-item {{ request()->routeIs('warehouse.*') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="fa fa-warehouse me-3"></i>
+                    Warehouse
+                </a>
+                <ul class="menu-sub">
+                    @can('warehouse-list')
+                        <li class="menu-item {{ request()->routeIs('warehouse.index') ? 'active' : '' }}">
+                            <a href="{{ route('warehouse.index') }}" class="menu-link">
+                                Warehouse List
+                            </a>
+                        </li>
+                    @endcan
+                </ul>
+            </li>
+        @endcan
 
         <!-- inventory -->
         @can('menu-inventory-list')
@@ -210,11 +220,13 @@
                     Sales
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->routeIs('customer-company.index') ? 'active' : '' }}">
-                        <a href="{{ route('customer-company.index') }}" class="menu-link">
-                            Customer Company
-                        </a>
-                    </li>
+                    @can('receiver-company-list')
+                        <li class="menu-item {{ request()->routeIs('customer-company.index') ? 'active' : '' }}">
+                            <a href="{{ route('customer-company.index') }}" class="menu-link">
+                                Customer Company
+                            </a>
+                        </li>
+                    @endcan
                     @can('receiver-list-list')
                         <li class="menu-item {{ request()->routeIs('receiver.index') ? 'active' : '' }}">
                             <a href="{{ route('receiver.index') }}" class="menu-link">
@@ -277,11 +289,13 @@
                     Expense
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item {{ request()->routeIs('customer-expense.index') ? 'active' : '' }}">
-                        <a href="{{ route('customer-expense.index') }}" class="menu-link">
-                            Customer Company
-                        </a>
-                    </li>
+                    @can('payee-company-list')
+                        <li class="menu-item {{ request()->routeIs('customer-expense.index') ? 'active' : '' }}">
+                            <a href="{{ route('customer-expense.index') }}" class="menu-link">
+                                Customer Company
+                            </a>
+                        </li>
+                    @endcan
                     @can('payee-list-list')
                         <li class="menu-item {{ request()->routeIs('party.index') ? 'active' : '' }}">
                             <a href="{{ route('party.index') }}" class="menu-link">
