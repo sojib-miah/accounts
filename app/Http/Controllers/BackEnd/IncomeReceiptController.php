@@ -442,32 +442,31 @@ class IncomeReceiptController extends Controller
         $request->validate([
             'payment_type_id' => [
                 'required',
-                'exists:payment_types,id'
+                'exists:payment_types,id',
             ],
 
             'account_id' => [
-                'nullable',
-                'exists:accounts,id'
+                'required',
+                'exists:accounts,id',
             ],
 
             'amount' => [
                 'required',
                 'numeric',
-                'gt:0'
+                'gt:0',
             ],
 
             'payment_date' => [
                 'required',
-                'date'
+                'date',
             ],
 
             'note' => [
                 'nullable',
                 'string',
-                'max:1000'
+                'max:1000',
             ],
         ]);
-
 
         DB::beginTransaction();
 
@@ -483,13 +482,13 @@ class IncomeReceiptController extends Controller
                     'Payment is only allowed for Sales Order.'
                 );
             }
+
             if ($receipt->status !== 'Completed') {
 
                 throw new \Exception(
                     'Payment can only be made for a completed receipt.'
                 );
             }
-
 
             if ($receipt->payment_status === 'Paid') {
 
@@ -503,11 +502,24 @@ class IncomeReceiptController extends Controller
                 2
             );
 
+            if ($amount <= 0) {
+
+                throw new \Exception(
+                    'Payment amount must be greater than zero.'
+                );
+            }
+
             $dueAmount = round(
                 (float) $receipt->due_amount,
                 2
             );
 
+            if ($dueAmount <= 0) {
+
+                throw new \Exception(
+                    'This Sales Order has no outstanding due amount.'
+                );
+            }
 
             if ($amount > $dueAmount) {
 
@@ -525,131 +537,129 @@ class IncomeReceiptController extends Controller
                 ->where('status', 'Active')
                 ->first();
 
-
             if (!$paymentType) {
 
                 throw new \Exception(
                     'Selected payment type is inactive or invalid.'
                 );
             }
-            $isCash = strtolower(
-                trim($paymentType->name)
-            ) === 'cash';
 
+            $account = Account::where(
+                'id',
+                $request->account_id
+            )
+                ->where('status', 'Active')
+                ->lockForUpdate()
+                ->first();
 
-            $account = null;
+            if (!$account) {
 
-            if ($isCash) {
-                $account = null;
-            } else {
-                if (!$request->account_id) {
-
-                    throw new \Exception(
-                        'Account is required for ' .
-                            $paymentType->name .
-                            ' payment.'
-                    );
-                }
-
-                $account = Account::where(
-                    'id',
-                    $request->account_id
-                )
-                    ->where('status', 'Active')
-                    ->lockForUpdate()
-                    ->first();
-
-
-                if (!$account) {
-
-                    throw new \Exception(
-                        'Selected account is inactive or invalid.'
-                    );
-                }
-
-                if (
-                    (int) $account->payment_type_id !==
-                    (int) $paymentType->id
-                ) {
-
-                    throw new \Exception(
-                        'Selected account does not belong to the selected payment type.'
-                    );
-                }
-
-                if (
-                    !$user->hasRole('Super-Admin') &&
-                    (int) $account->company_id !==
-                    (int) $user->company_id
-                ) {
-
-                    throw new \Exception(
-                        'You are not allowed to use this account.'
-                    );
-                }
-
-                if (
-                    !$user->hasRole('Super-Admin') &&
-                    (int) $account->branch_id !==
-                    (int) $user->branch_id
-                ) {
-
-                    throw new \Exception(
-                        'You are not allowed to use this account.'
-                    );
-                }
-
-                $currentBalance = round(
-                    (float) $account->current_balance,
-                    2
+                throw new \Exception(
+                    'Selected account is inactive or invalid.'
                 );
-
-                $newBalance =
-                    $currentBalance + $amount;
-
-                $account->update([
-                    'current_balance' => $newBalance,
-                    'updated_by'      => $userId,
-                ]);
-
-                AccountTransaction::create([
-                    'company_id' => $account->company_id,
-                    'account_id' => $account->id,
-                    'transaction_date' => $request->payment_date,
-                    'voucher_no' => $receipt->so_no ?? $receipt->receipt_no,
-                    'transaction_type' => 'Sales-Order',
-                    'purpose' => 'Sales Payment - ' . $receipt->receipt_no,
-                    'credit' => $amount,
-                    'debit' => 0,
-                    'balance' => $newBalance,
-                    'receipt_id' => $receipt->id,
-                    'created_by' => $userId,
-                ]);
             }
 
-            ReceiptPayment::create([
-                'receipt_id' => $receipt->id,
-                'payment_type_id' => $paymentType->id,
-                'account_id' => $account?->id,
-                'payment_date' => $request->payment_date,
-                'amount' => $amount,
-                'note' => $request->note,
-                'created_by' => $userId,
+            if (
+                (int) $account->payment_type_id !==
+                (int) $paymentType->id
+            ) {
+
+                throw new \Exception(
+                    'Selected account does not belong to the selected payment type.'
+                );
+            }
+
+            if (
+                !$user->hasRole('Super-Admin') &&
+                (int) $account->company_id !==
+                (int) $user->company_id
+            ) {
+
+                throw new \Exception(
+                    'You are not allowed to use this account.'
+                );
+            }
+
+            if (
+                !$user->hasRole('Super-Admin') &&
+                (int) $account->branch_id !==
+                (int) $user->branch_id
+            ) {
+
+                throw new \Exception(
+                    'You are not allowed to use this account.'
+                );
+            }
+
+            $currentBalance = round(
+                (float) $account->current_balance,
+                2
+            );
+
+            $newBalance = round(
+                $currentBalance + $amount,
+                2
+            );
+
+            $account->update([
+                'current_balance' => $newBalance,
+                'updated_by'      => $userId,
+            ]);
+            AccountTransaction::create([
+                'company_id'       => $account->company_id,
+                'account_id'       => $account->id,
+                'transaction_date' => $request->payment_date,
+
+                'voucher_no'       =>
+                $receipt->so_no ??
+                    $receipt->receipt_no,
+
+                'transaction_type' => 'Sales-Order',
+
+                'purpose'          =>
+                'Sales Payment - ' .
+                    $receipt->receipt_no,
+
+                'credit'           => $amount,
+
+                'debit'            => 0,
+
+                'balance'          => $newBalance,
+
+                'receipt_id'       => $receipt->id,
+
+                'created_by'       => $userId,
             ]);
 
-            $newPaidAmount = round(
-                (float) $receipt->paid_amount +
-                    $amount,
+            ReceiptPayment::create([
+                'receipt_id'      => $receipt->id,
+                'payment_type_id' => $paymentType->id,
+                'account_id'      => $account->id,
+                'payment_date'    => $request->payment_date,
+                'amount'          => $amount,
+                'note'            => $request->note,
+                'created_by'      => $userId,
+            ]);
+
+            $oldPaidAmount = round(
+                (float) $receipt->paid_amount,
                 2
             );
 
+            $newPaidAmount = round(
+                $oldPaidAmount + $amount,
+                2
+            );
+
+            $totalAmount = round(
+                (float) $receipt->total_amount,
+                2
+            );
 
             $newDueAmount = round(
-                (float) $receipt->total_amount -
-                    $newPaidAmount,
+                $totalAmount - $newPaidAmount,
                 2
             );
-
 
             if ($newDueAmount < 0) {
                 $newDueAmount = 0;
@@ -657,9 +667,9 @@ class IncomeReceiptController extends Controller
 
             if ($newDueAmount <= 0) {
 
-                $paymentStatus = 'Paid';
-
                 $newDueAmount = 0;
+
+                $paymentStatus = 'Paid';
             } elseif ($newPaidAmount > 0) {
 
                 $paymentStatus = 'Partial';
@@ -669,22 +679,13 @@ class IncomeReceiptController extends Controller
             }
 
             $receipt->update([
-
-                'paid_amount' =>
-                $newPaidAmount,
-
-                'due_amount' =>
-                $newDueAmount,
-
-                'payment_status' =>
-                $paymentStatus,
-
-                'updated_by' =>
-                $userId,
+                'paid_amount'    => $newPaidAmount,
+                'due_amount'     => $newDueAmount,
+                'payment_status' => $paymentStatus,
+                'updated_by'     => $userId,
             ]);
 
             DB::commit();
-
 
             return back()->with(
                 'success',

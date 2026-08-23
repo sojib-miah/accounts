@@ -173,4 +173,48 @@ class WarehouseController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
+    public function checkSerial(Request $request)
+    {
+        $request->validate([
+            'serial_no'       => 'required|string',
+            'receipt_item_id' => 'required|exists:receipt_items,id',
+        ]);
+
+        $serial = strtoupper(trim($request->serial_no));
+
+        $exists = SerialNumber::whereRaw(
+            'UPPER(TRIM(serial_no)) = ?',
+            [$serial]
+        )->first();
+
+        // Serial does not exist anywhere in database
+        if (!$exists) {
+            return response()->json([
+                'exists' => false,
+                'allowed' => true,
+            ]);
+        }
+
+        /*
+     * Edit page:
+     * If this serial already belongs to the same receipt item,
+     * allow it.
+     */
+        if ((int) $exists->receipt_item_id === (int) $request->receipt_item_id) {
+            return response()->json([
+                'exists' => true,
+                'allowed' => true,
+                'same_item' => true,
+            ]);
+        }
+
+        // Serial belongs to another receipt/item
+        return response()->json([
+            'exists' => true,
+            'allowed' => false,
+            'same_item' => false,
+            'message' => 'This serial number already exists in the system.',
+        ]);
+    }
 }

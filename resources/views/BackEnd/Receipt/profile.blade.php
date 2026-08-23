@@ -544,7 +544,7 @@
                                     Select Payment Type
                                 </option>
                                 @foreach ($paymentTypes as $type)
-                                    <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}">
+                                    <option value="{{ $type->id }}">
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
@@ -553,10 +553,13 @@
                         <!-- ACCOUNT -->
                         <div class="mb-3" id="party_account_wrapper" style="display:none;">
                             <label class="form-label fw-semibold">
-                                Receive Account
-                                <span class="text-danger">*</span>
+                                Payment Account
+                                <span class="text-danger">
+                                    *
+                                </span>
                             </label>
-                            <select id="party_account_id" name="account_id" class="form-select select2">
+                            <select id="party_account_id" name="account_id" class="form-select select2" disabled
+                                required>
                                 <option value="">
                                     Select Account
                                 </option>
@@ -643,68 +646,46 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            const paymentType =
+                $('#party_payment_type_id');
 
-            const dueAmount = {{ (float) $summary['due'] }};
+            const accountWrapper =
+                $('#party_account_wrapper');
 
-            $('#party_payment_type_id').on('change', function() {
+            const accountSelect =
+                $('#party_account_id');
+
+            const balanceBox =
+                $('#party_account_balance');
+
+            paymentType.on('change', function() {
 
                 let paymentTypeId = $(this).val();
-
-                let selectedOption = $(this).find(':selected');
-
-                let paymentTypeName =
-                    String(selectedOption.data('name') || '').toLowerCase();
-
-                let accountWrapper =
-                    $('#party_account_wrapper');
-
-                let accountSelect =
-                    $('#party_account_id');
-
-                let balanceBox =
-                    $('#party_account_balance');
-
                 accountSelect
                     .empty()
                     .append(
                         '<option value="">Select Account</option>'
-                    );
+                    )
+                    .val('')
+                    .prop('disabled', true)
+                    .prop('required', false)
+                    .trigger('change');
+
 
                 balanceBox.html(`
             <span class="text-muted">
                 Select an account to see available balance.
             </span>
         `);
-
                 if (!paymentTypeId) {
-
                     accountWrapper.hide();
-
-                    accountSelect
-                        .prop('required', false)
-                        .prop('disabled', true);
 
                     return;
                 }
-
-                if (paymentTypeName === 'cash') {
-
-                    accountWrapper.hide();
-
-                    accountSelect
-                        .prop('required', false)
-                        .prop('disabled', true);
-
-                    return;
-                }
-
                 accountWrapper.show();
-
                 accountSelect
                     .prop('disabled', false)
                     .prop('required', true);
-
-
                 accountSelect
                     .empty()
                     .append(
@@ -717,35 +698,46 @@
                         paymentTypeId,
 
                     type: "GET",
-
                     success: function(accounts) {
 
                         accountSelect.empty();
 
+                        if (!accounts || accounts.length === 0) {
 
-                        if (!accounts.length) {
+                            accountSelect.append(`
+                        <option value="">
+                            No account available
+                        </option>
+                    `);
 
-                            accountSelect.append(
-                                '<option value="">No account available</option>'
-                            );
 
                             balanceBox.html(`
                         <div class="alert alert-warning py-2 mb-0">
+
                             <i class="fa fa-exclamation-triangle me-1"></i>
+
                             No active account found for this payment type.
+
                         </div>
                     `);
 
                             return;
                         }
 
-
-                        accountSelect.append(
-                            '<option value="">Select Account</option>'
-                        );
-
+                        accountSelect.append(`
+                    <option value="">
+                        Select Account
+                    </option>
+                `);
 
                         $.each(accounts, function(index, account) {
+
+
+                            let balance =
+                                parseFloat(
+                                    account.current_balance
+                                ) || 0;
+
 
                             let defaultText =
                                 account.default_status === 'Default' ?
@@ -753,22 +745,33 @@
                                 '';
 
 
-                            accountSelect.append(`
+                            accountSelect.append(
 
-                        <option
-                            value="${account.id}"
-                            data-balance="${account.current_balance}">
+                                $('<option>', {
 
-                            ${account.account_name}
-                            (${account.account_number})
-                            ${defaultText}
+                                    value: account.id,
 
-                        </option>
+                                    text: account.account_name +
+                                        ' (' +
+                                        account.account_number +
+                                        ')' +
+                                        defaultText
 
-                    `);
+                                })
+
+                                .attr(
+                                    'data-balance',
+                                    balance
+                                )
+
+                                .attr(
+                                    'data-payment-type',
+                                    account.payment_type_id
+                                )
+
+                            );
 
                         });
-
 
                         accountSelect.trigger('change.select2');
 
@@ -777,14 +780,23 @@
 
                     error: function() {
 
-                        accountSelect.empty().append(
-                            '<option value="">Failed to load accounts</option>'
-                        );
+
+                        accountSelect
+                            .empty()
+                            .append(`
+                        <option value="">
+                            Failed to load accounts
+                        </option>
+                    `);
+
 
                         balanceBox.html(`
                     <div class="alert alert-danger py-2 mb-0">
+
                         <i class="fa fa-times-circle me-1"></i>
+
                         Failed to load payment accounts.
+
                     </div>
                 `);
 
@@ -794,17 +806,21 @@
 
             });
 
-            $('#party_account_id').on('change', function() {
+            accountSelect.on('change', function() {
 
-                let option = $(this).find(':selected');
+
+                let option =
+                    $(this).find(':selected');
+
 
                 let balance =
-                    parseFloat(option.data('balance') || 0);
-
+                    parseFloat(
+                        option.attr('data-balance') || 0
+                    ) || 0;
 
                 if (!$(this).val()) {
 
-                    $('#party_account_balance').html(`
+                    balanceBox.html(`
                 <span class="text-muted">
                     Select an account to see available balance.
                 </span>
@@ -813,8 +829,7 @@
                     return;
                 }
 
-
-                $('#party_account_balance').html(`
+                balanceBox.html(`
 
             <div class="alert alert-info py-2 mb-0">
 
@@ -823,7 +838,14 @@
                 Available Balance:
 
                 <strong>
-                    ${balance.toFixed(2)} TK
+
+                    ${balance.toLocaleString('en-BD', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })}
+
+                    TK
+
                 </strong>
 
             </div>
@@ -832,109 +854,69 @@
 
             });
 
-            $('#party_pay_amount').on('input', function() {
-
-                let amount =
-                    parseFloat($(this).val()) || 0;
-
-                let remaining =
-                    dueAmount - amount;
-
-
-                if (remaining < 0) {
-                    remaining = 0;
-                }
-
-
-                $('#party_remaining_due').text(
-                    remaining.toFixed(2) + ' TK'
-                );
-
-                if (amount > dueAmount) {
-
-                    $('#party_payment_warning')
-                        .removeClass('d-none')
-                        .find('span')
-                        .text(
-                            'Payment amount cannot be greater than outstanding due.'
-                        );
-
-                    $('#partyPaymentSubmit')
-                        .prop('disabled', true);
-
-                } else if (amount <= 0) {
-
-                    $('#party_payment_warning')
-                        .removeClass('d-none')
-                        .find('span')
-                        .text(
-                            'Payment amount must be greater than zero.'
-                        );
-
-                    $('#partyPaymentSubmit')
-                        .prop('disabled', true);
-
-                } else {
-
-                    $('#party_payment_warning')
-                        .addClass('d-none');
-
-                    $('#partyPaymentSubmit')
-                        .prop('disabled', false);
-
-                }
-
-            });
-
             $('#partyDuePaymentForm').on('submit', function(e) {
 
-                let paymentType =
-                    $('#party_payment_type_id').val();
+
+                let paymentTypeId =
+                    paymentType.val();
+
+
+                let accountId =
+                    accountSelect.val();
+
 
                 let amount =
-                    parseFloat($('#party_pay_amount').val()) || 0;
+                    parseFloat(
+                        $('#party_pay_amount').val()
+                    ) || 0;
 
-                let account =
-                    $('#party_account_id').val();
-
-                let selectedType =
-                    $('#party_payment_type_id option:selected');
-
-                let typeName =
-                    String(selectedType.data('name') || '')
-                    .toLowerCase();
-
-                if (amount <= 0 || amount > dueAmount) {
+                if (!paymentTypeId) {
 
                     e.preventDefault();
 
-                    alert(
-                        'Invalid payment amount.'
-                    );
+                    Swal.fire({
 
-                    return false;
-                }
-                if (!paymentType) {
+                        icon: 'warning',
 
-                    e.preventDefault();
+                        title: 'Payment Type Required',
 
-                    alert(
-                        'Please select payment type.'
-                    );
+                        text: 'Please select a payment type.'
+
+                    });
 
                     return false;
                 }
 
-                if (
-                    typeName !== 'cash' &&
-                    !account
-                ) {
+                if (!accountId) {
 
                     e.preventDefault();
 
-                    alert(
-                        'Please select a payment account.'
-                    );
+                    Swal.fire({
+
+                        icon: 'warning',
+
+                        title: 'Account Required',
+
+                        text: 'Please select an account.'
+
+                    });
+
+                    return false;
+                }
+
+                if (amount <= 0) {
+
+                    e.preventDefault();
+
+                    Swal.fire({
+
+                        icon: 'warning',
+
+                        title: 'Invalid Amount',
+
+                        text: 'Payment amount must be greater than zero.'
+
+                    });
 
                     return false;
                 }

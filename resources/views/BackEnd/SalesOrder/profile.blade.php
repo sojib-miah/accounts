@@ -530,34 +530,52 @@
                         </div>
                         <!-- Payment Type -->
                         <div class="mb-3">
+
                             <label class="form-label fw-semibold">
                                 Payment Type
                                 <span class="text-danger">*</span>
                             </label>
+
                             <select name="payment_type_id" id="due_payment_type_id" class="form-select select2" required>
+
                                 <option value="">
                                     Select Payment Type
                                 </option>
+
                                 @foreach ($paymentTypes as $type)
-                                    <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}">
+                                    <option value="{{ $type->id }}" data-name="{{ strtolower(trim($type->name)) }}">
                                         {{ $type->name }}
                                     </option>
                                 @endforeach
+
                             </select>
+
                         </div>
+
+
                         <!-- Account -->
-                        <div class="mb-3" id="due_account_wrapper" style="display: none;">
+                        <div class="mb-3">
+
                             <label class="form-label fw-semibold">
+
                                 Receive Account
+
                                 <span class="text-danger">*</span>
+
                             </label>
-                            <select name="account_id" id="due_account_id" class="form-select select2" disabled>
+
+                            <select name="account_id" id="due_account_id" class="form-select select2" required>
+
                                 <option value="">
-                                    Select Account
+                                    Select Payment Type First
                                 </option>
+
                             </select>
+
                             <div id="due_account_balance" class="mt-2"></div>
+
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
                                 Payment Amount
@@ -616,195 +634,187 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            $(document).on('change', '#due_payment_type_id', function() {
 
-                let paymentTypeId = $(this).val();
+            $(document).on(
+                'change',
+                '#due_payment_type_id',
+                function() {
 
-                let selectedOption = $(this).find(':selected');
+                    let paymentTypeId = $(this).val();
 
-                let paymentTypeName =
-                    String(selectedOption.data('name') || '').toLowerCase();
+                    let accountSelect =
+                        $('#due_account_id');
 
-                let isCash = paymentTypeName === 'cash';
-
-                let accountWrapper = $('#due_account_wrapper');
-                let accountSelect = $('#due_account_id');
-                let balanceBox = $('#due_account_balance');
-
-                accountSelect
-                    .empty()
-                    .append('<option value="">Select Account</option>')
-                    .val('')
-                    .trigger('change');
-
-                balanceBox.html('');
-
-                if (!paymentTypeId) {
-
-                    accountWrapper.hide();
+                    let balanceBox =
+                        $('#due_account_balance');
 
                     accountSelect
-                        .prop('disabled', true)
-                        .prop('required', false);
-
-                    return;
-                }
-                if (isCash) {
-
-                    accountWrapper.hide();
-
-                    accountSelect
-                        .prop('disabled', true)
-                        .prop('required', false)
-                        .val('');
-
-                    balanceBox.html('');
-
-                    return;
-                }
-
-                accountWrapper.show();
-
-                accountSelect
-                    .prop('disabled', false)
-                    .prop('required', true);
-
-                accountSelect
-                    .empty()
-                    .append(
-                        '<option value="">Loading accounts...</option>'
-                    );
-
-
-                $.ajax({
-
-                    url: "{{ url('/admin/ajax/payment-type') }}/" +
-                        paymentTypeId +
-                        "/accounts",
-
-                    type: "GET",
-
-                    success: function(response) {
-
-                        accountSelect.empty();
-
-                        accountSelect.append(
-                            '<option value="">Select Account</option>'
+                        .empty()
+                        .append(
+                            '<option value="">Loading accounts...</option>'
                         );
 
-
-                        if (
-                            response.success &&
-                            response.accounts &&
-                            response.accounts.length > 0
-                        ) {
-
-                            $.each(
-                                response.accounts,
-                                function(index, account) {
-
-                                    let balance =
-                                        parseFloat(
-                                            account.current_balance
-                                        ) || 0;
-
-
-                                    accountSelect.append(
-                                        $('<option>', {
-                                            value: account.id,
-                                            text: account.account_name +
-                                                ' - ' +
-                                                account.account_number +
-                                                ' (' +
-                                                balance.toFixed(2) +
-                                                ' TK)'
-                                        })
-                                        .attr(
-                                            'data-balance',
-                                            balance
-                                        )
-                                        .attr(
-                                            'data-payment-type',
-                                            account.payment_type_id
-                                        )
-                                    );
-
-                                }
-                            );
-
-
-                        } else {
-
-                            accountSelect.append(
-                                '<option value="">No Account Found</option>'
-                            );
-
-                        }
-
-                        accountSelect.trigger('change');
-
-                    },
-
-                    error: function() {
+                    balanceBox.html('');
+                    if (!paymentTypeId) {
 
                         accountSelect
                             .empty()
                             .append(
-                                '<option value="">Unable to load accounts</option>'
-                            )
-                            .trigger('change');
+                                '<option value="">Select Payment Type First</option>'
+                            );
 
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Account Loading Failed',
-                            text: 'Unable to load accounts for the selected payment type.'
-                        });
-
+                        return;
                     }
 
-                });
+                    $.ajax({
 
-            });
+                        url: "{{ url('/admin/ajax/payment-type') }}/" +
+                            paymentTypeId +
+                            "/accounts",
 
-            $(document).on('change', '#due_account_id', function() {
+                        type: "GET",
 
-                let option = $(this).find(':selected');
+                        success: function(response) {
 
-                let balance =
-                    parseFloat(
-                        option.attr('data-balance') || 0
-                    ) || 0;
+                            accountSelect.empty();
+                            accountSelect.append(
+                                '<option value="">Select Account</option>'
+                            );
+                            if (
+                                response.success &&
+                                response.accounts &&
+                                response.accounts.length > 0
+                            ) {
+
+                                $.each(
+                                    response.accounts,
+                                    function(index, account) {
+
+                                        let balance =
+                                            parseFloat(
+                                                account.current_balance
+                                            ) || 0;
 
 
-                if (!$(this).val()) {
+                                        let option =
+                                            $('<option>', {
 
-                    $('#due_account_balance').html('');
+                                                value: account.id,
 
-                    return;
+                                                text: account.account_name +
+                                                    ' - ' +
+                                                    account.account_number +
+                                                    ' (' +
+                                                    balance.toLocaleString(
+                                                        'en-BD', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        }
+                                                    ) +
+                                                    ' TK)'
+
+                                            });
+
+
+                                        option.attr(
+                                            'data-balance',
+                                            balance
+                                        );
+
+
+                                        option.attr(
+                                            'data-payment-type',
+                                            account.payment_type_id
+                                        );
+
+
+                                        accountSelect.append(
+                                            option
+                                        );
+
+                                    }
+                                );
+
+                            } else {
+
+                                accountSelect.append(
+                                    '<option value="">No Account Found</option>'
+                                );
+
+                            }
+
+                            accountSelect.trigger('change');
+
+                        },
+                        error: function() {
+
+                            accountSelect
+                                .empty()
+                                .append(
+                                    '<option value="">Unable to load accounts</option>'
+                                )
+                                .trigger('change');
+
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Account Loading Failed',
+
+                                text: 'Unable to load accounts for the selected payment type.'
+
+                            });
+
+                        }
+
+                    });
+
                 }
+            );
+
+            $(document).on(
+                'change',
+                '#due_account_id',
+                function() {
+
+                    let option =
+                        $(this).find(':selected');
 
 
-                $('#due_account_balance').html(`
+                    let balance =
+                        parseFloat(
+                            option.attr('data-balance')
+                        ) || 0;
 
-            <div class="alert alert-info py-2 mb-0">
+                    if (!$(this).val()) {
 
-                <i class="fa fa-wallet me-2"></i>
+                        $('#due_account_balance').html('');
 
-                Available Balance:
+                        return;
+                    }
 
-                <strong>
-                    ${balance.toLocaleString('en-BD', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })} TK
-                </strong>
+                    $('#due_account_balance').html(`
 
-            </div>
+                <div class="alert alert-info py-2 mb-0">
 
-        `);
+                    <i class="fa fa-wallet me-2"></i>
 
-            });
+                    Available Balance:
+
+                    <strong>
+                        ${balance.toLocaleString('en-BD', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })} TK
+                    </strong>
+
+                </div>
+
+            `);
+
+                }
+            );
 
         });
     </script>

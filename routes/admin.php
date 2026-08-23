@@ -238,6 +238,8 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::resource('purchase', PurchaseController::class);
     Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
     Route::get('/ajax/supplier-company/{customerCompany}/parties', [PurchaseController::class, 'supplierCompanyParties'])->name('ajax.supplier-company.parties');
+    Route::get('/ajax/check-serial', [PurchaseController::class, 'checkSerial'])->name('purchase.check.serial');
+    Route::get('/ajax/editcheck-serial', [PurchaseController::class, 'editCheckSerial'])->name('ajax.check.serial');
 
     // product category route 
     Route::resource('product-category', ProductCategoryController::class);
@@ -261,6 +263,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
     Route::post('/warehouse/{receipt}/serial/{receiptItem}', [WarehouseController::class, 'updateSerial'])->name('warehouse.serial.update');
     Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
+    Route::get('/warehouse/serial/check', [WarehouseController::class, 'checkSerial'])->name('warehouse.serial.check');
 
     // customer company route
     Route::get('/customer-company', [CustomerCompanyController::class, 'index'])->name('customer-company.index');

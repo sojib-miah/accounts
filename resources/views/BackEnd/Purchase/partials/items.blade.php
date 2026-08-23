@@ -8,8 +8,8 @@
                 <th width="10%">Unit</th>
                 <th width="10%">Stock</th>
                 <th width="10%">Qty</th>
-                <th width="12%">Rate</th>
-                <th width="13%">Amount</th>
+                <th width="12%">Unit Price</th>
+                <th width="13%">Total Price</th>
                 <th width="10%" class="text-center">Action</th>
             </tr>
         </thead>

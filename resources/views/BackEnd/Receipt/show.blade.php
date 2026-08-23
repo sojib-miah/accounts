@@ -422,9 +422,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">
                                 Payment Type
-                                <span class="text-danger">
-                                    *
-                                </span>
+                                <span class="text-danger">*</span>
                             </label>
                             <select id="expense_payment_type_id" name="payment_type_id" class="form-select select2"
                                 required>
@@ -442,16 +440,15 @@
                         <div class="mb-3" id="expense_account_wrapper">
                             <label class="form-label fw-semibold">
                                 Payment Account
+                                <span class="text-danger">*</span>
                             </label>
-
-                            <select id="expense_account_id" name="account_id" class="form-select select2">
-                                <option value="">Select Account</option>
+                            <select id="expense_account_id" name="account_id" class="form-select select2" required
+                                disabled>
+                                <option value="">
+                                    Select Payment Type First
+                                </option>
                             </select>
-
                             <div id="expense_account_balance" class="mt-2">
-                                <span class="text-muted">
-                                    Select an account to see available balance.
-                                </span>
                             </div>
                         </div>
 
@@ -521,65 +518,73 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-
             $('#expense_payment_type_id').on('change', function() {
 
                 let paymentTypeId = $(this).val();
 
-                let accountWrapper = $('#expense_account_wrapper');
-                let accountSelect = $('#expense_account_id');
-                let balanceBox = $('#expense_account_balance');
+                let accountSelect =
+                    $('#expense_account_id');
 
-                // Reset
-                accountSelect.empty().append(
-                    '<option value="">Select Account</option>'
-                );
+                let balanceBox =
+                    $('#expense_account_balance');
 
-                accountSelect.val('').trigger('change');
+                accountSelect
+                    .empty()
+                    .append(
+                        '<option value="">Select Account</option>'
+                    )
+                    .val('')
+                    .prop('disabled', true)
+                    .prop('required', true);
 
-                balanceBox.html(`
-            <span class="text-muted">
-                Select an account to see available balance.
-            </span>
-        `);
+                accountSelect.trigger('change.select2');
 
-                // No payment type selected
+                balanceBox.html('');
+
                 if (!paymentTypeId) {
 
-                    accountWrapper.hide();
+                    accountSelect
+                        .empty()
+                        .append(
+                            '<option value="">Select Payment Type First</option>'
+                        )
+                        .prop('disabled', true)
+                        .prop('required', true);
 
-                    accountSelect.prop('disabled', true);
-                    accountSelect.prop('required', false);
+                    accountSelect.trigger('change.select2');
 
                     return;
                 }
 
-                // Show Account
-                accountWrapper.show();
+                accountSelect
+                    .empty()
+                    .append(
+                        '<option value="">Loading accounts...</option>'
+                    )
+                    .prop('disabled', true);
 
-                accountSelect.prop('disabled', false);
-                // accountSelect.prop('required', true);
-
-                // Loading
-                accountSelect.empty().append(
-                    '<option value="">Loading accounts...</option>'
-                );
-
+                accountSelect.trigger('change.select2');
                 $.ajax({
 
-                    url: "{{ url('/admin/expense/payment/accounts') }}/" + paymentTypeId,
+                    url: "{{ url('/admin/expense/payment/accounts') }}/" +
+                        paymentTypeId,
 
                     type: "GET",
 
                     success: function(accounts) {
 
                         accountSelect.empty();
-
-                        if (accounts.length === 0) {
+                        if (!accounts || accounts.length === 0) {
 
                             accountSelect.append(
-                                '<option value="">No account available</option>'
+                                '<option value="">No Account Found</option>'
                             );
+
+                            accountSelect
+                                .prop('disabled', true)
+                                .prop('required', true);
+
+                            accountSelect.trigger('change.select2');
 
                             balanceBox.html(`
                         <div class="alert alert-warning py-2 mb-0">
@@ -597,36 +602,67 @@
 
                         $.each(accounts, function(index, account) {
 
+                            let balance =
+                                parseFloat(
+                                    account.current_balance
+                                ) || 0;
+
                             let defaultText =
                                 account.default_status === 'Default' ?
                                 ' - Default' :
                                 '';
 
-                            accountSelect.append(`
-                        <option
-                            value="${account.id}"
-                            data-balance="${account.current_balance}"
-                            data-account-name="${account.account_name}"
-                            data-account-number="${account.account_number}">
-                            
-                            ${account.account_name}
-                            (${account.account_number})
-                            ${defaultText}
+                            let option = $('<option>', {
 
-                        </option>
-                    `);
+                                value: account.id,
+
+                                text: account.account_name +
+                                    ' - ' +
+                                    account.account_number +
+                                    ' (' +
+                                    balance.toLocaleString(
+                                        'en-BD', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }
+                                    ) +
+                                    ' TK)' +
+                                    defaultText
+
+                            });
+
+
+                            option.attr(
+                                'data-balance',
+                                balance
+                            );
+
+                            option.attr(
+                                'data-payment-type',
+                                account.payment_type_id
+                            );
+
+
+                            accountSelect.append(option);
 
                         });
+                        accountSelect
+                            .prop('disabled', false)
+                            .prop('required', true);
 
-                        // Select2 refresh
                         accountSelect.trigger('change.select2');
-                    },
 
+                    },
                     error: function() {
 
-                        accountSelect.empty().append(
-                            '<option value="">Failed to load accounts</option>'
-                        );
+                        accountSelect
+                            .empty()
+                            .append(
+                                '<option value="">Unable to load accounts</option>'
+                            )
+                            .prop('disabled', true);
+
+                        accountSelect.trigger('change.select2');
 
                         balanceBox.html(`
                     <div class="alert alert-danger py-2 mb-0">
@@ -635,41 +671,51 @@
                     </div>
                 `);
 
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Account Loading Failed',
+                            text: 'Unable to load accounts for the selected payment type.'
+                        });
+
                     }
 
                 });
 
             });
-
-
-            // Account Change
             $('#expense_account_id').on('change', function() {
 
-                let option = $(this).find(':selected');
+                let option =
+                    $(this).find(':selected');
 
-                let balance = parseFloat(
-                    option.data('balance') || 0
-                );
+                let balance =
+                    parseFloat(
+                        option.attr('data-balance')
+                    ) || 0;
 
                 if (!$(this).val()) {
 
-                    $('#expense_account_balance').html(`
-                <span class="text-muted">
-                    Select an account to see available balance.
-                </span>
-            `);
+                    $('#expense_account_balance').html('');
 
                     return;
                 }
 
                 $('#expense_account_balance').html(`
+
             <div class="alert alert-info py-2 mb-0">
+
                 <i class="fa fa-wallet me-1"></i>
+
                 Available Balance:
+
                 <strong>
-                    ${balance.toFixed(2)} TK
+                    ${balance.toLocaleString('en-BD', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })} TK
                 </strong>
+
             </div>
+
         `);
 
             });

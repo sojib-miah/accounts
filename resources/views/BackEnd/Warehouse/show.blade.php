@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-4 mt-3">
             <div class="card-header">
                 <h4 class="mb-0">
                     <i class="fa fa-warehouse me-2"></i>
@@ -399,60 +399,24 @@
                     }
                 }
                 $('#addSerial').on('click', function() {
-                    let serial =
-                        $('#serialInput').val().trim().toUpperCase();
+                    let serial = $('#serialInput').val().trim().toUpperCase();
                     if (serial === '') {
                         Swal.fire({
                             icon: 'warning',
-                            position: 'top-end',
                             title: 'Serial Required',
                             text: 'Please enter serial number.'
                         });
                         $('#serialInput').focus();
                         return;
                     }
-                    if (editingIndex !== null) {
-                        let duplicate =
-                            serialArray.some(
-                                function(item, index) {
-                                    return (index !== editingIndex && String(item).toUpperCase() === serial);
-                                }
-                            );
-                        if (duplicate) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Duplicate Serial',
-                                text: 'This serial number is already added.'
-                            });
-                            $('#serialInput').focus();
-                            return;
+                    let duplicate = serialArray.some(function(item, index) {
+                        if (
+                            editingIndex !== null &&
+                            index === editingIndex
+                        ) {
+                            return false;
                         }
-                        serialArray[editingIndex] = serial;
-                        editingIndex = null;
-                        resetSerialInput();
-                        renderSerialList();
-                        Swal.fire({
-                            toast: true,
-                            icon: 'success',
-                            position: 'top-end',
-                            text: 'Serial number updated successfully.',
-                            timer: 1200,
-                            showConfirmButton: false,
-                            timerProgressBar: true
-                        });
-                        $('#serialInput').focus();
-                        return;
-                    }
-                    if (serialArray.length >= currentQty) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Serial Limit Reached',
-                            text: 'You can add only ' + currentQty + ' serial number(s).'
-                        });
-                        return;
-                    }
-                    let duplicate = serialArray.some(function(item) {
-                        return (String(item).toUpperCase() === serial);
+                        return String(item).trim().toUpperCase() === serial;
                     });
                     if (duplicate) {
                         Swal.fire({
@@ -460,12 +424,115 @@
                             title: 'Duplicate Serial',
                             text: 'This serial number is already added.'
                         });
-                        $('#serialInput').val('').focus();
+                        $('#serialInput')
+                            .val('')
+                            .focus();
+
                         return;
                     }
-                    serialArray.push(serial);
-                    renderSerialList();
-                    $('#serialInput').val('').focus();
+                    if (
+                        editingIndex === null &&
+                        serialArray.length >= currentQty
+                    ) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Serial Limit Reached',
+                            text: 'You can add only ' +
+                                currentQty +
+                                ' serial number(s).'
+                        });
+                        return;
+                    }
+                    let button = $(this);
+                    let oldButtonHtml = button.html();
+                    button
+                        .prop('disabled', true)
+                        .html(
+                            '<i class="fa fa-spinner fa-spin me-1"></i> Checking...'
+                        );
+                    $.ajax({
+                        url: "{{ route('warehouse.serial.check') }}",
+                        type: "GET",
+                        data: {
+                            serial_no: serial,
+                            receipt_item_id: currentItemId
+                        },
+                        success: function(response) {
+                            button
+                                .prop('disabled', false)
+                                .html(oldButtonHtml);
+                            if (
+                                response.exists &&
+                                response.allowed === false
+                            ) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Serial Already Exists',
+                                    text: response.message ||
+                                        'This serial number already exists in the system.',
+                                    confirmButtonText: 'OK'
+                                });
+                                $('#serialInput')
+                                    .val('')
+                                    .focus();
+
+                                return;
+                            }
+                            if (editingIndex !== null) {
+                                serialArray[editingIndex] = serial;
+                                editingIndex = null;
+                                resetSerialInput();
+                                renderSerialList();
+                                Swal.fire({
+                                    toast: true,
+                                    icon: 'success',
+                                    position: 'top-end',
+                                    text: 'Serial number updated successfully.',
+                                    timer: 1200,
+                                    showConfirmButton: false,
+                                    timerProgressBar: true
+                                });
+                                $('#serialInput').focus();
+                                return;
+                            }
+                            serialArray.push(serial);
+                            renderSerialList();
+                            $('#serialInput')
+                                .val('')
+                                .focus();
+                            Swal.fire({
+                                toast: true,
+                                icon: 'success',
+                                position: 'top-end',
+                                text: 'Serial number added.',
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+
+                        },
+
+                        error: function(xhr) {
+                            button
+                                .prop('disabled', false)
+                                .html(oldButtonHtml);
+                            let message =
+                                'Unable to check serial number. Please try again.';
+                            if (
+                                xhr.responseJSON &&
+                                xhr.responseJSON.message
+                            ) {
+                                message = xhr.responseJSON.message;
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Serial Check Failed',
+                                text: message
+                            });
+
+                        }
+
+                    });
+
                 });
                 $(document).on('click', '.editSerial', function() {
                     let index = parseInt($(this).data('index'));

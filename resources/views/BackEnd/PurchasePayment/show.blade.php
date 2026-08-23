@@ -148,31 +148,40 @@
                                         Payment Type
                                         <span class="text-danger">*</span>
                                     </label>
+
                                     <select name="payment_type_id" id="payment_type_id" class="form-select select2"
                                         required>
+
                                         <option value="">
                                             Select Payment Type
                                         </option>
+
                                         @foreach ($paymentTypes as $type)
-                                            <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}">
+                                            <option value="{{ $type->id }}">
                                                 {{ $type->name }}
                                             </option>
                                         @endforeach
+
                                     </select>
                                 </div>
+
+
                                 {{-- Account --}}
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">
                                         Account
                                         <span class="text-danger">*</span>
                                     </label>
+
                                     <select name="account_id" id="account_id" class="form-select select2" required>
+
                                         <option value="">
                                             Select Account
                                         </option>
+
                                     </select>
-                                    <div id="accountBalance" class="mt-2">
-                                    </div>
+
+                                    <div id="accountBalance" class="mt-2"></div>
                                 </div>
                                 {{-- Payment Date --}}
                                 <div class="col-md-4 mb-3">
@@ -287,52 +296,31 @@
 
                 let paymentTypeId = $(this).val();
 
-                let selectedOption = $(this).find(':selected');
-
-                let paymentTypeName = String(
-                    selectedOption.data('name') || ''
-                ).trim().toLowerCase();
-
-                let isCash = paymentTypeName === 'cash';
-
                 let accountSelect = $('#account_id');
                 let accountBalance = $('#accountBalance');
 
+                accountSelect
+                    .empty()
+                    .prop('disabled', true)
+                    .prop('required', true);
+
                 accountBalance.html('');
-                if (isCash) {
 
-                    accountSelect
-                        .html('<option value="">Cash Payment</option>')
-                        .val('')
-                        .prop('required', false)
-                        .prop('disabled', true)
-                        .trigger('change.select2');
-
-                    accountBalance.html(`
-                <div class="alert alert-success py-2 mb-0">
-                    <i class="fa fa-money-bill-wave me-1"></i>
-                    <strong>Cash Payment</strong>
-                    — No account is required.
-                </div>
-            `);
-
-                    return;
-                }
                 if (!paymentTypeId) {
 
                     accountSelect
-                        .html('<option value="">Select Account</option>')
-                        .val('')
-                        .prop('required', true)
-                        .prop('disabled', true)
+                        .append(
+                            '<option value="">Select Payment Type First</option>'
+                        )
                         .trigger('change.select2');
 
                     return;
                 }
+
                 accountSelect
-                    .prop('disabled', false)
-                    .prop('required', true)
-                    .html('<option value="">Loading Account...</option>')
+                    .append(
+                        '<option value="">Loading Accounts...</option>'
+                    )
                     .trigger('change.select2');
 
                 $.ajax({
@@ -347,23 +335,24 @@
 
                         accountSelect.empty();
 
-                        accountSelect.append(
-                            '<option value="">Select Account</option>'
-                        );
-
                         if (
                             response.success &&
                             response.accounts &&
                             response.accounts.length > 0
                         ) {
 
+                            accountSelect.append(
+                                '<option value="">Select Account</option>'
+                            );
+
                             $.each(
                                 response.accounts,
                                 function(index, account) {
 
-                                    let balance = parseFloat(
-                                        account.current_balance
-                                    ) || 0;
+                                    let balance =
+                                        parseFloat(
+                                            account.current_balance
+                                        ) || 0;
 
                                     let defaultText =
                                         account.default_status === 'Default' ?
@@ -371,20 +360,31 @@
                                         '';
 
                                     accountSelect.append(`
+
                                 <option
                                     value="${account.id}"
                                     data-balance="${balance}"
                                 >
+
                                     ${account.account_name}
                                     -
                                     ${account.account_number}
+
                                     ${defaultText}
-                                    | Balance: ${balance.toFixed(2)}
+
+                                    | Balance:
+                                    ${balance.toFixed(2)}
+
                                 </option>
+
                             `);
 
                                 }
                             );
+
+                            accountSelect
+                                .prop('disabled', false)
+                                .prop('required', true);
 
                         } else {
 
@@ -396,12 +396,18 @@
 
                             accountBalance.html(`
                         <div class="alert alert-warning py-2 mb-0">
+
                             <i class="fa fa-exclamation-triangle me-1"></i>
+
                             No active account found for this payment type.
+
                         </div>
                     `);
+
                         }
+
                         accountSelect.trigger('change.select2');
+
                     },
 
                     error: function() {
@@ -412,132 +418,179 @@
                             Unable to load Account
                         </option>
                     `)
+                            .prop('disabled', true)
                             .trigger('change.select2');
 
                         accountBalance.html(`
                     <div class="alert alert-danger py-2 mb-0">
+
                         <i class="fa fa-times-circle me-1"></i>
+
                         Unable to load payment accounts.
+
                     </div>
                 `);
+
                     }
 
                 });
 
             });
+
             $('#account_id').on('change', function() {
 
                 let accountId = $(this).val();
 
                 let option = $(this).find(':selected');
 
-                let balance = parseFloat(
-                    option.data('balance')
-                ) || 0;
+                let balance =
+                    parseFloat(
+                        option.attr('data-balance')
+                    ) || 0;
 
-                let paymentAmount = parseFloat(
-                    $('#payment_amount').val()
-                ) || 0;
+                let paymentAmount =
+                    parseFloat(
+                        $('#payment_amount').val()
+                    ) || 0;
+
+
                 if (!accountId) {
 
                     $('#accountBalance').html('');
 
                     return;
                 }
+
+
                 if (balance >= paymentAmount) {
 
                     $('#accountBalance').html(`
+
                 <div class="alert alert-success py-2 mb-0">
+
                     <i class="fa fa-check-circle me-1"></i>
+
                     Available Balance:
-                    <strong>৳ ${balance.toFixed(2)}</strong>
+
+                    <strong>
+                        ৳ ${balance.toFixed(2)}
+                    </strong>
+
                 </div>
+
             `);
 
                 } else {
+
                     $('#accountBalance').html(`
+
                 <div class="alert alert-danger py-2 mb-0">
+
                     <i class="fa fa-exclamation-triangle me-1"></i>
+
                     Insufficient Balance.
+
                     Available:
-                    <strong>৳ ${balance.toFixed(2)}</strong>
+
+                    <strong>
+                        ৳ ${balance.toFixed(2)}
+                    </strong>
+
                 </div>
+
             `);
+
                 }
 
             });
-            $('#payment_amount').on('input change', function() {
-                let paymentTypeName = String(
-                    $('#payment_type_id option:selected').data('name') || ''
-                ).trim().toLowerCase();
 
-                if (paymentTypeName === 'cash') {
-                    return;
+            $('#payment_amount').on(
+                'input change',
+                function() {
+
+                    $('#account_id').trigger('change');
+
                 }
+            );
 
-                $('#account_id').trigger('change');
-
-            });
             $('#paymentForm').on('submit', function(e) {
 
                 e.preventDefault();
 
                 let form = this;
 
-                let paymentType = $('#payment_type_id');
+                let paymentType =
+                    $('#payment_type_id');
 
-                let paymentTypeId = paymentType.val();
+                let paymentTypeId =
+                    paymentType.val();
 
-                let paymentTypeName = String(
-                    paymentType.find(':selected').data('name') || ''
-                ).trim().toLowerCase();
+                let account =
+                    $('#account_id option:selected');
 
-                let isCash = paymentTypeName === 'cash';
+                let accountId =
+                    $('#account_id').val();
 
-                let accountId = $('#account_id').val();
+                let balance =
+                    parseFloat(
+                        account.data('balance')
+                    ) || 0;
 
-                let account = $('#account_id option:selected');
+                let amount =
+                    parseFloat(
+                        $('#payment_amount').val()
+                    ) || 0;
 
-                let balance = parseFloat(
-                    account.data('balance')
-                ) || 0;
+                let due =
+                    parseFloat(
+                        "{{ $receipt->due_amount }}"
+                    ) || 0;
 
-                let amount = parseFloat(
-                    $('#payment_amount').val()
-                ) || 0;
-
-                let due = parseFloat(
-                    "{{ $receipt->due_amount }}"
-                ) || 0;
                 if (!paymentTypeId) {
 
                     Swal.fire({
+
                         icon: 'warning',
+
                         title: 'Payment Type Required',
+
                         text: 'Please select a payment type.',
+
                         confirmButtonText: 'OK'
+
                     });
 
                     return false;
                 }
-                if (!isCash && !accountId) {
+                if (!accountId) {
 
                     Swal.fire({
+
                         icon: 'warning',
+
                         title: 'Account Required',
-                        text: 'Please select an account for this payment type.',
+
+                        text: 'Please select an account.',
+
                         confirmButtonText: 'OK'
+
                     });
 
                     return false;
                 }
+
                 if (amount <= 0) {
 
                     Swal.fire({
+
                         icon: 'warning',
+
                         title: 'Invalid Amount',
+
                         text: 'Payment amount must be greater than zero.',
+
                         confirmButtonText: 'OK'
+
                     });
 
                     return false;
@@ -545,30 +598,44 @@
                 if (amount > due) {
 
                     Swal.fire({
+
                         icon: 'error',
+
                         title: 'Amount Exceeds Due',
+
                         html: 'Maximum payment allowed is ' +
                             '<strong>৳ ' +
                             due.toFixed(2) +
                             '</strong>',
+
                         confirmButtonText: 'OK'
+
                     });
 
                     return false;
                 }
-                if (!isCash && balance < amount) {
+                if (balance < amount) {
 
                     Swal.fire({
+
                         icon: 'error',
+
                         title: 'Insufficient Balance',
-                        html: 'Account Balance: <strong>৳ ' +
+
+                        html:
+
+                            'Account Balance: ' +
+                            '<strong>৳ ' +
                             balance.toFixed(2) +
                             '</strong><br>' +
 
-                            'Payment Amount: <strong>৳ ' +
+                            'Payment Amount: ' +
+                            '<strong>৳ ' +
                             amount.toFixed(2) +
                             '</strong>',
+
                         confirmButtonText: 'OK'
+
                     });
 
                     return false;
@@ -577,27 +644,33 @@
 
                     title: 'Confirm Payment',
 
-                    html: 'Payment Type: <strong>' +
-                        paymentType.find(':selected').text().trim() +
+                    html:
+
+                        'Payment Type: ' +
+                        '<strong>' +
+                        paymentType
+                        .find(':selected')
+                        .text()
+                        .trim() +
                         '</strong><br>' +
 
-                        'Payment Amount: <strong>৳ ' +
-                        amount.toFixed(2) +
-                        '</strong>' +
+                        'Account: ' +
+                        '<strong>' +
+                        account.text().trim() +
+                        '</strong><br>' +
 
-                        (
-                            isCash ?
-                            '<br><small class="text-muted">Cash payment — No account will be affected.</small>' :
-                            '<br>Account Balance: <strong>৳ ' +
-                            balance.toFixed(2) +
-                            '</strong>'
-                        ),
+                        'Payment Amount: ' +
+                        '<strong>৳ ' +
+                        amount.toFixed(2) +
+                        '</strong><br><br>' +
+
+                        'Are you sure you want to make this payment?',
 
                     icon: 'question',
 
                     showCancelButton: true,
 
-                    confirmButtonText: 'Yes, Make Payment',
+                    confirmButtonText: '<i class="fa fa-check me-1"></i> Yes, Make Payment',
 
                     cancelButtonText: 'Cancel',
 
@@ -606,18 +679,19 @@
                 }).then(function(result) {
 
                     if (result.isConfirmed) {
+
                         $('#payButton')
                             .prop('disabled', true)
                             .html(
                                 '<i class="fa fa-spinner fa-spin me-1"></i>' +
                                 ' Processing...'
                             );
+
                         form.submit();
+
                     }
 
                 });
-
-                return false;
 
             });
 

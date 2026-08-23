@@ -289,13 +289,10 @@
                 $('#serialInput').focus();
                 return;
             }
-            let duplicate =
-                serialArray.some(
-                    function(item) {
-                        return String(item).trim().toUpperCase() === serial;
-                    }
-                );
-            if (duplicate) {
+            let currentDuplicate = serialArray.some(function(item) {
+                return String(item).trim().toUpperCase() === serial;
+            });
+            if (currentDuplicate) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Duplicate Serial',
@@ -304,10 +301,116 @@
                 $('#serialInput').val('').focus();
                 return;
             }
+            let otherRowsSerials = [];
+            $('#purchaseBody tr').each(function() {
+                let row = $(this);
+                if (
+                    currentRow &&
+                    row[0] === currentRow[0]
+                ) {
+                    return;
+                }
+                let rowSerials = getRowSerials(row);
+                rowSerials.forEach(function(rowSerial) {
+                    let normalized = String(rowSerial)
+                        .trim()
+                        .toUpperCase();
 
-            serialArray.push(serial);
-            renderSerialList();
-            $('#serialInput').val('').focus();
+                    if (normalized !== '') {
+                        otherRowsSerials.push(normalized);
+                    }
+                });
+            });
+            if (otherRowsSerials.includes(serial)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate Serial Number',
+                    text: 'This serial number is already used for another product in this purchase.'
+                });
+                $('#serialInput').val('').focus();
+                return;
+            }
+            let productId = currentRow ?
+                currentRow.find('.product').val() :
+                '';
+            if (!productId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Product Required',
+                    text: 'Please select a product first.'
+                });
+                return;
+            }
+            let addButton = $('#addSerial');
+            let originalButtonHtml = addButton.html();
+            addButton
+                .prop('disabled', true)
+                .html(
+                    '<i class="fa fa-spinner fa-spin"></i> Checking...'
+                );
+            $.ajax({
+                url: "{{ url('/admin/ajax/editcheck-serial') }}",
+                type: "GET",
+                data: {
+                    serial_no: serial,
+                    product_id: productId,
+                    receipt_id: "{{ $purchase->id }}"
+                },
+                success: function(response) {
+                    addButton
+                        .prop('disabled', false)
+                        .html(originalButtonHtml);
+
+                    if (
+                        response.exists &&
+                        !response.belongs_to_current_receipt
+                    ) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Serial Already Exists',
+                            text: 'This serial number already exists in the system.'
+                        });
+                        $('#serialInput')
+                            .val('')
+                            .focus();
+                        return;
+                    }
+                    if (
+                        response.exists &&
+                        response.belongs_to_current_receipt
+                    ) {
+                        serialArray.push(serial);
+                        renderSerialList();
+                        $('#serialInput')
+                            .val('')
+                            .focus();
+                        return;
+                    }
+                    serialArray.push(serial);
+                    renderSerialList();
+                    $('#serialInput')
+                        .val('')
+                        .focus();
+                },
+                error: function(xhr) {
+                    addButton
+                        .prop('disabled', false)
+                        .html(originalButtonHtml);
+                    let message =
+                        'Unable to check serial number. Please try again.';
+                    if (
+                        xhr.responseJSON &&
+                        xhr.responseJSON.message
+                    ) {
+                        message = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Serial Check Failed',
+                        text: message
+                    });
+                }
+            });
         });
         $('#serialInput').on('keydown', function(e) {
             if (e.key === 'Enter') {

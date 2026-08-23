@@ -956,39 +956,46 @@ class SalesOrderController extends Controller
 
     public function duePayment(Request $request, Party $party)
     {
+        $user = Auth::user();
+        $userId = $user->id;
         $request->validate([
-            'payment_type_id' => 'required|exists:payment_types,id',
-
-            'account_id' => [
-                'nullable',
-                'exists:accounts,id'
+            'payment_type_id' => [
+                'required',
+                'exists:payment_types,id',
             ],
 
-            'payment_date' => 'required|date',
+            'account_id' => [
+                'required',
+                'exists:accounts,id',
+            ],
+
+            'payment_date' => [
+                'required',
+                'date',
+            ],
 
             'amount' => [
                 'required',
                 'numeric',
-                'gt:0'
+                'gt:0',
             ],
 
-            'note' => 'nullable|string|max:1000',
+            'note' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
         ]);
-
 
         DB::beginTransaction();
 
         try {
-
-            $user = Auth::user();
-
             $paymentType = PaymentType::where(
                 'id',
                 $request->payment_type_id
             )
                 ->where('status', 'Active')
                 ->first();
-
 
             if (!$paymentType) {
 
@@ -997,59 +1004,51 @@ class SalesOrderController extends Controller
                 );
             }
 
-            $isCash = strtolower(
-                trim($paymentType->name)
-            ) === 'cash';
+            $account = Account::where(
+                'id',
+                $request->account_id
+            )
+                ->where('status', 'Active')
+                ->lockForUpdate()
+                ->first();
 
-            $account = null;
+            if (!$account) {
 
-            if (!$isCash) {
+                throw new \Exception(
+                    'Selected account is not available.'
+                );
+            }
 
-                if (!$request->account_id) {
+            if (
+                (int) $account->payment_type_id !==
+                (int) $paymentType->id
+            ) {
 
-                    throw new \Exception(
-                        'Receive account is required for ' .
-                            $paymentType->name .
-                            ' payment.'
-                    );
-                }
+                throw new \Exception(
+                    'Selected account does not belong to the selected payment type.'
+                );
+            }
 
+            if (
+                !$user->hasRole('Super-Admin') &&
+                (int) $account->company_id !==
+                (int) $user->company_id
+            ) {
 
-                $account = Account::where(
-                    'id',
-                    $request->account_id
-                )
-                    ->where('status', 'Active')
-                    ->lockForUpdate()
-                    ->first();
+                throw new \Exception(
+                    'You are not allowed to use this account.'
+                );
+            }
 
+            if (
+                !$user->hasRole('Super-Admin') &&
+                (int) $account->branch_id !==
+                (int) $user->branch_id
+            ) {
 
-                if (!$account) {
-
-                    throw new \Exception(
-                        'Selected account is not available.'
-                    );
-                }
-
-                if (
-                    !$user->hasRole('Super-Admin') &&
-                    $account->created_by != $user->id
-                ) {
-
-                    throw new \Exception(
-                        'You are not allowed to use this account.'
-                    );
-                }
-
-                if (
-                    (int) $account->payment_type_id !==
-                    (int) $paymentType->id
-                ) {
-
-                    throw new \Exception(
-                        'Selected account does not belong to the selected payment type.'
-                    );
-                }
+                throw new \Exception(
+                    'You are not allowed to use this account.'
+                );
             }
 
             $amount = round(
@@ -1057,12 +1056,24 @@ class SalesOrderController extends Controller
                 2
             );
 
+            if ($amount <= 0) {
+
+                throw new \Exception(
+                    'Payment amount must be greater than zero.'
+                );
+            }
+
             $receipts = Receipt::where(
                 'party_id',
                 $party->id
             )
                 ->where('type', 'Sales-Order')
-                ->where('due_amount', '>', 0)->orderBy('receipt_date', 'asc')->orderBy('id', 'asc')->lockForUpdate()->get();
+                ->where('status', 'Completed')
+                ->where('due_amount', '>', 0)
+                ->orderBy('receipt_date', 'asc')
+                ->orderBy('id', 'asc')
+                ->lockForUpdate()
+                ->get();
 
             if ($receipts->isEmpty()) {
 
@@ -1071,10 +1082,10 @@ class SalesOrderController extends Controller
                 );
             }
 
-            $totalDue = (float) $receipts->sum(
-                'due_amount'
+            $totalDue = round(
+                (float) $receipts->sum('due_amount'),
+                2
             );
-
 
             if ($amount > $totalDue) {
 
@@ -1086,19 +1097,12 @@ class SalesOrderController extends Controller
                 );
             }
 
-            if (!$isCash) {
-
-                if (
-                    (float) $account->current_balance < $amount
-                ) {
-                    throw new \Exception(
-                        'Payment amount cannot be greater than account available balance.'
-                    );
-                }
-            }
+            $currentBalance = round(
+                (float) $account->current_balance,
+                2
+            );
 
             $remainingPayment = $amount;
-
 
             foreach ($receipts as $receipt) {
 
@@ -1106,12 +1110,10 @@ class SalesOrderController extends Controller
                     break;
                 }
 
-
                 $due = round(
                     (float) $receipt->due_amount,
                     2
                 );
-
 
                 $payAmount = min(
                     $remainingPayment,
@@ -1119,38 +1121,26 @@ class SalesOrderController extends Controller
                 );
 
                 ReceiptPayment::create([
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'payment_type_id' =>
-                    $paymentType->id,
-
-                    'account_id' =>
-                    $account?->id,
-
-                    'payment_date' =>
-                    $request->payment_date,
-
-                    'amount' =>
-                    $payAmount,
-
-                    'note' =>
-                    $request->note,
-
-                    'created_by' =>
-                    $user->id,
+                    'receipt_id'      => $receipt->id,
+                    'payment_type_id' => $paymentType->id,
+                    'account_id'      => $account->id,
+                    'payment_date'    => $request->payment_date,
+                    'amount'          => $payAmount,
+                    'note'            => $request->note,
+                    'created_by'      => $userId,
                 ]);
 
-                $receipt->paid_amount =
+                $receipt->paid_amount = round(
                     (float) $receipt->paid_amount +
-                    $payAmount;
+                        $payAmount,
+                    2
+                );
 
-
-                $receipt->due_amount =
+                $receipt->due_amount = round(
                     (float) $receipt->due_amount -
-                    $payAmount;
-
+                        $payAmount,
+                    2
+                );
 
                 if ($receipt->due_amount <= 0.01) {
 
@@ -1165,59 +1155,74 @@ class SalesOrderController extends Controller
                     $receipt->payment_status = 'Pending';
                 }
 
-
-                $receipt->updated_by =
-                    $user->id;
-
+                $receipt->updated_by = $userId;
 
                 $receipt->save();
 
-                if (!$isCash) {
-                    $account->current_balance =
-                        (float) $account->current_balance + $payAmount;
+                $currentBalance = round(
+                    $currentBalance + $payAmount,
+                    2
+                );
 
-                    $account->save();
+                $account->current_balance = $currentBalance;
+                $account->updated_by = $userId;
 
-                    AccountTransaction::create([
+                $account->save();
 
-                        'company_id' =>
-                        $account->company_id,
+                AccountTransaction::create([
+                    'company_id'       => $account->company_id,
+                    'account_id'       => $account->id,
+                    'receipt_id'       => $receipt->id,
 
-                        'account_id' =>
-                        $account->id,
+                    'transaction_date' =>
+                    $request->payment_date,
 
-                        'receipt_id' =>
-                        $receipt->id,
+                    'voucher_no' =>
+                    $receipt->so_no ??
+                        $receipt->receipt_no,
 
-                        'transaction_date' =>
-                        $request->payment_date,
+                    'transaction_type' =>
+                    'Sales-Order',
 
-                        'voucher_no' =>
-                        $receipt->so_no ??
-                            $receipt->receipt_no,
+                    'purpose' =>
+                    'Party Due Payment - ' .
+                        $receipt->receipt_no,
 
-                        'transaction_type' =>
-                        'Sales-Order',
+                    'credit' =>
+                    $payAmount,
 
-                        'purpose' =>
-                        'Party Due Payment',
-                        'credit' =>
-                        $payAmount,
-                        'debit' =>
-                        0,
-                        'balance' =>
-                        $account->current_balance,
-                        'created_by' =>
-                        $user->id,
-                    ]);
-                }
-                $remainingPayment -= $payAmount;
+                    'debit' =>
+                    0,
+
+                    'balance' =>
+                    $currentBalance,
+
+                    'created_by' =>
+                    $userId,
+                ]);
+
+                $remainingPayment = round(
+                    $remainingPayment - $payAmount,
+                    2
+                );
             }
+
             DB::commit();
-            return back()->with('success', 'Due payment completed successfully.');
+
+            return back()->with(
+                'success',
+                'Due payment completed successfully.'
+            );
         } catch (\Exception $e) {
+
             DB::rollBack();
-            return back()->withInput()->with('error', $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
         }
     }
 

@@ -120,12 +120,13 @@ class PurchasePaymentController extends Controller
 
 
     /**
-     * Store Payment
+     * Store Purchase Payment
      */
     public function store(Request $request, Receipt $receipt)
     {
         $user = Auth::user();
         if (!$user->hasRole('Super-Admin')) {
+
             if (
                 $receipt->company_id != $user->company_id ||
                 $receipt->created_by != $user->id
@@ -133,224 +134,312 @@ class PurchasePaymentController extends Controller
                 abort(403);
             }
         }
+
         if (
             $receipt->type !== 'Purchase-Order' ||
             $receipt->status !== 'Completed'
         ) {
+
             return back()->with(
                 'error',
                 'This purchase is not available for payment.'
             );
         }
         $request->validate([
+
             'payment_type_id' => [
                 'required',
                 'exists:payment_types,id'
             ],
+
             'account_id' => [
-                'nullable',
+                'required',
                 'exists:accounts,id'
             ],
+
             'payment_date' => [
                 'required',
                 'date'
             ],
+
             'amount' => [
                 'required',
                 'numeric',
                 'gt:0'
             ],
+
             'note' => [
                 'nullable',
                 'string',
                 'max:1000'
             ],
+
         ]);
+
         DB::beginTransaction();
+
         try {
+
             $receipt = Receipt::where('id', $receipt->id)
                 ->where('type', 'Purchase-Order')
+                ->where('status', 'Completed')
                 ->lockForUpdate()
                 ->firstOrFail();
+
+
             $dueAmount = round(
                 (float) $receipt->due_amount,
                 2
             );
+
             if ($dueAmount <= 0) {
+
                 throw new \Exception(
                     'This purchase has no outstanding balance.'
                 );
             }
+
             $paymentAmount = round(
                 (float) $request->amount,
                 2
             );
+
             if ($paymentAmount > $dueAmount) {
+
                 throw new \Exception(
                     'Payment amount cannot be greater than due amount. ' .
-                        'Due: ' . number_format($dueAmount, 2)
+                        'Due: ' .
+                        number_format($dueAmount, 2)
                 );
             }
-            $paymentType = PaymentType::where('id', $request->payment_type_id)
+
+            $paymentType = PaymentType::where(
+                'id',
+                $request->payment_type_id
+            )
                 ->where('status', 'Active')
                 ->first();
+
             if (!$paymentType) {
+
                 throw new \Exception(
                     'Selected payment type is not active.'
                 );
             }
-            $isCash = strtolower(trim($paymentType->name)) === 'cash';
-            $account = null;
-            if ($isCash) {
-                $account = null;
-            } else {
-                if (!$request->account_id) {
-                    throw new \Exception(
-                        'Please select an account for this payment type.'
-                    );
-                }
-                $account = Account::where('id', $request->account_id)
-                    ->where('status', 'Active')
-                    ->lockForUpdate()
-                    ->first();
-                if (!$account) {
-                    throw new \Exception(
-                        'Selected account is not active or does not exist.'
-                    );
-                }
-                if (
-                    !$user->hasRole('Super-Admin') &&
-                    $account->company_id != $user->company_id
-                ) {
-                    throw new \Exception(
-                        'You are not allowed to use this account.'
-                    );
-                }
-                if (
-                    $account->payment_type_id &&
-                    (int) $account->payment_type_id !==
-                    (int) $request->payment_type_id
-                ) {
-                    throw new \Exception(
-                        'Selected account does not belong to the selected payment type.'
-                    );
-                }
-                $accountBalance = round(
-                    (float) $account->current_balance,
-                    2
+
+            $account = Account::where(
+                'id',
+                $request->account_id
+            )
+                ->where('status', 'Active')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$account) {
+
+                throw new \Exception(
+                    'Selected account is not active or does not exist.'
                 );
-                if ($accountBalance < $paymentAmount) {
-                    throw new \Exception(
-                        'Insufficient account balance. ' .
-                            'Available: ' .
-                            number_format($accountBalance, 2) .
-                            ', Required: ' .
-                            number_format($paymentAmount, 2)
-                    );
-                }
             }
-            $payment = ReceiptPayment::create([
-                'receipt_id'      => $receipt->id,
-                'payment_type_id' => $request->payment_type_id,
-                'account_id'      => $account?->id,
-                'payment_date'    => $request->payment_date,
-                'amount'          => $paymentAmount,
-                'note'            => $request->note,
-                'created_by'      => $user->id,
+
+            if (
+                !$user->hasRole('Super-Admin') &&
+                (int) $account->company_id !== (int) $user->company_id
+            ) {
+
+                throw new \Exception(
+                    'You are not allowed to use this account.'
+                );
+            }
+
+            if (
+                (int) $account->payment_type_id !==
+                (int) $paymentType->id
+            ) {
+
+                throw new \Exception(
+                    'Selected account does not belong to the selected payment type.'
+                );
+            }
+
+            $accountBalance = round(
+                (float) $account->current_balance,
+                2
+            );
+
+            if ($accountBalance < $paymentAmount) {
+
+                throw new \Exception(
+                    'Insufficient account balance. ' .
+                        'Available: ' .
+                        number_format($accountBalance, 2) .
+                        ', Required: ' .
+                        number_format($paymentAmount, 2)
+                );
+            }
+
+            ReceiptPayment::create([
+
+                'receipt_id' =>
+                $receipt->id,
+
+                'payment_type_id' =>
+                $paymentType->id,
+
+                'account_id' =>
+                $account->id,
+
+                'payment_date' =>
+                $request->payment_date,
+
+                'amount' =>
+                $paymentAmount,
+
+                'note' =>
+                $request->note,
+
+                'created_by' =>
+                $user->id,
+
             ]);
-            if ($account) {
-                $newAccountBalance =
-                    round(
-                        (float) $account->current_balance -
-                            $paymentAmount,
-                        2
-                    );
-                $account->update([
-                    'current_balance' => $newAccountBalance,
-                    'updated_by' => $user->id,
-                ]);
-                $lastTransaction = AccountTransaction::where(
-                    'account_id',
-                    $account->id
-                )
-                    ->latest('id')
-                    ->lockForUpdate()
-                    ->first();
-                $previousBalance = $lastTransaction
-                    ? (float) $lastTransaction->balance
-                    : (float) $account->opening_balance;
-                $newTransactionBalance =
-                    round(
-                        $previousBalance -
-                            $paymentAmount,
-                        2
-                    );
-                AccountTransaction::create([
-                    'company_id' =>
-                    $account->company_id,
-                    'account_id' =>
-                    $account->id,
-                    'transaction_date' =>
-                    $request->payment_date,
-                    'voucher_no' =>
-                    $receipt->po_no ??
-                        $receipt->receipt_no,
-                    'transaction_type' =>
-                    'Purchase-Order',
-                    'purpose' =>
-                    'Purchase Payment - ' .
-                        (
-                            $receipt->po_no ??
-                            $receipt->receipt_no
-                        ),
-                    'credit' => 0,
-                    'debit' =>
+
+            $newAccountBalance = round(
+                $accountBalance - $paymentAmount,
+                2
+            );
+
+            $account->update([
+
+                'current_balance' =>
+                $newAccountBalance,
+
+                'updated_by' =>
+                $user->id,
+
+            ]);
+
+            $lastTransaction = AccountTransaction::where(
+                'account_id',
+                $account->id
+            )
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            $previousBalance = $lastTransaction
+                ? (float) $lastTransaction->balance
+                : (float) $account->opening_balance;
+
+            $newTransactionBalance = round(
+                $previousBalance - $paymentAmount,
+                2
+            );
+            AccountTransaction::create([
+
+                'company_id' =>
+                $account->company_id,
+
+                'account_id' =>
+                $account->id,
+
+                'transaction_date' =>
+                $request->payment_date,
+
+                'voucher_no' =>
+                $receipt->po_no ??
+                    $receipt->receipt_no,
+
+                'transaction_type' =>
+                'Purchase-Order',
+
+                'purpose' =>
+                'Purchase Payment - ' .
+                    (
+                        $receipt->po_no ??
+                        $receipt->receipt_no
+                    ),
+
+                'credit' =>
+                0,
+
+                'debit' =>
+                $paymentAmount,
+
+                'balance' =>
+                $newTransactionBalance,
+
+                'receipt_id' =>
+                $receipt->id,
+
+                'created_by' =>
+                $user->id,
+
+            ]);
+            $newPaidAmount = round(
+                (float) $receipt->paid_amount +
                     $paymentAmount,
-                    'balance' =>
-                    $newTransactionBalance,
-                    'receipt_id' =>
-                    $receipt->id,
-                    'created_by' =>
-                    $user->id,
-                ]);
-            }
-            $newPaidAmount =
-                round(
-                    (float) $receipt->paid_amount +
-                        $paymentAmount,
-                    2
-                );
-            $newDueAmount =
-                round(
-                    (float) $receipt->total_amount -
-                        $newPaidAmount,
-                    2
-                );
+                2
+            );
+
+            $newDueAmount = round(
+                (float) $receipt->total_amount -
+                    $newPaidAmount,
+                2
+            );
+
+
             if ($newDueAmount < 0) {
                 $newDueAmount = 0;
             }
             if ($newDueAmount <= 0) {
+
                 $paymentStatus = 'Paid';
+
+                $newDueAmount = 0;
             } elseif ($newPaidAmount > 0) {
+
                 $paymentStatus = 'Partial';
             } else {
+
                 $paymentStatus = 'Pending';
             }
             $receipt->update([
+
                 'paid_amount' =>
                 $newPaidAmount,
+
                 'due_amount' =>
                 $newDueAmount,
+
                 'payment_status' =>
                 $paymentStatus,
+
                 'updated_by' =>
                 $user->id,
+
             ]);
             DB::commit();
-            return redirect()->route('purchase.payment.show', $receipt->id)->with('success', 'Payment completed successfully.');
+
+
+            return redirect()
+                ->route(
+                    'purchase.payment.show',
+                    $receipt->id
+                )
+                ->with(
+                    'success',
+                    'Payment completed successfully.'
+                );
         } catch (\Exception $e) {
+
             DB::rollBack();
-            return back()->withInput()->with('error', $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
         }
     }
 

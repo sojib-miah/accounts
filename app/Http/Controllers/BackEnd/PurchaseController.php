@@ -537,4 +537,72 @@ class PurchaseController extends Controller
             'parties' => $parties,
         ]);
     }
+
+    public function checkSerial(Request $request)
+    {
+        $request->validate([
+            'serial_no' => 'required|string|max:255',
+        ]);
+
+        $serial = strtoupper(trim($request->serial_no));
+
+        $exists = SerialNumber::whereRaw(
+            'UPPER(TRIM(serial_no)) = ?',
+            [$serial]
+        )->exists();
+
+        if ($exists) {
+            return response()->json([
+                'exists' => true,
+                'message' => "Serial Number '{$serial}' already exists."
+            ]);
+        }
+
+        return response()->json([
+            'exists' => false,
+            'message' => 'Serial Number is available.'
+        ]);
+    }
+
+    public function editCheckSerial(Request $request)
+    {
+        $request->validate([
+            'serial_no'  => 'required|string',
+            'product_id' => 'required|exists:products,id',
+            'receipt_id' => 'nullable|exists:receipts,id',
+        ]);
+
+        $serial = strtoupper(trim($request->serial_no));
+
+        $query = SerialNumber::whereRaw(
+            'UPPER(TRIM(serial_no)) = ?',
+            [$serial]
+        );
+
+        $serialNumber = $query->first();
+
+        if (!$serialNumber) {
+
+            return response()->json([
+                'exists' => false,
+                'belongs_to_current_receipt' => false,
+            ]);
+        }
+        $belongsToCurrentReceipt =
+            $request->receipt_id &&
+            (int) $serialNumber->receipt_id ===
+            (int) $request->receipt_id;
+
+        return response()->json([
+            'exists' => true,
+
+            'belongs_to_current_receipt' =>
+            $belongsToCurrentReceipt,
+
+            'message' =>
+            $belongsToCurrentReceipt
+                ? 'Serial belongs to current purchase order.'
+                : 'Serial number already exists.',
+        ]);
+    }
 }
