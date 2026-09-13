@@ -70,7 +70,7 @@
         </div>
     </div>
     <!-- Password Modal -->
-    <div class="modal fade" id="passwordModal" tabindex="-1">
+    <div class="modal fade" id="passwordModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('profile.password') }}" method="POST">

@@ -9,10 +9,31 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerCompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $customerCompanies = CustomerCompany::where('status', 'Sales')->latest()->get();
+        $customerCompanies = CustomerCompany::query()
+            ->where('status', 'Sales')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
+                });
+            })
+
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
         return view('BackEnd.SalesCustomer.index', compact('customerCompanies'));
     }
 
@@ -24,9 +45,7 @@ class CustomerCompanyController extends Controller
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
         ]);
-
         try {
-
             CustomerCompany::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -35,13 +54,11 @@ class CustomerCompanyController extends Controller
                 'status' => 'Sales',
                 'created_by' => Auth::id(),
             ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Customer Company created successfully.',
             ]);
         } catch (\Exception $e) {
-
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -122,10 +139,31 @@ class CustomerCompanyController extends Controller
     }
 
     // expense method 
-    public function expenseIndex()
+    public function expenseIndex(Request $request)
     {
         $user = Auth::user();
-        $customerCompanies = CustomerCompany::where('status', 'Expense')->latest()->get();
+        $customerCompanies = CustomerCompany::query()
+            ->where('status', 'Expense')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
+                });
+            })
+
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
         return view('BackEnd.ExpenseCustomer.index', compact('customerCompanies'));
     }
 

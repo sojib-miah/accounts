@@ -170,7 +170,7 @@
     </div>
 
     {{-- add modal  --}}
-    <div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal fade" id="addUserModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body">
@@ -270,7 +270,8 @@
 
     {{-- edit modal  --}}
     @foreach ($users as $user)
-        <div class="modal fade" id="editUser{{ $user->id }}" tabindex="-1">
+        <div class="modal fade" id="editUser{{ $user->id }}" tabindex="-1" data-bs-backdrop="static"
+            data-bs-keyboard="false">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <form action="{{ route('users.update', $user->id) }}" method="POST">

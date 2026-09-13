@@ -204,7 +204,8 @@
     </div>
 
     {{-- SERIAL NUMBER MODAL --}}
-    <div class="modal fade" id="serialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="serialModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 {{-- HEADER --}}

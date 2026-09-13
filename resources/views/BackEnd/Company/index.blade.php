@@ -124,7 +124,7 @@
     </div>
 
     {{-- add modal --}}
-    <div class="modal fade" id="addCompanyModal">
+    <div class="modal fade" id="addCompanyModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('company.store') }}" method="POST" enctype="multipart/form-data">
@@ -184,7 +184,7 @@
     </div>
 
     <!-- Edit Company Modal -->
-    <div class="modal fade" id="editCompanyModal" tabindex="-1">
+    <div class="modal fade" id="editCompanyModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editForm" method="POST" enctype="multipart/form-data">

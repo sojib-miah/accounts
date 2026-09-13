@@ -1,4 +1,4 @@
-<div class="modal fade" id="createSupplierModal" tabindex="-1">
+<div class="modal fade" id="createSupplierModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">

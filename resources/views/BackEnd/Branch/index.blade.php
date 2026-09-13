@@ -97,7 +97,7 @@
     </div>
 
     {{-- modal add  --}}
-    <div class="modal fade" id="addBranchModal">
+    <div class="modal fade" id="addBranchModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('branch.store') }}" method="POST">
@@ -175,7 +175,8 @@
     </div>
 
     <!-- Edit Branch Modal -->
-    <div class="modal fade" id="editBranchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editBranchModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editForm" method="POST">

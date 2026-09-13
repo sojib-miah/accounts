@@ -86,7 +86,8 @@
         </div>
     </div>
     {{-- ADD / EDIT MODAL --}}
-    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">

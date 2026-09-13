@@ -303,6 +303,7 @@ class SalesOrderController extends Controller
 
     public function show(Receipt $receipt)
     {
+        $user = Auth::user();
         $receipt->load([
             'company',
             'branch',
@@ -315,7 +316,15 @@ class SalesOrderController extends Controller
             'payments.paymentType',
             'payments.user',
         ]);
-        $paymentTypes = PaymentType::where('status', 'Active')->get();
+        $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
         $accounts = Account::where('status', 'Active')
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('company_id', Auth::user()->company_id)
@@ -850,6 +859,7 @@ class SalesOrderController extends Controller
 
     public function profile(Request $request, Party $party)
     {
+        $user = Auth::user();
         $receiptQuery = Receipt::with([
             'creator',
             'branch',
@@ -925,6 +935,12 @@ class SalesOrderController extends Controller
         ];
 
         $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
             ->orderBy('name')
             ->get();
 

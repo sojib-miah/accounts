@@ -111,7 +111,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">
+                                        <td colspan="12" class="text-center">
                                             No Customer Found.
                                         </td>
                                     </tr>

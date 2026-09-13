@@ -153,6 +153,7 @@ class IncomeReceiptController extends Controller
 
     public function show(Receipt $receipt)
     {
+        $user = Auth::user();
         $receipt->load([
             'company',
             'branch',
@@ -167,6 +168,12 @@ class IncomeReceiptController extends Controller
             'payments.user',
         ]);
         $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
             ->orderBy('name')
             ->get();
 
@@ -325,6 +332,7 @@ class IncomeReceiptController extends Controller
 
     public function profile(Request $request, Party $party)
     {
+        $user = Auth::user();
         $receiptQuery = Receipt::with([
             'creator',
             'branch',
@@ -405,6 +413,12 @@ class IncomeReceiptController extends Controller
         ];
 
         $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
             ->orderBy('name')
             ->get();
 

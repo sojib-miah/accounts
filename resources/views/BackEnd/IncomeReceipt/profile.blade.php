@@ -472,7 +472,7 @@
 
     <!-- DUE PAYMENT MODAL -->
     <div class="modal fade" id="duePaymentModal" tabindex="-1" aria-labelledby="duePaymentModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <!-- HEADER -->

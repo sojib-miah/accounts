@@ -101,7 +101,7 @@
 
     <!-- Add Company User Modal -->
     <div class="modal fade" id="addCompanyUserModal" tabindex="-1" aria-labelledby="addCompanyUserModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('user.store') }}" method="POST">
@@ -210,7 +210,7 @@
 
     <!-- Edit Company User Modal -->
     <div class="modal fade" id="editCompanyUserModal" tabindex="-1" aria-labelledby="editCompanyUserModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editUserForm" method="POST">

@@ -71,7 +71,7 @@
     </div>
 
     {{-- CREATE MODAL --}}
-    <div class="modal fade" id="createModal">
+    <div class="modal fade" id="createModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('product-category.store') }}" method="POST">
@@ -113,7 +113,7 @@
     </div>
 
     {{-- EDIT MODAL --}}
-    <div class="modal fade" id="editModal">
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="POST" id="editForm">

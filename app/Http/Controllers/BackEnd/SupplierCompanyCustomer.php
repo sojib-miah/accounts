@@ -36,10 +36,7 @@ class SupplierCompanyCustomer extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view(
-            'BackEnd.SupplierCustomer.index',
-            compact('customerCompanies')
-        );
+        return view('BackEnd.SupplierCustomer.index', compact('customerCompanies'));
     }
 
     public function store(Request $request)

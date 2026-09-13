@@ -276,7 +276,15 @@ class ReceiptController extends Controller
             'payments.paymentType',
             'payments.user',
         ]);
-        $paymentTypes = PaymentType::where('status', 'Active')->get();
+        $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
         $accounts = Account::where('status', 'Active')
             ->when(
                 !$user->hasRole('Super-Admin'),
@@ -733,7 +741,6 @@ class ReceiptController extends Controller
                         ->where('branch_id', $user->branch_id);
                 }
             )
-            ->orderBy('default_status', 'asc')
             ->orderBy('account_name')
             ->get([
                 'id',
@@ -741,7 +748,6 @@ class ReceiptController extends Controller
                 'account_number',
                 'current_balance',
                 'payment_type_id',
-                'default_status'
             ]);
 
         return response()->json($accounts);
@@ -946,6 +952,7 @@ class ReceiptController extends Controller
 
     public function profile(Request $request, Party $party)
     {
+        $user = Auth::user();
         $receiptQuery = Receipt::with('creator')->where('party_id', $party->id)->where('type', 'Expense');
 
         // Receipt Search
@@ -987,7 +994,15 @@ class ReceiptController extends Controller
             });
         }
         $payments = $paymentQuery->latest()->paginate(20, ['*'], 'payment_page')->withQueryString();
-        $paymentTypes = PaymentType::where('status', 'Active')->orderBy('name')->get();
+        $paymentTypes = PaymentType::where('status', 'Active')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->orderBy('name')
+            ->get();
         $summary = [
             'receipt_count' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->count(),
             'qty' => Receipt::where('party_id', $party->id)->where('type', 'Expense')->sum('total_qty'),

@@ -474,7 +474,7 @@
 
     <!-- PARTY DUE PAYMENT MODAL -->
     <div class="modal fade" id="duePaymentModal" tabindex="-1" aria-labelledby="duePaymentModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <form action="{{ route('party.due.payment', $party->id) }}" method="POST" id="partyDuePaymentForm">
@@ -739,12 +739,6 @@
                                 ) || 0;
 
 
-                            let defaultText =
-                                account.default_status === 'Default' ?
-                                ' - Default' :
-                                '';
-
-
                             accountSelect.append(
 
                                 $('<option>', {
@@ -754,9 +748,7 @@
                                     text: account.account_name +
                                         ' (' +
                                         account.account_number +
-                                        ')' +
-                                        defaultText
-
+                                        ')'
                                 })
 
                                 .attr(

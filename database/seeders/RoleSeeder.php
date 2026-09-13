@@ -2,151 +2,131 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
-class PermissionSeeder extends Seeder
+class RoleSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $permissions = [
+        Role::firstOrCreate([
+            'name' => 'Super-Admin',
+            'guard_name' => 'web',
+        ]);
 
-            // Dashboard
+        Role::firstOrCreate([
+            'name' => 'Admin',
+            'guard_name' => 'web',
+        ]);
+
+        Role::firstOrCreate([
+            'name' => 'Manager',
+            'guard_name' => 'web',
+        ]);
+
+        $userRole = Role::firstOrCreate([
+            'name' => 'User',
+            'guard_name' => 'web',
+        ]);
+
+        $userRole->syncPermissions([
             'dashboard-view',
 
-            // User Management
-            'user-list',
-            'user-create',
-            'user-edit',
-            'user-delete',
+            'account-create',
+            'account-delete',
+            'account-edit',
+            'account-list',
 
-            // Role Management
-            'role-list',
-            'role-create',
-            'role-edit',
-            'role-delete',
-
-            // Permission Management
-            'permission-list',
-            'permission-create',
-            'permission-edit',
-            'permission-delete',
-
-            // company 
             'company-create',
             'company-edit',
             'company-list',
             'company-delete',
 
-            // company user 
-            'company-user-list',
-            'company-user-create',
-            'company-user-edit',
-            'company-user-delete',
-
-            // branch 
             'branch-list',
             'branch-create',
             'branch-edit',
             'branch-delete',
 
-            // payment type 
             'payment-type-list',
             'payment-type-create',
             'payment-type-edit',
             'payment-type-delete',
 
-            // account 
             'account-list',
             'account-edit',
             'account-delete',
             'account-create',
 
-            // payee list 
             'payee-list-list',
             'payee-list-create',
             'payee-list-edit',
             'payee-list-delete',
 
-            // expense category 
             'expense-category-list-list',
             'expense-category-list-create',
             'expense-category-list-edit',
             'expense-category-list-delete',
 
-            // expense list 
             'expense-list-list',
             'expense-list-create',
             'expense-list-edit',
             'expense-list-delete',
-
-            // expense recept list 
             'expense-receipt-list',
             'expense-receipt-create',
             'expense-receipt-edit',
             'expense-receipt-delete',
 
-            // receiver list 
             'receiver-list-list',
             'receiver-list-create',
             'receiver-list-edit',
             'receiver-list-delete',
 
-            // income category list 
             'income-category-list-list',
             'income-category-list-create',
             'income-category-list-edit',
             'income-category-list-delete',
 
-            // income leist 
             'income-list-list',
             'income-list-create',
             'income-list-edit',
             'income-list-delete',
-
-            // income recept list 
             'income-receipt-list',
             'income-receipt-create',
             'income-receipt-edit',
             'income-receipt-delete',
 
-            // Settings
-            'general-settings-list',
-            'general-settings-create',
-            'general-settings-edit',
-            'general-settings-delete',
-
             'income-challan-list',
             'income-challan-edit',
             'income-challan-delete',
             'income-challan-create',
+
             'menu-account-list',
             'menu-company-list',
             'menu-sales-list',
             'menu-expense-list',
-            'menu-comits-user-list',
-            'menu-role-permission-list',
-            'menu-setting-list',
+            'menu-purchase-list',
+            'menu-inventory-list',
+            'menu-product-list',
+            'menu-warehouse-list',
+
             'expense-details-list',
             'income-details-list',
-            'menu-package-list',
-            'package-edit',
-            'package-list',
-            'package-create',
-            'package-delete',
             'income-salesorder-list',
+
             'purchase-delete',
             'purchase-list',
             'purchase-edit',
             'purchase-create',
-            'menu-purchase-list',
 
             'supplier-list',
             'supplier-delete',
             'supplier-create',
             'supplier-edit',
 
-            'menu-product-list',
             'product-edit',
             'product-create',
             'product-list',
@@ -157,25 +137,17 @@ class PermissionSeeder extends Seeder
             'product-category-list',
             'product-category-delete',
 
-            'menu-inventory-list',
             'inventory-list',
             'inventory-lowstock-list',
             'inventory-report-list',
+
             'brand-list',
+
             'supplier-company-list',
             'make-payment-list',
-            'menu-warehouse-list',
             'warehouse-list',
             'receiver-company-list',
             'payee-company-list',
-        ];
-
-        foreach ($permissions as $permission) {
-
-            Permission::firstOrCreate([
-                'name' => $permission,
-                'guard_name' => 'web'
-            ]);
-        }
+        ]);
     }
 }

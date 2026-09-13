@@ -100,7 +100,8 @@
             </div>
 
             {{-- ADD MODAL --}}
-            <div class="modal fade" id="addPermissionModal" tabindex="-1">
+            <div class="modal fade" id="addPermissionModal" tabindex="-1" data-bs-backdrop="static"
+                data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered modal-simple">
                     <div class="modal-content">
                         <div class="modal-body">
@@ -172,7 +173,8 @@
 
             {{-- EDIT MODALS --}}
             @foreach ($permissions as $permission)
-                <div class="modal fade" id="editPermissionModal{{ $permission->id }}" tabindex="-1">
+                <div class="modal fade" id="editPermissionModal{{ $permission->id }}" tabindex="-1"
+                    data-bs-backdrop="static" data-bs-keyboard="false">
                     <div class="modal-dialog modal-dialog-centered modal-simple">
                         <div class="modal-content">
                             <div class="modal-body">

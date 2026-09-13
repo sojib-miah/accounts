@@ -103,7 +103,7 @@
     </div>
 
     {{-- add modal  --}}
-    <div class="modal fade" id="addModal">
+    <div class="modal fade" id="addModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('payment-type.store') }}" method="POST">
@@ -149,7 +149,7 @@
     </div>
 
     {{-- edit modal  --}}
-    <div class="modal fade" id="editModal">
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="editForm" method="POST">

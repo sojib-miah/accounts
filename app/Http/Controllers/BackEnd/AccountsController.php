@@ -25,22 +25,17 @@ class AccountsController extends Controller
             'updater'
         ])
             ->when($request->filled('search'), function ($query) use ($request) {
-
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
-
                     $q->where('account_name', 'like', "%{$search}%")
                         ->orWhere('account_holder_name', 'like', "%{$search}%")
                         ->orWhere('account_number', 'like', "%{$search}%")
                         ->orWhere('opening_balance', 'like', "%{$search}%")
                         ->orWhere('current_balance', 'like', "%{$search}%")
-                        ->orWhere('default_status', 'like', "%{$search}%")
                         ->orWhere('status', 'like', "%{$search}%");
                 });
             })
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-
                 $query->where('created_by', Auth::id());
             })
             ->latest()
@@ -91,7 +86,6 @@ class AccountsController extends Controller
             'account_number'      => 'required|string|max:255|unique:accounts,account_number',
             'opening_balance'     => 'required|numeric|min:0',
             'payment_type_id'     => 'required|exists:payment_types,id',
-            'default_status'      => 'required|in:Default,Not Default',
             'status'              => 'required|in:Active,Inactive',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
@@ -102,15 +96,6 @@ class AccountsController extends Controller
         }
         DB::beginTransaction();
         try {
-            if (!Account::where('default_status', 'Default')->exists()) {
-                $request->default_status = 'Default';
-            }
-            if ($request->default_status == 'Default') {
-                Account::where('default_status', 'Default')
-                    ->update([
-                        'default_status' => 'Not Default'
-                    ]);
-            }
             Account::create([
                 'company_id'          => $request->company_id,
                 'branch_id'           => $request->branch_id,
@@ -121,7 +106,6 @@ class AccountsController extends Controller
                 'opening_balance'     => $request->opening_balance,
                 'current_balance'     => $request->opening_balance,
                 'payment_type_id'     => $request->payment_type_id,
-                'default_status'      => $request->default_status,
                 'status'              => $request->status,
                 'created_by'          => auth()->id(),
             ]);
@@ -172,26 +156,10 @@ class AccountsController extends Controller
             'account_number'      => 'required|max:255|unique:accounts,account_number,' . $account->id,
             'opening_balance'     => 'required|numeric|min:0',
             'payment_type_id'     => 'required|exists:payment_types,id',
-            'default_status'      => 'required|in:Default,Not Default',
             'status'              => 'required|in:Active,Inactive',
         ]);
         DB::beginTransaction();
         try {
-            if (
-                $account->default_status == 'Default' &&
-                $request->default_status == 'Not Default'
-            ) {
-                $defaultCount = Account::where('default_status', 'Default')->count();
-                if ($defaultCount == 1) {
-                    return back()->withInput()->with('error', 'At least one account must remain as Default.');
-                }
-            }
-            if ($request->default_status == 'Default') {
-                Account::where('id', '!=', $account->id)
-                    ->update([
-                        'default_status' => 'Not Default'
-                    ]);
-            }
             $difference = $request->opening_balance - $account->opening_balance;
             $currentBalance = $account->current_balance + $difference;
             $account->update([
@@ -204,7 +172,6 @@ class AccountsController extends Controller
                 'account_number'      => $request->account_number,
                 'opening_balance'     => $request->opening_balance,
                 'current_balance'     => $currentBalance,
-                'default_status'      => $request->default_status,
                 'status'              => $request->status,
                 'updated_by'          => auth()->id(),
             ]);

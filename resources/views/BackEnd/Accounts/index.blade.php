@@ -50,7 +50,6 @@
                                     <th>Payment Type</th>
                                     <th class="text-end">Opening Balance</th>
                                     <th class="text-end">Current Balance</th>
-                                    <th>Default</th>
                                     <th>Status</th>
                                     <th width="170">Action</th>
                                 </tr>
@@ -76,13 +75,6 @@
                                             <strong>{{ number_format($account->current_balance, 2) }}</strong>
                                         </td>
                                         <td>
-                                            @if ($account->default_status == 'Default')
-                                                <span class="badge bg-primary">Default</span>
-                                            @else
-                                                <span class="badge bg-secondary">No</span>
-                                            @endif
-                                        </td>
-                                        <td>
                                             @if ($account->status == 'Active')
                                                 <span class="badge bg-success">Active</span>
                                             @else
@@ -100,7 +92,6 @@
                                                     data-holder="{{ $account->account_holder_name }}"
                                                     data-number="{{ $account->account_number }}"
                                                     data-opening="{{ $account->opening_balance }}"
-                                                    data-default="{{ $account->default_status }}"
                                                     data-status="{{ $account->status }}">
 
                                                     <i class="fa fa-edit"></i>
@@ -121,7 +112,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">No Account Found</td>
+                                        <td colspan="12" class="text-center">No Account Found</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -133,7 +124,8 @@
     </div>
 
     {{-- add modal  --}}
-    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('accounts.store') }}" method="POST">
@@ -253,17 +245,6 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
-                            {{-- Default Status --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Default</label>
-                                <select name="default_status" class="form-select select2">
-                                    <option value="Not Default">Not Default</option>
-                                    <option value="Default">Default</option>
-                                </select>
-                                @error('default_status', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Status</label>
@@ -293,7 +274,8 @@
     </div>
 
     {{-- Edit Account Modal --}}
-    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editAccountForm" method="POST">
@@ -413,17 +395,6 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
-                            {{-- Default Status --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Default Status</label>
-                                <select name="default_status" id="edit_default_status" class="form-select select2">
-                                    <option value="Default">Default</option>
-                                    <option value="Not Default">Not Default</option>
-                                </select>
-                                @error('default_status', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Status</label>
@@ -510,10 +481,6 @@
 
             $('#edit_payment_type_id')
                 .val(paymentTypeId)
-                .trigger('change');
-
-            $('#edit_default_status')
-                .val(btn.data('default'))
                 .trigger('change');
 
             $('#edit_status')

@@ -22,7 +22,6 @@ return new class extends Migration
             $table->decimal('opening_balance', 15, 2)->default(0);
             $table->decimal('current_balance', 15, 2)->default(0);
             $table->foreignId('payment_type_id')->nullable()->constrained('payment_types')->cascadeOnUpdate()->restrictOnDelete();
-            $table->enum('default_status', ['Default', 'Not Default'])->default('Not Default');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

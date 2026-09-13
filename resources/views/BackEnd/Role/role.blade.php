@@ -148,7 +148,7 @@
     </div>
 
     {{-- Add Role Modal --}}
-    <div class="modal fade" id="addRoleModal" tabindex="-1">
+    <div class="modal fade" id="addRoleModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-xl modal-simple modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body">
@@ -228,7 +228,8 @@
 
     {{-- Edit Role Modal --}}
     @foreach ($roles as $role)
-        <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1">
+        <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1" data-bs-backdrop="static"
+            data-bs-keyboard="false">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <form action="{{ route('roles.update', $role->id) }}" method="POST">
@@ -298,6 +299,9 @@
                         </div>
                         <hr>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
                             <button type="submit" class="btn btn-primary">
                                 Update Role
                             </button>

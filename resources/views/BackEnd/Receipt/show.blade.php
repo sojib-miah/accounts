@@ -343,7 +343,7 @@
 
     <!-- Expense Payment Modal -->
     <div class="modal fade" id="expensePaymentModal" tabindex="-1" aria-labelledby="expensePaymentModalLabel"
-        aria-hidden="true">
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <form action="{{ route('expense.payment.store', $receipt->id) }}" method="POST"
@@ -518,15 +518,14 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+
             $('#expense_payment_type_id').on('change', function() {
 
                 let paymentTypeId = $(this).val();
 
-                let accountSelect =
-                    $('#expense_account_id');
+                let accountSelect = $('#expense_account_id');
 
-                let balanceBox =
-                    $('#expense_account_balance');
+                let balanceBox = $('#expense_account_balance');
 
                 accountSelect
                     .empty()
@@ -564,6 +563,8 @@
                     .prop('disabled', true);
 
                 accountSelect.trigger('change.select2');
+
+
                 $.ajax({
 
                     url: "{{ url('/admin/expense/payment/accounts') }}/" +
@@ -574,6 +575,8 @@
                     success: function(accounts) {
 
                         accountSelect.empty();
+
+
                         if (!accounts || accounts.length === 0) {
 
                             accountSelect.append(
@@ -587,18 +590,20 @@
                             accountSelect.trigger('change.select2');
 
                             balanceBox.html(`
-                        <div class="alert alert-warning py-2 mb-0">
-                            <i class="fa fa-exclamation-triangle me-1"></i>
-                            No active account found for this payment type.
-                        </div>
-                    `);
+                                <div class="alert alert-warning py-2 mb-0">
+                                    <i class="fa fa-exclamation-triangle me-1"></i>
+                                    No active account found for this payment type.
+                                </div>
+                            `);
 
                             return;
                         }
 
+
                         accountSelect.append(
                             '<option value="">Select Account</option>'
                         );
+
 
                         $.each(accounts, function(index, account) {
 
@@ -607,10 +612,15 @@
                                     account.current_balance
                                 ) || 0;
 
-                            let defaultText =
-                                account.default_status === 'Default' ?
-                                ' - Default' :
-                                '';
+
+                            let formattedBalance =
+                                balance.toLocaleString(
+                                    'en-BD', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                );
+
 
                             let option = $('<option>', {
 
@@ -620,14 +630,8 @@
                                     ' - ' +
                                     account.account_number +
                                     ' (' +
-                                    balance.toLocaleString(
-                                        'en-BD', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        }
-                                    ) +
-                                    ' TK)' +
-                                    defaultText
+                                    formattedBalance +
+                                    ' TK)'
 
                             });
 
@@ -636,6 +640,7 @@
                                 'data-balance',
                                 balance
                             );
+
 
                             option.attr(
                                 'data-payment-type',
@@ -646,6 +651,8 @@
                             accountSelect.append(option);
 
                         });
+
+
                         accountSelect
                             .prop('disabled', false)
                             .prop('required', true);
@@ -653,6 +660,8 @@
                         accountSelect.trigger('change.select2');
 
                     },
+
+
                     error: function() {
 
                         accountSelect
@@ -664,17 +673,23 @@
 
                         accountSelect.trigger('change.select2');
 
+
                         balanceBox.html(`
-                    <div class="alert alert-danger py-2 mb-0">
-                        <i class="fa fa-times-circle me-1"></i>
-                        Failed to load payment accounts.
-                    </div>
-                `);
+                            <div class="alert alert-danger py-2 mb-0">
+                                <i class="fa fa-times-circle me-1"></i>
+                                Failed to load payment accounts.
+                            </div>
+                        `);
+
 
                         Swal.fire({
+
                             icon: 'error',
+
                             title: 'Account Loading Failed',
+
                             text: 'Unable to load accounts for the selected payment type.'
+
                         });
 
                     }
@@ -682,15 +697,18 @@
                 });
 
             });
+
+
+            // Show Account Balance
             $('#expense_account_id').on('change', function() {
 
-                let option =
-                    $(this).find(':selected');
+                let option = $(this).find(':selected');
 
                 let balance =
                     parseFloat(
                         option.attr('data-balance')
                     ) || 0;
+
 
                 if (!$(this).val()) {
 
@@ -699,24 +717,25 @@
                     return;
                 }
 
+
                 $('#expense_account_balance').html(`
 
-            <div class="alert alert-info py-2 mb-0">
+                    <div class="alert alert-info py-2 mb-0">
 
-                <i class="fa fa-wallet me-1"></i>
+                        <i class="fa fa-wallet me-1"></i>
 
-                Available Balance:
+                        Available Balance:
 
-                <strong>
-                    ${balance.toLocaleString('en-BD', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })} TK
-                </strong>
+                        <strong>
+                            ${balance.toLocaleString('en-BD', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} TK
+                        </strong>
 
-            </div>
+                    </div>
 
-        `);
+                `);
 
             });
 

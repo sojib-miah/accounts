@@ -1,4 +1,5 @@
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <form id="editForm" method="POST">

@@ -1,5 +1,6 @@
 <!-- Add Party Modal -->
-<div class="modal fade" id="addPartyModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="addPartyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form action="{{ route('party.store') }}" method="POST">

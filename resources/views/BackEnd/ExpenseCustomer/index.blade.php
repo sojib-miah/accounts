@@ -5,24 +5,32 @@
         <div class="mt-3">
             {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
-
                 <div>
                     <h4 class="mb-0">
                         Customer Company
                     </h4>
-
                     <small class="text-muted">
                         Manage customer companies
                     </small>
                 </div>
-
-                <button type="button" class="btn btn-primary" id="addCustomerCompany">
-
-                    <i class="fa fa-plus me-1"></i>
-                    Add Customer Company
-
-                </button>
-
+                <div class="d-flex gap-3 align-items-center">
+                    <form action="{{ route('customer-expense.index') }}" method="GET" class="d-flex gap-2">
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search Customer Company...">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search me-1"></i>
+                            Search
+                        </button>
+                        <a href="{{ route('customer-expense.index') }}" class="btn btn-secondary">
+                            <i class="fa fa-refresh me-1"></i>
+                            Reset
+                        </a>
+                    </form>
+                    <button type="button" class="btn btn-primary" id="addCustomerCompany">
+                        <i class="fa fa-plus me-1"></i>
+                        Add Customer Company
+                    </button>
+                </div>
             </div>
             {{-- TABLE --}}
             <div class="card">
@@ -154,7 +162,8 @@
         </div>
     </div>
     {{-- ADD / EDIT MODAL --}}
-    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">

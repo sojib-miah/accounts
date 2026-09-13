@@ -1,4 +1,4 @@
-<div class="modal fade" id="addBrandModal" tabindex="-1">
+<div class="modal fade" id="addBrandModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
         <form action="{{ route('brand.store') }}" method="POST">
             @csrf

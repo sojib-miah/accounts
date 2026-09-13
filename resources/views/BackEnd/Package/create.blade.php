@@ -1,4 +1,4 @@
-<div class="modal fade" id="addPackageModal" tabindex="-1">
+<div class="modal fade" id="addPackageModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <form action="{{ route('package.store') }}" method="POST">
             @csrf

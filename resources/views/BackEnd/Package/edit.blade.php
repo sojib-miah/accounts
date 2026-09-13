@@ -1,4 +1,4 @@
-<div class="modal fade" id="editPackageModal" tabindex="-1">
+<div class="modal fade" id="editPackageModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <form id="editForm" method="POST">
             @csrf
