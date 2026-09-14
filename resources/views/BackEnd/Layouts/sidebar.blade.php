@@ -442,7 +442,7 @@
         @endcan
     </ul>
 
-    <div class="m-5">
+    <div class="m-4">
         <a href="{{ route('upgrade.index') }}" class="btn btn-success btn-lg shadow">
             <i class="fa-brands fa-web-awesome me-3"></i>
             Upgrade To Pro
