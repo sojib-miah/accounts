@@ -11,6 +11,7 @@ use App\Http\Controllers\BackEnd\CompanyController;
 use App\Http\Controllers\BackEnd\CompanyUserController;
 use App\Http\Controllers\BackEnd\CustomerCompanyController;
 use App\Http\Controllers\BackEnd\DashboardController;
+use App\Http\Controllers\BackEnd\DirectIncomeController;
 use App\Http\Controllers\BackEnd\IncomeCategoryController;
 use App\Http\Controllers\BackEnd\IncomeController;
 use App\Http\Controllers\BackEnd\IncomeReceiptController;
@@ -283,4 +284,13 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'show'])->name('supplier-company.show');
     Route::put('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'update'])->name('supplier-company.update');
     Route::delete('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'destroy'])->name('supplier-company.destroy');
+
+    // Direct Income route 
+    Route::get('/direct/income', [DirectIncomeController::class, 'index'])->name('direct.income.index');
+    Route::get('/direct/income/create', [DirectIncomeController::class, 'createIncome'])->name('direct.income.create');
+    Route::post('/direct/income/store', [DirectIncomeController::class, 'store'])->name('direct.income.store');
+    Route::get('/direct/income/{receipt}', [DirectIncomeController::class, 'show'])->name('direct.income.show');
+    Route::get('/direct/income/{receipt}/edit', [DirectIncomeController::class, 'edit'])->name('direct.income.edit');
+    Route::put('/direct/income/{receipt}', [DirectIncomeController::class, 'update'])->name('direct.income.update');
+    Route::post('/direct/income/{receipt}/payment', [DirectIncomeController::class, 'paymentStore'])->name('direct.income.payment.store');
 });

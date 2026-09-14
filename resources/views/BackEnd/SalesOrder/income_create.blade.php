@@ -133,7 +133,7 @@
                                         <table class="table table-bordered mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th width="50">SL</th>
+                                                    <th width="50">SN</th>
                                                     <th width="300">sku-Product name</th>
                                                     <th>Description</th>
                                                     <th width="150">Serial No</th>
@@ -156,8 +156,8 @@
                                     <label>Remarks</label>
                                     <textarea name="remarks" rows="5" class="form-control"></textarea>
                                 </div>
-                                <div class="col-md-4 border">
-                                    <table class="table table-bordered">
+                                <div class="col-md-4">
+                                    <table class="table table-bordered border">
                                         <tr>
                                             <th>Total Qty</th>
                                             <td>

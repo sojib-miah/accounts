@@ -280,6 +280,21 @@
             </li>
         @endcan
 
+        {{-- direct income  --}}
+        <li class="menu-item {{ request()->routeIs('direct.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-solid fa-diamond-turn-right me-3"></i>
+                Direct Income
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('direct.income.index') ? 'active' : '' }}">
+                    <a href="{{ route('direct.income.index') }}" class="menu-link">
+                        Direct Income
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- expense -->
         @can('menu-expense-list')
             <li
