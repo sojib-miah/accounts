@@ -1,2 +1,0 @@
-Receipts table type update-- Direct-Income.
-AccountTranstions table type update-- Direct-Income.

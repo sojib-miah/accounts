@@ -118,9 +118,9 @@
                                 </div>
                             </div>
                             {{-- Income Item List --}}
-                            <div class="card">
+                            <div class="card mt-3">
                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Purchase Order Items</h5>
+                                    <h5 class="mb-0">Direct Income Items</h5>
                                     <button type="button" class="btn btn-primary btn-sm" id="addRow">
                                         <i class="fa fa-plus"></i>
                                         Add Product
