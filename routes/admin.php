@@ -23,6 +23,7 @@ use App\Http\Controllers\BackEnd\PaymentTypeController;
 use App\Http\Controllers\BackEnd\PermissionController;
 use App\Http\Controllers\BackEnd\ProductCategoryController;
 use App\Http\Controllers\BackEnd\ProductController;
+use App\Http\Controllers\BackEnd\ProPackageController;
 use App\Http\Controllers\BackEnd\PurchaseController;
 use App\Http\Controllers\BackEnd\PurchasePaymentController;
 use App\Http\Controllers\BackEnd\ReceiptController;
@@ -293,4 +294,9 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     Route::get('/direct/income/{receipt}/edit', [DirectIncomeController::class, 'edit'])->name('direct.income.edit');
     Route::put('/direct/income/{receipt}', [DirectIncomeController::class, 'update'])->name('direct.income.update');
     Route::post('/direct/income/{receipt}/payment', [DirectIncomeController::class, 'paymentStore'])->name('direct.income.payment.store');
+    Route::get('/direct/income/{receipt}/print', [DirectIncomeController::class, 'print'])->name('direct.income.print');
+    Route::get('/direct/income/{receipt}/pdf', [DirectIncomeController::class, 'pdf'])->name('direct.income.pdf');
+
+    // upgrade to pro route 
+    Route::get('/upgrade', [ProPackageController::class, 'index'])->name('upgrade.index');
 });

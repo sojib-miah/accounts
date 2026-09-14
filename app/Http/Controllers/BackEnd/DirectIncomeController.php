@@ -16,6 +16,7 @@ use App\Models\ReceiptItem;
 use App\Models\ReceiptPayment;
 use App\Models\SerialNumber;
 use App\Models\StockTransaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -835,5 +836,49 @@ class DirectIncomeController extends Controller
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
         }
+    }
+
+    public function print(Receipt $receipt)
+    {
+        $receipt->load([
+            'company',
+            'branch',
+            'customerCompany',
+            'party',
+            'creator',
+            'items.product',
+            'items.category',
+            'items.accountHead',
+            'payments.account',
+            'payments.paymentType',
+            'payments.user',
+        ]);
+
+        return view('BackEnd.DirectIncome.print', compact('receipt'));
+    }
+
+    public function pdf(Receipt $receipt)
+    {
+        $receipt->load([
+            'company',
+            'branch',
+            'customerCompany',
+            'party',
+            'creator',
+            'items.product',
+            'items.category',
+            'items.accountHead',
+            'payments.account',
+            'payments.paymentType',
+            'payments.user',
+        ]);
+
+        $pdf = Pdf::loadView('BackEnd.DirectIncome.pdf', compact('receipt'));
+
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->stream(
+            'Direct-Income-' . $receipt->receipt_no . '.pdf'
+        );
     }
 }
