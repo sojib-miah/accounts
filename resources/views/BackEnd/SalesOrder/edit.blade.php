@@ -269,10 +269,16 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 mt-3">
-                            <i class="fa fa-save me-2"></i>
-                            Update Sales Order
-                        </button>
+                        <div class="d-flex justify-content-end gap-5">
+                            <a href="{{ route('sales.order.index') }}" class="btn btn-secondary mt-3">
+                                <i class="fa-solid fa-arrow-left me-2"></i>
+                                Back
+                            </a>
+                            <button type="submit" class="btn btn-success mt-3">
+                                <i class="fa fa-save me-2"></i>
+                                Update Sales Order
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>

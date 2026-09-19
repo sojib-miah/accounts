@@ -248,9 +248,16 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary w-100 mt-3">
-                            Save Receipt
-                        </button>
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary mt-3">
+                                <i class="fa-solid fa-arrow-left me-3"></i>
+                                Back
+                            </a>
+                            <button class="btn btn-primary mt-3">
+                                <i class="fa-regular fa-floppy-disk me-3"></i>
+                                Save Receipt
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

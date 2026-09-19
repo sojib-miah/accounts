@@ -79,10 +79,10 @@
                 </div>
             </div>
             <div class="text-end mt-3">
-                <button class="btn btn-danger me-3" onclick="location.reload()">
-                    <i class="fa-solid fa-arrows-rotate me-2"></i>
-                    Reset
-                </button>
+                <a href="{{ route('purchase.index') }}" class="btn btn-secondary me-3">
+                    <i class="fa-solid fa-arrow-left me-2"></i>
+                    Back
+                </a>
                 <button class="btn btn-success">
                     <i class="fa fa-save me-2"></i>
                     Save Purchase

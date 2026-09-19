@@ -337,6 +337,12 @@
                         </table>
                     </div>
                 </div>
+                <div>
+                    <a href="{{ route('receipt.expense.index') }}" class="btn d-block w-full btn-secondary mt-3">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        Back
+                    </a>
+                </div>
             </div>
         </div>
     </div>

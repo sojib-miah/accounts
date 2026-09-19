@@ -321,11 +321,13 @@
                                 Receive Payment
                             </button>
                         @endif
-                        <a href="{{ route('direct.income.edit', $receipt->id) }}"
-                            class="btn btn-warning btn-lg text-white">
-                            <i class="fa fa-edit me-2"></i>
-                            Modify
-                        </a>
+                        @if ($receipt->payment_status == 'Pending')
+                            <a href="{{ route('direct.income.edit', $receipt->id) }}"
+                                class="btn btn-warning btn-lg text-white">
+                                <i class="fa fa-edit me-2"></i>
+                                Modify
+                            </a>
+                        @endif
                         <a href="{{ route('direct.income.print', $receipt->id) }}" target="_blank"
                             class="btn btn-primary btn-lg">
                             <i class="fa fa-print me-2"></i>
@@ -372,6 +374,12 @@
                                 </tr>
                             </table>
                         </div>
+                    </div>
+                    <div>
+                        <a href="{{ route('direct.income.index') }}" class="btn d-block w-full btn-secondary mt-3">
+                            <i class="fa-solid fa-arrow-left me-3"></i>
+                            Back
+                        </a>
                     </div>
                 </div>
             </div>

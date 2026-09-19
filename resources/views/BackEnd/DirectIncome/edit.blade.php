@@ -334,9 +334,17 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 mt-3">
-                            Update Direct Income
-                        </button>
+
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{{ route('direct.income.index') }}" class="btn btn-secondary mt-3">
+                                <i class="fa-solid fa-arrow-left me-3"></i>
+                                Back
+                            </a>
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fa-regular fa-floppy-disk me-3"></i>
+                                Update Direct Invoice
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>

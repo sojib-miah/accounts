@@ -4,52 +4,8 @@
 
 @section('content')
     <div class="mx-5 py-4">
-        <div class="d-flex justify-content-end align-items-center mt-3">
-            <div class="card shadow-sm">
-                <div class="card-body" style="padding: 10px;">
-
-                    <p class="text-primary mb-0">
-                        <strong>Package:</strong>
-                        {{ $package?->package?->name ?? 'No Package' }}
-                    </p>
-
-                    <p class="mb-0">
-                        <strong>Start:</strong>
-                        {{ $package?->start_date?->format('d M Y') ?? '-' }}
-                    </p>
-
-                    <p class="mb-0">
-                        <strong>Expire:</strong>
-                        {{ $package?->expire_date?->format('d M Y') ?? '-' }}
-                    </p>
-
-                    <p class="mb-0">
-                        <strong>Status:</strong>
-
-                        @if ($package?->status === 'Active')
-                            <span class="badge bg-success">
-                                Active
-                            </span>
-                        @elseif ($package?->status === 'Expired')
-                            <span class="badge bg-danger">
-                                Expired
-                            </span>
-                        @elseif ($package?->status === 'Cancelled')
-                            <span class="badge bg-secondary">
-                                Cancelled
-                            </span>
-                        @else
-                            <span class="badge bg-warning text-dark">
-                                Inactive
-                            </span>
-                        @endif
-                    </p>
-
-                </div>
-            </div>
-        </div>
         <!-- ================= Header ================= -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center my-5">
             <div>
                 <h2 class="fw-bold mb-1">
                     <i class="fa fa-chart-line text-primary me-2"></i>
@@ -59,18 +15,62 @@
                     Income • Expense • Cash Flow • Reports
                 </small>
             </div>
-            <div>
-                <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger btn-sm" target="_blank">
-                    <i class="fa fa-file-pdf me-2"></i>
-                    PDF
-                </a>
-                <a href="{{ route('dashboard.excel') }}" class="btn btn-success btn-sm">
-                    <i class="fa fa-file-excel me-2"></i>
-                    Excel
-                </a>
-                <a href="{{ url()->current() }}" class="btn btn-primary">
-                    <i class="fa fa-sync"></i>
-                </a>
+            <div class="d-flex gap-3 align-items-center justify-content-center">
+                <div class="card shadow-sm">
+                    <div class="card-body" style="padding: 10px;">
+
+                        <p class="text-primary mb-0">
+                            <strong>Package:</strong>
+                            {{ $package?->package?->name ?? 'No Package' }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Start:</strong>
+                            {{ $package?->start_date?->format('d M Y') ?? '-' }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Expire:</strong>
+                            {{ $package?->expire_date?->format('d M Y') ?? '-' }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Status:</strong>
+
+                            @if ($package?->status === 'Active')
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+                            @elseif ($package?->status === 'Expired')
+                                <span class="badge bg-danger">
+                                    Expired
+                                </span>
+                            @elseif ($package?->status === 'Cancelled')
+                                <span class="badge bg-secondary">
+                                    Cancelled
+                                </span>
+                            @else
+                                <span class="badge bg-warning text-dark">
+                                    Inactive
+                                </span>
+                            @endif
+                        </p>
+
+                    </div>
+                </div>
+                <div>
+                    <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger btn-sm" target="_blank">
+                        <i class="fa fa-file-pdf me-2"></i>
+                        PDF
+                    </a>
+                    <a href="{{ route('dashboard.excel') }}" class="btn btn-success btn-sm">
+                        <i class="fa fa-file-excel me-2"></i>
+                        Excel
+                    </a>
+                    <a href="{{ url()->current() }}" class="btn btn-primary">
+                        <i class="fa fa-sync"></i>
+                    </a>
+                </div>
             </div>
         </div>
         <!-- ================= KPI Cards ================= -->
@@ -724,9 +724,17 @@
                                             {{ \Carbon\Carbon::parse($tran->transaction_date)->format('d M') }}
                                         </td>
                                         <td>
-                                            @if ($tran->transaction_type == 'Income')
+                                            @if ($tran->transaction_type == 'Purchase-Order')
                                                 <span class="badge bg-success">
-                                                    Income
+                                                    Purchase Order
+                                                </span>
+                                            @elseif ($tran->transaction_type == 'Sales-Order')
+                                                <span class="badge bg-info">
+                                                    Sales Order
+                                                </span>
+                                            @elseif ($tran->transaction_type == 'Direct-Income')
+                                                <span class="badge bg-primary">
+                                                    Direct Income
                                                 </span>
                                             @else
                                                 <span class="badge bg-danger">
@@ -759,27 +767,27 @@
                 </h5>
             </div>
             <div class="card-body text-center">
-                <a href="{{ route('income.receipt.create') }}" class="btn btn-success m-2">
+                <a href="{{ route('sales.order.create') }}" class="btn btn-success m-2">
                     <i class="fa fa-plus-circle me-2"></i>
-                    New Income
+                    New Sales
                 </a>
                 <a href="{{ route('receipt.expense.create') }}" class="btn btn-danger m-2">
                     <i class="fa fa-minus-circle me-2"></i>
                     New Expense
                 </a>
-                <a href="{{ route('income.receipt.index') }}" class="btn btn-primary m-2">
+                <a href="{{ route('sales.order.index') }}" class="btn btn-primary m-2">
                     <i class="fa fa-list me-2"></i>
-                    Income List
+                    Sales List
                 </a>
                 <a href="{{ route('receipt.expense.index') }}" class="btn btn-warning m-2">
                     <i class="fa fa-list me-2"></i>
                     Expense List
                 </a>
-                <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger m-2">
+                <a href="{{ route('dashboard.pdf') }}" class="btn btn-danger m-2" target="_blank">
                     <i class="fa fa-file-pdf me-2"></i>
                     Export PDF
                 </a>
-                <a href="{{ route('dashboard.excel') }}" class="btn btn-success m-2">
+                <a href="{{ route('dashboard.excel') }}" class="btn btn-success m-2" target="_blank">
                     <i class="fa fa-file-excel me-2"></i>
                     Export Excel
                 </a>

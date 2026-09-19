@@ -193,9 +193,16 @@
                                     </table>
                                 </div>
                             </div>
-                            <button class="btn btn-primary w-100 mt-3">
-                                Save Sales Order
-                            </button>
+                            <div class="d-flex justify-content-end gap-5">
+                                <a href="{{ route('sales.order.index') }}" class="btn btn-secondary mt-3">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>
+                                    Back
+                                </a>
+                                <button class="btn btn-primary mt-3" type="submit">
+                                    <i class="fa-regular fa-floppy-disk me-2"></i>
+                                    Save Sales Order
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -289,7 +296,7 @@
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" name="description[]" class="form-control description" placeholder="Description"></td>
+            <td><input type="text" name="description[]" class="form-control description" readonly placeholder="Description"></td>
             <td class="text-center">
                 <button type="button" class="btn btn-info btn-sm serialBtn" disabled>
                     <i class="fa fa-barcode me-1"></i>

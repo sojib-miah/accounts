@@ -57,6 +57,38 @@
             </li>
         @endcan
 
+        <!-- party -->
+        <li
+            class="menu-item {{ request()->routeIs('supplier-company.index') || request()->routeIs('supplier.index') || request()->routeIs('customer-company.index') || request()->routeIs('receiver.index') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-solid fa-champagne-glasses me-3"></i>
+                Party
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
+                    <a href="{{ route('supplier-company.index') }}" class="menu-link">
+                        Supplier
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
+                    <a href="{{ route('supplier.index') }}" class="menu-link">
+                        Supplier List
+                    </a>
+                </li>
+
+                <li class="menu-item {{ request()->routeIs('customer-company.index') ? 'active' : '' }}">
+                    <a href="{{ route('customer-company.index') }}" class="menu-link">
+                        Customer
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('receiver.index') ? 'active' : '' }}">
+                    <a href="{{ route('receiver.index') }}" class="menu-link">
+                        Customer List
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Accounts -->
         @can('menu-account-list')
             <li
@@ -121,13 +153,13 @@
         <!-- purchase -->
         @can('menu-purchase-list')
             <li
-                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('supplier.*') || request()->routeIs('supplier-company.*') || request()->routeIs('purchase.payment.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('purchase.*') || request()->routeIs('purchase.payment.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-basket-shopping me-3"></i>
                     Purchase
                 </a>
                 <ul class="menu-sub">
-                    @can('supplier-company-list')
+                    {{-- @can('supplier-company-list')
                         <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
                             <a href="{{ route('supplier-company.index') }}" class="menu-link">
                                 Supplier Company
@@ -140,7 +172,7 @@
                                 Supplier List
                             </a>
                         </li>
-                    @endcan
+                    @endcan --}}
                     @can('purchase-list')
                         <li class="menu-item {{ request()->routeIs('purchase.index') ? 'active' : '' }}">
                             <a href="{{ route('purchase.index') }}" class="menu-link">
@@ -214,13 +246,13 @@
         <!-- Income seals-->
         @can('menu-sales-list')
             <li
-                class="menu-item {{ request()->routeIs('receiver.*') || request()->routeIs('income.category.*') || request()->routeIs('income.*') || request()->routeIs('income.receipt.*') || request()->routeIs('challan.*') || request()->routeIs('income.*') || request()->routeIs('sales.order.*') || request()->routeIs('customer-company.*') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('income.category.*') || request()->routeIs('income.*') || request()->routeIs('income.receipt.*') || request()->routeIs('challan.*') || request()->routeIs('income.*') || request()->routeIs('sales.order.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-money-bill-trend-up me-3"></i>
                     Sales
                 </a>
                 <ul class="menu-sub">
-                    @can('receiver-company-list')
+                    {{-- @can('receiver-company-list')
                         <li class="menu-item {{ request()->routeIs('customer-company.index') ? 'active' : '' }}">
                             <a href="{{ route('customer-company.index') }}" class="menu-link">
                                 Customer Company
@@ -233,7 +265,7 @@
                                 Customer List
                             </a>
                         </li>
-                    @endcan
+                    @endcan --}}
                     {{-- @can('income-category-list-list')
                         <li class="menu-item {{ request()->routeIs('income.category.index') ? 'active' : '' }}">
                             <a href="{{ route('income.category.index') }}" class="menu-link">
@@ -284,12 +316,12 @@
         <li class="menu-item {{ request()->routeIs('direct.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="fa-solid fa-diamond-turn-right me-3"></i>
-                Direct Income
+                Direct Sales
             </a>
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('direct.income.index') ? 'active' : '' }}">
                     <a href="{{ route('direct.income.index') }}" class="menu-link">
-                        Direct Income
+                        Direct Invoice
                     </a>
                 </li>
             </ul>
@@ -304,7 +336,7 @@
                     Expense
                 </a>
                 <ul class="menu-sub">
-                    @can('payee-company-list')
+                    {{-- @can('payee-company-list')
                         <li class="menu-item {{ request()->routeIs('customer-expense.index') ? 'active' : '' }}">
                             <a href="{{ route('customer-expense.index') }}" class="menu-link">
                                 Customer Company
@@ -317,7 +349,7 @@
                                 Customer List
                             </a>
                         </li>
-                    @endcan
+                    @endcan --}}
                     @can('expense-category-list-list')
                         <li class="menu-item {{ request()->routeIs('category.index') ? 'active' : '' }}">
                             <a href="{{ route('category.index') }}" class="menu-link">

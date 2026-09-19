@@ -18,7 +18,7 @@
                             <input type="text" name="search" class="form-control" placeholder="Search Brand..."
                                 value="{{ request('search') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <select name="status" class="form-select">
                                 <option value="">
                                     All Status
@@ -31,19 +31,24 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fa fa-search me-2"></i>
-                                Search
-                            </button>
-                            <a href="{{ route('brand.index') }}" class="btn btn-secondary">
-                                Reset
-                            </a>
-                            <button type="button" class="btn ms-3 btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#addBrandModal">
-                                <i class="fa fa-plus me-2"></i>
-                                Add Brand
-                            </button>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-search me-2"></i>
+                                        Search
+                                    </button>
+                                    <a href="{{ route('brand.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                </div>
+
+                                <button type="button" class="btn ms-3 btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addBrandModal">
+                                    <i class="fa fa-plus me-2"></i>
+                                    Add Brand
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>

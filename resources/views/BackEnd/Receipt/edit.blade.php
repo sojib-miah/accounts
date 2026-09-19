@@ -279,10 +279,17 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 mt-3">
-                            <i class="fa fa-save me-2"></i>
-                            Update Receipt
-                        </button>
+
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary mt-3">
+                                <i class="fa-solid fa-arrow-left me-2"></i>
+                                Back
+                            </a>
+                            <button type="submit" class="btn btn-success mt-3">
+                                <i class="fa fa-save me-2"></i>
+                                Update Receipt
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>

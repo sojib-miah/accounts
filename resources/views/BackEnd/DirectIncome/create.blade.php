@@ -225,9 +225,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 mt-3">
-                                Save Direct Income
-                            </button>
+
+                            <div class="d-flex justify-content-end gap-3">
+                                <a href="{{ route('direct.income.index') }}" class="btn btn-secondary mt-3">
+                                    <i class="fa-solid fa-arrow-left me-3"></i>
+                                    Back
+                                </a>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fa-regular fa-floppy-disk me-3"></i>
+                                    Save Direct Invoice
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -244,7 +252,7 @@
                 <textarea
                     name="details[]"
                     class="form-control details"
-                    rows="2"
+                    rows="1"
                     placeholder="Write item details..."
                     required></textarea>
 

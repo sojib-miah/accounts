@@ -85,7 +85,7 @@ class ReceiptController extends Controller
             ->orderBy('name')
             ->get();
 
-        $parties = Party::where('type', 'Expense')
+        $parties = Party::whereIn('type', ['Supplier', 'Both'])
             ->where('status', 'Active')
             ->when(
                 !$user->hasRole('Super-Admin'),
@@ -95,7 +95,7 @@ class ReceiptController extends Controller
             )
             ->orderBy('name')
             ->get();
-        $customerCompanies = CustomerCompany::where('status', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $customerCompanies = CustomerCompany::where('status', 'Supplier')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
@@ -313,10 +313,10 @@ class ReceiptController extends Controller
             $q->where('created_by', Auth::id())
                 ->orWhere('id', Auth::user()->branch_id);
         })->latest()->get();
-        $parties = Party::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $parties = Party::whereIn('type', ['Supplier', 'Both'])->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        $customerCompanies = CustomerCompany::where('status', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $customerCompanies = CustomerCompany::where('status', 'Supplier')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
         $categories = Category::where('type', 'Expense')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
@@ -895,7 +895,7 @@ class ReceiptController extends Controller
         }
 
         $parties = Party::where('customer_company_id', $customerCompany->id)
-            ->where('type', 'Expense')
+            ->whereIn('type', ['Supplier', 'Both'])
             ->where('status', 'Active')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
