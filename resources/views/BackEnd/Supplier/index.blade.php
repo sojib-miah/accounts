@@ -54,7 +54,11 @@
                             <tr>
                                 <td>{{ $loop->iteration ?? '-' }}</td>
                                 <td>{{ $supplier->party_id ?? '-' }}</td>
-                                <td>{{ $supplier->customerCompany->name ?? '-' }}</td>
+                                <td>
+                                    <a href="{{ route('income.party.profile', $supplier->id) }}">
+                                        {{ $supplier->customerCompany->name ?? '-' }}
+                                </td>
+                                </a>
                                 <td>{{ $supplier->name ?? '-' }}</td>
                                 <td>{{ $supplier->designation ?? '-' }}</td>
                                 <td>{{ $supplier->phone ?? '-' }}</td>

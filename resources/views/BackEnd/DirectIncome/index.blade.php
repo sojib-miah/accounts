@@ -71,6 +71,7 @@
                                     <th class="text-center">Order NO</th>
                                     <th class="text-center">Detailes</th>
                                     <th class="text-center">Quantity</th>
+                                    <th class="text-center">Total Amount</th>
                                     <th class="text-center">Created BY</th>
                                     <th class="text-center">DATE & TIME</th>
                                     <th class="text-center">STATUS</th>
@@ -88,12 +89,10 @@
                                             </a>
                                         </td>
                                         <td class="text-center">
-                                        <td class="text-center">
                                             {{ $receipt->items->pluck('details')->implode(', ') }}
                                         </td>
-
-                                        </td>
                                         <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>
+                                        <td class="text-center">{{ $receipt->total_amount ?? '-' }}</td>
                                         <td class="text-center">{{ $receipt->creator->name ?? '-' }}</td>
                                         <td class="text-center">{{ $receipt->created_at->format('d-m-Y h:i A') }}</td>
                                         <td class="text-center">

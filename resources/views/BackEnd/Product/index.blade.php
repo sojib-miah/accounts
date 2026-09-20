@@ -56,7 +56,7 @@
             <div class="card-body">
                 <form>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <input type="text" name="search" class="form-control" placeholder="Search..."
                                 value="{{ request('search') }}">
                         </div>
@@ -86,20 +86,24 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-primary">
-                                Search
-                            </button>
-                            <a href="{{ route('product.index') }}" class="btn btn-secondary">
-                                Reset
-                            </a>
-                            @can('product-create')
-                                <button type="button" class="ms-3 btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#createProductModal">
-                                    <i class="fa fa-plus me-2"></i>
-                                    Create Product
-                                </button>
-                            @endcan
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-primary">
+                                        Search
+                                    </button>
+                                    <a href="{{ route('product.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                </div>
+                                @can('product-create')
+                                    <button type="button" class="ms-3 btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#createProductModal">
+                                        <i class="fa fa-plus me-2"></i>
+                                        Create Product
+                                    </button>
+                                @endcan
+                            </div>
                         </div>
                     </div>
                 </form>

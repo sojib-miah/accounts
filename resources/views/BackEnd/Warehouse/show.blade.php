@@ -32,7 +32,7 @@
                         <label class="fw-bold">
                             Supplier
                         </label>
-                        <input class="form-control" readonly value="{{ $receipt->supplier->name ?? '' }}">
+                        <input class="form-control" readonly value="{{ $receipt->supplier->customerCompany->name ?? '' }}">
                     </div>
                     {{-- Remarks --}}
                     <div class="col-md-12">

@@ -96,11 +96,19 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('purchase.payment.show', $purchase->id) }}"
-                                                class="btn btn-primary btn-sm">
-                                                <i class="fa fa-money-bill-wave me-2"></i>
-                                                Payment
-                                            </a>
+                                            @if ($purchase->payment_status != 'Paid')
+                                                <a href="{{ route('purchase.payment.show', $purchase->id) }}"
+                                                    class="btn btn-primary btn-sm">
+                                                    <i class="fa fa-money-bill-wave me-2"></i>
+                                                    Payment
+                                                </a>
+                                            @else
+                                                <a href="{{ route('purchase.payment.show', $purchase->id) }}"
+                                                    class="btn btn-success btn-sm">
+                                                    <i class="fa-regular fa-eye me-2"></i>
+                                                    View
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

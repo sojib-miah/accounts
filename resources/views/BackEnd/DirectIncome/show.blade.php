@@ -543,17 +543,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Payment Warning -->
-                        <div class="alert alert-warning d-flex align-items-start mt-4 mb-0">
-                            <i class="fa fa-info-circle fs-5 me-3 mt-1"></i>
-                            <div>
-                                <strong>Payment Information</strong>
-                                <div class="small mt-1">
-                                    Please make sure the selected account has sufficient
-                                    balance before submitting the payment.
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <!-- Footer -->
                     <div class="modal-footer border-0 px-4 py-3">

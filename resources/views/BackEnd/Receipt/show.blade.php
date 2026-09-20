@@ -273,14 +273,14 @@
                 </div>
                 {{-- Action Buttons --}}
                 <div class="d-grid gap-2">
-                    @if ($receipt->payment_status != 'Paid')
+                    @if ($receipt->status != 'Cancelled' && $receipt->payment_status != 'Paid')
                         <button class="btn btn-primary btn-lg" data-bs-toggle="modal"
                             data-bs-target="#expensePaymentModal">
                             <i class="fa fa-money-bill-wave me-2"></i>
                             Bill Pay
                         </button>
                     @endif
-                    @if ($receipt->status != 'Cancelled')
+                    @if ($receipt->status != 'Cancelled' && $receipt->payment_status == 'Pending')
                         @can('expense-receipt-edit')
                             <a href="{{ route('receipt.edit', $receipt->id) }}" class="btn btn-warning btn-lg text-white">
                                 <i class="fa fa-edit me-2"></i>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Party;
 use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
@@ -13,21 +14,72 @@ use Illuminate\Support\Facades\DB;
 
 class WarehouseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $search = trim($request->search ?? '');
+        $supplierId = $request->party_id;
+        $status = $request->status;
 
-        $purchases = Receipt::with('supplier')
-            ->where('type', 'Purchase-Order')
-            // ->where('status', 'Draft')
-            // ->where('is_receive', false)
-            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+        $suppliers = Party::when(
+            !$user->hasRole('Super-Admin'),
+            function ($query) use ($user) {
                 $query->where('created_by', $user->id);
-            })
-            ->latest()
-            ->paginate(20);
+            }
+        )->where('type', 'Supplier')->where('status', 'Active')->orderBy('name')->get();
 
-        return view('BackEnd.Warehouse.index', compact('purchases'));
+        $purchaseQuery = Receipt::with([
+            'supplier',
+            'items.product',
+        ])
+            ->where('type', 'Purchase-Order')
+            ->when(
+                !$user->hasRole('Super-Admin'),
+                function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                }
+            )
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    // PO No
+                    $q->where('po_no', 'like', "%{$search}%")
+                        // Supplier
+                        ->orWhereHas('supplier', function ($supplierQuery) use ($search) {
+                            $supplierQuery->where('name', 'like', "%{$search}%");
+                        })
+                        // Product information
+                        ->orWhereHas('items.product', function ($productQuery) use ($search) {
+                            $productQuery
+                                ->where('sku', 'like', "%{$search}%")
+                                ->orWhere('name', 'like', "%{$search}%")
+                                ->orWhere('description', 'like', "%{$search}%");
+                        })
+                        // Receipt item details
+                        ->orWhereHas('items', function ($itemQuery) use ($search) {
+                            $itemQuery->where('details', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when($supplierId, function ($query) use ($supplierId) {
+                $query->where('party_id', $supplierId);
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })->latest();
+        $pendingCount = (clone $purchaseQuery)->where('status', 'Draft')->count();
+        $purchases = $purchaseQuery->paginate(20)->withQueryString();
+
+        return view(
+            'BackEnd.Warehouse.index',
+            compact(
+                'purchases',
+                'suppliers',
+                'search',
+                'supplierId',
+                'status',
+                'pendingCount'
+            )
+        );
     }
 
     public function show(Receipt $receipt)
@@ -36,7 +88,7 @@ class WarehouseController extends Controller
             return redirect()->route('warehouse.index')->with('error', 'Cancelled warehouse cannot be view.');
         }
         $receipt->load([
-            'supplier',
+            'supplier.customerCompany',
             'items.product',
             'items.serialNumbers',
             'company',
