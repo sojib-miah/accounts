@@ -28,7 +28,7 @@
                                                     </div>
                                                     <div class="col-8">
                                                         <input type="date" name="receipt_date" class="form-control"
-                                                            value="{{ date('Y-m-d') }}">
+                                                            value="{{ date('Y-m-d') }}" readonly disabled>
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-center align-items-center gap-2">
@@ -36,7 +36,7 @@
                                                         <b>By :</b>
                                                     </div>
                                                     <div class="col-8 mt-2">
-                                                        <input type="text" class="form-control" readonly
+                                                        <input type="text" class="form-control" readonly disabled
                                                             value="{{ auth()->user()->name }}">
                                                     </div>
                                                 </div>
@@ -161,12 +161,14 @@
                                                     </th>
                                                     <th>
                                                         <input type="text" id="totalQty"
-                                                            class="form-control text-end" value="0" readonly>
+                                                            class="form-control text-end" value="0" readonly
+                                                            disabled>
                                                     </th>
                                                     <th></th>
                                                     <th>
                                                         <input type="text" id="subTotal"
-                                                            class="form-control text-end" value="0.00" readonly>
+                                                            class="form-control text-end" value="0.00" readonly
+                                                            disabled>
                                                     </th>
                                                     <th></th>
                                                 </tr>
@@ -177,64 +179,61 @@
                             </div>
                             {{-- Total --}}
                             <div class="row mt-4">
-                                <div class="col-md-4 offset-md-8">
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            Discount
-                                        </label>
-                                        <input type="number" name="discount" id="discount"
-                                            class="form-control text-end" min="0" step="0.01"
-                                            value="{{ old('discount', 0) }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            VAT (%)
-                                        </label>
-                                        <input type="number" name="vat" id="vat"
-                                            class="form-control text-end" min="0" step="0.01"
-                                            value="{{ old('vat', 0) }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            VAT Amount
-                                        </label>
-                                        <input type="text" id="vatAmount" class="form-control text-end"
-                                            value="0.00" readonly>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">
-                                            Total Amount
-                                        </label>
-                                        <input type="text" id="totalAmount" class="form-control text-end fw-bold"
-                                            value="0.00" readonly>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            Paid Amount
-                                        </label>
-                                        <input type="number" name="paid_amount" id="paid_amount"
-                                            class="form-control text-end" min="0" step="0.01"
-                                            value="{{ old('paid_amount', 0) }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">
-                                            Due Amount
-                                        </label>
-                                        <input type="text" id="dueAmount" class="form-control text-end fw-bold"
-                                            value="0.00" readonly>
+                                <div class="col-md-8">
+                                    <label>Remarks</label>
+                                    <textarea name="remarks" rows="5" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-4">
+                                    <table class="table table-bordered border">
+                                        <tr>
+                                            <th>Discount</th>
+                                            <td><input type="number" name="discount" id="discount"
+                                                    class="form-control text-end" min="0" step="0.01"
+                                                    value="{{ old('discount', 0) }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>VAT (%)</th>
+                                            <td><input type="number" name="vat" id="vat"
+                                                    class="form-control text-end" min="0" step="0.01"
+                                                    value="{{ old('vat', 0) }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>VAT Amount</th>
+                                            <td><input type="text" id="vatAmount" class="form-control text-end"
+                                                    value="0.00" readonly disabled></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Amount</th>
+                                            <td><input type="text" id="totalAmount"
+                                                    class="form-control text-end fw-bold" value="0.00" readonly
+                                                    disabled></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Paid Amount</th>
+                                            <td><input type="number" name="paid_amount" id="paid_amount"
+                                                    class="form-control text-end" min="0" step="0.01"
+                                                    value="{{ old('paid_amount', 0) }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Due Amount</th>
+                                            <td><input type="text" id="dueAmount"
+                                                    class="form-control text-end fw-bold" value="0.00" readonly
+                                                    disabled></td>
+                                        </tr>
+                                    </table>
+
+                                    <div class="d-flex gap-3">
+                                        <a href="{{ route('direct.income.index') }}"
+                                            class="btn w-100 btn-secondary mt-3">
+                                            <i class="fa-solid fa-arrow-left me-3"></i>
+                                            Back
+                                        </a>
+                                        <button type="submit" class="btn btn-primary mt-3 w-100">
+                                            <i class="fa-regular fa-floppy-disk me-3"></i>
+                                            Save Direct Invoice
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end gap-3">
-                                <a href="{{ route('direct.income.index') }}" class="btn btn-secondary mt-3">
-                                    <i class="fa-solid fa-arrow-left me-3"></i>
-                                    Back
-                                </a>
-                                <button type="submit" class="btn btn-primary mt-3">
-                                    <i class="fa-regular fa-floppy-disk me-3"></i>
-                                    Save Direct Invoice
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -282,7 +281,7 @@
                     type="text"
                     class="form-control total text-end"
                     value="0.00"
-                    readonly>
+                    readonly disabled>
             </td>
             <td class="text-center">
                 <button

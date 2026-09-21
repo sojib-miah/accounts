@@ -437,19 +437,23 @@
 
         {{-- package  --}}
         @can('menu-package-list')
-            <li class="menu-item {{ request()->routeIs('package.*') ? 'active open' : '' }}">
+            <li
+                class="menu-item {{ request()->routeIs('package.*') || request()->routeIs('admin.company-package.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-cubes me-3"></i>
                     Package
                 </a>
                 <ul class="menu-sub">
-                    {{-- @can('') --}}
                     <li class="menu-item {{ request()->routeIs('package.index') ? 'active' : '' }}">
                         <a href="{{ route('package.index') }}" class="menu-link">
                             Package
                         </a>
                     </li>
-                    {{-- @endcan --}}
+                    <li class="menu-item {{ request()->routeIs('admin.company-package.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.company-package.index') }}" class="menu-link">
+                            User Package
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endcan

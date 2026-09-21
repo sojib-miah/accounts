@@ -8,6 +8,7 @@ use App\Http\Controllers\BackEnd\BrandController;
 use App\Http\Controllers\BackEnd\CategoryController;
 use App\Http\Controllers\BackEnd\ChallanController;
 use App\Http\Controllers\BackEnd\CompanyController;
+use App\Http\Controllers\BackEnd\CompanyPackageController;
 use App\Http\Controllers\BackEnd\CompanyUserController;
 use App\Http\Controllers\BackEnd\CustomerCompanyController;
 use App\Http\Controllers\BackEnd\DashboardController;
@@ -59,244 +60,257 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
     // dashboard 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    // role route 
-    Route::resource('roles', RoleController::class);
-
-    // permission route 
-    Route::resource('permissions', PermissionController::class);
-
-    // user route 
-    Route::resource('users', UserController::class);
-
-    // soft delete route
-    Route::get('/deleted-users', [UserController::class, 'deleted'])->name('users.deleted');
-    Route::put('/deleted-users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
-    Route::delete('/deleted-users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
-
-    // setting route
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
-
-    // update profile route 
-    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/profile/password', [UserController::class, 'changePassword'])->name('profile.password');
-
-    // company route 
-    Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
-    Route::post('/company/store', [CompanyController::class, 'store'])->name('company.store');
-    Route::put('/company/update/{company}', [CompanyController::class, 'update'])->name('company.update');
-    Route::delete('/company/delete/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
-
-    // branch route 
-    Route::get('/branch', [BranchController::class, 'index'])->name('branch.index');
-    Route::post('/branch', [BranchController::class, 'store'])->name('branch.store');
-    Route::put('/branch/{branch}', [BranchController::class, 'update'])->name('branch.update');
-    Route::delete('/branch/{branch}', [BranchController::class, 'destroy'])->name('branch.destroy');
-
-    // company user route 
-    Route::get('/user', [CompanyUserController::class, 'index'])->name('user.index');
-    Route::post('/user', [CompanyUserController::class, 'store'])->name('user.store');
-    Route::put('/user/{user}', [CompanyUserController::class, 'update'])->name('user.update');
-    Route::delete('/user/{user}', [CompanyUserController::class, 'destroy'])->name('user.destroy');
-
-    // Accounts route
-    Route::get('/accounts', [AccountsController::class, 'index'])->name('accounts.index');
-    Route::post('/accounts/store', [AccountsController::class, 'store'])->name('accounts.store');
-    Route::get('/accounts/{account}', [AccountsController::class, 'show'])->name('accounts.show');
-    Route::put('/accounts/{account}', [AccountsController::class, 'update'])->name('accounts.update');
-    Route::delete('/accounts/{account}', [AccountsController::class, 'destroy'])->name('accounts.destroy');
-
-    // payment type route 
-    Route::get('/payment-type', [PaymentTypeController::class, 'index'])->name('payment-type.index');
-    Route::post('/payment-type/store', [PaymentTypeController::class, 'store'])->name('payment-type.store');
-    Route::put('/payment-type/update/{paymentType}', [PaymentTypeController::class, 'update'])->name('payment-type.update');
-    Route::delete('/payment-type/delete/{paymentType}', [PaymentTypeController::class, 'destroy'])->name('payment-type.destroy');
-
-    // party routes expense route 
-    Route::get('/party', [PartyController::class, 'index'])->name('party.index');
-    Route::post('/party', [PartyController::class, 'store'])->name('party.store');
-    Route::put('/party/{party}', [PartyController::class, 'update'])->name('party.update');
-    Route::delete('/party/{party}', [PartyController::class, 'destroy'])->name('party.destroy');
-
-    // category route expense route
-    Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
-    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
-    Route::put('/category/{category}', [CategoryController::class, 'update'])->name('category.update');
-    Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
-
-    // expense list route account head route description
-    Route::get('/account-head', [AccountHeadController::class, 'index'])->name('account-head.index');
-    Route::post('/account-head', [AccountHeadController::class, 'store'])->name('account-head.store');
-    Route::put('/account-head/{accountHead}', [AccountHeadController::class, 'update'])->name('account-head.update');
-    Route::delete('/account-head/{accountHead}', [AccountHeadController::class, 'destroy'])->name('account-head.destroy');
-
-    // expense recipt route 
-    Route::get('/receipt/expense', [ReceiptController::class, 'expenseIndex'])->name('receipt.expense.index');
-    Route::get('/receipt/expense/create', [ReceiptController::class, 'expenseCreate'])->name('receipt.expense.create');
-    Route::post('/receipt/store', [ReceiptController::class, 'store'])->name('receipt.store');
-    Route::get('/receipt/{receipt}', [ReceiptController::class, 'show'])->name('receipt.show');
-    Route::get('/receipt/{receipt}/edit', [ReceiptController::class, 'edit'])->name('receipt.edit');
-    Route::put('/receipt/{receipt}', [ReceiptController::class, 'update'])->name('receipt.update');
-    Route::delete('/receipt/{receipt}', [ReceiptController::class, 'destroy'])->name('receipt.destroy');
-    Route::post('/receipt/{receipt}/cancel', [ReceiptController::class, 'cancel'])->name('receipt.cancel');
-    Route::post('/expense/{receipt}/payment', [ReceiptController::class, 'expensePaymentStore'])->name('expense.payment.store');
-    Route::get('/expense/payment/accounts/{paymentType}', [ReceiptController::class, 'paymentAccounts'])->name('expense.payment.accounts');
-    Route::get('/receipt/{receipt}/payments', [ReceiptController::class, 'paymentHistory'])->name('receipt.payment.history');
-    Route::get('/receipt/{receipt}/print', [ReceiptController::class, 'print'])->name('receipt.print');
-    Route::get('/receipt/{receipt}/pdf', [ReceiptController::class, 'pdf'])->name('receipt.pdf');
-    Route::get('/ajax/branch/{branch}', [ReceiptController::class, 'branchInfo'])->name('ajax.branch');
-    Route::get('/ajax/party/{party}', [ReceiptController::class, 'partyInfo'])->name('ajax.party');
-    Route::get('/ajax/company/{company}/branches', [ReceiptController::class, 'getBranches']);
-    Route::get('/ajax/customer-company/{customerCompany}/parties', [ReceiptController::class, 'customerCompanyParties'])->name('ajax.customer-company.parties');
-    Route::get('/ajax/customer-expense/{customerCompany}/parties', [ReceiptController::class, 'customerExpenseParties'])->name('ajax.customer-expense.parties');
-    Route::get('/ajax/customer-company/{customerCompany}', [ReceiptController::class, 'customerCompanyInfo'])->name('ajax.customer-company');
-    Route::get('/ajax/account-head/{category}', [ReceiptController::class, 'accountHeads'])->name('ajax.account-head');
-    Route::get('/party/{party}/profile', [ReceiptController::class, 'profile'])->name('party.profile');
-    Route::post('/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('party.due.payment');
-
-    // income,sales or invoice route start 
-    // party routes income receiver route customer list
-    Route::get('/receiver', [ReceiverController::class, 'index'])->name('receiver.index');
-    Route::post('/receiver', [ReceiverController::class, 'store'])->name('receiver.store');
-    Route::put('/receiver/{party}', [ReceiverController::class, 'update'])->name('receiver.update');
-    Route::delete('/receiver/{party}', [ReceiverController::class, 'destroy'])->name('receiver.destroy');
-
-    // category route income route
-    Route::get('/income/category', [IncomeCategoryController::class, 'index'])->name('income.category.index');
-    Route::post('/income/category', [IncomeCategoryController::class, 'store'])->name('income.category.store');
-    Route::put('/income/category/{category}', [IncomeCategoryController::class, 'update'])->name('income.category.update');
-    Route::delete('/income/category/{category}', [IncomeCategoryController::class, 'destroy'])->name('income.category.destroy');
-
-    // income list route item
-    Route::get('/income', [IncomeController::class, 'index'])->name('income.index');
-    Route::post('/income', [IncomeController::class, 'store'])->name('income.store');
-    Route::put('/income/{accountHead}', [IncomeController::class, 'update'])->name('income.update');
-    Route::delete('/income/{income}', [IncomeController::class, 'destroy'])->name('income.destroy');
-
-    // sales order income 
-    Route::get('/sales/order', [SalesOrderController::class, 'index'])->name('sales.order.index');
-    Route::get('/sales/order/create', [SalesOrderController::class, 'createIncome'])->name('sales.order.create');
-    Route::post('/sales/order/store', [SalesOrderController::class, 'store'])->name('sales.order.store');
-    Route::get('/sales/order/{receipt}', [SalesOrderController::class, 'show'])->name('sales.order.show');
-    Route::get('/sales/order/{receipt}/edit', [SalesOrderController::class, 'edit'])->name('sales.order.edit');
-    Route::put('/sales/order/{receipt}', [SalesOrderController::class, 'update'])->name('sales.order.update');
-    Route::post('/sales/order/{receipt}/cancel', [SalesOrderController::class, 'cancel'])->name('sales.order.cancel');
-    Route::get('/sales/order/{party}/profile', [SalesOrderController::class, 'profile'])->name('sales.order.profile');
-    Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
-    Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
-    Route::get('/sales/order/{receipt}/pdf', [SalesOrderController::class, 'pdf'])->name('sales.order.pdf');
-    Route::get('/ajax/product/{product}/available-serials', [SalesOrderController::class, 'availableSerials'])->name('ajax.product.availableSerials');
-    Route::get('/sales-order/{receipt}/product/{product}/serials', [SalesOrderController::class, 'serials'])->name('sales.order.serials');
-
-    Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
-
-    Route::post('/sales-order/{receipt}/convert-income', [SalesOrderController::class, 'convertIncome'])->name('sales.order.convert.income');
-
-    // income receipt route
-    Route::get('/income/receipt', [IncomeReceiptController::class, 'index'])->name('income.receipt.index');
-    Route::get('/income/receipt/income/create', [IncomeReceiptController::class, 'createIncome'])->name('income.receipt.create');
-    Route::post('/income/receipt/store', [IncomeReceiptController::class, 'store'])->name('income.receipt.store');
-    Route::get('/income/receipt/{receipt}', [IncomeReceiptController::class, 'show'])->name('income.receipt.show');
-    Route::get('/income/receipt/{receipt}/edit', [IncomeReceiptController::class, 'edit'])->name('income.receipt.edit');
-    Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
-    Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
-    Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
-    Route::post('/income/{receipt}/payment', [IncomeReceiptController::class, 'paymentStore'])->name('income.receipt.payment.store');
-
-    // report 
-    Route::get('/dashboard/pdf', [ReportController::class, 'pdf'])->name('dashboard.pdf');
-    Route::get('/dashboard/excel', [ReportController::class, 'excel'])->name('dashboard.excel');
-    // income or invoice route end
-
-    // income receipt route
-    Route::get('/challan', [ChallanController::class, 'index'])->name('challan.index');
-    Route::get('/challan/create', [ChallanController::class, 'createChallan'])->name('challan.create');
-    Route::post('/challan/store', [ChallanController::class, 'store'])->name('challan.store');
-    Route::get('/challan/{receipt}', [ChallanController::class, 'show'])->name('challan.show');
-    Route::get('/challan/{receipt}/edit', [ChallanController::class, 'edit'])->name('challan.edit');
-    Route::put('/challan/{receipt}', [ChallanController::class, 'update'])->name('challan.update');
-    Route::post('/challan/{receipt}/cancel', [ChallanController::class, 'cancel'])->name('challan.cancel');
-    Route::get('/challan/{receipt}/print', [ChallanController::class, 'print'])->name('challan.print');
-    Route::get('/challan/{receipt}/pdf', [ChallanController::class, 'pdf'])->name('challan.pdf');
-
-    // payment detailes 
-    Route::get('/expense/details', [PaymentDetailesController::class, 'expenseDetails'])->name('expense.details');
-    Route::get('/income/invoice', [PaymentDetailesController::class, 'incomeInvoice'])->name('income.invoice');
-
-    // package route 
-    Route::resource('package', PackageController::class);
-
-    // product Route 
-    Route::resource('product', ProductController::class);
-
-    // purchase payment route 
-    Route::get('/purchase/make-payment', [PurchasePaymentController::class, 'index'])->name('purchase.payment.index');
-    Route::get('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'show'])->name('purchase.payment.show');
-    Route::post('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'store'])->name('purchase.payment.store');
-    Route::get('/ajax/payment-type/{paymentType}/accounts', [PurchasePaymentController::class, 'paymentTypeAccounts'])->name('ajax.payment-type.accounts');
-
-    // purchase route 
-    Route::resource('purchase', PurchaseController::class);
-    Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
-    Route::get('/ajax/supplier-company/{customerCompany}/parties', [PurchaseController::class, 'supplierCompanyParties'])->name('ajax.supplier-company.parties');
-    Route::get('/ajax/check-serial', [PurchaseController::class, 'checkSerial'])->name('purchase.check.serial');
-    Route::get('/ajax/editcheck-serial', [PurchaseController::class, 'editCheckSerial'])->name('ajax.check.serial');
-
-    // product category route 
-    Route::resource('product-category', ProductCategoryController::class);
-
-    // create suplier route 
-    Route::resource('supplier', SupplierController::class);
-
-    // inventory route 
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.lowStock');
-    Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
-    Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
-    Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
-    Route::get('/inventory/product/{product}', [InventoryController::class, 'productShow'])->name('inventory.product.show');
-
-    // brand route 
-    Route::resource('brand', BrandController::class);
-
-    // warehouse routs 
-    Route::get('/warehouse', [WarehouseController::class, 'index'])->name('warehouse.index');
-    Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
-    Route::post('/warehouse/{receipt}/serial/{receiptItem}', [WarehouseController::class, 'updateSerial'])->name('warehouse.serial.update');
-    Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
-    Route::get('/warehouse/serial/check', [WarehouseController::class, 'checkSerial'])->name('warehouse.serial.check');
-
-    // customer company route
-    Route::get('/customer-company', [CustomerCompanyController::class, 'index'])->name('customer-company.index');
-    Route::post('/customer-company/store', [CustomerCompanyController::class, 'store'])->name('customer-company.store');
-    Route::get('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'show'])->name('customer-company.show');
-    Route::put('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'update'])->name('customer-company.update');
-    Route::delete('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'destroy'])->name('customer-company.destroy');
-
-    Route::get('/customer-expense', [CustomerCompanyController::class, 'expenseIndex'])->name('customer-expense.index');
-    Route::post('/customer-expense/store', [CustomerCompanyController::class, 'expenseStore'])->name('customer-expense.store');
-    Route::get('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseShow'])->name('customer-expense.show');
-    Route::put('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseUpdate'])->name('customer-expense.update');
-    Route::delete('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseDestroy'])->name('customer-expense.destroy');
-
-    Route::get('/supplier-company', [SupplierCompanyCustomer::class, 'index'])->name('supplier-company.index');
-    Route::post('/supplier-company/store', [SupplierCompanyCustomer::class, 'store'])->name('supplier-company.store');
-    Route::get('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'show'])->name('supplier-company.show');
-    Route::put('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'update'])->name('supplier-company.update');
-    Route::delete('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'destroy'])->name('supplier-company.destroy');
-
-    // Direct Income route 
-    Route::get('/direct/income', [DirectIncomeController::class, 'index'])->name('direct.income.index');
-    Route::get('/direct/income/create', [DirectIncomeController::class, 'createIncome'])->name('direct.income.create');
-    Route::post('/direct/income/store', [DirectIncomeController::class, 'store'])->name('direct.income.store');
-    Route::get('/direct/income/{receipt}', [DirectIncomeController::class, 'show'])->name('direct.income.show');
-    Route::get('/direct/income/{receipt}/edit', [DirectIncomeController::class, 'edit'])->name('direct.income.edit');
-    Route::put('/direct/income/{receipt}', [DirectIncomeController::class, 'update'])->name('direct.income.update');
-    Route::post('/direct/income/{receipt}/payment', [DirectIncomeController::class, 'paymentStore'])->name('direct.income.payment.store');
-    Route::get('/direct/income/{receipt}/print', [DirectIncomeController::class, 'print'])->name('direct.income.print');
-    Route::get('/direct/income/{receipt}/pdf', [DirectIncomeController::class, 'pdf'])->name('direct.income.pdf');
-
     // upgrade to pro route 
     Route::get('/upgrade', [ProPackageController::class, 'index'])->name('upgrade.index');
+
+    // package middleware route 
+    Route::middleware(['package'])->group(function () {
+        // role route 
+        Route::resource('roles', RoleController::class);
+
+        // permission route 
+        Route::resource('permissions', PermissionController::class);
+
+        // user route 
+        Route::resource('users', UserController::class);
+
+        // soft delete route
+        Route::get('/deleted-users', [UserController::class, 'deleted'])->name('users.deleted');
+        Route::put('/deleted-users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::delete('/deleted-users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
+
+        // setting route
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
+
+        // update profile route 
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+        Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/profile/password', [UserController::class, 'changePassword'])->name('profile.password');
+
+        // company route 
+        Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
+        Route::post('/company/store', [CompanyController::class, 'store'])->name('company.store');
+        Route::put('/company/update/{company}', [CompanyController::class, 'update'])->name('company.update');
+        Route::delete('/company/delete/{company}', [CompanyController::class, 'destroy'])->name('company.destroy');
+
+        // branch route 
+        Route::get('/branch', [BranchController::class, 'index'])->name('branch.index');
+        Route::post('/branch', [BranchController::class, 'store'])->name('branch.store');
+        Route::put('/branch/{branch}', [BranchController::class, 'update'])->name('branch.update');
+        Route::delete('/branch/{branch}', [BranchController::class, 'destroy'])->name('branch.destroy');
+
+        // company user route 
+        Route::get('/user', [CompanyUserController::class, 'index'])->name('user.index');
+        Route::post('/user', [CompanyUserController::class, 'store'])->name('user.store');
+        Route::put('/user/{user}', [CompanyUserController::class, 'update'])->name('user.update');
+        Route::delete('/user/{user}', [CompanyUserController::class, 'destroy'])->name('user.destroy');
+
+        // Accounts route
+        Route::get('/accounts', [AccountsController::class, 'index'])->name('accounts.index');
+        Route::post('/accounts/store', [AccountsController::class, 'store'])->name('accounts.store');
+        Route::get('/accounts/{account}', [AccountsController::class, 'show'])->name('accounts.show');
+        Route::put('/accounts/{account}', [AccountsController::class, 'update'])->name('accounts.update');
+        Route::delete('/accounts/{account}', [AccountsController::class, 'destroy'])->name('accounts.destroy');
+
+        // payment type route 
+        Route::get('/payment-type', [PaymentTypeController::class, 'index'])->name('payment-type.index');
+        Route::post('/payment-type/store', [PaymentTypeController::class, 'store'])->name('payment-type.store');
+        Route::put('/payment-type/update/{paymentType}', [PaymentTypeController::class, 'update'])->name('payment-type.update');
+        Route::delete('/payment-type/delete/{paymentType}', [PaymentTypeController::class, 'destroy'])->name('payment-type.destroy');
+
+        // party routes expense route 
+        Route::get('/party', [PartyController::class, 'index'])->name('party.index');
+        Route::post('/party', [PartyController::class, 'store'])->name('party.store');
+        Route::put('/party/{party}', [PartyController::class, 'update'])->name('party.update');
+        Route::delete('/party/{party}', [PartyController::class, 'destroy'])->name('party.destroy');
+
+        // category route expense route
+        Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
+        Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
+        Route::put('/category/{category}', [CategoryController::class, 'update'])->name('category.update');
+        Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
+
+        // expense list route account head route description
+        Route::get('/account-head', [AccountHeadController::class, 'index'])->name('account-head.index');
+        Route::post('/account-head', [AccountHeadController::class, 'store'])->name('account-head.store');
+        Route::put('/account-head/{accountHead}', [AccountHeadController::class, 'update'])->name('account-head.update');
+        Route::delete('/account-head/{accountHead}', [AccountHeadController::class, 'destroy'])->name('account-head.destroy');
+
+        // expense recipt route 
+        Route::get('/receipt/expense', [ReceiptController::class, 'expenseIndex'])->name('receipt.expense.index');
+        Route::get('/receipt/expense/create', [ReceiptController::class, 'expenseCreate'])->name('receipt.expense.create');
+        Route::post('/receipt/store', [ReceiptController::class, 'store'])->name('receipt.store');
+        Route::get('/receipt/{receipt}', [ReceiptController::class, 'show'])->name('receipt.show');
+        Route::get('/receipt/{receipt}/edit', [ReceiptController::class, 'edit'])->name('receipt.edit');
+        Route::put('/receipt/{receipt}', [ReceiptController::class, 'update'])->name('receipt.update');
+        Route::delete('/receipt/{receipt}', [ReceiptController::class, 'destroy'])->name('receipt.destroy');
+        Route::post('/receipt/{receipt}/cancel', [ReceiptController::class, 'cancel'])->name('receipt.cancel');
+        Route::post('/expense/{receipt}/payment', [ReceiptController::class, 'expensePaymentStore'])->name('expense.payment.store');
+        Route::get('/expense/payment/accounts/{paymentType}', [ReceiptController::class, 'paymentAccounts'])->name('expense.payment.accounts');
+        Route::get('/receipt/{receipt}/payments', [ReceiptController::class, 'paymentHistory'])->name('receipt.payment.history');
+        Route::get('/receipt/{receipt}/print', [ReceiptController::class, 'print'])->name('receipt.print');
+        Route::get('/receipt/{receipt}/pdf', [ReceiptController::class, 'pdf'])->name('receipt.pdf');
+        Route::get('/ajax/branch/{branch}', [ReceiptController::class, 'branchInfo'])->name('ajax.branch');
+        Route::get('/ajax/party/{party}', [ReceiptController::class, 'partyInfo'])->name('ajax.party');
+        Route::get('/ajax/company/{company}/branches', [ReceiptController::class, 'getBranches']);
+        Route::get('/ajax/customer-company/{customerCompany}/parties', [ReceiptController::class, 'customerCompanyParties'])->name('ajax.customer-company.parties');
+        Route::get('/ajax/customer-expense/{customerCompany}/parties', [ReceiptController::class, 'customerExpenseParties'])->name('ajax.customer-expense.parties');
+        Route::get('/ajax/customer-company/{customerCompany}', [ReceiptController::class, 'customerCompanyInfo'])->name('ajax.customer-company');
+        Route::get('/ajax/account-head/{category}', [ReceiptController::class, 'accountHeads'])->name('ajax.account-head');
+        Route::get('/party/{party}/profile', [ReceiptController::class, 'profile'])->name('party.profile');
+        Route::post('/party/{party}/due-payment', [ReceiptController::class, 'duePayment'])->name('party.due.payment');
+
+        // income,sales or invoice route start 
+        // party routes income receiver route customer list
+        Route::get('/receiver', [ReceiverController::class, 'index'])->name('receiver.index');
+        Route::post('/receiver', [ReceiverController::class, 'store'])->name('receiver.store');
+        Route::put('/receiver/{party}', [ReceiverController::class, 'update'])->name('receiver.update');
+        Route::delete('/receiver/{party}', [ReceiverController::class, 'destroy'])->name('receiver.destroy');
+
+        // category route income route
+        Route::get('/income/category', [IncomeCategoryController::class, 'index'])->name('income.category.index');
+        Route::post('/income/category', [IncomeCategoryController::class, 'store'])->name('income.category.store');
+        Route::put('/income/category/{category}', [IncomeCategoryController::class, 'update'])->name('income.category.update');
+        Route::delete('/income/category/{category}', [IncomeCategoryController::class, 'destroy'])->name('income.category.destroy');
+
+        // income list route item
+        Route::get('/income', [IncomeController::class, 'index'])->name('income.index');
+        Route::post('/income', [IncomeController::class, 'store'])->name('income.store');
+        Route::put('/income/{accountHead}', [IncomeController::class, 'update'])->name('income.update');
+        Route::delete('/income/{income}', [IncomeController::class, 'destroy'])->name('income.destroy');
+
+        // sales order income 
+        Route::get('/sales/order', [SalesOrderController::class, 'index'])->name('sales.order.index');
+        Route::get('/sales/order/create', [SalesOrderController::class, 'createIncome'])->name('sales.order.create');
+        Route::post('/sales/order/store', [SalesOrderController::class, 'store'])->name('sales.order.store');
+        Route::get('/sales/order/{receipt}', [SalesOrderController::class, 'show'])->name('sales.order.show');
+        Route::get('/sales/order/{receipt}/edit', [SalesOrderController::class, 'edit'])->name('sales.order.edit');
+        Route::put('/sales/order/{receipt}', [SalesOrderController::class, 'update'])->name('sales.order.update');
+        Route::post('/sales/order/{receipt}/cancel', [SalesOrderController::class, 'cancel'])->name('sales.order.cancel');
+        Route::get('/sales/order/{party}/profile', [SalesOrderController::class, 'profile'])->name('sales.order.profile');
+        Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
+        Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
+        Route::get('/sales/order/{receipt}/pdf', [SalesOrderController::class, 'pdf'])->name('sales.order.pdf');
+        Route::get('/ajax/product/{product}/available-serials', [SalesOrderController::class, 'availableSerials'])->name('ajax.product.availableSerials');
+        Route::get('/sales-order/{receipt}/product/{product}/serials', [SalesOrderController::class, 'serials'])->name('sales.order.serials');
+
+        Route::post('/sales-order/{receipt}/convert-challan', [SalesOrderController::class, 'convertChallan'])->name('sales.order.convert.challan');
+
+        Route::post('/sales-order/{receipt}/convert-income', [SalesOrderController::class, 'convertIncome'])->name('sales.order.convert.income');
+
+        // income receipt route
+        Route::get('/income/receipt', [IncomeReceiptController::class, 'index'])->name('income.receipt.index');
+        Route::get('/income/receipt/income/create', [IncomeReceiptController::class, 'createIncome'])->name('income.receipt.create');
+        Route::post('/income/receipt/store', [IncomeReceiptController::class, 'store'])->name('income.receipt.store');
+        Route::get('/income/receipt/{receipt}', [IncomeReceiptController::class, 'show'])->name('income.receipt.show');
+        Route::get('/income/receipt/{receipt}/edit', [IncomeReceiptController::class, 'edit'])->name('income.receipt.edit');
+        Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
+        Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
+        Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
+        Route::post('/income/{receipt}/payment', [IncomeReceiptController::class, 'paymentStore'])->name('income.receipt.payment.store');
+
+        // report 
+        Route::get('/dashboard/pdf', [ReportController::class, 'pdf'])->name('dashboard.pdf');
+        Route::get('/dashboard/excel', [ReportController::class, 'excel'])->name('dashboard.excel');
+        // income or invoice route end
+
+        // income receipt route
+        Route::get('/challan', [ChallanController::class, 'index'])->name('challan.index');
+        Route::get('/challan/create', [ChallanController::class, 'createChallan'])->name('challan.create');
+        Route::post('/challan/store', [ChallanController::class, 'store'])->name('challan.store');
+        Route::get('/challan/{receipt}', [ChallanController::class, 'show'])->name('challan.show');
+        Route::get('/challan/{receipt}/edit', [ChallanController::class, 'edit'])->name('challan.edit');
+        Route::put('/challan/{receipt}', [ChallanController::class, 'update'])->name('challan.update');
+        Route::post('/challan/{receipt}/cancel', [ChallanController::class, 'cancel'])->name('challan.cancel');
+        Route::get('/challan/{receipt}/print', [ChallanController::class, 'print'])->name('challan.print');
+        Route::get('/challan/{receipt}/pdf', [ChallanController::class, 'pdf'])->name('challan.pdf');
+
+        // payment detailes 
+        Route::get('/expense/details', [PaymentDetailesController::class, 'expenseDetails'])->name('expense.details');
+        Route::get('/income/invoice', [PaymentDetailesController::class, 'incomeInvoice'])->name('income.invoice');
+
+        // package route 
+        Route::resource('package', PackageController::class);
+
+        // product Route 
+        Route::resource('product', ProductController::class);
+
+        // purchase payment route 
+        Route::get('/purchase/make-payment', [PurchasePaymentController::class, 'index'])->name('purchase.payment.index');
+        Route::get('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'show'])->name('purchase.payment.show');
+        Route::post('/purchase/make-payment/{receipt}', [PurchasePaymentController::class, 'store'])->name('purchase.payment.store');
+        Route::get('/ajax/payment-type/{paymentType}/accounts', [PurchasePaymentController::class, 'paymentTypeAccounts'])->name('ajax.payment-type.accounts');
+
+        // purchase route 
+        Route::resource('purchase', PurchaseController::class);
+        Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+        Route::get('/ajax/supplier-company/{customerCompany}/parties', [PurchaseController::class, 'supplierCompanyParties'])->name('ajax.supplier-company.parties');
+        Route::get('/ajax/check-serial', [PurchaseController::class, 'checkSerial'])->name('purchase.check.serial');
+        Route::get('/ajax/editcheck-serial', [PurchaseController::class, 'editCheckSerial'])->name('ajax.check.serial');
+
+        // product category route 
+        Route::resource('product-category', ProductCategoryController::class);
+
+        // create suplier route 
+        Route::resource('supplier', SupplierController::class);
+
+        // inventory route 
+        Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('/inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.lowStock');
+        Route::get('/inventory/report', [InventoryController::class, 'report'])->name('inventory.report');
+        Route::get('/inventory/report/print', [InventoryController::class, 'print'])->name('inventory.print');
+        Route::get('/inventory/report/pdf', [InventoryController::class, 'pdf'])->name('inventory.pdf');
+        Route::get('/inventory/product/{product}', [InventoryController::class, 'productShow'])->name('inventory.product.show');
+
+        // brand route 
+        Route::resource('brand', BrandController::class);
+
+        // warehouse routs 
+        Route::get('/warehouse', [WarehouseController::class, 'index'])->name('warehouse.index');
+        Route::get('/warehouse/{receipt}', [WarehouseController::class, 'show'])->name('warehouse.show');
+        Route::post('/warehouse/{receipt}/serial/{receiptItem}', [WarehouseController::class, 'updateSerial'])->name('warehouse.serial.update');
+        Route::post('/warehouse/{receipt}/receive', [WarehouseController::class, 'receive'])->name('warehouse.receive');
+        Route::get('/warehouse/serial/check', [WarehouseController::class, 'checkSerial'])->name('warehouse.serial.check');
+
+        // customer company route
+        Route::get('/customer-company', [CustomerCompanyController::class, 'index'])->name('customer-company.index');
+        Route::post('/customer-company/store', [CustomerCompanyController::class, 'store'])->name('customer-company.store');
+        Route::get('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'show'])->name('customer-company.show');
+        Route::put('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'update'])->name('customer-company.update');
+        Route::delete('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'destroy'])->name('customer-company.destroy');
+
+        Route::get('/customer-expense', [CustomerCompanyController::class, 'expenseIndex'])->name('customer-expense.index');
+        Route::post('/customer-expense/store', [CustomerCompanyController::class, 'expenseStore'])->name('customer-expense.store');
+        Route::get('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseShow'])->name('customer-expense.show');
+        Route::put('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseUpdate'])->name('customer-expense.update');
+        Route::delete('/customer-expense/{customerCompany}', [CustomerCompanyController::class, 'expenseDestroy'])->name('customer-expense.destroy');
+
+        Route::get('/supplier-company', [SupplierCompanyCustomer::class, 'index'])->name('supplier-company.index');
+        Route::post('/supplier-company/store', [SupplierCompanyCustomer::class, 'store'])->name('supplier-company.store');
+        Route::get('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'show'])->name('supplier-company.show');
+        Route::put('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'update'])->name('supplier-company.update');
+        Route::delete('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'destroy'])->name('supplier-company.destroy');
+
+        // Direct Income route 
+        Route::get('/direct/income', [DirectIncomeController::class, 'index'])->name('direct.income.index');
+        Route::get('/direct/income/create', [DirectIncomeController::class, 'createIncome'])->name('direct.income.create');
+        Route::post('/direct/income/store', [DirectIncomeController::class, 'store'])->name('direct.income.store');
+        Route::get('/direct/income/{receipt}', [DirectIncomeController::class, 'show'])->name('direct.income.show');
+        Route::get('/direct/income/{receipt}/edit', [DirectIncomeController::class, 'edit'])->name('direct.income.edit');
+        Route::put('/direct/income/{receipt}', [DirectIncomeController::class, 'update'])->name('direct.income.update');
+        Route::post('/direct/income/{receipt}/payment', [DirectIncomeController::class, 'paymentStore'])->name('direct.income.payment.store');
+        Route::get('/direct/income/{receipt}/print', [DirectIncomeController::class, 'print'])->name('direct.income.print');
+        Route::get('/direct/income/{receipt}/pdf', [DirectIncomeController::class, 'pdf'])->name('direct.income.pdf');
+
+        // company user package 
+        Route::resource('company-package', CompanyPackageController::class)
+            ->only(['index', 'store', 'update', 'destroy',])
+            ->names([
+                'index' => 'admin.company-package.index',
+                'store' => 'admin.company-package.store',
+                'update' => 'admin.company-package.update',
+                'destroy' => 'admin.company-package.destroy',
+            ]);
+    });
 });

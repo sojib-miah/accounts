@@ -27,4 +27,13 @@ class CompanyPackage extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getDisplayStatusAttribute()
+    {
+        if ($this->status === 'Active' && $this->expire_date && $this->expire_date->isPast()) {
+            return 'Expired';
+        }
+
+        return $this->status;
+    }
 }

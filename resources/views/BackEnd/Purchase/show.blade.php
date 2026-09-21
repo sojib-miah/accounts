@@ -12,10 +12,6 @@
                         <i class="fa-solid fa-arrow-left me-2"></i>
                         Back
                     </a>
-                    <a href="{{ route('purchase.edit', $purchase->id) }}" class="btn btn-warning">
-                        <i class="fa fa-edit me-2"></i>
-                        Edit
-                    </a>
                 </div>
             </div>
             <div class="card-body">

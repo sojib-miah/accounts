@@ -388,85 +388,20 @@ class DirectIncomeController extends Controller
 
         $request->validate([
             'receipt_date' => ['required', 'date'],
-
-            'company_id' => [
-                'required',
-                'exists:companies,id',
-            ],
-
-            'branch_id' => [
-                'required',
-                'exists:branches,id',
-            ],
-
-            'customer_company_id' => [
-                'nullable',
-                'exists:customer_companies,id',
-            ],
-
-            'party_id' => [
-                'required',
-                'exists:parties,id',
-            ],
-
-            'details' => [
-                'required',
-                'array',
-                'min:1',
-            ],
-
-            'details.*' => [
-                'required',
-                'string',
-                'max:5000',
-            ],
-
-            'qty' => [
-                'required',
-                'array',
-                'min:1',
-            ],
-
-            'qty.*' => [
-                'required',
-                'numeric',
-                'min:0.01',
-            ],
-
-            'rate' => [
-                'required',
-                'array',
-                'min:1',
-            ],
-
-            'rate.*' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-
-            'discount' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'vat' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'paid_amount' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'remarks' => [
-                'nullable',
-                'string',
-            ],
+            'company_id' => ['required', 'exists:companies,id',],
+            'branch_id' => ['required', 'exists:branches,id',],
+            'customer_company_id' => ['nullable', 'exists:customer_companies,id',],
+            'party_id' => ['required', 'exists:parties,id',],
+            'details' => ['required', 'array', 'min:1',],
+            'details.*' => ['required', 'string', 'max:5000',],
+            'qty' => ['required', 'array', 'min:1',],
+            'qty.*' => ['required', 'numeric', 'min:0.01',],
+            'rate' => ['required', 'array', 'min:1',],
+            'rate.*' => ['required', 'numeric', 'min:0',],
+            'discount' => ['nullable', 'numeric', 'min:0',],
+            'vat' => ['nullable', 'numeric', 'min:0',],
+            'paid_amount' => ['nullable', 'numeric', 'min:0',],
+            'remarks' => ['nullable', 'string',],
         ]);
 
         DB::beginTransaction();

@@ -57,8 +57,8 @@
                                 <td>
                                     <a href="{{ route('income.party.profile', $supplier->id) }}">
                                         {{ $supplier->customerCompany->name ?? '-' }}
+                                    </a>
                                 </td>
-                                </a>
                                 <td>{{ $supplier->name ?? '-' }}</td>
                                 <td>{{ $supplier->designation ?? '-' }}</td>
                                 <td>{{ $supplier->phone ?? '-' }}</td>

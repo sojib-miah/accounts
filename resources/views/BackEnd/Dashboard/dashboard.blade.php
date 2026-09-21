@@ -4,6 +4,107 @@
 
 @section('content')
 
+    {{-- PACKAGE RESTRICTION MODAL --}}
+    @if (session('package_restricted'))
+        @php
+            $packageStatus = session('package_status', 'No Package');
+        @endphp
+        <div class="modal fade" id="packageRestrictionModal" tabindex="-1" aria-labelledby="packageRestrictionModalLabel"
+            aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-body text-center p-5">
+                        {{-- ICON --}}
+                        <div class="mx-auto mb-4 d-flex align-items-center justify-content-center"
+                            style="
+                            width:80px;
+                            height:80px;
+                            border-radius:50%;
+                            background:#fff3cd;
+                            font-size:38px;
+                        ">
+                            @if ($packageStatus === 'Expired')
+                                ⏰
+                            @elseif($packageStatus === 'Cancelled')
+                                ❌
+                            @else
+                                🔒
+                            @endif
+                        </div>
+                        {{-- TITLE --}}
+                        <h4 class="fw-bold mb-3" id="packageRestrictionModalLabel">
+                            @if ($packageStatus === 'Expired')
+                                Your Package Has Expired
+                            @elseif($packageStatus === 'Cancelled')
+                                Your Package Has Been Cancelled
+                            @else
+                                No Active Package
+                            @endif
+                        </h4>
+                        {{-- MESSAGE --}}
+                        <p class="text-muted mb-4">
+                            @if ($packageStatus === 'Expired')
+                                Your package has expired.
+                                Please purchase or upgrade your package
+                                to continue using the system.
+                            @elseif($packageStatus === 'Cancelled')
+                                Your package has been cancelled.
+                                Please purchase a new package to continue
+                                using the system.
+                            @else
+                                You currently do not have an active package.
+                                Please purchase a package to continue
+                                using the system.
+                            @endif
+                        </p>
+                        {{-- STATUS --}}
+                        <div class="mb-4">
+                            @if ($packageStatus === 'Expired')
+                                <span class="badge bg-danger px-3 py-2">
+                                    Package Expired
+                                </span>
+                            @elseif($packageStatus === 'Cancelled')
+                                <span class="badge bg-secondary px-3 py-2">
+                                    Package Cancelled
+                                </span>
+                            @else
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    No Active Package
+                                </span>
+                            @endif
+                        </div>
+                        {{-- BUTTON --}}
+                        <a href="{{ route('upgrade.index') }}" class="btn btn-primary px-4 py-2">
+                            <i class="fa fa-arrow-up-circle me-1"></i>
+                            Buy / Upgrade Package
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- OPEN MODAL --}}
+        <script>
+            document.addEventListener(
+                'DOMContentLoaded',
+                function() {
+                    const modalElement =
+                        document.getElementById(
+                            'packageRestrictionModal'
+                        );
+                    if (modalElement) {
+
+                        const modal =
+                            new bootstrap.Modal(
+                                modalElement
+                            );
+                        modal.show();
+                    }
+                }
+            );
+        </script>
+
+    @endif
+
     <div class="mt-5">
         <div class="p-5">
             {{-- dash board header  --}}
@@ -94,7 +195,7 @@
                                     Today's Sales
                                 </span>
                                 <h3>
-                                    ৳ {{ number_format($todaySales, 2) }}
+                                    ৳ {{ number_format($todaySale, 2) }}
                                 </h3>
                             </div>
                             <div class="stat-icon">
