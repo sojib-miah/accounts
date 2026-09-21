@@ -46,11 +46,11 @@
                     </td>
                     <td>
                         <input type="text" name="unit[]" class="form-control unit"
-                            value="{{ $item->product->unit }}" readonly>
+                            value="{{ $item->product->unit }}" readonly disabled>
                     </td>
                     <td>
                         <input type="text" class="form-control stock"
-                            value="{{ (int) $item->product->current_stock }}" readonly>
+                            value="{{ (int) $item->product->current_stock }}" readonly disabled>
                     </td>
                     <td>
                         <input type="number" min="1" name="qty[]" class="form-control qty"
@@ -62,7 +62,7 @@
                     </td>
                     <td>
                         <input type="text" name="amount[]" class="form-control amount"
-                            value="{{ number_format($item->amount, 2, '.', '') }}" readonly>
+                            value="{{ number_format($item->amount, 2, '.', '') }}" readonly disabled>
                     </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-danger removeRow">
@@ -97,7 +97,7 @@
         </select>
     </td>
     <td>
-        <input type="text" name="description[]" class="form-control description" readonly>
+        <input type="text" name="description[]" class="form-control description" readonly disabled>
     </td>
     <td>
         <button type="button" class="btn btn-info serialBtn">
@@ -106,10 +106,10 @@
         <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
     </td>
     <td>
-        <input type="text" name="unit[]" class="form-control unit" readonly>
+        <input type="text" name="unit[]" class="form-control unit" readonly disabled>
     </td>
     <td>
-        <input type="text" class="form-control stock" readonly>
+        <input type="text" class="form-control stock" readonly disabled>
     </td>
     <td>
         <input type="number" min="1" value="0" name="qty[]" class="form-control qty" required>
@@ -118,7 +118,7 @@
         <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>
     </td>
     <td>
-        <input type="text" name="amount[]" class="form-control amount" value="0.00" readonly>
+        <input type="text" name="amount[]" class="form-control amount" value="0.00" readonly disabled>
     </td>
     <td class="text-center">
         <button type="button" class="btn btn-danger removeRow">

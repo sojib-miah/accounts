@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label class="form-label">PO No</label>
-                <input type="text" class="form-control" value="{{ $purchase->receipt_no }}" readonly>
+                <input type="text" class="form-control" value="{{ $purchase->receipt_no }}" readonly disabled>
                 <input type="hidden" name="receipt_no" value="{{ $purchase->receipt_no }}">
             </div>
             <div class="col-md-3 mb-3">

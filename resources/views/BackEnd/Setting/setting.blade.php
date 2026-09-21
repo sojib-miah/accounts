@@ -39,10 +39,10 @@
                         <div class="mb-3">
                             <label>Currency</label>
                             <select name="currency" class="form-select">
-                                <option value="BDT" {{ $setting?->currency == 'BDT' ? 'selected' : '' }}>
+                                <option value="BDT" @selected($setting?->currency === 'BDT')>
                                     BDT
                                 </option>
-                                <option value="USD" {{ $setting?->currency == 'USD' ? 'selected' : '' }}>
+                                <option value="USD" @selected($setting?->currency === 'USD')>
                                     USD
                                 </option>
                             </select>

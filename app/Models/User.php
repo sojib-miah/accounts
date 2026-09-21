@@ -109,4 +109,9 @@ class User extends Authenticatable
         return $this->hasOne(CompanyPackage::class)
             ->latestOfMany();
     }
+
+    public function setting()
+    {
+        return $this->hasOne(Setting::class);
+    }
 }

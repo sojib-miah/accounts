@@ -28,7 +28,7 @@
                                                     </div>
                                                     <div class="col-8">
                                                         <input type="date" name="receipt_date" class="form-control"
-                                                            value="{{ date('Y-m-d') }}" readonly disabled>
+                                                            value="{{ date('Y-m-d') }}">
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-center align-items-center gap-2">

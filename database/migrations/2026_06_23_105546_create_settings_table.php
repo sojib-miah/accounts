@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('logo')->nullable();
             $table->string('favaicon')->nullable();
             $table->enum('currency', ['BDT', 'USD'])->default('BDT');
-            $table->string('footer_text')->nullable();
+            $table->text('footer_text')->nullable();
             $table->timestamps();
+            $table->unique('user_id');
         });
     }
 

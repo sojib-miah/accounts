@@ -321,7 +321,7 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('direct.income.index') ? 'active' : '' }}">
                     <a href="{{ route('direct.income.index') }}" class="menu-link">
-                        Direct Invoice
+                        Direct Sales
                     </a>
                 </li>
             </ul>

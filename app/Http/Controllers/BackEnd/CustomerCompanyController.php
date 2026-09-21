@@ -13,7 +13,7 @@ class CustomerCompanyController extends Controller
     {
         $user = Auth::user();
         $customerCompanies = CustomerCompany::query()
-            ->where('status', 'Sales')
+            ->where('status', 'Customer')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
@@ -51,7 +51,7 @@ class CustomerCompanyController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'status' => 'Sales',
+                'status' => 'Customer',
                 'created_by' => Auth::id(),
             ]);
             return response()->json([
@@ -97,7 +97,6 @@ class CustomerCompanyController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'status' => 'Sales',
                 'updated_by' => Auth::id(),
             ]);
 
@@ -114,29 +113,51 @@ class CustomerCompanyController extends Controller
         }
     }
 
+    // public function destroy(CustomerCompany $customerCompany)
+    // {
+    //     try {
+    //         if ($customerCompany->parties()->exists()) {
+    //             return back()->with(
+    //                 'error',
+    //                 'This Customer Company has customers. It cannot be deleted.'
+    //             );
+    //         }
+    //         $customerCompany->delete();
+
+    //         return back()->with(
+    //             'success',
+    //             'This Customer Company has deleted Successfull.'
+    //         );
+
+    //         // return response()->json([
+    //         //     'success' => true,
+    //         //     'message' => 'Customer Company deleted successfully.',
+    //         // ]);
+    //     } catch (\Exception $e) {
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
     public function destroy(CustomerCompany $customerCompany)
     {
-        try {
-            if ($customerCompany->parties()->exists()) {
-                return back()->with(
-                    'error',
-                    'This Customer Company has customers. It cannot be deleted.'
-                );
-            }
-            $customerCompany->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer Company deleted successfully.',
-            ]);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+        if ($customerCompany->parties()->exists()) {
+            return back()->with(
+                'error',
+                'This Customer Company has customers. It cannot be deleted.'
+            );
         }
+
+        $customerCompany->delete();
+
+        return back()->with(
+            'success',
+            'Customer Company deleted successfully.'
+        );
     }
+
 
     // expense method 
     public function expenseIndex(Request $request)

@@ -36,7 +36,7 @@
                                                     <b>By :</b>
                                                 </div>
                                                 <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
+                                                    <input type="text" class="form-control" readonly disabled
                                                         value="{{ auth()->user()->name }}">
                                                 </div>
                                             </div>
@@ -204,59 +204,58 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="border">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <th width="180">Total Qty</th>
-                                            <td>
-                                                <input type="text" id="total_qty" class="form-control text-end"
-                                                    readonly value="0">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Sub Total</th>
-                                            <td>
-                                                <input type="text" id="sub_total" class="form-control text-end"
-                                                    readonly value="0.00">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Discount</th>
-                                            <td>
-                                                <input type="number" name="discount" id="discount" value="0"
-                                                    class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="d-flex align-items-center gap-2">
-                                                <span>VAT</span>
-                                                <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
-                                            </th>
-                                            <td>
-                                                <input type="number" name="vat" id="vat" value="0"
-                                                    class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr class="table-primary">
-                                            <th>Grand Total</th>
-                                            <td>
-                                                <input type="text" id="grand_total"
-                                                    class="form-control text-end fw-bold" readonly value="0.00">
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <table class="table border">
+                                    <tr>
+                                        <th width="180">Total Qty</th>
+                                        <td>
+                                            <input type="text" id="total_qty" class="form-control text-end" readonly
+                                                disabled value="0">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sub Total</th>
+                                        <td>
+                                            <input type="text" id="sub_total" class="form-control text-end" readonly
+                                                disabled value="0.00">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discount</th>
+                                        <td>
+                                            <input type="number" name="discount" id="discount" value="0"
+                                                class="form-control text-end">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="d-flex align-items-center gap-2">
+                                            <span>VAT</span>
+                                            <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
+                                        </th>
+                                        <td>
+                                            <input type="number" name="vat" id="vat" value="0"
+                                                class="form-control text-end">
+                                        </td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <th>Grand Total</th>
+                                        <td>
+                                            <input type="text" id="grand_total" class="form-control text-end fw-bold"
+                                                readonly disabled value="0.00">
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div class="d-flex gap-3">
+                                    <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary w-100">
+                                        <i class="fa-solid fa-arrow-left me-3"></i>
+                                        Back
+                                    </a>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fa-regular fa-floppy-disk me-3"></i>
+                                        Save Receipt
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end gap-3">
-                            <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary mt-3">
-                                <i class="fa-solid fa-arrow-left me-3"></i>
-                                Back
-                            </a>
-                            <button class="btn btn-primary mt-3">
-                                <i class="fa-regular fa-floppy-disk me-3"></i>
-                                Save Receipt
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -287,7 +286,7 @@
                 <input type="number" name="rate[]" class="form-control rate text-end" min="0" value="0" required>
             </td>
             <td>
-                <input type="text" class="form-control total text-end" value="0.00" readonly>
+                <input type="text" class="form-control total text-end" value="0.00" readonly disabled>
             </td>
             <td>
                 <input type="text" name="details[]" class="form-control details" placeholder="Remarks">

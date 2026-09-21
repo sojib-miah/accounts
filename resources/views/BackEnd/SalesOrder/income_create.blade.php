@@ -36,7 +36,7 @@
                                                         <b>By :</b>
                                                     </div>
                                                     <div class="col-8 mt-2">
-                                                        <input type="text" class="form-control" readonly
+                                                        <input type="text" class="form-control" readonly disabled
                                                             value="{{ auth()->user()->name }}">
                                                     </div>
                                                 </div>
@@ -161,13 +161,13 @@
                                         <tr>
                                             <th>Total Qty</th>
                                             <td>
-                                                <input id="total_qty" readonly class="form-control text-end">
+                                                <input id="total_qty" readonly disabled class="form-control text-end">
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Sub Total</th>
                                             <td>
-                                                <input id="sub_total" readonly class="form-control text-end">
+                                                <input id="sub_total" readonly disabled class="form-control text-end">
                                             </td>
                                         </tr>
                                         <tr>
@@ -187,21 +187,23 @@
                                         <tr>
                                             <th>Grand Total</th>
                                             <td>
-                                                <input id="grand_total" readonly class="form-control text-end fw-bold">
+                                                <input id="grand_total" readonly disabled
+                                                    class="form-control text-end fw-bold">
                                             </td>
                                         </tr>
                                     </table>
+
+                                    <div class="d-flex gap-5 mt-3">
+                                        <a href="{{ route('sales.order.index') }}" class="btn btn-secondary w-100">
+                                            <i class="fa-solid fa-arrow-left me-2"></i>
+                                            Back
+                                        </a>
+                                        <button class="btn btn-primary w-100" type="submit">
+                                            <i class="fa-regular fa-floppy-disk me-2"></i>
+                                            Save Sales Order
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex justify-content-end gap-5">
-                                <a href="{{ route('sales.order.index') }}" class="btn btn-secondary mt-3">
-                                    <i class="fa-solid fa-arrow-left me-2"></i>
-                                    Back
-                                </a>
-                                <button class="btn btn-primary mt-3" type="submit">
-                                    <i class="fa-regular fa-floppy-disk me-2"></i>
-                                    Save Sales Order
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -229,15 +231,15 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="fw-bold">Product</label>
-                            <input type="text" id="serialProductName" class="form-control" readonly>
+                            <input type="text" id="serialProductName" class="form-control" readonly disabled>
                         </div>
                         <div class="col-md-3">
                             <label class="fw-bold">Required Qty</label>
-                            <input type="text" id="serialRequiredQty" class="form-control text-end" readonly>
+                            <input type="text" id="serialRequiredQty" class="form-control text-end" readonly disabled>
                         </div>
                         <div class="col-md-3">
                             <label class="fw-bold">Selected</label>
-                            <input type="text" id="serialSelectedQty" class="form-control text-end" readonly>
+                            <input type="text" id="serialSelectedQty" class="form-control text-end" readonly disabled>
                         </div>
                     </div>
                     {{-- Search --}}
@@ -310,7 +312,7 @@
                 </div>
             </td>
             <td>
-                <input type="text" class="form-control stock text-end" readonly>
+                <input type="text" class="form-control stock text-end" readonly disabled>
             </td>
             <td>
                 <input type="number" min="1" name="qty[]" class="form-control qty text-end" value="1">
@@ -319,7 +321,7 @@
                 <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate text-end" value="0">
             </td>
             <td>
-                <input type="text" class="form-control total text-end" readonly>
+                <input type="text" class="form-control total text-end" readonly disabled>
             </td>
             <td>
                 <input type="text" name="details[]" class="form-control details" placeholder="Remarks">

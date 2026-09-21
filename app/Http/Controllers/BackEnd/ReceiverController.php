@@ -47,7 +47,7 @@ class ReceiverController extends Controller
                 $query->where('created_by', Auth::id());
             }
         )
-            ->where('status', 'Sales')
+            ->where('status', 'Customer')
             ->orderBy('name')
             ->get();
 

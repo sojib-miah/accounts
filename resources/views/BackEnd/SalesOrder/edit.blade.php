@@ -3,8 +3,8 @@
 @section('title', 'Modify Sales Order')
 
 @section('content')
-    <div class="py-4">
-        <div class="mx-5">
+    <div class="mt-3">
+        <div class="p-5">
             <form action="{{ route('sales.order.update', $receipt->id) }}" method="POST" id="receiptForm">
                 @csrf
                 @method('PUT')
@@ -29,7 +29,7 @@
                                                 </div>
                                                 <div class="col-8">
                                                     <input type="text" class="form-control" readonly
-                                                        value="{{ $receipt->receipt_no }}">
+                                                        value="{{ $receipt->receipt_no }}" disabled>
                                                 </div>
                                             </div>
                                             <div class="d-flex justify-content-center align-items-center gap-2">
@@ -46,7 +46,7 @@
                                                     <b>By :</b>
                                                 </div>
                                                 <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
+                                                    <input type="text" class="form-control" readonly disabled
                                                         value="{{ $receipt->creator->name ?? auth()->user()->name }}">
                                                 </div>
                                             </div>
@@ -130,9 +130,9 @@
                                             class="form-select select2" required>
                                             <option value="">Select Customer</option>
                                             @foreach ($customerCompanies as $company)
-                                                <option value="{{ $company->id }}"
-                                                    {{ $receipt->customer_company_id == $company->id ? 'selected' : '' }}>
-                                                    {{ $company->name }}</option>
+                                                <option value="{{ $company->id }}" @selected($receipt->customer_company_id == $company->id)>
+                                                    {{ $company->name }}
+                                                </option>
                                             @endforeach
                                         </select>
                                         <div class="mt-3">
@@ -151,7 +151,8 @@
                                             Contact Name
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <select name="party_id" id="party_id" class="form-select select2" required>
+                                        <select name="party_id" id="party_id" class="form-select select2" required
+                                            data-selected-party="{{ $receipt->party_id }}">
                                             @foreach ($parties as $party)
                                                 <option value="{{ $party->id }}"
                                                     {{ $receipt->party_id == $party->id ? 'selected' : '' }}>
@@ -231,53 +232,53 @@
                                 <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
                             </div>
                             <div class="col-md-4">
-                                <div class="border">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <th>Total Qty</th>
-                                            <td>
-                                                <input id="total_qty" readonly class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Sub Total</th>
-                                            <td>
-                                                <input id="sub_total" readonly class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Discount</th>
-                                            <td>
-                                                <input type="number" id="discount" name="discount"
-                                                    value="{{ $receipt->discount }}" class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>VAT %</th>
-                                            <td>
-                                                <input type="number" id="vat" name="vat"
-                                                    value="{{ $receipt->vat }}" class="form-control text-end">
-                                            </td>
-                                        </tr>
-                                        <tr class="table-primary">
-                                            <th>Grand Total</th>
-                                            <td>
-                                                <input id="grand_total" readonly class="form-control text-end fw-bold">
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <table class="table border">
+                                    <tr>
+                                        <th>Total Qty</th>
+                                        <td>
+                                            <input id="total_qty" readonly class="form-control text-end" disabled>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sub Total</th>
+                                        <td>
+                                            <input id="sub_total" readonly class="form-control text-end" disabled>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discount</th>
+                                        <td>
+                                            <input type="number" id="discount" name="discount"
+                                                value="{{ $receipt->discount }}" class="form-control text-end">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>VAT %</th>
+                                        <td>
+                                            <input type="number" id="vat" name="vat"
+                                                value="{{ $receipt->vat }}" class="form-control text-end">
+                                        </td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <th>Grand Total</th>
+                                        <td>
+                                            <input id="grand_total" readonly class="form-control text-end fw-bold"
+                                                disabled>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div class="d-flex gap-5 mt-3">
+                                    <a href="{{ route('sales.order.index') }}" class="btn btn-secondary w-100">
+                                        <i class="fa-solid fa-arrow-left me-2"></i>
+                                        Back
+                                    </a>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fa fa-save me-2"></i>
+                                        Update Sales Order
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end gap-5">
-                            <a href="{{ route('sales.order.index') }}" class="btn btn-secondary mt-3">
-                                <i class="fa-solid fa-arrow-left me-2"></i>
-                                Back
-                            </a>
-                            <button type="submit" class="btn btn-success mt-3">
-                                <i class="fa fa-save me-2"></i>
-                                Update Sales Order
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -302,21 +303,21 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="fw-bold">Product</label>
-                            <input type="text" id="serialProductName" class="form-control" readonly>
+                            <input type="text" id="serialProductName" class="form-control" readonly disabled>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold">Qty</label>
-                            <input type="text" id="serialQty" class="form-control text-end" readonly>
+                            <input type="text" id="serialQty" class="form-control text-end" readonly disabled>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold">Selected</label>
                             <input type="text" id="serialSelected" class="form-control text-end" value="0"
-                                readonly>
+                                readonly disabled>
                         </div>
                         <div class="col-md-2">
                             <label class="fw-bold">Available</label>
                             <input type="text" id="serialAvailable" class="form-control text-end" value="0"
-                                readonly>
+                                readonly disabled>
                         </div>
                     </div>
                     {{-- SEARCH --}}
@@ -325,7 +326,7 @@
                             placeholder="Search serial number...">
                     </div>
                     {{-- SERIAL LIST --}}
-                    <div id="serialList" class="border rounded p-3" style="max-height:350px; overflow-y:auto;">
+                    <div id="serialList" class="border rounded p-5" style="max-height:350px; overflow-y:auto;">
                         <div class="text-center text-muted py-4">
                             <i class="fa fa-spinner fa-spin"></i>
                             Loading...
@@ -364,7 +365,7 @@
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" name="description[]" class="form-control description" placeholder="Description"></td>
+            <td><input type="text" name="description[]" class="form-control description" placeholder="Description" readonly></td>
             <td>
                 <div class="mt-2 d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-info btn-sm serialBtn">
@@ -377,7 +378,7 @@
                 </div>
             </td>
             <td>
-                <input type="text" class="form-control stock text-end" readonly>
+                <input type="text" class="form-control stock text-end" readonly disabled>
             </td>
             <td>
                 <input type="number" min="1" name="qty[]" value="1" class="form-control qty text-end" required>
@@ -386,7 +387,7 @@
                 <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate text-end" required>
             </td>
             <td>
-                <input type="text" class="form-control total text-end" value="0.00" readonly>
+                <input type="text" class="form-control total text-end" value="0.00" readonly disabled>
             </td>
             <td>
                 <input type="text" name="details[]" class="form-control details">

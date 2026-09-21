@@ -3,8 +3,8 @@
 @section('title', 'Modify Direct Income')
 
 @section('content')
-    <div class="py-4">
-        <div class="mx-5">
+    <div class="mt-3">
+        <div class="p-5">
             <form action="{{ route('direct.income.update', $receipt->id) }}" method="POST" id="receiptForm">
                 @csrf
                 @method('PUT')
@@ -29,7 +29,7 @@
                                                 </div>
                                                 <div class="col-8">
                                                     <input type="text" class="form-control" readonly
-                                                        value="{{ $receipt->receipt_no }}">
+                                                        value="{{ $receipt->receipt_no }}" disabled>
                                                 </div>
                                             </div>
                                             <div class="d-flex justify-content-center align-items-center gap-2">
@@ -46,7 +46,7 @@
                                                     <b>By :</b>
                                                 </div>
                                                 <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
+                                                    <input type="text" class="form-control" readonly disabled
                                                         value="{{ $receipt->creator->name ?? auth()->user()->name }}">
                                                 </div>
                                             </div>
@@ -192,7 +192,7 @@
                             </div>
                         </div>
                         {{-- Income Item List --}}
-                        <div class="card">
+                        <div class="card mt-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Purchase Order Items</h5>
                                 <button type="button" class="btn btn-primary btn-sm" id="addRow">
@@ -251,7 +251,7 @@
                                                     <td>
                                                         <input type="text" class="form-control total text-end"
                                                             value="{{ number_format($item['amount'], 2, '.', '') }}"
-                                                            readonly>
+                                                            readonly disabled>
                                                     </td>
 
                                                     <td class="text-center">
@@ -271,12 +271,12 @@
                                                 </th>
                                                 <th>
                                                     <input type="text" id="totalQty" class="form-control text-end"
-                                                        value="0" readonly>
+                                                        value="0" readonly disabled>
                                                 </th>
                                                 <th></th>
                                                 <th>
                                                     <input type="text" id="subTotal" class="form-control text-end"
-                                                        value="0.00" readonly>
+                                                        value="0.00" readonly disabled>
                                                 </th>
                                                 <th></th>
                                             </tr>
@@ -287,63 +287,58 @@
                         </div>
                         {{-- Total --}}
                         <div class="row mt-4">
-                            <div class="col-md-4 offset-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        Discount
-                                    </label>
-                                    <input type="number" name="discount" id="discount" class="form-control text-end"
-                                        min="0" step="0.01"
-                                        value="{{ old('discount', $receipt->discount ?? 0) }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        VAT (%)
-                                    </label>
-                                    <input type="number" name="vat" id="vat" class="form-control text-end"
-                                        min="0" step="0.01" value="{{ old('vat', $vatPercent) }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        VAT Amount
-                                    </label>
-                                    <input type="text" id="vatAmount" class="form-control text-end" value="0.00"
-                                        readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        Total Amount
-                                    </label>
-                                    <input type="text" id="totalAmount" class="form-control text-end fw-bold"
-                                        value="0.00" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        Paid Amount
-                                    </label>
-                                    <input type="number" name="paid_amount" id="paid_amount"
-                                        class="form-control text-end" min="0" step="0.01"
-                                        value="{{ old('paid_amount', $receipt->paid_amount ?? 0) }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">
-                                        Due Amount
-                                    </label>
-                                    <input type="text" id="dueAmount" class="form-control text-end fw-bold"
-                                        value="0.00" readonly>
+                            <div class="col-md-8">
+                                <label>Remarks</label>
+                                <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <table class="table table-bordered border">
+                                    <tr>
+                                        <th>Discount</th>
+                                        <td><input type="number" name="discount" id="discount"
+                                                class="form-control text-end" min="0" step="0.01"
+                                                value="{{ old('discount', $receipt->discount ?? 0) }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>VAT (%)</th>
+                                        <td><input type="number" name="vat" id="vat"
+                                                class="form-control text-end" min="0" step="0.01"
+                                                value="{{ old('vat', $vatPercent) }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>VAT Amount</th>
+                                        <td><input type="text" id="vatAmount" class="form-control text-end"
+                                                value="0.00" readonly disabled></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Amount</th>
+                                        <td><input type="text" id="totalAmount" class="form-control text-end fw-bold"
+                                                value="0.00" readonly disabled></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Paid Amount</th>
+                                        <td><input type="number" name="paid_amount" id="paid_amount"
+                                                class="form-control text-end" min="0" step="0.01"
+                                                value="{{ old('paid_amount', $receipt->paid_amount ?? 0) }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Due Amount</th>
+                                        <td><input type="text" id="dueAmount" class="form-control text-end fw-bold"
+                                                value="0.00" readonly disabled></td>
+                                    </tr>
+                                </table>
+
+                                <div class="d-flex gap-3">
+                                    <a href="{{ route('direct.income.index') }}" class="btn w-100 btn-secondary mt-3">
+                                        <i class="fa-solid fa-arrow-left me-3"></i>
+                                        Back
+                                    </a>
+                                    <button type="submit" class="btn btn-primary mt-3 w-100">
+                                        <i class="fa-regular fa-floppy-disk me-3"></i>
+                                        Update Direct Invoice
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-3">
-                            <a href="{{ route('direct.income.index') }}" class="btn btn-secondary mt-3">
-                                <i class="fa-solid fa-arrow-left me-3"></i>
-                                Back
-                            </a>
-                            <button type="submit" class="btn btn-primary mt-3">
-                                <i class="fa-regular fa-floppy-disk me-3"></i>
-                                Update Direct Invoice
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -390,7 +385,7 @@
                     type="text"
                     class="form-control total text-end"
                     value="0.00"
-                    readonly>
+                    readonly disabled>
             </td>
             <td class="text-center">
                 <button

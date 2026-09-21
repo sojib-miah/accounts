@@ -67,7 +67,7 @@ class SalesOrderController extends Controller
         $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        $customerCompanies = CustomerCompany::where('status', 'Sales')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $customerCompanies = CustomerCompany::where('status', 'Customer')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
@@ -356,9 +356,19 @@ class SalesOrderController extends Controller
         $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        $customerCompanies = CustomerCompany::where('status', 'Sales')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->get();
+        $customerCompanies = CustomerCompany::where('status', 'Customer')
+            ->when(
+                !Auth::user()->hasRole('Super-Admin'),
+                function ($query) use ($receipt) {
+
+                    $query->where(function ($q) use ($receipt) {
+
+                        $q->where('created_by', Auth::id())
+                            ->orWhere('id', $receipt->customer_company_id);
+                    });
+                }
+            )
+            ->get();
 
         $products = Product::with('category')
             ->where('status', 'Active')

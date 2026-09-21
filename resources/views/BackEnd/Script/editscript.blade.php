@@ -488,7 +488,7 @@
             html += `
 
                 <div
-                    class="form-check serial-item border rounded p-2 mb-2">
+                    class="form-check serial-item border rounded p-2 ms-3 mb-2">
 
                     <input
                         class="form-check-input serialCheckbox"
@@ -1451,102 +1451,6 @@
 
         }
     );
-    $('#customer_company_id').change(function() {
-
-        let companyId = $(this).val();
-
-        $('#party_id')
-            .html('<option value="">Select Customer</option>')
-            .val('')
-            .trigger('change');
-
-        $('#customer_company_name').text('');
-        $('#customer_company_phone').text('');
-        $('#customer_company_email').text('');
-        $('#customer_company_address').text('');
-
-        if (companyId === '') {
-            return;
-        }
-
-        $.get(
-            '/admin/ajax/customer-company/' + companyId,
-            function(res) {
-
-                if (res.success) {
-
-                    $('#customer_company_name')
-                        .text(res.data.name ?? '');
-
-                    $('#customer_company_phone')
-                        .text(res.data.phone ?? '');
-
-                    $('#customer_company_email')
-                        .text(res.data.email ?? '');
-
-                    $('#customer_company_address')
-                        .text(res.data.address ?? '');
-                }
-            }
-        );
-
-        $.get(
-            '/admin/ajax/customer-company/' + companyId + '/parties',
-            function(res) {
-
-                if (!res.success) {
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: res.message ?? 'Unable to load customers.'
-                    });
-
-                    return;
-                }
-
-                let html =
-                    '<option value="">Select Customer</option>';
-
-                if (res.parties.length === 0) {
-
-                    html =
-                        '<option value="">No Customer Found</option>';
-
-                } else {
-
-                    $.each(res.parties, function(i, party) {
-
-                        html += `
-                        <option value="${party.id}">
-                            ${party.name}
-                            ${party.party_id
-                                ? ' (' + party.party_id + ')'
-                                : ''}
-                        </option>
-                    `;
-                    });
-                }
-
-                $('#party_id')
-                    .html(html)
-                    .val('')
-                    .trigger('change');
-
-            }
-        ).fail(function(xhr) {
-
-            console.log(xhr);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Unable to load customers.'
-            });
-
-        });
-
-    });
 
     $('#branch_id').change(
         function() {
@@ -1616,78 +1520,173 @@
         }
     );
 
-    $('#party_id').change(
-        function() {
+    $(document).ready(function() {
 
-            let id =
-                $(this).val();
+        let isInitialLoad = true;
 
+        $('#customer_company_id').on('change', function() {
 
-            if (
-                id == ''
-            ) {
+            let customerCompanyId = $(this).val();
 
-                $('#party_id_text')
-                    .text('');
+            // Existing party from edit page
+            let selectedPartyId = '';
 
-                $('#party_name')
-                    .text('');
+            if (isInitialLoad) {
+                selectedPartyId = $('#party_id').val() || '';
+            }
 
-                $('#party_phone')
-                    .text('');
+            // Clear Customer Company information
+            $('#customer_company_name').text('-');
+            $('#customer_company_phone').text('-');
+            $('#customer_company_email').text('-');
+            $('#customer_company_address').text('-');
 
-                $('#party_address')
-                    .text('');
+            // Clear Party information
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
 
-                $('#party_email')
-                    .text('');
+            if (!customerCompanyId) {
 
-                $('#party_designation')
-                    .text('');
+                $('#party_id')
+                    .html('<option value="">Select Party</option>')
+                    .val('')
+                    .trigger('change');
+
+                isInitialLoad = false;
 
                 return;
             }
+            $.get(
+                "{{ url('/admin/ajax/customer-company') }}/" + customerCompanyId,
+                function(res) {
 
+                    if (res.success) {
+
+                        $('#customer_company_name')
+                            .text(res.data.name ?? '-');
+
+                        $('#customer_company_phone')
+                            .text(res.data.phone ?? '-');
+
+                        $('#customer_company_email')
+                            .text(res.data.email ?? '-');
+
+                        $('#customer_company_address')
+                            .text(res.data.address ?? '-');
+                    }
+
+                }
+            ).fail(function(xhr) {
+
+                console.log(
+                    'Customer Company AJAX Error:',
+                    xhr
+                );
+
+            });
 
             $.get(
-                '/admin/ajax/party/' +
-                id,
+                "{{ url('/admin/ajax/customer-company/') }}/" +
+                customerCompanyId +
+                "/parties",
 
                 function(res) {
 
-                    $('#party_id_text')
-                        .text(
-                            res.data.id
-                        );
+                    if (!res.success) {
+                        isInitialLoad = false;
+                        return;
+                    }
 
-                    $('#party_name')
-                        .text(
-                            res.data.name
-                        );
+                    let html =
+                        '<option value="">Select Party</option>';
 
-                    $('#party_email')
-                        .text(
-                            res.data.email
-                        );
+                    $.each(res.parties, function(i, party) {
 
-                    $('#party_designation')
-                        .text(
-                            res.data.designation
-                        );
+                        html += `
+                        <option value="${party.id}">
+                            ${party.name ?? '-'}
+                            ${
+                                party.designation
+                                    ? ' - ' + party.designation
+                                    : ''
+                            }
+                        </option>
+                    `;
+                    });
 
-                    $('#party_phone')
-                        .text(
-                            res.data.phone
-                        );
+                    $('#party_id').html(html);
 
-                    $('#party_address')
-                        .text(
-                            res.data.address
-                        );
+                    // Restore party on edit page
+                    if (isInitialLoad && selectedPartyId) {
+
+                        $('#party_id')
+                            .val(selectedPartyId)
+                            .trigger('change');
+
+                    } else {
+
+                        $('#party_id')
+                            .val('')
+                            .trigger('change');
+                    }
+
+                    isInitialLoad = false;
 
                 }
-            );
+            ).fail(function(xhr) {
 
+                console.log(
+                    'Customer Company Parties AJAX Error:',
+                    xhr
+                );
+
+                isInitialLoad = false;
+
+            });
+
+        });
+
+        $('#party_id').on('change', function() {
+            let partyId = $(this).val();
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
+            if (!partyId) {
+                return;
+            }
+            $.get(
+                "{{ url('/admin/ajax/party') }}/" + partyId,
+                function(res) {
+                    if (res.success) {
+                        $('#party_name')
+                            .text(res.data.name ?? '-');
+                        $('#party_designation')
+                            .text(res.data.designation ?? '-');
+                        $('#party_phone')
+                            .text(res.data.phone ?? '-');
+                        $('#party_email')
+                            .text(res.data.email ?? '-');
+                        $('#party_address')
+                            .text(res.data.address ?? '-');
+                    }
+                }
+            ).fail(function(xhr) {
+                console.log(
+                    'Party AJAX Error:',
+                    xhr
+                );
+            });
+        });
+        let customerCompanyId =
+            $('#customer_company_id').val();
+        if (customerCompanyId) {
+            $('#customer_company_id')
+                .trigger('change');
         }
-    );
+    });
 </script>

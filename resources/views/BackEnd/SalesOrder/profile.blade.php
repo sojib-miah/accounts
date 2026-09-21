@@ -274,7 +274,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-center">
-                                                {{ $receipt->so_no }}
+                                                {{ $receipt->so_no ?? $receipt->receipt_no }}
                                             </td>
                                             <td class="text-center">
                                                 {{ $receipt->total_qty }}
@@ -406,7 +406,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-center">
-                                                {{ $payment->receipt->so_no ?? '' }}
+                                                {{ $payment->receipt->so_no ?? $payment->receipt->receipt_no }}
                                             </td>
                                             <td class="text-center fw-bold text-success">
                                                 {{ number_format($payment->amount, 2) }} TK

@@ -27,66 +27,67 @@
                     <textarea name="remarks" rows="5" class="form-control" placeholder="Write remarks if necessary...">{{ old('remarks') }}</textarea>
                 </div>
                 <div class="col-md-4">
-                    <div class="border">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>Total Qty</th>
-                                <td>
-                                    <input type="text" id="totalQty" name="total_qty" class="form-control" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Sub Total</th>
-                                <td>
-                                    <input type="text" id="subTotal" name="sub_total" class="form-control" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Discount</th>
-                                <td>
-                                    <input type="number" step="0.01" id="discount" name="discount" value="0"
-                                        class="form-control">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>VAT</th>
-                                <td>
-                                    <input type="number" step="0.01" id="vat" name="vat" value="0"
-                                        class="form-control">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Grand Total</th>
-                                <td>
-                                    <input type="text" id="grandTotal" class="form-control" readonly>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Paid Amount</th>
-                                <td>
-                                    <input type="number" step="0.01" id="paidAmount" name="paid_amount" value="0"
-                                        class="form-control">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Due Amount</th>
-                                <td>
-                                    <input type="text" id="dueAmount" class="form-control" readonly>
-                                </td>
-                            </tr>
-                        </table>
+                    <table class="table border">
+                        <tr>
+                            <th>Total Qty</th>
+                            <td>
+                                <input type="text" id="totalQty" name="total_qty" class="form-control" readonly
+                                    disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Sub Total</th>
+                            <td>
+                                <input type="text" id="subTotal" name="sub_total" class="form-control" readonly
+                                    disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Discount</th>
+                            <td>
+                                <input type="number" step="0.01" id="discount" name="discount" value="0"
+                                    class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>VAT</th>
+                            <td>
+                                <input type="number" step="0.01" id="vat" name="vat" value="0"
+                                    class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Grand Total</th>
+                            <td>
+                                <input type="text" id="grandTotal" class="form-control" readonly disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Paid Amount</th>
+                            <td>
+                                <input type="number" step="0.01" id="paidAmount" name="paid_amount" value="0"
+                                    class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Due Amount</th>
+                            <td>
+                                <input type="text" id="dueAmount" class="form-control" readonly disabled>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="{{ route('purchase.index') }}" class="btn w-100 btn-secondary me-3">
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+                            Back
+                        </a>
+                        <button class="btn btn-success w-100">
+                            <i class="fa fa-save me-2"></i>
+                            Save Purchase
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="text-end mt-3">
-                <a href="{{ route('purchase.index') }}" class="btn btn-secondary me-3">
-                    <i class="fa-solid fa-arrow-left me-2"></i>
-                    Back
-                </a>
-                <button class="btn btn-success">
-                    <i class="fa fa-save me-2"></i>
-                    Save Purchase
-                </button>
             </div>
         </form>
     </div>
@@ -109,7 +110,7 @@
                         <label class="form-label fw-bold">
                             Product
                         </label>
-                        <input type="text" id="serialProductName" class="form-control" readonly>
+                        <input type="text" id="serialProductName" class="form-control" readonly disabled>
                     </div>
                     <!-- Serial Input -->
                     <div class="mb-3">

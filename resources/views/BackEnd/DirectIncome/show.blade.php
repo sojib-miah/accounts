@@ -219,7 +219,10 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-md-7"></div>
+                        <div class="col-md-7">
+                            <label>Remarks</label>
+                            <textarea name="remarks" rows="5" class="form-control">{{ $receipt->remarks }}</textarea>
+                        </div>
                         <div class="col-md-5">
                             <div class="card shadow-sm border-0">
                                 <table class="table table-bordered mb-0">

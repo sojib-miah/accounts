@@ -31,7 +31,7 @@
                                                     <b>Receipt No :</b>
                                                 </div>
                                                 <div class="col-8">
-                                                    <input type="text" class="form-control" readonly
+                                                    <input type="text" class="form-control" readonly disabled
                                                         value="{{ $receipt->receipt_no }}">
                                                 </div>
                                             </div>
@@ -51,7 +51,7 @@
                                                     <b>By :</b>
                                                 </div>
                                                 <div class="col-8 mt-2">
-                                                    <input type="text" class="form-control" readonly
+                                                    <input type="text" class="form-control" readonly disabled
                                                         value="{{ $receipt->creator->name ?? auth()->user()->name }}">
                                                 </div>
                                             </div>
@@ -232,63 +232,60 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="border">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <th width="180">Total Qty</th>
-                                            <td>
-                                                <input type="text" id="total_qty" class="form-control text-end"
-                                                    readonly value="{{ $receipt->total_qty }}">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Sub Total</th>
-                                            <td>
-                                                <input type="text" id="sub_total" class="form-control text-end"
-                                                    readonly value="{{ number_format($receipt->sub_total, 2, '.', '') }}">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Discount</th>
-                                            <td>
-                                                <input type="number" name="discount" id="discount"
-                                                    value="{{ $receipt->discount ?? 0 }}" class="form-control text-end"
-                                                    min="0">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="d-flex align-items-center gap-2">
-                                                <span>VAT</span>
-                                                <i class="fa-solid fa-circle-info mt-1" title="VAT Percentage"></i>
-                                            </th>
-                                            <td>
-                                                <input type="number" name="vat" id="vat"
-                                                    value="{{ $receipt->vat ?? 0 }}" class="form-control text-end"
-                                                    min="0">
-                                            </td>
-                                        </tr>
-                                        <tr class="table-primary">
-                                            <th>Grand Total</th>
-                                            <td>
-                                                <input type="text" id="grand_total"
-                                                    class="form-control text-end fw-bold" readonly
-                                                    value="{{ number_format($receipt->total_amount, 2, '.', '') }}">
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <table class="table border">
+                                    <tr>
+                                        <th width="180">Total Qty</th>
+                                        <td>
+                                            <input type="text" id="total_qty" class="form-control text-end" readonly
+                                                disabled value="{{ $receipt->total_qty }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sub Total</th>
+                                        <td>
+                                            <input type="text" id="sub_total" class="form-control text-end" readonly
+                                                disabled value="{{ number_format($receipt->sub_total, 2, '.', '') }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Discount</th>
+                                        <td>
+                                            <input type="number" name="discount" id="discount"
+                                                value="{{ $receipt->discount ?? 0 }}" class="form-control text-end"
+                                                min="0">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            VAT(%)
+                                        </th>
+                                        <td>
+                                            <input type="number" name="vat" id="vat"
+                                                value="{{ $receipt->vat ?? 0 }}" class="form-control text-end"
+                                                min="0">
+                                        </td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <th>Grand Total</th>
+                                        <td>
+                                            <input type="text" id="grand_total" class="form-control text-end fw-bold"
+                                                readonly disabled
+                                                value="{{ number_format($receipt->total_amount, 2, '.', '') }}">
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div class="d-flex gap-3">
+                                    <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary w-100">
+                                        <i class="fa-solid fa-arrow-left me-2"></i>
+                                        Back
+                                    </a>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fa fa-save me-2"></i>
+                                        Update Receipt
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-3">
-                            <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary mt-3">
-                                <i class="fa-solid fa-arrow-left me-2"></i>
-                                Back
-                            </a>
-                            <button type="submit" class="btn btn-success mt-3">
-                                <i class="fa fa-save me-2"></i>
-                                Update Receipt
-                            </button>
                         </div>
                     </div>
                 </div>

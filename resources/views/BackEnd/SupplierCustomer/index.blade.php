@@ -62,10 +62,21 @@
                                                 data-id="{{ $company->id }}">
                                                 <i class="fa fa-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-danger deleteCompany"
+                                            {{-- <button type="button" class="btn btn-sm btn-danger deleteCompany"
                                                 data-id="{{ $company->id }}" data-name="{{ $company->name }}">
                                                 <i class="fa fa-trash"></i>
-                                            </button>
+                                            </button> --}}
+                                            <form action="{{ route('supplier-company.destroy', $company->id) }}"
+                                                method="POST" style="display:inline;">
+
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+
                                         </td>
                                     </tr>
                                 @empty
@@ -133,7 +144,8 @@
                                 <label class="form-label">
                                     Address
                                 </label>
-                                <textarea name="address" id="company_address" class="form-control" rows="3" placeholder="Enter company address"></textarea>
+                                <textarea name="address" id="company_address" class="form-control" rows="3"
+                                    placeholder="Enter company address"></textarea>
                                 <div class="invalid-feedback" id="error-address"></div>
                             </div>
                         </div>

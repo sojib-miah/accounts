@@ -40,10 +40,10 @@
                     <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
                 </td>
                 <td>
-                    <input type="text" name="unit[]" class="form-control unit" readonly>
+                    <input type="text" name="unit[]" class="form-control unit" readonly disabled>
                 </td>
                 <td>
-                    <input type="text" class="form-control stock" readonly>
+                    <input type="text" class="form-control stock" readonly disabled>
                 </td>
                 <td>
                     <input type="number" min="1" value="0" name="qty[]" class="form-control qty">
@@ -53,7 +53,7 @@
                         required>
                 </td>
                 <td>
-                    <input type="text" name="amount[]" class="form-control amount" readonly>
+                    <input type="text" name="amount[]" class="form-control amount" readonly disabled>
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger removeRow">
@@ -84,10 +84,10 @@
     <input type="hidden" name="serial_json[]" class="serial_json" value="[]">
 </td>
 <td>
-    <input type="text" name="unit[]" class="form-control unit" readonly>
+    <input type="text" name="unit[]" class="form-control unit" readonly disabled>
 </td>
 <td>
-    <input type="text" class="form-control stock" readonly>
+    <input type="text" class="form-control stock" readonly disabled>
 </td>
 <td>
     <input type="number" min="1" value="0" name="qty[]" class="form-control qty">
@@ -96,7 +96,7 @@
     <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>
 </td>
 <td>
-    <input type="text" name="amount[]" class="form-control amount" readonly>
+    <input type="text" name="amount[]" class="form-control amount" readonly disabled>
 </td>
 <td class="text-center">
     <button type="button" class="btn btn-danger removeRow">

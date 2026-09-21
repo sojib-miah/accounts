@@ -66,7 +66,7 @@ class DirectIncomeController extends Controller
         $parties = Party::where('type', 'Customer')->where('status', 'Active')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
-        $customerCompanies = CustomerCompany::where('status', 'Sales')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+        $customerCompanies = CustomerCompany::where('status', 'Customer')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
@@ -334,7 +334,7 @@ class DirectIncomeController extends Controller
             )
             ->get();
 
-        $customerCompanies = CustomerCompany::where('status', 'Sales')
+        $customerCompanies = CustomerCompany::where('status', 'Customer')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {

@@ -103,7 +103,6 @@ class SupplierCompanyCustomer extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'status' => 'Supplier',
                 'updated_by' => Auth::id(),
             ]);
 
@@ -120,27 +119,43 @@ class SupplierCompanyCustomer extends Controller
         }
     }
 
+    // public function destroy(CustomerCompany $customerCompany)
+    // {
+    //     try {
+    //         if ($customerCompany->parties()->exists()) {
+    //             return back()->with(
+    //                 'error',
+    //                 'This Supplier Company has customers. It cannot be deleted.'
+    //             );
+    //         }
+    //         $customerCompany->delete();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Supplier Company deleted successfully.',
+    //         ]);
+    //     } catch (\Exception $e) {
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
     public function destroy(CustomerCompany $customerCompany)
     {
-        try {
-            if ($customerCompany->parties()->exists()) {
-                return back()->with(
-                    'error',
-                    'This Supplier Company has customers. It cannot be deleted.'
-                );
-            }
-            $customerCompany->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Supplier Company deleted successfully.',
-            ]);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+        if ($customerCompany->parties()->exists()) {
+            return back()->with(
+                'error',
+                'This Customer Company has customers. It cannot be deleted.'
+            );
         }
+
+        $customerCompany->delete();
+
+        return back()->with(
+            'success',
+            'Customer Company deleted successfully.'
+        );
     }
 }

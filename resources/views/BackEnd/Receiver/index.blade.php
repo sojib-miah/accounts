@@ -58,9 +58,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $party->party_id ?? '-' }}</td>
                                         <td>
-                                            <a href="{{ route('income.party.profile', $party->id) }}">
-                                                {{ $party->customerCompany->name ?? '-' }}
-                                            </a>
+                                            {{ $party->customerCompany->name ?? '-' }}
                                         </td>
                                         <td>{{ $party->name ?? '-' }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>

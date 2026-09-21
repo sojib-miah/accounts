@@ -205,38 +205,36 @@
                 <div class="row mt-4">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
-                        <div class="border">
-                            <table class="table table-bordered">
-                                <tr>
-                                    <th width="180">Total Qty</th>
-                                    <td class="text-end">{{ number_format($totalQty) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Sub Total</th>
-                                    <td class="text-end">{{ number_format($receipt->sub_total, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Discount</th>
-                                    <td class="text-end text-danger">{{ number_format($receipt->discount, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <th>VAT</th>
-                                    <td class="text-end">{{ number_format($receipt->vat, 2) }}</td>
-                                </tr>
-                                <tr class="table-primary">
-                                    <th>Grand Total</th>
-                                    <td class="text-end fw-bold">{{ number_format($receipt->total_amount, 2) }}</td>
-                                </tr>
-                                <tr class="table-success">
-                                    <th>Paid Amount</th>
-                                    <td class="text-end fw-bold">{{ number_format($receipt->paid_amount, 2) }}</td>
-                                </tr>
-                                <tr class="table-danger">
-                                    <th>Due Amount</th>
-                                    <td class="text-end fw-bold">{{ number_format($receipt->due_amount, 2) }}</td>
-                                </tr>
-                            </table>
-                        </div>
+                        <table class="table border">
+                            <tr>
+                                <th width="180">Total Qty</th>
+                                <td class="text-end">{{ number_format($totalQty) }}</td>
+                            </tr>
+                            <tr>
+                                <th>Sub Total</th>
+                                <td class="text-end">{{ number_format($receipt->sub_total, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <th>Discount</th>
+                                <td class="text-end text-danger">{{ number_format($receipt->discount, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <th>VAT</th>
+                                <td class="text-end">{{ number_format($receipt->vat, 2) }}</td>
+                            </tr>
+                            <tr class="table-primary">
+                                <th>Grand Total</th>
+                                <td class="text-end fw-bold">{{ number_format($receipt->total_amount, 2) }}</td>
+                            </tr>
+                            <tr class="table-success">
+                                <th>Paid Amount</th>
+                                <td class="text-end fw-bold">{{ number_format($receipt->paid_amount, 2) }}</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <th>Due Amount</th>
+                                <td class="text-end fw-bold">{{ number_format($receipt->due_amount, 2) }}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -308,6 +306,10 @@
                         <i class="fa fa-file-pdf me-2"></i>
                         PDF
                     </a>
+                    <a href="{{ route('receipt.expense.index') }}" class="btn d-block btn-lg btn-secondary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>
+                        Back
+                    </a>
                 </div>
                 {{-- Payment Summary --}}
                 <div class="card shadow-sm border-0 mt-3">
@@ -336,12 +338,6 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div>
-                    <a href="{{ route('receipt.expense.index') }}" class="btn d-block w-full btn-secondary mt-3">
-                        <i class="fa-solid fa-arrow-left me-2"></i>
-                        Back
-                    </a>
                 </div>
             </div>
         </div>

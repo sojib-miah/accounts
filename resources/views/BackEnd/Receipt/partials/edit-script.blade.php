@@ -1,5 +1,196 @@
 <script>
     $(document).ready(function() {
+
+        let isInitialLoad = true;
+
+        $('#customer_company_id').on('change', function() {
+
+            let customerCompanyId = $(this).val();
+
+            // Existing party from edit page
+            let selectedPartyId = '';
+
+            if (isInitialLoad) {
+                selectedPartyId = $('#party_id').val() || '';
+            }
+
+            // Clear Customer Company information
+            $('#customer_company_name').text('-');
+            $('#customer_company_phone').text('-');
+            $('#customer_company_email').text('-');
+            $('#customer_company_address').text('-');
+
+            // Clear Party information
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
+
+            if (!customerCompanyId) {
+
+                $('#party_id')
+                    .html('<option value="">Select Party</option>')
+                    .val('')
+                    .trigger('change');
+
+                isInitialLoad = false;
+
+                return;
+            }
+
+            $.get(
+                "{{ url('/admin/ajax/customer-company') }}/" + customerCompanyId,
+                function(res) {
+
+                    if (res.success) {
+
+                        $('#customer_company_name')
+                            .text(res.data.name ?? '-');
+
+                        $('#customer_company_phone')
+                            .text(res.data.phone ?? '-');
+
+                        $('#customer_company_email')
+                            .text(res.data.email ?? '-');
+
+                        $('#customer_company_address')
+                            .text(res.data.address ?? '-');
+                    }
+
+                }
+            ).fail(function(xhr) {
+
+                console.log(
+                    'Customer Company AJAX Error:',
+                    xhr
+                );
+
+            });
+
+            $.get(
+                "{{ url('/admin/ajax/customer-expense') }}/" +
+                customerCompanyId +
+                "/parties",
+
+                function(res) {
+
+                    if (!res.success) {
+                        isInitialLoad = false;
+                        return;
+                    }
+
+                    let html =
+                        '<option value="">Select Party</option>';
+
+                    $.each(res.parties, function(i, party) {
+
+                        html += `
+                        <option value="${party.id}">
+                            ${party.name ?? '-'}
+                            ${
+                                party.designation
+                                    ? ' - ' + party.designation
+                                    : ''
+                            }
+                        </option>
+                    `;
+                    });
+
+                    $('#party_id').html(html);
+
+                    // Restore party on edit page
+                    if (isInitialLoad && selectedPartyId) {
+
+                        $('#party_id')
+                            .val(selectedPartyId)
+                            .trigger('change');
+
+                    } else {
+
+                        $('#party_id')
+                            .val('')
+                            .trigger('change');
+                    }
+
+                    isInitialLoad = false;
+
+                }
+            ).fail(function(xhr) {
+
+                console.log(
+                    'Customer Company Parties AJAX Error:',
+                    xhr
+                );
+
+                isInitialLoad = false;
+
+            });
+
+        });
+
+        $('#party_id').on('change', function() {
+
+            let partyId = $(this).val();
+
+            $('#party_name').text('-');
+            $('#party_designation').text('-');
+            $('#party_phone').text('-');
+            $('#party_email').text('-');
+            $('#party_address').text('-');
+
+            if (!partyId) {
+                return;
+            }
+
+            $.get(
+                "{{ url('/admin/ajax/party') }}/" + partyId,
+
+                function(res) {
+
+                    if (res.success) {
+
+                        $('#party_name')
+                            .text(res.data.name ?? '-');
+
+                        $('#party_designation')
+                            .text(res.data.designation ?? '-');
+
+                        $('#party_phone')
+                            .text(res.data.phone ?? '-');
+
+                        $('#party_email')
+                            .text(res.data.email ?? '-');
+
+                        $('#party_address')
+                            .text(res.data.address ?? '-');
+                    }
+
+                }
+            ).fail(function(xhr) {
+
+                console.log(
+                    'Party AJAX Error:',
+                    xhr
+                );
+
+            });
+
+        });
+
+        let customerCompanyId =
+            $('#customer_company_id').val();
+
+        if (customerCompanyId) {
+
+            $('#customer_company_id')
+                .trigger('change');
+
+        }
+
+    });
+
+    $(document).ready(function() {
         const editData = window.expenseEditData || {};
         const receiptItems = Array.isArray(editData.receiptItems) ? editData.receiptItems : [];
         const categories = Array.isArray(editData.categories) ? editData.categories : [];
@@ -130,133 +321,12 @@
             $('#branch_address').text('-');
         }
 
-        $('#customer_company_id').on('change', function() {
-
-            let customerCompanyId = $(this).val();
-
-            $('#customer_company_name').text('');
-            $('#customer_company_phone').text('');
-            $('#customer_company_email').text('');
-            $('#customer_company_address').text('');
-
-            $('#party_id')
-                .html('<option value="">Select Party</option>')
-                .val('')
-                .trigger('change');
-
-            $('#party_name').text('-');
-            $('#party_designation').text('-');
-            $('#party_phone').text('-');
-            $('#party_email').text('-');
-            $('#party_address').text('-');
-
-            if (!customerCompanyId) {
-                return;
-            }
-
-            $.get(
-                "{{ url('/admin/ajax/customer-company') }}/" + customerCompanyId,
-                function(res) {
-
-                    if (res.success) {
-
-                        $('#customer_company_name')
-                            .text(res.data.name ?? '');
-
-                        $('#customer_company_phone')
-                            .text(res.data.phone ?? '');
-
-                        $('#customer_company_email')
-                            .text(res.data.email ?? '');
-
-                        $('#customer_company_address')
-                            .text(res.data.address ?? '');
-                    }
-                }
-            );
-
-            $.get(
-                "{{ url('/admin/ajax/customer-expense') }}/" +
-                customerCompanyId +
-                "/parties",
-                function(res) {
-
-                    if (res.success) {
-
-                        let html =
-                            '<option value="">Select Party</option>';
-
-                        $.each(res.parties, function(i, party) {
-
-                            html += `
-                        <option value="${party.id}">
-                            ${party.name ?? '-'}
-                            ${party.designation ? ' - ' + party.designation : ''}
-                        </option>
-                    `;
-                        });
-
-                        $('#party_id')
-                            .html(html)
-                            .trigger('change');
-                    }
-                }
-            );
-
-        });
-
-        $('#party_id').on('change', function() {
-
-            let partyId = $(this).val();
-
-            $('#party_name').text('-');
-            $('#party_designation').text('-');
-            $('#party_phone').text('-');
-            $('#party_email').text('-');
-            $('#party_address').text('-');
-
-            if (!partyId) {
-                return;
-            }
-
-            $.get(
-                "{{ url('/admin/ajax/party') }}/" + partyId,
-                function(res) {
-
-                    if (res.success) {
-
-                        $('#party_name')
-                            .text(res.data.name ?? '-');
-
-                        $('#party_designation')
-                            .text(res.data.designation ?? '-');
-
-                        $('#party_phone')
-                            .text(res.data.phone ?? '-');
-
-                        $('#party_email')
-                            .text(res.data.email ?? '-');
-
-                        $('#party_address')
-                            .text(res.data.address ?? '-');
-                    }
-                }
-            );
-
-        });
-
         function resetPartyInfo() {
-
             $('#party_name').text('-');
-
             $('#party_designation').text('-');
-
             $('#party_phone').text('-');
-
             $('#party_email').text('-');
-
             $('#party_address').text('-');
-
         }
 
         if (receiptItems.length > 0) {
@@ -420,13 +490,10 @@
 
             const $total =
                 $('<input>', {
-
                     type: 'text',
-
                     class: 'form-control text-end total',
-
                     readonly: true,
-
+                    disabled: true,
                     value: item ?
                         Number(
                             item.amount || 0
@@ -993,46 +1060,22 @@
                         'disabled',
                         false
                     );
-
             }
-
         }
-
-
         $(document).on('click', '.removeRow', function() {
-
-            const rows =
-                $('#expenseBody .expense-row');
-
-            if (
-                rows.length <= 1
-            ) {
-
+            const rows = $('#expenseBody .expense-row');
+            if (rows.length <= 1) {
                 Swal.fire({
-
                     icon: 'warning',
-
                     title: 'Cannot Remove',
-
                     text: 'At least one expense item is required.'
-
                 });
-
                 return;
-
             }
-            $(this)
-                .closest(
-                    '.expense-row'
-                )
-                .remove();
-
+            $(this).closest('.expense-row').remove();
             updateRowNumbers();
-
             updateRemoveButtons();
-
             calculateGrandTotal();
-
         });
 
         $('#receiptForm').on('submit', function(e) {
@@ -1249,20 +1292,9 @@
             );
 
         }
-
-        if (
-            $('#party_id').val()
-        ) {
-
-            $('#party_id')
-                .trigger(
-                    'change'
-                );
-
+        if ($('#party_id').val()) {
+            $('#party_id').trigger('change');
         }
-
         calculateGrandTotal();
-
-
     });
 </script>

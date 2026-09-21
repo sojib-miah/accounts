@@ -9,11 +9,8 @@
             {{-- PO No --}}
             <div class="col-md-3 mb-3">
                 <label class="form-label">PO No</label>
-
-                <input type="text" class="form-control" value="{{ $receiptNo }}" readonly>
-
+                <input type="text" class="form-control" value="{{ $receiptNo }}" readonly disabled>
                 <input type="hidden" name="receipt_no" value="{{ $receiptNo }}">
-
                 <input type="hidden" name="po_no" value="{{ $receiptNo }}">
             </div>
 

@@ -1,5 +1,7 @@
 @extends('BackEnd.Layouts.layout')
 
+@section('title', 'Customer List')
+
 @section('content')
     <div class="p-5">
         {{-- HEADER --}}
@@ -54,13 +56,13 @@
                                     <td>{{ $company->phone ?: '-' }}</td>
                                     <td>{{ $company->address ?: '-' }}</td>
                                     <td>
-                                        @if ($company->status === 'Sales')
+                                        @if ($company->status === 'Customer')
                                             <span class="badge bg-success">
-                                                Sales
+                                                Customer
                                             </span>
                                         @else
                                             <span class="badge bg-warning text-dark">
-                                                Expense
+                                                Supplier
                                             </span>
                                         @endif
                                     </td>
@@ -69,10 +71,20 @@
                                             data-id="{{ $company->id }}">
                                             <i class="fa fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger deleteCompany"
+                                        {{-- <button type="button" class="btn btn-sm btn-danger deleteCompany"
                                             data-id="{{ $company->id }}" data-name="{{ $company->name }}">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
+                                        </button> --}}
+                                        <form action="{{ route('customer-company.destroy', $company->id) }}" method="POST"
+                                            style="display:inline;">
+
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+
                                     </td>
                                 </tr>
                             @empty

@@ -5,12 +5,19 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
     public function index()
     {
-        $setting = Setting::first();
+        $setting = Setting::firstOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'currency' => 'BDT',
+            ]
+        );
+
         return view('BackEnd.Setting.setting', compact('setting'));
     }
 
@@ -19,14 +26,19 @@ class SettingController extends Controller
         $request->validate([
             'logo' => 'nullable|image',
             'favaicon' => 'nullable|image',
-            'currency' => 'required',
-            'footer_text' => 'nullable',
+            'currency' => 'required|in:BDT,USD',
+            'footer_text' => 'nullable|string',
         ]);
 
-        $setting = Setting::first();
+        $setting = Setting::firstOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'currency' => 'BDT',
+            ]
+        );
 
-        $logo = $setting?->logo;
-        $favicon = $setting?->favaicon;
+        $logo = $setting->logo;
+        $favicon = $setting->favaicon;
 
         // Logo Upload
         if ($request->hasFile('logo')) {
@@ -52,15 +64,12 @@ class SettingController extends Controller
             );
         }
 
-        Setting::updateOrCreate(
-            ['id' => $setting?->id ?? 1],
-            [
-                'logo' => $logo,
-                'favaicon' => $favicon,
-                'currency' => $request->currency,
-                'footer_text' => $request->footer_text,
-            ]
-        );
+        $setting->update([
+            'logo' => $logo,
+            'favaicon' => $favicon,
+            'currency' => $request->currency,
+            'footer_text' => $request->footer_text,
+        ]);
 
         return back()->with(
             'success',

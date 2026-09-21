@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\Auth;
 
 function setting()
 {
-    return Setting::first();
+    if (!Auth::check()) {
+        return null;
+    }
+
+    return Setting::where('user_id', Auth::id())->first();
 }
 
 if (!function_exists('numberToWords')) {
