@@ -238,14 +238,14 @@
 
                                                     <td>
                                                         <input type="number" name="qty[]"
-                                                            class="form-control qty text-end" min="0.01"
-                                                            step="0.01" value="{{ $item['qty'] }}" required>
+                                                            class="form-control qty text-end" min="1"
+                                                            step="1" value="{{ $item['qty'] }}" required>
                                                     </td>
 
                                                     <td>
                                                         <input type="number" name="rate[]"
                                                             class="form-control rate text-end" min="0"
-                                                            step="0.01" value="{{ $item['rate'] }}" required>
+                                                            step="1" value="{{ $item['rate'] }}" required>
                                                     </td>
 
                                                     <td>

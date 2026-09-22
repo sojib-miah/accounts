@@ -467,7 +467,7 @@
                                     TK
                                 </span>
                                 <input type="number" name="amount" id="expense_paid_amount"
-                                    class="form-control fw-bold" step="0.01" min="0.01"
+                                    class="form-control fw-bold" step="1" min="1"
                                     max="{{ $receipt->due_amount }}" value="{{ $receipt->due_amount }}" required>
                             </div>
                             <small class="text-muted">
@@ -506,7 +506,7 @@
                         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
                             Cancel
                         </button>
-                        <button type="submit" id="expensePaymentSubmit" class="btn btn-danger px-4">
+                        <button type="submit" id="expensePaymentSubmit" class="btn btn-primary px-4">
                             <i class="fa fa-check-circle me-2"></i>
                             Confirm Payment
                         </button>

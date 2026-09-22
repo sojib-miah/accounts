@@ -227,10 +227,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th class="d-flex align-items-center gap-2">
-                                            <span>VAT</span>
-                                            <i class="fa-solid fa-circle-info mt-1" title="Vat Count Percentege."></i>
-                                        </th>
+                                        <th>VAT(%)</th>
                                         <td>
                                             <input type="number" name="vat" id="vat" value="0"
                                                 class="form-control text-end">

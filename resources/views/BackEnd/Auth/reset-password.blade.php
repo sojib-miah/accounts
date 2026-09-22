@@ -22,8 +22,13 @@
                 <div class="grid lg:grid-cols-2">
                     <!-- ================= LEFT ================= -->
                     <div class="hidden lg:flex flex-col justify-center p-12 text-white">
-                        <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
-                            class="w-52 mb-10 bg-white rounded-xl p-3">
+                        @if (optional(setting())->logo)
+                            <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
+                                class="w-52 mb-10 bg-white rounded-xl p-3">
+                        @else
+                            <img src="{{ asset('uploads/logo.png') }}" class="h-auto w-44 object-contain"
+                                alt="COMITS">
+                        @endif
                         <h1 class="text-3xl font-bold leading-tight">
                             Welcome to COMITS
                         </h1>

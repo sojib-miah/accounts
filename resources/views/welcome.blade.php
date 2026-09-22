@@ -388,8 +388,13 @@
                 <div class="flex items-center justify-between py-2 sm:py-3">
                     <!-- Logo -->
                     <a href="#" class="flex-shrink-0">
-                        <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
-                            class="h-12 sm:h-11 md:h-12 w-full object-contain" alt="COMITS">
+                        @if (optional(setting())->logo)
+                            <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
+                                class="h-12 sm:h-11 md:h-12 w-full object-contain" alt="COMITS">
+                        @else
+                            <img src="{{ asset('uploads/logo.png') }}"
+                                class="h-12 sm:h-11 md:h-12 w-full object-contain" alt="COMITS">
+                        @endif
                     </a>
 
                     <!-- Desktop Nav Links -->

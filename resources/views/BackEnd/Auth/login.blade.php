@@ -22,8 +22,13 @@
                 <div class="rounded-3xl border border-white/30 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
                     <div class="mb-8 flex justify-center">
                         <div class="rounded-2xl bg-white px-3 py-2 shadow-lg">
-                            <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
-                                alt="COMITS" class="h-auto w-44 object-contain">
+                            @if (optional(setting())->logo)
+                                <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
+                                    alt="COMITS" class="h-auto w-44 object-contain">
+                            @else
+                                <img src="{{ asset('uploads/logo.png') }}" class="h-auto w-44 object-contain"
+                                    alt="COMITS">
+                            @endif
                         </div>
                     </div>
                     <div class="text-center">

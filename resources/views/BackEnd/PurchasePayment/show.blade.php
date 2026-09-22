@@ -207,7 +207,7 @@
                                     <label class="form-label">
                                         Note
                                     </label>
-                                    <textarea name="note" class="form-control" rows="2" placeholder="Payment note"></textarea>
+                                    <textarea name="note" class="form-control" rows="1" placeholder="Payment note"></textarea>
                                 </div>
                             </div>
                             <div class="text-end">
