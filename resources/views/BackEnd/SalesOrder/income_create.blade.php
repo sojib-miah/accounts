@@ -178,7 +178,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>VAT %</th>
+                                            <th>VAT(%)</th>
                                             <td>
                                                 <input type="number" name="vat" id="vat" value="0"
                                                     class="form-control text-end">

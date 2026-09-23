@@ -224,8 +224,8 @@
                                 <td class="text-end text-danger">{{ number_format($receipt->discount, 2) }}</td>
                             </tr>
                             <tr>
-                                <th>VAT(%)</th>
-                                <td class="text-end">{{ number_format($receipt->vat, 2) }} %</td>
+                                <th>VAT</th>
+                                <td class="text-end">{{ number_format($receipt->vat, 2) }}</td>
                             </tr>
                             <tr class="table-primary">
                                 <th>Grand Total</th>

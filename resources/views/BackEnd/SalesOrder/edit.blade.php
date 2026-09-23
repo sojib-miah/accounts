@@ -253,7 +253,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>VAT %</th>
+                                        <th>VAT(%)</th>
                                         <td>
                                             <input type="number" id="vat" name="vat"
                                                 value="{{ $receipt->vat }}" class="form-control text-end">
