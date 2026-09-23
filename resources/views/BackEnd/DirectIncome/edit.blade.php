@@ -316,7 +316,7 @@
                                                 value="0.00" readonly disabled></td>
                                     </tr>
                                     <tr>
-                                        <th>Paid Amount</th>
+                                        <th>Paid Amount(Cash)</th>
                                         <td><input type="number" name="paid_amount" id="paid_amount"
                                                 class="form-control text-end" min="0" step="0.01"
                                                 value="{{ old('paid_amount', $receipt->paid_amount ?? 0) }}"></td>

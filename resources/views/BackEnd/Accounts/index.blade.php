@@ -50,6 +50,12 @@
                                     <th>Payment Type</th>
                                     <th class="text-end">Opening Balance</th>
                                     <th class="text-end">Current Balance</th>
+                                    <th>
+                                        <div class="d-flex gap-1">
+                                            Is Default <i class="fa-solid fa-circle-info text-danger fs-5"
+                                                title="Here One Cash Account Must be Default."></i>
+                                        </div>
+                                    </th>
                                     <th>Status</th>
                                     <th width="170">Action</th>
                                 </tr>
@@ -75,6 +81,13 @@
                                             <strong>{{ number_format($account->current_balance, 2) }}</strong>
                                         </td>
                                         <td>
+                                            @if ($account->is_default == true)
+                                                <span class="badge bg-primary">Default</span>
+                                            @else
+                                                <span class="badge bg-secondary">Not Default</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             @if ($account->status == 'Active')
                                                 <span class="badge bg-success">Active</span>
                                             @else
@@ -92,7 +105,8 @@
                                                     data-holder="{{ $account->account_holder_name }}"
                                                     data-number="{{ $account->account_number }}"
                                                     data-opening="{{ $account->opening_balance }}"
-                                                    data-status="{{ $account->status }}">
+                                                    data-status="{{ $account->status }}"
+                                                    data-is_default="{{ $account->is_default }}">
 
                                                     <i class="fa fa-edit"></i>
                                                 </button>
@@ -242,6 +256,17 @@
                                 <input type="number" step="0.01" min="0" name="opening_balance"
                                     class="form-control">
                                 @error('opening_balance', 'add')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            {{-- isdefault --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Is Default</label>
+                                <select name="is_default" class="form-select select2">
+                                    <option value="0">Not Default</option>
+                                    <option value="1">Default</option>
+                                </select>
+                                @error('is_default', 'add')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
@@ -395,6 +420,17 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+                            {{-- isdefault --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Is Default</label>
+                                <select name="is_default" id="edit_default" class="form-select select2">
+                                    <option value="0">Not Default</option>
+                                    <option value="1">Default</option>
+                                </select>
+                                @error('is_default', 'edit')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Status</label>
@@ -479,13 +515,9 @@
             $('#edit_opening_balance')
                 .val(btn.data('opening'));
 
-            $('#edit_payment_type_id')
-                .val(paymentTypeId)
-                .trigger('change');
-
-            $('#edit_status')
-                .val(btn.data('status'))
-                .trigger('change');
+            $('#edit_payment_type_id').val(paymentTypeId).trigger('change');
+            $('#edit_status').val(btn.data('status')).trigger('change');
+            $('#edit_default').val(btn.data('is_default')).trigger('change');
             $.get(
                 '/admin/ajax/company/' + companyId + '/branches',
                 function(res) {

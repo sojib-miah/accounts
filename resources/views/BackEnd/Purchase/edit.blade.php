@@ -35,49 +35,49 @@
                             <tr>
                                 <th>Total Qty</th>
                                 <td>
-                                    <input type="text" id="totalQty" name="total_qty" class="form-control"
+                                    <input type="text" id="totalQty" name="total_qty" class="form-control text-end"
                                         value="{{ $purchase->total_qty }}" readonly disabled>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Sub Total</th>
                                 <td>
-                                    <input type="text" id="subTotal" name="sub_total" class="form-control"
+                                    <input type="text" id="subTotal" name="sub_total" class="form-control text-end"
                                         value="{{ number_format($purchase->sub_total, 2, '.', '') }}" readonly disabled>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Discount</th>
                                 <td>
-                                    <input type="number" step="0.01" id="discount" name="discount" class="form-control"
-                                        value="{{ $purchase->discount }}">
+                                    <input type="number" step="1" id="discount" name="discount"
+                                        class="form-control text-end" value="{{ $purchase->discount }}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>VAT</th>
                                 <td>
-                                    <input type="number" step="0.01" id="vat" name="vat" class="form-control"
-                                        value="{{ $purchase->vat }}">
+                                    <input type="number" step="1" id="vat" name="vat"
+                                        class="form-control text-end" value="{{ $purchase->vat }}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>Grand Total</th>
                                 <td>
-                                    <input type="text" id="grandTotal" class="form-control"
+                                    <input type="text" id="grandTotal" class="form-control text-end"
                                         value="{{ number_format($purchase->total_amount, 2, '.', '') }}" readonly disabled>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="d-none">
                                 <th>Paid Amount</th>
                                 <td>
-                                    <input type="number" step="0.01" id="paidAmount" name="paid_amount"
-                                        class="form-control" value="{{ $purchase->paid_amount }}">
+                                    <input type="number" step="1" id="paidAmount" name="paid_amount"
+                                        class="form-control text-end" value="{{ $purchase->paid_amount }}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>Due Amount</th>
                                 <td>
-                                    <input type="text" id="dueAmount" class="form-control"
+                                    <input type="text" id="dueAmount" class="form-control text-end"
                                         value="{{ number_format($purchase->due_amount, 2, '.', '') }}" readonly disabled>
                                 </td>
                             </tr>

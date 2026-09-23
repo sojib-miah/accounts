@@ -31,48 +31,48 @@
                         <tr>
                             <th>Total Qty</th>
                             <td>
-                                <input type="text" id="totalQty" name="total_qty" class="form-control" readonly
+                                <input type="text" id="totalQty" name="total_qty" class="form-control text-end" readonly
                                     disabled>
                             </td>
                         </tr>
                         <tr>
                             <th>Sub Total</th>
                             <td>
-                                <input type="text" id="subTotal" name="sub_total" class="form-control" readonly
+                                <input type="text" id="subTotal" name="sub_total" class="form-control text-end" readonly
                                     disabled>
                             </td>
                         </tr>
                         <tr>
                             <th>Discount</th>
                             <td>
-                                <input type="number" step="0.01" id="discount" name="discount" value="0"
-                                    class="form-control">
+                                <input type="number" step="1" id="discount" name="discount" value="0"
+                                    class="form-control text-end">
                             </td>
                         </tr>
                         <tr>
-                            <th>VAT</th>
+                            <th>VAT(%)</th>
                             <td>
-                                <input type="number" step="0.01" id="vat" name="vat" value="0"
-                                    class="form-control">
+                                <input type="number" step="1" id="vat" name="vat" value="0"
+                                    class="form-control text-end">
                             </td>
                         </tr>
                         <tr>
                             <th>Grand Total</th>
                             <td>
-                                <input type="text" id="grandTotal" class="form-control" readonly disabled>
+                                <input type="text" id="grandTotal" class="form-control text-end" readonly disabled>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="d-none">
                             <th>Paid Amount</th>
                             <td>
-                                <input type="number" step="0.01" id="paidAmount" name="paid_amount" value="0"
-                                    class="form-control">
+                                <input type="number" step="1" id="paidAmount" name="paid_amount" value="0"
+                                    class="form-control text-end">
                             </td>
                         </tr>
                         <tr>
                             <th>Due Amount</th>
                             <td>
-                                <input type="text" id="dueAmount" class="form-control" readonly disabled>
+                                <input type="text" id="dueAmount" class="form-control text-end" readonly disabled>
                             </td>
                         </tr>
                     </table>

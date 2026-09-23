@@ -49,19 +49,19 @@
                             value="{{ $item->product->unit }}" readonly disabled>
                     </td>
                     <td>
-                        <input type="text" class="form-control stock"
+                        <input type="text" class="form-control stock text-end"
                             value="{{ (int) $item->product->current_stock }}" readonly disabled>
                     </td>
                     <td>
-                        <input type="number" min="1" name="qty[]" class="form-control qty"
+                        <input type="number" min="1" name="qty[]" class="form-control qty text-end"
                             value="{{ (int) $item->qty }}" required>
                     </td>
                     <td>
-                        <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate"
-                            value="{{ $item->rate }}" required>
+                        <input type="number" step="1" min="0" name="rate[]"
+                            class="form-control rate text-end" value="{{ $item->rate }}" required>
                     </td>
                     <td>
-                        <input type="text" name="amount[]" class="form-control amount"
+                        <input type="text" name="amount[]" class="form-control amount text-end"
                             value="{{ number_format($item->amount, 2, '.', '') }}" readonly disabled>
                     </td>
                     <td class="text-center">
@@ -109,16 +109,16 @@
         <input type="text" name="unit[]" class="form-control unit" readonly disabled>
     </td>
     <td>
-        <input type="text" class="form-control stock" readonly disabled>
+        <input type="text" class="form-control stock text-end" readonly disabled>
     </td>
     <td>
-        <input type="number" min="1" value="0" name="qty[]" class="form-control qty" required>
+        <input type="number" min="1" value="0" name="qty[]" class="form-control qty text-end" required>
     </td>
     <td>
-        <input type="number" step="0.01" min="0" name="rate[]" class="form-control rate" required>
+        <input type="number" step="1" min="0" name="rate[]" class="form-control rate text-end" required>
     </td>
     <td>
-        <input type="text" name="amount[]" class="form-control amount" value="0.00" readonly disabled>
+        <input type="text" name="amount[]" class="form-control amount text-end" value="0.00" readonly disabled>
     </td>
     <td class="text-center">
         <button type="button" class="btn btn-danger removeRow">

@@ -12,6 +12,17 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+        <style>
+            input:-webkit-autofill,
+            input:-webkit-autofill:hover,
+            input:-webkit-autofill:focus,
+            input:-webkit-autofill:active {
+                -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+                -webkit-text-fill-color: white !important;
+                transition: background-color 9999s ease-in-out 0s;
+            }
+        </style>
     </head>
 
     <body>

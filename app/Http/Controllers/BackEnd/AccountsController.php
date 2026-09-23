@@ -87,6 +87,7 @@ class AccountsController extends Controller
             'opening_balance'     => 'required|numeric|min:0',
             'payment_type_id'     => 'required|exists:payment_types,id',
             'status'              => 'required|in:Active,Inactive',
+            'is_default'              => 'required',
         ]);
         if (!Auth::user()->hasRole('Super-Admin')) {
             $current = Account::where('created_by', Auth::id())->count();
@@ -107,6 +108,7 @@ class AccountsController extends Controller
                 'current_balance'     => $request->opening_balance,
                 'payment_type_id'     => $request->payment_type_id,
                 'status'              => $request->status,
+                'is_default'              => $request->is_default,
                 'created_by'          => auth()->id(),
             ]);
             DB::commit();
@@ -157,6 +159,7 @@ class AccountsController extends Controller
             'opening_balance'     => 'required|numeric|min:0',
             'payment_type_id'     => 'required|exists:payment_types,id',
             'status'              => 'required|in:Active,Inactive',
+            'is_default'              => 'required',
         ]);
         DB::beginTransaction();
         try {
@@ -173,6 +176,7 @@ class AccountsController extends Controller
                 'opening_balance'     => $request->opening_balance,
                 'current_balance'     => $currentBalance,
                 'status'              => $request->status,
+                'is_default'              => $request->is_default,
                 'updated_by'          => auth()->id(),
             ]);
             DB::commit();

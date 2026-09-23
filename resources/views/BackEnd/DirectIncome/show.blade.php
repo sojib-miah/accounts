@@ -255,7 +255,7 @@
                                             VAT
                                         </th>
                                         <td class="text-end">
-                                            {{ number_format($receipt->vat, 2) }} %
+                                            {{ number_format($receipt->vat, 2) }} Tk
                                         </td>
                                     </tr>
                                     <tr class="table-primary">
