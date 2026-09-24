@@ -104,10 +104,6 @@
                 @apply relative flex flex-col h-full bg-white rounded-xl border border-slate-300 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg;
             }
 
-            .pricingSlider {
-                padding: 10px 0 50px;
-            }
-
             .pricingSlider .swiper-slide {
                 height: auto;
             }
@@ -462,15 +458,12 @@
                             Smart Company Management System
                         </span>
                         <h1 class="mt-6 text-4xl font-extrabold leading-tight text-slate-900 lg:text-4xl">
-                            Manage Your
-                            <span class="text-cyan-600"></span>
-                            Smarter with
-                            COMITS
+                            Manage Your Business Smarter with COMITS
                         </h1>
                         <p class="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-                            COMITS helps you manage employees, payroll, inventory,
-                            sales, accounting, attendance, and reports from one
-                            modern dashboard.
+                            COMITS brings Purchase, Inventory, Sales, Accounting, and Reporting together in one
+                            platform—so you can streamline operations, stay in control, and turn everyday business data
+                            into smarter decisions.
                         </p>
                         <div class="mt-10 flex flex-wrap gap-4">
                             <a href="{{ route('admin.login') }}"
@@ -523,150 +516,125 @@
                             save time, improve productivity, and make better decisions.
                         </p>
                     </div>
-
-                    <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-
+                    <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5">
                         <!-- Card 1 -->
                         <div
-                            class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
-
+                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
                             <!-- Top Line -->
                             <div
                                 class="absolute left-0 top-0 h-1 w-full scale-x-0 origin-left bg-gradient-to-r from-blue-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100">
                             </div>
-
                             <!-- Glow -->
                             <div
                                 class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-200/20 via-transparent to-blue-200/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100">
                             </div>
-
                             <div class="relative z-10">
-
                                 <div
                                     class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-yellow-100 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg">
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="currentColor"
-                                        class="h-8 w-8 text-yellow-500">
-                                        <path
-                                            d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z" />
-                                    </svg>
-
+                                    <i class="fa-solid fa-cart-plus text-2xl text-green-600"></i>
                                 </div>
-
                                 <h3 class="mt-6 text-xl font-bold text-slate-900 transition group-hover:text-cyan-600">
-                                    Review Rating
+                                    Product Purchase
                                 </h3>
-
-                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700">
-                                    Collect customer reviews and monitor your business reputation with real-time
-                                    feedback.
+                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700 text-sm">
+                                    Manage suppliers, purchase orders, receiving, payments, and purchase history from
+                                    one centralized platform.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <!-- Card 2 -->
                         <div
-                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
-
+                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
                             <div
                                 class="absolute left-0 top-0 h-1 w-full scale-x-0 origin-left bg-gradient-to-r from-blue-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100">
                             </div>
-
                             <div
                                 class="absolute inset-0 rounded-sm bg-gradient-to-br from-cyan-200/20 via-transparent to-blue-200/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100">
                             </div>
-
                             <div class="relative z-10">
-
                                 <div
                                     class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-green-100 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg">
-
-                                    <i class="fa-solid fa-users text-2xl text-green-600"></i>
-
+                                    <i class="fa-solid fa-warehouse text-2xl text-green-600"></i>
                                 </div>
-
                                 <h3 class="mt-6 text-xl font-bold text-slate-900 transition group-hover:text-cyan-600">
-                                    Active Users
+                                    Inventory
                                 </h3>
-
-                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700">
-                                    Manage employees, customers and user roles from one centralized dashboard.
+                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700 text-sm">
+                                    Track stock, products, warehouses, branches, transfers, and inventory movements with
+                                    real-time visibility.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <!-- Card 3 -->
                         <div
-                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
-
+                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
                             <div
                                 class="absolute left-0 top-0 h-1 w-full scale-x-0 origin-left bg-gradient-to-r from-blue-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100">
                             </div>
-
                             <div
                                 class="absolute inset-0 rounded-sm bg-gradient-to-br from-cyan-200/20 via-transparent to-blue-200/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100">
                             </div>
-
                             <div class="relative z-10">
-
                                 <div
                                     class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-blue-100 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg">
-
-                                    <i class="fa-solid fa-building-columns text-2xl text-blue-600"></i>
-
+                                    <i class="fa-solid fa-chart-line text-2xl text-blue-600"></i>
                                 </div>
-
                                 <h3 class="mt-6 text-xl font-bold text-slate-900 transition group-hover:text-cyan-600">
-                                    Multiple Branch
+                                    Sales
                                 </h3>
-
-                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700">
-                                    Manage multiple branches, inventory and accounts from one central dashboard.
+                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700 text-sm">
+                                    Manage sales orders, invoices, customers, payments, returns, and your complete sales
+                                    operations.
                                 </p>
-
                             </div>
-
                         </div>
-
                         <!-- Card 4 -->
                         <div
-                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
-
+                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
                             <div
                                 class="absolute left-0 top-0 h-1 w-full scale-x-0 origin-left bg-gradient-to-r from-blue-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100">
                             </div>
-
                             <div
                                 class="absolute inset-0 rounded-sm bg-gradient-to-br from-cyan-200/20 via-transparent to-blue-200/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100">
                             </div>
-
                             <div class="relative z-10">
-
                                 <div
                                     class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-purple-100 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg">
-
-                                    <i class="fa-solid fa-mobile-screen-button text-2xl text-purple-600"></i>
-
+                                    <i class="fa-solid fa-calculator text-2xl text-purple-600"></i>
                                 </div>
-
                                 <h3 class="mt-6 text-xl font-bold text-slate-900 transition group-hover:text-cyan-600">
-                                    Web & Mobile Access
+                                    Accounting
                                 </h3>
-
-                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700">
-                                    Access your business securely from desktop, tablet and mobile anytime, anywhere.
+                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700 text-sm">
+                                    Monitor income, expenses, accounts, payments, balances, and financial transactions
+                                    with ease.
                                 </p>
-
                             </div>
-
                         </div>
-
+                        <!-- Card 5 -->
+                        <div
+                            class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-center transition-all duration-500 hover:-translate-y-3 hover:border-cyan-300 hover:bg-gradient-to-br hover:from-cyan-50 hover:via-white hover:to-blue-50 hover:shadow-[0_20px_50px_rgba(6,182,212,.18)]">
+                            <div
+                                class="absolute left-0 top-0 h-1 w-full scale-x-0 origin-left bg-gradient-to-r from-blue-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100">
+                            </div>
+                            <div
+                                class="absolute inset-0 rounded-sm bg-gradient-to-br from-cyan-200/20 via-transparent to-blue-200/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100">
+                            </div>
+                            <div class="relative z-10">
+                                <div
+                                    class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-lime-100 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-lg">
+                                    <i class="fa-solid fa-file-invoice text-2xl text-lime-600"></i>
+                                </div>
+                                <h3 class="mt-6 text-xl font-bold text-slate-900 transition group-hover:text-cyan-600">
+                                    Business Reports
+                                </h3>
+                                <p class="mt-4 leading-7 text-slate-600 transition group-hover:text-slate-700 text-sm">
+                                    Get clear insights into sales, purchases, inventory, expenses, profit, and overall
+                                    business performance.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </section>
             <section class="partner-section">
@@ -792,181 +760,152 @@
                 </div>
             </section>
             <!-- ================= CONTACT SECTION ================= -->
-            <section id="contact" class="py-16 lg:py-20 bg-gradient-to-br from-cyan-50 via-white to-cyan-50">
-
+            <section id="contact" class="pb-16 pt-8 bg-gradient-to-br from-cyan-50 via-white to-cyan-50">
                 <div class="max-w-7xl mx-auto px-5 lg:px-8">
-
                     <!-- Heading -->
-
                     <div class="max-w-3xl mx-auto text-center">
-
                         <span
                             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-100 text-cyan-600 font-semibold">
-
                             <i class="fa-solid fa-headset"></i>
-
                             Contact Us
-
                         </span>
-
                         <h2 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
-
                             Request a Free Demo
-
                         </h2>
-
                         <p class="mt-3 text-base lg:text-lg text-slate-600">
-
                             Fill out the form below and our representative will contact you shortly.
-
                         </p>
-
                     </div>
-
                     <!-- Contact Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-
                         <!-- Address -->
                         <div
                             class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-
                             <div
                                 class="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-red-500 via-red-300 to-red-100 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500">
                             </div>
-
                             <div
                                 class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-gradient-to-br from-red-100 to-red-100 shadow-md transition duration-500 group-hover:scale-110">
-
                                 <i class="fa-solid fa-location-dot text-2xl text-red-600"></i>
-
                             </div>
-
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
                                 Our Address
                             </h3>
-
                             <p class="mt-3 text-slate-600 leading-7">
-                                House 375, Road 28<br>
+                                3<sup>rd</sup> floor,
+                                House-375, Road-28<br>
                                 DOHS Mohakhali<br>
                                 Dhaka-1212, Bangladesh
                             </p>
-
                         </div>
-
                         <!-- Phone -->
                         <div
                             class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-
                             <div
                                 class="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500">
                             </div>
-
                             <div
                                 class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-gradient-to-br from-emerald-100 to-green-100 shadow-md transition duration-500 group-hover:scale-110">
-
                                 <i class="fa-solid fa-phone text-2xl text-emerald-600"></i>
-
                             </div>
-
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
                                 Phone Number
                             </h3>
-
                             <p class="mt-3 text-slate-600 text-lg font-medium">
+                                +880 1331-995522
+                                <br>
                                 +880 1711-257224
                             </p>
-
                         </div>
-
                         <!-- Email -->
                         <div
                             class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
-
                             <div
                                 class="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-cyan-500 via-cyan-300 to-cyan-100 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500">
                             </div>
-
                             <div
                                 class="mx-auto flex h-16 w-16 items-center justify-center rounded-sm bg-gradient-to-br from-cyan-100 to-cyan-100 shadow-md transition duration-500 group-hover:scale-110">
-
                                 <i class="fa-solid fa-envelope text-2xl text-cyan-600"></i>
-
                             </div>
-
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
                                 Email Address
                             </h3>
-
                             <p class="mt-3 text-slate-600 break-all">
                                 info@comitsbd.com
+                                <br>
+                                sales@comitsbd.com
                             </p>
-
                         </div>
-
                     </div>
-
                     <!-- Map + Form -->
-
-                    <div class="grid lg:grid-cols-2 gap-8 items-start mt-5">
-
+                    <div class="flex gap-8 mt-5" id="form">
                         <!-- Google Map -->
-
-                        <div
-                            class="overflow-hidden rounded-sm border border-slate-200 shadow-lg h-[450px] lg:h-[500px]">
-
+                        <div class="overflow-hidden rounded-sm border border-slate-200 shadow-lg w-1/2">
                             <iframe
                                 src="https://www.google.com/maps?q=House+375+Road+28+DOHS+Mohakhali+Dhaka&output=embed"
                                 class="w-full h-full border-0" loading="lazy">
                             </iframe>
-
                         </div>
 
                         <!-- Form -->
+                        <div class="bg-white rounded-sm border border-slate-200 shadow-lg p-4 lg:p-5 w-1/2">
+                            @if (session('success'))
+                                <div class="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
+                                    role="alert">
+                                    <div class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                            fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z"
+                                                clip-rule="evenodd" />
+                                        </svg>
 
-                        <div class="bg-white rounded-sm border border-slate-200 shadow-lg p-4 lg:p-5">
+                                        <span>{{ session('success') }}</span>
+                                    </div>
 
-                            <form class="space-y-4" onsubmit="event.preventDefault();">
-
-                                <input type="text" placeholder="Your Name" required
+                                    <button type="button" onclick="this.parentElement.remove()"
+                                        class="ml-4 text-green-600 hover:text-green-900" aria-label="Close">
+                                        ✕
+                                    </button>
+                                </div>
+                            @endif
+                            <form method="POST" action="{{ route('contact.store') }}" class="space-y-4">
+                                @csrf
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    placeholder="Your Name" required
                                     class="w-full rounded-sm border border-slate-300 px-5 py-3.5 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100">
-
-                                <input type="tel" placeholder="Phone Number" required
+                                @error('name')
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                                <input type="tel" name="phone" value="{{ old('phone') }}"
+                                    placeholder="Phone Number" required
                                     class="w-full rounded-sm border border-slate-300 px-5 py-3.5 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100">
-
-                                <input type="email" placeholder="Email Address" required
+                                @error('phone')
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                                <input type="email" name="email" value="{{ old('email') }}"
+                                    placeholder="Email Address" required
                                     class="w-full rounded-sm border border-slate-300 px-5 py-3.5 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100">
-
-                                <select required
-                                    class="w-full rounded-sm border border-slate-300 px-5 py-3.5 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100">
-
-                                    <option value="" disabled selected>
-                                        Select Service Type
-                                    </option>
-
-                                    <option>Software & Web Solutions</option>
-
-                                    <option>Hardware Solutions</option>
-
-                                    <option>Printing POS</option>
-
-                                    <option>Digital Marketing</option>
-
-                                    <option>IT Support</option>
-
-                                    <option>Career & Job</option>
-
-                                </select>
-
-                                <textarea rows="4" placeholder="Tell us about your business..."
-                                    class="w-full rounded-sm border border-slate-300 px-5 py-3 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100"></textarea>
-
+                                @error('email')
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                                <textarea rows="4" name="message" placeholder="Tell us about your business..."
+                                    class="w-full rounded-sm border border-slate-300 px-5 py-3 outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100">{{ old('message') }}</textarea>
+                                @error('message')
+                                    <p class="mt-1 text-sm text-red-600">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
                                 <button type="submit"
-                                    class="w-50 rounded-sm bg-gradient-to-r from-cyan-600 to-cyan-500 py-3.5 text-base font-semibold text-white hover:shadow-xl hover:scale-[1.02] transition-all">
-
+                                    class="w-50 rounded-sm bg-gradient-to-r from-cyan-600 to-cyan-500 py-3.5 text-base font-semibold text-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
                                     Request Free Demo
-
                                 </button>
-
                             </form>
 
                             <p class="mt-5 flex items-center justify-center gap-2 text-center text-sm text-slate-500">
@@ -975,17 +914,13 @@
                                     Your information is secure. We'll never share your personal information.
                                 </span>
                             </p>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
             <!-- FOOTER START -->
             <footer
-                class="bg-gradient-to-b from-cyan-50 to-white text-slate-700 pt-16 mt-5 border-t border-slate-200/80 font-sans">
+                class="bg-gradient-to-b from-cyan-50 to-white text-slate-700 pt-16 border-t border-slate-200/80 font-sans">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
 
@@ -1121,8 +1056,10 @@
                                         <i class="fa-solid fa-location-dot text-base"></i>
                                     </div>
                                     <span class="leading-relaxed text-slate-700">
-                                        Comits Computers, 3rd Floor, House: 375, Road: 28, DOHS Mohakhali, Dhaka-1212,
-                                        Bangladesh
+                                        3<sup>rd</sup> floor,
+                                        House-375, Road-28
+                                        DOHS Mohakhali
+                                        Dhaka-1212, Bangladesh
                                     </span>
                                 </div>
 
@@ -1133,12 +1070,12 @@
                                         <i class="fa-solid fa-phone text-sm"></i>
                                     </div>
                                     <div class="space-y-1 leading-snug">
-                                        <p><span class="font-semibold text-slate-800">Sales:</span> <a
-                                                href="tel:+8801711257224"
+                                        <p><span class="font-semibold text-slate-800">Sales:</span> &nbsp;&nbsp;
+                                            &nbsp; <a href="tel:+8801711257224"
                                                 class="hover:text-cyan-600 transition">+8801711257224</a></p>
-                                        <p><span class="font-semibold text-slate-800">Support:</span> <a
-                                                href="tel:+8801331995522"
-                                                class="hover:text-cyan-600 transition">+8801331995522</a></p>
+                                        <p><span class="font-semibold text-slate-800">Support: </span> <a
+                                                href="tel:+8801331995522" class="hover:text-cyan-600 transition">
+                                                +8801331995522</a></p>
                                     </div>
                                 </div>
 
@@ -1152,7 +1089,7 @@
                                         <p><a href="mailto:info@comitsbd.com"
                                                 class="hover:text-cyan-600 transition">info@comitsbd.com</a></p>
                                         <p><a href="mailto:support@comitsbd.com"
-                                                class="hover:text-cyan-600 transition">support@comitsbd.com</a></p>
+                                                class="hover:text-cyan-600 transition">sales@comitsbd.com</a></p>
                                     </div>
                                 </div>
                             </div>

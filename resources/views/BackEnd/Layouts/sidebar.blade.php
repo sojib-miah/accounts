@@ -458,6 +458,23 @@
             </li>
         @endcan
 
+        {{-- contact  --}}
+        @can('menu-package-list')
+            <li class="menu-item {{ request()->routeIs('contact.show') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="fa-solid fa-phone me-3"></i>
+                    Contact
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->routeIs('contact.show') ? 'active' : '' }}">
+                        <a href="{{ route('contact.show') }}" class="menu-link">
+                            Contact Form
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endcan
+
         {{-- Settings  --}}
         @can('menu-setting-list')
             <li class="menu-item {{ request()->routeIs('settings*') ? 'active open' : '' }}">

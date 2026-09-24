@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FrontEnd\ContactController;
 use App\Http\Controllers\FrontEnd\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,7 @@ require __DIR__ . '/admin.php';
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::post('/send-contact-message', [HomeController::class, 'store'])->name('contact.send');
+// frontend contact 
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.show');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::delete('/contact/{contact}', [ContactController::class, 'destroy'])->name('contact.destroy');
