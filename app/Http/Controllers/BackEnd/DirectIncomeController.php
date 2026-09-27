@@ -85,144 +85,66 @@ class DirectIncomeController extends Controller
 
         $request->validate([
             'receipt_date' => ['required', 'date'],
-
-            'customer_company_id' => [
-                'nullable',
-                'exists:customer_companies,id'
-            ],
-
-            'party_id' => [
-                'required',
-                'exists:parties,id'
-            ],
-
-            'details' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'details.*' => [
-                'required',
-                'string',
-                'max:5000'
-            ],
-
-            'qty' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'qty.*' => [
-                'required',
-                'numeric',
-                'min:0.01'
-            ],
-
-            'rate' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'rate.*' => [
-                'required',
-                'numeric',
-                'min:0'
-            ],
-
-            'discount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'vat' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'paid_amount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'remarks' => [
-                'nullable',
-                'string'
-            ],
+            'customer_company_id' => ['nullable', 'exists:customer_companies,id'],
+            'party_id' => ['nullable', 'exists:parties,id'],
+            'details' => ['required', 'array', 'min:1'],
+            'details.*' => ['required', 'string', 'max:5000'],
+            'qty' => ['required', 'array', 'min:1'],
+            'qty.*' => ['required', 'numeric', 'min:1'],
+            'rate' => ['required', 'array', 'min:1'],
+            'rate.*' => ['required', 'numeric', 'min:0'],
+            'discount' => ['nullable', 'numeric', 'min:0'],
+            'vat' => ['nullable', 'numeric', 'min:0'],
+            'paid_amount' => ['nullable', 'numeric', 'min:0'],
+            'remarks' => ['nullable', 'string'],
+            'customer_name' => ['nullable', 'string'],
+            'customer_phone' => ['nullable', 'string'],
         ]);
-
         DB::beginTransaction();
-
         try {
-
-            $companyId = $user->hasRole('Super-Admin')
-                ? ($request->company_id ?? $user->company_id)
-                : $user->company_id;
-
-            $branchId = $user->hasRole('Super-Admin')
-                ? ($request->branch_id ?? $user->branch_id)
-                : $user->branch_id;
+            $companyId = $user->hasRole('Super-Admin') ? ($request->company_id ?? $user->company_id) : $user->company_id;
+            $branchId = $user->hasRole('Super-Admin') ? ($request->branch_id ?? $user->branch_id) : $user->branch_id;
             $totalQty = 0;
             $subTotal = 0;
-
             foreach ($request->details as $index => $details) {
-
                 $details = trim($details);
-
                 $qty = (float) ($request->qty[$index] ?? 0);
                 $rate = (float) ($request->rate[$index] ?? 0);
-
                 if ($qty <= 0) {
                     throw new \Exception(
                         'Quantity must be greater than zero.'
                     );
                 }
-
                 if ($rate < 0) {
                     throw new \Exception(
                         'Rate cannot be negative.'
                     );
                 }
-
                 $amount = round($qty * $rate, 2);
-
                 $totalQty += $qty;
                 $subTotal += $amount;
             }
             $subTotal = round($subTotal, 2);
-
             $discount = (float) ($request->discount ?? 0);
-
             if ($discount > $subTotal) {
                 throw new \Exception(
                     'Discount cannot be greater than subtotal.'
                 );
             }
-
             $vatPercent = (float) ($request->vat ?? 0);
-
             $afterDiscount = $subTotal - $discount;
-
             $vatAmount = round(
                 ($afterDiscount * $vatPercent) / 100,
                 2
             );
-
             $totalAmount = round(
                 $afterDiscount + $vatAmount,
                 2
             );
-
             $paidAmount = round(
                 (float) ($request->paid_amount ?? 0),
                 2
             );
-
             if ($paidAmount > $totalAmount) {
                 throw new \Exception(
                     'Paid amount cannot be greater than total amount.'
@@ -232,28 +154,18 @@ class DirectIncomeController extends Controller
                 $totalAmount - $paidAmount,
                 2
             );
-
             if ($paidAmount <= 0) {
-
                 $paymentStatus = 'Pending';
             } elseif ($dueAmount > 0) {
-
                 $paymentStatus = 'Partial';
             } else {
-
                 $paymentStatus = 'Paid';
             }
-
             $paymentType = null;
             $cashAccount = null;
-
             if ($paidAmount > 0) {
-                $paymentType = PaymentType::where('name', 'Cash')
-                    ->where('status', 'Active')
-                    ->first();
-
+                $paymentType = PaymentType::where('name', 'Cash')->where('status', 'Active')->first();
                 if (!$paymentType) {
-
                     throw new \Exception(
                         'Cash payment type is not available or inactive. Please create/activate the Cash payment type first.'
                     );
@@ -261,137 +173,69 @@ class DirectIncomeController extends Controller
                 $cashAccountQuery = Account::where(
                     'payment_type_id',
                     $paymentType->id
-                )
-                    ->where('is_default', true)
-                    ->where('status', 'Active');
-
+                )->where('is_default', true)->where('status', 'Active');
                 if (!$user->hasRole('Super-Admin')) {
-
-                    $cashAccountQuery
-                        ->where('company_id', $companyId)
-                        ->where('branch_id', $branchId);
+                    $cashAccountQuery->where('company_id', $companyId)->where('branch_id', $branchId);
                 } else {
-
                     $cashAccountQuery
                         ->where(function ($query) use ($companyId) {
-                            $query->where('company_id', $companyId)
-                                ->orWhereNull('company_id');
+                            $query->where('company_id', $companyId)->orWhereNull('company_id');
                         })
                         ->where(function ($query) use ($branchId) {
-                            $query->where('branch_id', $branchId)
-                                ->orWhereNull('branch_id');
+                            $query->where('branch_id', $branchId)->orWhereNull('branch_id');
                         });
                 }
-
-                $cashAccount = $cashAccountQuery
-                    ->lockForUpdate()
-                    ->first();
-
+                $cashAccount = $cashAccountQuery->lockForUpdate()->first();
                 if (!$cashAccount) {
-
                     throw new \Exception(
                         'Default Cash account not found. Please create a Cash account and set it as Default.'
                     );
                 }
             }
-
             $receiptNo = $this->generateReceiptNo();
-
             $receipt = Receipt::create([
-
                 'receipt_no' => $receiptNo,
-
                 'type' => 'Direct-Income',
-
                 'is_challan' => false,
                 'is_invoice' => false,
                 'is_receive' => false,
-
                 'company_id' => $companyId,
                 'branch_id' => $branchId,
-
-                'customer_company_id' =>
-                $request->customer_company_id,
-
-                'party_id' =>
-                $request->party_id,
-
-                'receipt_date' =>
-                $request->receipt_date,
-
-                'remarks' =>
-                $request->remarks,
-
+                'customer_company_id' => $request->customer_company_id,
+                'party_id' => $request->party_id,
+                'receipt_date' => $request->receipt_date,
+                'remarks' => $request->remarks,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
                 'total_qty' => $totalQty,
-
-                'sub_total' =>
-                $subTotal,
-
-                'discount' =>
-                round($discount, 2),
-
-                'vat' =>
-                round($vatAmount, 2),
-
-                'total_amount' =>
-                $totalAmount,
-
-                'paid_amount' =>
-                $paidAmount,
-
-                'due_amount' =>
-                $dueAmount,
-
-                'payment_status' =>
-                $paymentStatus,
-
-                'status' =>
-                'Draft',
-
-                'created_by' =>
-                $user->id,
-
-                'updated_by' =>
-                $user->id,
+                'sub_total' => $subTotal,
+                'discount' => round($discount, 2),
+                'vat' => round($vatAmount, 2),
+                'total_amount' => $totalAmount,
+                'paid_amount' => $paidAmount,
+                'due_amount' => $dueAmount,
+                'payment_status' => $paymentStatus,
+                'status' => 'Draft',
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
             ]);
             foreach ($request->details as $index => $details) {
-
                 $details = trim($details);
-
                 $qty = (float) ($request->qty[$index] ?? 0);
-
                 $rate = (float) ($request->rate[$index] ?? 0);
-
                 $amount = round(
                     $qty * $rate,
                     2
                 );
-
                 ReceiptItem::create([
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'category_id' =>
-                    null,
-
-                    'account_head_id' =>
-                    null,
-
-                    'product_id' =>
-                    null,
-
-                    'qty' =>
-                    $qty,
-
-                    'rate' =>
-                    $rate,
-
-                    'amount' =>
-                    $amount,
-
-                    'details' =>
-                    $details,
+                    'receipt_id' => $receipt->id,
+                    'category_id' => null,
+                    'account_head_id' => null,
+                    'product_id' => null,
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'amount' => $amount,
+                    'details' => $details,
                 ]);
             }
             if ($paidAmount > 0) {
@@ -399,105 +243,42 @@ class DirectIncomeController extends Controller
                     (float) $cashAccount->current_balance,
                     2
                 );
-
                 $newBalance = round(
                     $currentBalance + $paidAmount,
                     2
                 );
-
                 $cashAccount->update([
-
-                    'current_balance' =>
-                    $newBalance,
-
-                    'updated_by' =>
-                    $user->id,
+                    'current_balance' => $newBalance,
+                    'updated_by' => $user->id,
                 ]);
-
                 AccountTransaction::create([
-
-                    'company_id' =>
-                    $cashAccount->company_id,
-
-                    'account_id' =>
-                    $cashAccount->id,
-
-                    'transaction_date' =>
-                    $request->receipt_date,
-
-                    'voucher_no' =>
-                    $receipt->receipt_no,
-
-                    'transaction_type' =>
-                    'Direct-Income',
-
-                    'purpose' =>
-                    'Direct Income Cash Payment - ' .
-                        $receipt->receipt_no,
-
-                    'credit' =>
-                    $paidAmount,
-
-                    'debit' =>
-                    0,
-
-                    'balance' =>
-                    $newBalance,
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'created_by' =>
-                    $user->id,
+                    'company_id' => $cashAccount->company_id,
+                    'account_id' => $cashAccount->id,
+                    'transaction_date' => $request->receipt_date,
+                    'voucher_no' => $receipt->receipt_no,
+                    'transaction_type' => 'Direct-Income',
+                    'purpose' => 'Direct Income Cash Payment - ' . $receipt->receipt_no,
+                    'credit' => $paidAmount,
+                    'debit' => 0,
+                    'balance' => $newBalance,
+                    'receipt_id' => $receipt->id,
+                    'created_by' => $user->id,
                 ]);
-
                 ReceiptPayment::create([
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'payment_type_id' =>
-                    $paymentType->id,
-
-                    'account_id' =>
-                    $cashAccount->id,
-
-                    'payment_date' =>
-                    $request->receipt_date,
-
-                    'amount' =>
-                    $paidAmount,
-
-                    'note' =>
-                    'Initial Cash Payment',
-
-                    'created_by' =>
-                    $user->id,
+                    'receipt_id' => $receipt->id,
+                    'payment_type_id' => $paymentType->id,
+                    'account_id' => $cashAccount->id,
+                    'payment_date' => $request->receipt_date,
+                    'amount' => $paidAmount,
+                    'note' => 'Initial Cash Payment',
+                    'created_by' => $user->id,
                 ]);
             }
-
-
             DB::commit();
-
-            return redirect()
-                ->route(
-                    'direct.income.show',
-                    ['receipt' => $receipt->id]
-                )
-                ->with(
-                    'success',
-                    'Direct Income created successfully.'
-                );
+            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Income created successfully.');
         } catch (\Throwable $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -626,132 +407,37 @@ class DirectIncomeController extends Controller
     public function update(Request $request, Receipt $receipt)
     {
         $user = Auth::user();
-
         // Make sure this is a Direct Income receipt
-        abort_unless(
-            $receipt->type === 'Direct-Income',
-            404
-        );
-
+        abort_unless($receipt->type === 'Direct-Income', 404);
         $request->validate([
-
-            'receipt_date' => [
-                'required',
-                'date'
-            ],
-
-            'company_id' => [
-                'required',
-                'exists:companies,id'
-            ],
-
-            'branch_id' => [
-                'required',
-                'exists:branches,id'
-            ],
-
-            'customer_company_id' => [
-                'nullable',
-                'exists:customer_companies,id'
-            ],
-
-            'party_id' => [
-                'required',
-                'exists:parties,id'
-            ],
-
-            'details' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'details.*' => [
-                'required',
-                'string',
-                'max:5000'
-            ],
-
-            'qty' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'qty.*' => [
-                'required',
-                'numeric',
-                'min:0.01'
-            ],
-
-            'rate' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'rate.*' => [
-                'required',
-                'numeric',
-                'min:0'
-            ],
-
-            'discount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'vat' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'paid_amount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'remarks' => [
-                'nullable',
-                'string'
-            ],
+            'receipt_date' => ['required', 'date'],
+            'company_id' => ['required', 'exists:companies,id'],
+            'branch_id' => ['required', 'exists:branches,id'],
+            'customer_company_id' => ['nullable', 'exists:customer_companies,id'],
+            'party_id' => ['nullable', 'exists:parties,id'],
+            'details' => ['required', 'array', 'min:1'],
+            'details.*' => ['required', 'string', 'max:5000'],
+            'qty' => ['required', 'array', 'min:1'],
+            'qty.*' => ['required', 'numeric', 'min:1'],
+            'rate' => ['required', 'array', 'min:1'],
+            'rate.*' => ['required', 'numeric', 'min:0'],
+            'discount' => ['nullable', 'numeric', 'min:0'],
+            'vat' => ['nullable', 'numeric', 'min:0'],
+            'paid_amount' => ['nullable', 'numeric', 'min:0'],
+            'remarks' => ['nullable', 'string'],
+            'customer_name' => ['nullable', 'string'],
+            'customer_phone' => ['nullable', 'string'],
         ]);
-
         DB::beginTransaction();
-
         try {
-            $companyId = $user->hasRole('Super-Admin')
-                ? $request->company_id
-                : $user->company_id;
-
-            $branchId = $user->hasRole('Super-Admin')
-                ? $request->branch_id
-                : $user->branch_id;
-
+            $companyId = $user->hasRole('Super-Admin') ? $request->company_id : $user->company_id;
+            $branchId = $user->hasRole('Super-Admin') ? $request->branch_id : $user->branch_id;
             if (!$user->hasRole('Super-Admin')) {
-
-                $branchExists = Branch::where(
-                    'id',
-                    $branchId
-                )
+                $branchExists = Branch::where('id', $branchId)
                     ->where(function ($query) use ($user) {
-
-                        $query->where(
-                            'created_by',
-                            $user->id
-                        )
-                            ->orWhere(
-                                'id',
-                                $user->branch_id
-                            );
-                    })
-                    ->exists();
-
+                        $query->where('created_by', $user->id)->orWhere('id', $user->branch_id);
+                    })->exists();
                 if (!$branchExists) {
-
                     throw new \Exception(
                         'You are not authorized to use this branch.'
                     );
@@ -759,489 +445,189 @@ class DirectIncomeController extends Controller
             }
             $totalQty = 0;
             $subTotal = 0;
-
-            $details = $request->input(
-                'details',
-                []
-            );
-
-            $qtys = $request->input(
-                'qty',
-                []
-            );
-
-            $rates = $request->input(
-                'rate',
-                []
-            );
+            $details = $request->input('details', []);
+            $qtys = $request->input('qty', []);
+            $rates = $request->input('rate', []);
             $receipt->items()->delete();
             foreach ($details as $index => $detail) {
-
                 $detail = trim($detail);
-
-                $qty = (float) (
-                    $qtys[$index] ?? 0
-                );
-
-                $rate = (float) (
-                    $rates[$index] ?? 0
-                );
-
-
+                $qty = (float) ($qtys[$index] ?? 0);
+                $rate = (float) ($rates[$index] ?? 0);
                 if ($qty <= 0) {
-
                     throw new \Exception(
                         'Quantity must be greater than zero.'
                     );
                 }
-
-
                 if ($rate < 0) {
-
                     throw new \Exception(
                         'Rate cannot be negative.'
                     );
                 }
-
-
-                $amount = round(
-                    $qty * $rate,
-                    2
-                );
-
-
+                $amount = round($qty * $rate, 2);
                 ReceiptItem::create([
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'category_id' =>
-                    null,
-
-                    'account_head_id' =>
-                    null,
-
-                    'product_id' =>
-                    null,
-
-                    'qty' =>
-                    $qty,
-
-                    'rate' =>
-                    $rate,
-
-                    'amount' =>
-                    $amount,
-
-                    'details' =>
-                    $detail,
+                    'receipt_id' => $receipt->id,
+                    'category_id' => null,
+                    'account_head_id' => null,
+                    'product_id' => null,
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'amount' => $amount,
+                    'details' => $detail,
                 ]);
-
-
                 $totalQty += $qty;
-
                 $subTotal += $amount;
             }
-
-
-            $subTotal = round(
-                $subTotal,
-                2
-            );
+            $subTotal = round($subTotal, 2);
             $discount = (float) (
                 $request->discount ?? 0
             );
-
             if ($discount > $subTotal) {
-
                 throw new \Exception(
                     'Discount cannot be greater than subtotal.'
                 );
             }
-            $vatPercent = (float) (
-                $request->vat ?? 0
-            );
-
-            $afterDiscount =
-                $subTotal - $discount;
-
-
-            $vatAmount = round(
-                ($afterDiscount * $vatPercent) / 100,
-                2
-            );
-            $totalAmount = round(
-                $afterDiscount + $vatAmount,
-                2
-            );
-            $newPaidAmount = round(
-                (float) (
-                    $request->paid_amount ?? 0
-                ),
-                2
-            );
-
-
+            $vatPercent = (float) ($request->vat ?? 0);
+            $afterDiscount = $subTotal - $discount;
+            $vatAmount = round(($afterDiscount * $vatPercent) / 100, 2);
+            $totalAmount = round($afterDiscount + $vatAmount, 2);
+            $newPaidAmount = round((float) ($request->paid_amount ?? 0), 2);
             if ($newPaidAmount > $totalAmount) {
-
                 throw new \Exception(
                     'Paid amount cannot be greater than total amount.'
                 );
             }
-            $oldPaidAmount = round(
-                (float) $receipt->paid_amount,
-                2
-            );
-            $paymentDifference = round(
-                $newPaidAmount - $oldPaidAmount,
-                2
-            );
-            $dueAmount = round(
-                $totalAmount - $newPaidAmount,
-                2
-            );
-
+            $oldPaidAmount = round((float) $receipt->paid_amount, 2);
+            $paymentDifference = round($newPaidAmount - $oldPaidAmount, 2);
+            $dueAmount = round($totalAmount - $newPaidAmount, 2);
             if ($dueAmount < 0) {
-
                 $dueAmount = 0;
             }
             if ($newPaidAmount <= 0) {
-
                 $paymentStatus = 'Pending';
             } elseif ($dueAmount > 0) {
-
                 $paymentStatus = 'Partial';
             } else {
-
                 $paymentStatus = 'Paid';
             }
-
             if ($paymentDifference != 0) {
-                $paymentType = PaymentType::where(
-                    'name',
-                    'Cash'
-                )
-                    ->where(
-                        'status',
-                        'Active'
-                    )
-                    ->first();
-
-
+                $paymentType = PaymentType::where('name', 'Cash')->where('status', 'Active')->first();
                 if (!$paymentType) {
-
                     throw new \Exception(
                         'Cash payment type is not available or inactive. Please create/activate the Cash payment type first.'
                     );
                 }
-
-                $cashAccountQuery = Account::where(
-                    'payment_type_id',
-                    $paymentType->id
-                )
-                    ->where(
-                        'is_default',
-                        true
-                    )
-                    ->where(
-                        'status',
-                        'Active'
-                    );
-
+                $cashAccountQuery = Account::where('payment_type_id', $paymentType->id)->where('is_default', true)->where('status', 'Active');
                 if (!$user->hasRole('Super-Admin')) {
-
-                    $cashAccountQuery
-                        ->where(
-                            'company_id',
-                            $companyId
-                        )
-                        ->where(
-                            'branch_id',
-                            $branchId
-                        );
+                    $cashAccountQuery->where('company_id', $companyId)->where('branch_id', $branchId);
                 } else {
-
                     $cashAccountQuery
                         ->where(function ($query) use ($companyId) {
-
-                            $query->where(
-                                'company_id',
-                                $companyId
-                            )
-                                ->orWhereNull(
-                                    'company_id'
-                                );
+                            $query->where('company_id', $companyId)->orWhereNull('company_id');
                         })
                         ->where(function ($query) use ($branchId) {
-
-                            $query->where(
-                                'branch_id',
-                                $branchId
-                            )
-                                ->orWhereNull(
-                                    'branch_id'
-                                );
+                            $query->where('branch_id', $branchId)->orWhereNull('branch_id');
                         });
                 }
-
-
-                $cashAccount = $cashAccountQuery
-                    ->lockForUpdate()
-                    ->first();
-
-
+                $cashAccount = $cashAccountQuery->lockForUpdate()->first();
                 if (!$cashAccount) {
-
                     throw new \Exception(
                         'Default Cash account not found. Please create a Cash account and set it as Default.'
                     );
                 }
-
-                $currentBalance = round(
-                    (float) $cashAccount->current_balance,
-                    2
-                );
-
-
-                if (
-                    $paymentDifference < 0 &&
-                    $currentBalance < abs($paymentDifference)
-                ) {
-
+                $currentBalance = round((float) $cashAccount->current_balance, 2);
+                if ($paymentDifference < 0 && $currentBalance < abs($paymentDifference)) {
                     throw new \Exception(
                         'Cash account does not have enough balance to reverse this payment.'
                     );
                 }
-
-                $newBalance = round(
-                    $currentBalance + $paymentDifference,
-                    2
-                );
-
+                $newBalance = round($currentBalance + $paymentDifference, 2);
                 $cashAccount->update([
-
-                    'current_balance' =>
-                    $newBalance,
-
-                    'updated_by' =>
-                    $user->id,
+                    'current_balance' => $newBalance,
+                    'updated_by' => $user->id,
                 ]);
-
-                $accountTransaction =
-                    AccountTransaction::where(
-                        'receipt_id',
-                        $receipt->id
-                    )
-                    ->where(
-                        'transaction_type',
-                        'Direct-Income'
-                    )
-                    ->where(
-                        'account_id',
-                        $cashAccount->id
-                    )
-                    ->lockForUpdate()
-                    ->first();
+                $accountTransaction = AccountTransaction::where('receipt_id', $receipt->id)
+                    ->where('transaction_type', 'Direct-Income')
+                    ->where('account_id', $cashAccount->id)->lockForUpdate()->first();
                 if ($newPaidAmount > 0) {
                     if (!$accountTransaction) {
-
                         AccountTransaction::create([
-
-                            'company_id' =>
-                            $cashAccount->company_id,
-
-                            'account_id' =>
-                            $cashAccount->id,
-
-                            'transaction_date' =>
-                            $request->receipt_date,
-
-                            'voucher_no' =>
-                            $receipt->receipt_no,
-
-                            'transaction_type' =>
-                            'Direct-Income',
-
-                            'purpose' =>
-                            'Direct Income Cash Payment - ' .
-                                $receipt->receipt_no,
-
-                            'credit' =>
-                            $newPaidAmount,
-
-                            'debit' =>
-                            0,
-
-                            'balance' =>
-                            $newBalance,
-
-                            'receipt_id' =>
-                            $receipt->id,
-
-                            'created_by' =>
-                            $user->id,
+                            'company_id' => $cashAccount->company_id,
+                            'account_id' => $cashAccount->id,
+                            'transaction_date' => $request->receipt_date,
+                            'voucher_no' => $receipt->receipt_no,
+                            'transaction_type' => 'Direct-Income',
+                            'purpose' => 'Direct Income Cash Payment - ' . $receipt->receipt_no,
+                            'credit' => $newPaidAmount,
+                            'debit' => 0,
+                            'balance' => $newBalance,
+                            'receipt_id' => $receipt->id,
+                            'created_by' => $user->id,
                         ]);
                     } else {
                         $accountTransaction->update([
-
-                            'transaction_date' =>
-                            $request->receipt_date,
-
-                            'credit' =>
-                            $newPaidAmount,
-
-                            'debit' =>
-                            0,
-
-                            'balance' =>
-                            $newBalance,
-
-                            'updated_by' =>
-                            $user->id,
+                            'transaction_date' => $request->receipt_date,
+                            'credit' => $newPaidAmount,
+                            'debit' => 0,
+                            'balance' => $newBalance,
+                            'updated_by' => $user->id,
                         ]);
                     }
                 } else {
                     if ($accountTransaction) {
-
                         $accountTransaction->delete();
                     }
                 }
-                $receiptPayment =
-                    ReceiptPayment::where(
-                        'receipt_id',
-                        $receipt->id
-                    )
-                    ->where(
-                        'payment_type_id',
-                        $paymentType->id
-                    )
-                    ->where(
-                        'account_id',
-                        $cashAccount->id
-                    )
-                    ->lockForUpdate()
-                    ->first();
-
-
+                $receiptPayment = ReceiptPayment::where('receipt_id', $receipt->id)
+                    ->where('payment_type_id', $paymentType->id)
+                    ->where('account_id', $cashAccount->id)->lockForUpdate()->first();
                 if ($newPaidAmount > 0) {
-
                     if (!$receiptPayment) {
-
                         ReceiptPayment::create([
-
-                            'receipt_id' =>
-                            $receipt->id,
-
-                            'payment_type_id' =>
-                            $paymentType->id,
-
-                            'account_id' =>
-                            $cashAccount->id,
-
-                            'payment_date' =>
-                            $request->receipt_date,
-
-                            'amount' =>
-                            $newPaidAmount,
-
-                            'note' =>
-                            'Initial Cash Payment',
-
-                            'created_by' =>
-                            $user->id,
+                            'receipt_id' => $receipt->id,
+                            'payment_type_id' => $paymentType->id,
+                            'account_id' => $cashAccount->id,
+                            'payment_date' => $request->receipt_date,
+                            'amount' => $newPaidAmount,
+                            'note' => 'Initial Cash Payment',
+                            'created_by' => $user->id,
                         ]);
                     } else {
-
                         $receiptPayment->update([
-
-                            'payment_date' =>
-                            $request->receipt_date,
-
-                            'amount' =>
-                            $newPaidAmount,
-
-                            'updated_by' =>
-                            $user->id,
+                            'payment_date' => $request->receipt_date,
+                            'amount' => $newPaidAmount,
+                            'updated_by' => $user->id,
                         ]);
                     }
                 } else {
-
                     if ($receiptPayment) {
-
                         $receiptPayment->delete();
                     }
                 }
             }
             $receipt->update([
-
-                'company_id' =>
-                $companyId,
-
-                'branch_id' =>
-                $branchId,
-
-                'customer_company_id' =>
-                $request->customer_company_id,
-
-                'party_id' =>
-                $request->party_id,
-
-                'receipt_date' =>
-                $request->receipt_date,
-
-                'remarks' =>
-                $request->remarks,
-
-                'total_qty' =>
-                round($totalQty, 2),
-
-                'sub_total' =>
-                round($subTotal, 2),
-
-                'discount' =>
-                round($discount, 2),
-                'vat' =>
-                round($vatAmount, 2),
-
-                'total_amount' =>
-                $totalAmount,
-
-                'paid_amount' =>
-                $newPaidAmount,
-
-                'due_amount' =>
-                $dueAmount,
-
-                'payment_status' =>
-                $paymentStatus,
-
-                'updated_by' =>
-                $user->id,
+                'company_id' => $companyId,
+                'branch_id' => $branchId,
+                'customer_company_id' => $request->customer_company_id,
+                'party_id' => $request->party_id,
+                'receipt_date' => $request->receipt_date,
+                'remarks' => $request->remarks,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'total_qty' => round($totalQty, 2),
+                'sub_total' => round($subTotal, 2),
+                'discount' => round($discount, 2),
+                'vat' => round($vatAmount, 2),
+                'total_amount' => $totalAmount,
+                'paid_amount' => $newPaidAmount,
+                'due_amount' => $dueAmount,
+                'payment_status' => $paymentStatus,
+                'updated_by' => $user->id,
             ]);
             DB::commit();
-
-
-            return redirect()
-                ->route(
-                    'direct.income.show',
-                    [
-                        'receipt' => $receipt->id
-                    ]
-                )
-                ->with(
-                    'success',
-                    'Direct Income updated successfully.'
-                );
+            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Income updated successfully.');
         } catch (\Throwable $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 

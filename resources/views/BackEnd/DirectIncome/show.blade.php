@@ -90,60 +90,74 @@
                             </div>
                             <!-- company customer -->
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    Customer Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" readonly
-                                    value="{{ $receipt->customerCompany->name ?? '' }}">
-                                <div class="mt-3">
-                                    <p class="mb-1">
-                                        <b>Name:</b>
-                                        {{ $receipt->customerCompany->name ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>Mobile:</b>
-                                        {{ $receipt->customerCompany->phone ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>E-mail:</b>
-                                        {{ $receipt->customerCompany->email ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>Address:</b>
-                                        {{ $receipt->customerCompany->address ?? '' }}
-                                    </p>
+                                <div class="mb-2">
+                                    <label class="form-label">Customer Name</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ $receipt->customer_name ?? 'No Customer Name' }}" readonly>
+                                </div>
+
+                                <div>
+                                    <label class="form-label fw-bold">
+                                        Customer Name
+                                    </label>
+                                    <input type="text" class="form-control" readonly
+                                        value="{{ $receipt->customerCompany->name ?? 'No Customer Name' }}">
+                                    <div class="mt-3">
+                                        <p class="mb-1">
+                                            <b>Name:</b>
+                                            {{ $receipt->customerCompany->name ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>Mobile:</b>
+                                            {{ $receipt->customerCompany->phone ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>E-mail:</b>
+                                            {{ $receipt->customerCompany->email ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>Address:</b>
+                                            {{ $receipt->customerCompany->address ?? '' }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <!-- customer -->
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    Contact Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" readonly
-                                    value="{{ $receipt->party->name ?? '' }}">
-                                <div class="mt-3">
-                                    <p class="mb-1">
-                                        <b>Name:</b>
-                                        {{ $receipt->party->name ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>Designation:</b>
-                                        {{ $receipt->party->designation ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>Mobile:</b>
-                                        {{ $receipt->party->phone ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>E-mail:</b>
-                                        {{ $receipt->party->email ?? '' }}
-                                    </p>
-                                    <p class="mb-1">
-                                        <b>Address:</b>
-                                        {{ $receipt->party->address ?? '' }}
-                                    </p>
+                                <div class="mb-2">
+                                    <label class="form-label">Customer Phone</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ $receipt->customer_phone ?? 'No Customer Phone' }}" readonly>
+                                </div>
+
+                                <div>
+                                    <label class="form-label fw-bold">
+                                        Contact Name
+                                    </label>
+                                    <input type="text" class="form-control" readonly
+                                        value="{{ $receipt->party->name ?? 'No Contact Name' }}">
+                                    <div class="mt-3">
+                                        <p class="mb-1">
+                                            <b>Name:</b>
+                                            {{ $receipt->party->name ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>Designation:</b>
+                                            {{ $receipt->party->designation ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>Mobile:</b>
+                                            {{ $receipt->party->phone ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>E-mail:</b>
+                                            {{ $receipt->party->email ?? '' }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <b>Address:</b>
+                                            {{ $receipt->party->address ?? '' }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

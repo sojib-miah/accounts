@@ -121,71 +121,89 @@
                                             </p>
                                         </div>
                                     </div>
+
                                     <!-- customer company-->
                                     <div class="col-md-3">
-                                        <label class="form-label">
-                                            Customer Name <span class="text-danger">*</span>
-                                        </label>
-                                        <select name="customer_company_id" id="customer_company_id"
-                                            class="form-select select2" required>
-                                            <option value="">Select Customer</option>
-                                            @foreach ($customerCompanies as $company)
-                                                <option value="{{ $company->id }}"
-                                                    {{ $receipt->customer_company_id == $company->id ? 'selected' : '' }}>
-                                                    {{ $company->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="mt-3">
-                                            <p class="mb-1"><b>Name :</b> <span id="customer_company_name"></span></p>
-                                            <p class="mb-1"><b>Mobile :</b> <span id="customer_company_phone"></span>
-                                            </p>
-                                            <p class="mb-1"><b>E-mail :</b> <span id="customer_company_email"></span>
-                                            </p>
-                                            <p class="mb-1"><b>Address :</b> <span id="customer_company_address"></span>
-                                            </p>
+                                        <div class="mb-2">
+                                            <label class="form-label">Customer Name</label>
+                                            <input type="text" class="form-control" name="customer_name"
+                                                placeholder="Customer name..." value="{{ $receipt->customer_name }}">
+                                        </div>
+
+                                        <div>
+                                            <label class="form-label">
+                                                Customer Name
+                                            </label>
+                                            <select name="customer_company_id" id="customer_company_id"
+                                                class="form-select select2">
+                                                <option value="">Select Customer</option>
+                                                @foreach ($customerCompanies as $company)
+                                                    <option value="{{ $company->id }}"
+                                                        {{ $receipt->customer_company_id == $company->id ? 'selected' : '' }}>
+                                                        {{ $company->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="mt-3">
+                                                <p class="mb-1"><b>Name :</b> <span id="customer_company_name"></span></p>
+                                                <p class="mb-1"><b>Mobile :</b> <span id="customer_company_phone"></span>
+                                                </p>
+                                                <p class="mb-1"><b>E-mail :</b> <span id="customer_company_email"></span>
+                                                </p>
+                                                <p class="mb-1"><b>Address :</b> <span
+                                                        id="customer_company_address"></span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- customer -->
                                     <div class="col-md-3">
-                                        <label class="form-label">
-                                            Contact Name
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <select name="party_id" id="party_id" class="form-select select2" required>
-                                            @foreach ($parties as $party)
-                                                <option value="{{ $party->id }}"
-                                                    {{ $receipt->party_id == $party->id ? 'selected' : '' }}>
-                                                    {{ $party->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <div class="mt-3">
-                                            <p class="mb-1">
-                                                <b>Name :</b>
-                                                <span id="party_name">
-                                                    {{ $receipt->party->name ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p class="mb-1">
-                                                <b>Designation :</b>
-                                                <span id="party_designation">
-                                                    {{ $receipt->party->designation ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p class="mb-1">
-                                                <b>Mobile :</b>
-                                                <span id="party_phone">
-                                                    {{ $receipt->party->phone ?? '' }}
-                                                </span>
-                                            </p>
-                                            <p class="mb-1"><b>E-mail :</b> <span
-                                                    id="party_email">{{ $receipt->party->email ?? '' }}</span></p>
-                                            <p class="mb-1">
-                                                <b>Address :</b>
-                                                <span id="party_address">
-                                                    {{ $receipt->party->address ?? '' }}
-                                                </span>
-                                            </p>
+                                        <div class="mb-2">
+                                            <label class="form-label">Customer Phone</label>
+                                            <input type="text" class="form-control" name="customer_phone"
+                                                placeholder="Customer Phone..." value="{{ $receipt->customer_phone }}">
+                                        </div>
+
+                                        <div>
+                                            <label class="form-label">
+                                                Contact Name
+                                            </label>
+                                            <select name="party_id" id="party_id" class="form-select select2">
+                                                <option value="">Select Contact</option>
+                                                @foreach ($parties as $party)
+                                                    <option value="{{ $party->id }}"
+                                                        {{ $receipt->party_id == $party->id ? 'selected' : '' }}>
+                                                        {{ $party->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="mt-3">
+                                                <p class="mb-1">
+                                                    <b>Name :</b>
+                                                    <span id="party_name">
+                                                        {{ $receipt->party->name ?? '' }}
+                                                    </span>
+                                                </p>
+                                                <p class="mb-1">
+                                                    <b>Designation :</b>
+                                                    <span id="party_designation">
+                                                        {{ $receipt->party->designation ?? '' }}
+                                                    </span>
+                                                </p>
+                                                <p class="mb-1">
+                                                    <b>Mobile :</b>
+                                                    <span id="party_phone">
+                                                        {{ $receipt->party->phone ?? '' }}
+                                                    </span>
+                                                </p>
+                                                <p class="mb-1"><b>E-mail :</b> <span
+                                                        id="party_email">{{ $receipt->party->email ?? '' }}</span></p>
+                                                <p class="mb-1">
+                                                    <b>Address :</b>
+                                                    <span id="party_address">
+                                                        {{ $receipt->party->address ?? '' }}
+                                                    </span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -335,7 +353,7 @@
                                     </a>
                                     <button type="submit" class="btn btn-primary mt-3 w-100">
                                         <i class="fa-regular fa-floppy-disk me-3"></i>
-                                        Update Direct Invoice
+                                        Update Direct Sales
                                     </button>
                                 </div>
                             </div>
@@ -398,11 +416,11 @@
         </tr>
     </script>
 
-    <style>
+    {{-- <style>
         .select2 {
             width: 250px !important;
         }
-    </style>
+    </style> --}}
 @endsection
 
 @push('scripts')

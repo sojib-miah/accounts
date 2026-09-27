@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('branch_id')->nullable()->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('customer_company_id')->nullable()->constrained('customer_companies')->nullOnDelete();
-            $table->foreignId('party_id')->constrained('parties')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('party_id')->nullable()->constrained('parties')->cascadeOnUpdate()->restrictOnDelete();
             $table->date('receipt_date');
             $table->text('remarks')->nullable();
             $table->integer('total_qty')->default(0);
@@ -39,6 +39,8 @@ return new class extends Migration
             $table->decimal('due_amount', 15, 2)->default(0);
             $table->enum('payment_status', ['Pending', 'Partial', 'Paid'])->default('Pending');
             $table->enum('status', ['Draft', 'Completed', 'Cancelled'])->default('Draft');
+            $table->string('customer_name')->nullable();
+            $table->string('customer_phone')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

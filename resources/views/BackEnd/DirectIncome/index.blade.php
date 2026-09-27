@@ -7,7 +7,7 @@
         <div class="mt-3">
             {{-- Page Header --}}
             <div class="mb-3">
-                <h2 class="fw-bold mb-0">Direct Income List</h2>
+                <h2 class="fw-bold mb-0">Direct Sales List</h2>
             </div>
             {{-- Card --}}
             <div class="card border-0 shadow-sm">
@@ -55,7 +55,7 @@
                                     @can('income-receipt-create')
                                         <a href="{{ route('direct.income.create') }}" class="btn btn-success">
                                             <i class="fa fa-plus me-2"></i>
-                                            Create Direct Income
+                                            Create Direct Sales
                                         </a>
                                     @endcan
                                 </div>
@@ -132,7 +132,7 @@
                                         <td colspan="10" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
-                                            No Direct Income Receipt Found
+                                            No Direct Sales Receipt Found
                                         </td>
                                     </tr>
                                 @endforelse
