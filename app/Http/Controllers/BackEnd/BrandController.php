@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,15 +13,38 @@ class BrandController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::when(
-            !Auth::user()->hasRole('Super-Admin'),
-            function ($query) {
-                $query->where('created_by', Auth::id());
-            }
-        )->latest()->paginate(20);
-        return view('BackEnd.Brand.index', compact('brands'));
+        $user = Auth::user();
+
+        $brands = Brand::with('company')
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('company', function ($company) use ($search) {
+                            $company->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when(
+                !Auth::user()->hasRole('Super-Admin'),
+                function ($query) {
+                    $query->where('created_by', Auth::id());
+                }
+            )->latest()->paginate(10)->withQueryString();
+
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.Brand.index', compact('brands', 'companies'));
     }
 
     /**

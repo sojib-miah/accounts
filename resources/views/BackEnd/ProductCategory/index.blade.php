@@ -7,7 +7,31 @@
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between">
                 <h4>Product Category</h4>
-                <div>
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <form action="{{ route('product-category.index') }}" method="GET"
+                        class="d-flex justify-content-center align-items-center gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search Product Category">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search me-1"></i>
+                            Search
+                        </button>
+                        @if (request('search') || request('company_id'))
+                            <a href="{{ route('product-category.index') }}" class="btn btn-secondary">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
+
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
                         <i class="fa fa-plus me-2"></i>
                         Add Category
@@ -19,7 +43,8 @@
                     <thead>
                         <tr>
                             <th>SL</th>
-                            <th>Name</th>
+                            <th>Company Name</th>
+                            <th>Category</th>
                             <th>Status</th>
                             <th width="150">Action</th>
                         </tr>
@@ -28,7 +53,8 @@
                         @forelse ($categories as $category)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $category->name }}</td>
+                                <td>{{ $category->company->name ?? '-' }}</td>
+                                <td>{{ $category->name ?? '-' }}</td>
                                 <td>
                                     @if ($category->status == 'Active')
                                         <span class="badge bg-success">
@@ -40,32 +66,45 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td>
-                                    <button type="button" class="btn btn-warning btn-sm editBtn"
-                                        data-id="{{ $category->id }}">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                    <form action="{{ route('product-category.destroy', $category) }}" method="POST"
-                                        style="display:inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Delete?')">
-                                            <i class="fa fa-trash"></i>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                            <i class="fa fa-ellipsis-v"></i>
                                         </button>
-                                    </form>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                            <li class="mb-2">
+                                                <button type="button" class="btn btn-warning btn-sm editBtn w-100"
+                                                    data-id="{{ $category->id }}">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('product-category.destroy', $category) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm w-100"
+                                                        onclick="return confirm('Delete?')">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center">
+                                <td colspan="5" class="text-center">
                                     No categories found.
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                {{ $categories->links() }}
+                <div class="mt-3">
+                    {{ $categories->links() }}
+                </div>
             </div>
         </div>
     </div>

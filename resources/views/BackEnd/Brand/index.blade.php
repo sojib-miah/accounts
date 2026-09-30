@@ -5,86 +5,74 @@
 @section('content')
     <div class="p-5">
         <div class="card shadow-sm mt-3">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center mb-4">
                 <h4 class="mb-0">
                     <i class="fa fa-tags me-2"></i>
                     Brand List
                 </h4>
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <form action="{{ route('brand.index') }}" method="GET"
+                        class="d-flex justify-content-center align-items-center gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="text" name="search" class="form-control" placeholder="Search Brand..."
+                            value="{{ request('search') }}">
+                        <select name="status" class="form-select">
+                            <option value="">
+                                All Status
+                            </option>
+                            <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>
+                                Active
+                            </option>
+                            <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>
+                                Inactive
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-search me-2"></i>
+                            Search
+                        </button>
+                        @if (request('search') || request('company_id'))
+                            <a href="{{ route('brand.index') }}" class="btn btn-secondary">
+                                Reset
+                            </a>
+                        @endif
+                    </form>
+
+                    <button type="button" class="btn ms-3 btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addBrandModal">
+                        <i class="fa fa-plus me-2"></i>
+                        Add Brand
+                    </button>
+                </div>
             </div>
             <div class="card-body">
-                <form method="GET">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <input type="text" name="search" class="form-control" placeholder="Search Brand..."
-                                value="{{ request('search') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <select name="status" class="form-select">
-                                <option value="">
-                                    All Status
-                                </option>
-                                <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>
-                                    Active
-                                </option>
-                                <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>
-                                    Inactive
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fa fa-search me-2"></i>
-                                        Search
-                                    </button>
-                                    <a href="{{ route('brand.index') }}" class="btn btn-secondary">
-                                        Reset
-                                    </a>
-                                </div>
-
-                                <button type="button" class="btn ms-3 btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#addBrandModal">
-                                    <i class="fa fa-plus me-2"></i>
-                                    Add Brand
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">
-                                    SL
-                                </th>
-                                <th>
-                                    Brand Name
-                                </th>
-                                <th>
-                                    Description
-                                </th>
-                                <th width="120">
-                                    Status
-                                </th>
-                                <th width="160">
-                                    Action
-                                </th>
+                                <th width="60">SN</th>
+                                <th>Company Name</th>
+                                <th>Brand Name</th>
+                                <th>Description</th>
+                                <th width="120">Status</th>
+                                <th width="160">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($brands as $brand)
                                 <tr>
-                                    <td>
-                                        {{ $brands->firstItem() + $loop->index }}
-                                    </td>
-                                    <td>
-                                        {{ $brand->name ?? '-' }}
-                                    </td>
-                                    <td>
-                                        {{ $brand->description ?? '-' }}
-                                    </td>
+                                    <td>{{ $brands->firstItem() + $loop->index }}</td>
+                                    <td>{{ $brand->company->name ?? '-' }}</td>
+                                    <td>{{ $brand->name ?? '-' }}</td>
+                                    <td>{{ $brand->description ?? '-' }}</td>
                                     <td>
                                         @if ($brand->status == 'Active')
                                             <span class="badge bg-success">
@@ -96,26 +84,37 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm editBrand" data-id="{{ $brand->id }}"
-                                            data-name="{{ $brand->name }}" data-description="{{ $brand->description }}"
-                                            data-status="{{ $brand->status }}" data-bs-toggle="modal"
-                                            data-bs-target="#editBrandModal">
-                                            <i class="fa fa-edit"></i>
-                                        </button>
-                                        <form action="{{ route('brand.destroy', $brand->id) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm ">
-                                                <i class="fa fa-trash"></i>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
                                             </button>
-                                        </form>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    <button class="btn w-100 btn-warning btn-sm editBrand"
+                                                        data-id="{{ $brand->id }}" data-name="{{ $brand->name }}"
+                                                        data-description="{{ $brand->description }}"
+                                                        data-status="{{ $brand->status }}" data-bs-toggle="modal"
+                                                        data-bs-target="#editBrandModal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('brand.destroy', $brand->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-danger">
+                                    <td colspan="6" class="text-center text-danger">
                                         No Brand Found
                                     </td>
                                 </tr>
@@ -123,7 +122,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3">
+                <div class="mt-3 p-3">
                     {{ $brands->links() }}
                 </div>
             </div>

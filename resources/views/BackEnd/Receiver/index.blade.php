@@ -10,13 +10,22 @@
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('receiver.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Customer">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('receiver.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
@@ -40,6 +49,7 @@
                                     <th>SN</th>
                                     <th>Customer ID</th>
                                     <th>Company</th>
+                                    <th>Supplier Company</th>
                                     <th>Name</th>
                                     <th>Designation</th>
                                     <th>Phone</th>
@@ -57,6 +67,9 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $party->party_id ?? '-' }}</td>
+                                        <td>
+                                            {{ $party->company->name ?? '-' }}
+                                        </td>
                                         <td>
                                             {{ $party->customerCompany->name ?? '-' }}
                                         </td>
@@ -83,39 +96,55 @@
                                                 <span class="badge bg-secondary">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @can('receiver-list-edit')
-                                                <button class="btn btn-warning btn-sm editBtn" data-id="{{ $party->id }}"
-                                                    data-name="{{ $party->name }}" data-phone="{{ $party->phone }}"
-                                                    data-email="{{ $party->email }}" data-address="{{ $party->address }}"
-                                                    data-status="{{ $party->status }}"
-                                                    data-customer_company_id="{{ $party->customer_company_id }}"
-                                                    data-designation="{{ $party->designation }}">
-                                                    <i class="fa fa-edit"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('receiver-list-delete')
-                                                <form action="{{ route('receiver.destroy', $party->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Are you sure you want to delete this receiver?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @can('receiver-list-edit')
+                                                            <button class="btn btn-warning w-100 btn-sm editBtn"
+                                                                data-id="{{ $party->id }}" data-name="{{ $party->name }}"
+                                                                data-phone="{{ $party->phone }}"
+                                                                data-email="{{ $party->email }}"
+                                                                data-address="{{ $party->address }}"
+                                                                data-status="{{ $party->status }}"
+                                                                data-customer_company_id="{{ $party->customer_company_id }}"
+                                                                data-designation="{{ $party->designation }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('receiver-list-delete')
+                                                            <form action="{{ route('receiver.destroy', $party->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="btn btn-danger btn-sm w-100"
+                                                                    onclick="return confirm('Are you sure you want to delete this receiver?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="text-center">
+                                        <td colspan="13" class="text-center">
                                             No Customer Found.
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                        <div class="mt-3">
+                            {{ $parties->links() }}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -13,13 +13,22 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('accounts.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Company Account">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('accounts.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
@@ -94,34 +103,45 @@
                                                 <span class="badge bg-danger">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @can('account-edit')
-                                                <button type="button" class="btn btn-warning btn-sm editBtn"
-                                                    data-id="{{ $account->id }}" data-company="{{ $account->company_id }}"
-                                                    data-branch="{{ $account->branch_id }}"
-                                                    data-payment-type="{{ $account->payment_type_id }}"
-                                                    data-account-name="{{ $account->account_name }}"
-                                                    data-address="{{ $account->address }}"
-                                                    data-holder="{{ $account->account_holder_name }}"
-                                                    data-number="{{ $account->account_number }}"
-                                                    data-opening="{{ $account->opening_balance }}"
-                                                    data-status="{{ $account->status }}"
-                                                    data-is_default="{{ $account->is_default }}">
-
-                                                    <i class="fa fa-edit"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('account-delete')
-                                                <form action="{{ route('accounts.destroy', $account->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Delete this account?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @can('account-edit')
+                                                            <button type="button" class="btn w-100 btn-warning btn-sm editBtn"
+                                                                data-id="{{ $account->id }}"
+                                                                data-company="{{ $account->company_id }}"
+                                                                data-branch="{{ $account->branch_id }}"
+                                                                data-payment-type="{{ $account->payment_type_id }}"
+                                                                data-account-name="{{ $account->account_name }}"
+                                                                data-address="{{ $account->address }}"
+                                                                data-holder="{{ $account->account_holder_name }}"
+                                                                data-number="{{ $account->account_number }}"
+                                                                data-opening="{{ $account->opening_balance }}"
+                                                                data-status="{{ $account->status }}"
+                                                                data-is_default="{{ $account->is_default }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('account-delete')
+                                                            <form action="{{ route('accounts.destroy', $account->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="btn btn-danger btn-sm w-100"
+                                                                    onclick="return confirm('Delete this account?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -131,6 +151,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="mt-3 p-3">
+                        {{ $accounts->links() }}
                     </div>
                 </div>
             </div>

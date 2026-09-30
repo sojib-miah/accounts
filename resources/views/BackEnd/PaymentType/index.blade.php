@@ -12,21 +12,26 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('payment-type.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Payment Type">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('payment-type.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('payment-type-create')
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -39,10 +44,11 @@
 
             <div class="card">
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
+                    <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>SN</th>
+                                <th>Company Name</th>
                                 <th>Payment Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -51,12 +57,9 @@
                         <tbody>
                             @forelse($paymentTypes as $paymentType)
                                 <tr>
-                                    <td>
-                                        {{ $loop->iteration }}
-                                    </td>
-                                    <td>
-                                        {{ $paymentType->name }}
-                                    </td>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $paymentType->company->name ?? '-' }}</td>
+                                    <td>{{ $paymentType->name ?? '-' }}</td>
                                     <td>
                                         @if ($paymentType->status == 'Active')
                                             <span class="badge bg-success">
@@ -68,35 +71,51 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        @can('payment-type-edit')
-                                            <button class="btn btn-warning btn-sm editBtn" data-id="{{ $paymentType->id }}"
-                                                data-name="{{ $paymentType->name }}" data-status="{{ $paymentType->status }}">
-                                                <i class="fa fa-edit"></i>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
                                             </button>
-                                        @endcan
-                                        @can('payment-type-delete')
-                                            <form action="{{ route('payment-type.destroy', $paymentType->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Delete this Payment Type?')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    @can('payment-type-edit')
+                                                        <button class="btn w-100 btn-warning btn-sm editBtn"
+                                                            data-id="{{ $paymentType->id }}"
+                                                            data-name="{{ $paymentType->name }}"
+                                                            data-status="{{ $paymentType->status }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                    @endcan
+                                                </li>
+                                                <li>
+                                                    @can('payment-type-delete')
+                                                        <form action="{{ route('payment-type.destroy', $paymentType->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button class="btn w-100 btn-danger btn-sm"
+                                                                onclick="return confirm('Delete this Payment Type?')">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">
+                                    <td colspan="5" class="text-center">
                                         No Data Found
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 p-3">
+                    {{ $paymentTypes->links() }}
                 </div>
             </div>
         </div>

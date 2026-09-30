@@ -41,7 +41,7 @@
 
             <div class="card">
                 <div class="card-datatable table-responsive">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th>SN</th>

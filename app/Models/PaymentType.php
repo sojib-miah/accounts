@@ -12,4 +12,9 @@ class PaymentType extends Model
     {
         return $this->hasMany(Account::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

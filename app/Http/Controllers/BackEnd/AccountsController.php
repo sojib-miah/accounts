@@ -23,7 +23,9 @@ class AccountsController extends Controller
             'paymentType',
             'creator',
             'updater'
-        ])
+        ])->when($request->filled('company_id'), function ($query) use ($request) {
+            $query->where('company_id', $request->company_id);
+        })
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
@@ -37,18 +39,14 @@ class AccountsController extends Controller
             })
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('created_by', Auth::id());
-            })
-            ->latest()
-            ->get();
+            })->latest()->paginate(10)->withQueryString();
 
         $companies = Company::when(
             !$user->hasRole('Super-Admin'),
             function ($query) use ($user) {
                 $query->where('id', $user->company_id);
             }
-        )
-            ->orderBy('name')
-            ->get();
+        )->orderBy('name')->get();
 
         $branches = Branch::when(
             !$user->hasRole('Super-Admin'),
@@ -58,9 +56,7 @@ class AccountsController extends Controller
                         ->orWhere('id', $user->branch_id);
                 });
             }
-        )
-            ->orderBy('name')
-            ->get();
+        )->orderBy('name')->get();
 
         $paymentTypes = PaymentType::where('status', 'Active')
             ->when(
@@ -68,9 +64,7 @@ class AccountsController extends Controller
                 function ($query) use ($user) {
                     $query->where('created_by', $user->id);
                 }
-            )
-            ->orderBy('name')
-            ->get();
+            )->orderBy('name')->get();
 
         return view('BackEnd.Accounts.index', compact('accounts', 'companies', 'branches', 'paymentTypes'));
     }

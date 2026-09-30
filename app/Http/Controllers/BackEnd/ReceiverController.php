@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Http\Request;
@@ -13,11 +14,15 @@ class ReceiverController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $parties = Party::with([
             'creator',
             'updater',
             'customerCompany'
-        ])
+        ])->when($request->filled('company_id'), function ($query) use ($request) {
+            $query->where('company_id', $request->company_id);
+        })
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
 
@@ -37,21 +42,23 @@ class ReceiverController extends Controller
             ->where('type', 'Customer')
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('created_by', Auth::id());
-            })
-            ->latest()
-            ->get();
+            })->latest()->paginate(10)->withQueryString();
 
         $customerCompanies = CustomerCompany::when(
             !Auth::user()->hasRole('Super-Admin'),
             function ($query) {
                 $query->where('created_by', Auth::id());
             }
-        )
-            ->where('status', 'Customer')
-            ->orderBy('name')
-            ->get();
+        )->where('status', 'Customer')->orderBy('name')->get();
 
-        return view('BackEnd.Receiver.index', compact('parties', 'customerCompanies'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.Receiver.index', compact('parties', 'customerCompanies', 'companies'));
     }
 
     public function store(Request $request)

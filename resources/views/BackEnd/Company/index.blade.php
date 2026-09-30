@@ -36,7 +36,7 @@
 
             <div class="card">
                 <div class="card-datatable table-responsive">
-                    <table class="table table-bordered align-middle">
+                    <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>SN</th>

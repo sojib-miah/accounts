@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,14 +13,35 @@ class ProductCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $user = Auth::user();
+
         $categories = Category::where('type', 'Product')
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('company', function ($company) use ($search) {
+                            $company->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('created_by', auth()->id());
-            })->latest()->paginate(20);
+            })->latest()->paginate(10)->withQueryString();
 
-        return view('BackEnd.ProductCategory.index', compact('categories'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.ProductCategory.index', compact('categories', 'companies'));
     }
 
     /**

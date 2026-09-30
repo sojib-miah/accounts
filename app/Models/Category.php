@@ -32,4 +32,9 @@ class Category extends Model
     {
         return $this->hasMany(ReceiptItem::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payment_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
