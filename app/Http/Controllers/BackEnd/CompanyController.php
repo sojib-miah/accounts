@@ -26,7 +26,7 @@ class CompanyController extends Controller
                 });
             })
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('BackEnd.Company.index', compact('companies'));
     }

@@ -460,7 +460,6 @@
                         </div>
                     </div>
                 </div>
-
                 {{-- TODAY DEBIT --}}
                 <div class="col-xl-3 col-lg-3">
                     <div class="account-debit-card shadow-lg">
@@ -475,6 +474,26 @@
                             </div>
                             <div class="account-big-icon">
                                 <i class="fa fa-arrow-up"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{-- Current Stock --}}
+                <div class="col-xl-3 col-lg-3">
+                    <div class="small-stat account-stat shadow-lg">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span>
+                                    Total Stock Value
+                                </span>
+
+                                <h4>
+                                    ৳ {{ number_format($totalStockValue, 2) }}
+                                </h4>
+                            </div>
+
+                            <div class="small-stat-icon">
+                                <i class="fa fa-chart-column"></i>
                             </div>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Branch;
 use App\Models\Party;
+use App\Models\Product;
 use App\Models\Receipt;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,409 +19,153 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-
         $today = Carbon::today();
 
         $receiptScope = function ($query) use ($user) {
-
             if (!$user->hasRole('Super-Admin')) {
-
-                $query->where('company_id', $user->company_id)
-                    ->where('branch_id', $user->branch_id);
+                $query->where('company_id', $user->company_id)->where('branch_id', $user->branch_id);
             }
-
             return $query;
         };
 
+        $productQuery = Product::query()->where('current_stock', '>', 0);
+        if (!$user->hasRole('Super-Admin')) {
+            $productQuery->where('company_id', $user->company_id);
+        }
+        $totalStockValue = $productQuery->selectRaw('COALESCE(SUM(current_stock * purchase_price), 0) as total')->value('total');
+
         $todaySale = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->whereIn(
-                'receipts.type',
-                [
-                    'Sales-Order',
-                    'Direct-Income',
-                ]
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->whereIn('receipts.type', ['Sales-Order', 'Direct-Income',])
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
-
+            )->sum('receipt_payments.amount');
 
         $todayPurchase = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->where(
-                'receipts.type',
-                'Purchase-Order'
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->where('receipts.type', 'Purchase-Order')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)
+                        ->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
+            )->sum('receipt_payments.amount');
 
         $todayReceived = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->whereIn(
-                'receipts.type',
-                [
-                    'Sales-Order',
-                    'Direct-Income',
-                    'Income',
-                ]
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->whereIn('receipts.type', ['Sales-Order', 'Direct-Income', 'Income',])
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)
+                        ->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
+            )->sum('receipt_payments.amount');
 
         $todayPaid = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->whereIn(
-                'receipts.type',
-                [
-                    'Purchase-Order',
-                    'Expense',
-                ]
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->whereIn('receipts.type', ['Purchase-Order', 'Expense',])
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)
+                        ->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
+            )->sum('receipt_payments.amount');
 
         $todayExpense = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->where(
-                'receipts.type',
-                'Expense'
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->where('receipts.type', 'Expense')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)
+                        ->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
+            )->sum('receipt_payments.amount');
 
         $todayDirectIncome = DB::table('receipt_payments')
-            ->join(
-                'receipts',
-                'receipts.id',
-                '=',
-                'receipt_payments.receipt_id'
-            )
-            ->whereDate(
-                'receipt_payments.payment_date',
-                $today
-            )
-            ->where(
-                'receipts.type',
-                'Direct-Income'
-            )
+            ->join('receipts', 'receipts.id', '=', 'receipt_payments.receipt_id')
+            ->whereDate('receipt_payments.payment_date', $today)
+            ->where('receipts.type', 'Direct-Income')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'receipts.company_id',
-                        $user->company_id
-                    )
-                        ->where(
-                            'receipts.branch_id',
-                            $user->branch_id
-                        );
+                    $query->where('receipts.company_id', $user->company_id)->where('receipts.branch_id', $user->branch_id);
                 }
-            )
-            ->sum('receipt_payments.amount');
+            )->sum('receipt_payments.amount');
 
         $todayProfit = $todaySale - $todayPurchase - $todayExpense;
 
-
-        $receivable = Receipt::whereIn(
-            'type',
-            [
-                'Sales-Order',
-                'Direct-Income',
-                'Income',
-            ]
-        )
-            ->tap($receiptScope)
-            ->sum('due_amount');
-
-        $payable = Receipt::whereIn(
-            'type',
-            [
-                'Purchase-Order',
-                'Expense',
-            ]
-        )
-            ->tap($receiptScope)
-            ->sum('due_amount');
-
-        $customers = Party::where(
-            'type',
-            'Customer'
-        )
-            ->where(
-                'status',
-                'Active'
-            )
+        $receivable = Receipt::whereIn('type', ['Sales-Order', 'Direct-Income', 'Income',])->tap($receiptScope)->sum('due_amount');
+        $payable = Receipt::whereIn('type', ['Purchase-Order', 'Expense',])->tap($receiptScope)->sum('due_amount');
+        $customers = Party::where('type', 'Customer')->where('status', 'Active')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'created_by',
-                        $user->id
-                    );
+                    $query->where('created_by', $user->id);
                 }
-            )
-            ->count();
+            )->count();
 
-        $suppliers = Party::where(
-            'type',
-            'Supplier'
-        )
-            ->where(
-                'status',
-                'Active'
-            )
+        $suppliers = Party::where('type', 'Supplier')->where('status', 'Active')
             ->when(
                 !$user->hasRole('Super-Admin'),
                 function ($query) use ($user) {
-
-                    $query->where(
-                        'created_by',
-                        $user->id
-                    );
+                    $query->where('created_by', $user->id);
                 }
-            )
-            ->count();
-
+            )->count();
         $branches = Branch::when(
             !$user->hasRole('Super-Admin'),
             function ($query) use ($user) {
-
-                $query->where(
-                    'company_id',
-                    $user->company_id
-                );
+                $query->where('company_id', $user->company_id);
             }
         )->count();
 
-        $accountQuery = Account::where(
-            'status',
-            'Active'
-        );
-
+        $accountQuery = Account::where('status', 'Active');
         if (!$user->hasRole('Super-Admin')) {
-
-            $accountQuery
-                ->where(
-                    'company_id',
-                    $user->company_id
-                )
-                ->where(
-                    'branch_id',
-                    $user->branch_id
-                );
+            $accountQuery->where('company_id', $user->company_id)->where('branch_id', $user->branch_id);
         }
-
-        $accounts = $accountQuery
-            ->with('paymentType')
-            ->orderBy('account_name')
-            ->get();
+        $accounts = $accountQuery->with('paymentType')->orderBy('account_name')->get();
 
         $totalAccountBalance = $accounts->sum(
             function ($account) {
-
                 return (float) $account->current_balance;
             }
         );
-
-        $todayAccountCreditQuery =
-            AccountTransaction::whereDate(
-                'transaction_date',
-                $today
-            );
+        $todayAccountCreditQuery = AccountTransaction::whereDate('transaction_date', $today);
+        if (!$user->hasRole('Super-Admin')) {
+            $todayAccountCreditQuery->where('company_id', $user->company_id);
+        }
+        $todayAccountCredit = $todayAccountCreditQuery->sum('credit');
+        $todayAccountDebitQuery = AccountTransaction::whereDate('transaction_date', $today);
 
         if (!$user->hasRole('Super-Admin')) {
-
-            $todayAccountCreditQuery
-                ->where(
-                    'company_id',
-                    $user->company_id
-                );
+            $todayAccountDebitQuery->where('company_id', $user->company_id);
         }
-
-        $todayAccountCredit =
-            $todayAccountCreditQuery->sum('credit');
-
-        $todayAccountDebitQuery =
-            AccountTransaction::whereDate(
-                'transaction_date',
-                $today
-            );
-
+        $todayAccountDebit = $todayAccountDebitQuery->sum('debit');
+        $todayNetCashFlow = $todayAccountCredit - $todayAccountDebit;
+        $accountTransactionsQuery = AccountTransaction::with('account')->whereDate('transaction_date', $today);
         if (!$user->hasRole('Super-Admin')) {
-
-            $todayAccountDebitQuery
-                ->where(
-                    'company_id',
-                    $user->company_id
-                );
+            $accountTransactionsQuery->where('company_id', $user->company_id);
         }
-
-        $todayAccountDebit =
-            $todayAccountDebitQuery->sum('debit');
-
-        $todayNetCashFlow =
-            $todayAccountCredit
-            - $todayAccountDebit;
-
-
-        $accountTransactionsQuery =
-            AccountTransaction::with('account')
-            ->whereDate(
-                'transaction_date',
-                $today
-            );
-
-        if (!$user->hasRole('Super-Admin')) {
-
-            $accountTransactionsQuery
-                ->where(
-                    'company_id',
-                    $user->company_id
-                );
-        }
-
-        $todayAccountTransactions =
-            $accountTransactionsQuery
-            ->orderByDesc('id')
-            ->get();
-
-
+        $todayAccountTransactions = $accountTransactionsQuery->orderByDesc('id')->get();
         $chartLabels = [];
-
         $salesData = [];
-
         $purchaseData = [];
-
-
         for ($i = 11; $i >= 0; $i--) {
-
-            $month = Carbon::now()
-                ->subMonths($i)
-                ->startOfMonth();
-
-            $monthEnd =
-                $month->copy()->endOfMonth();
-
-
-            $chartLabels[] =
-                $month->format('M Y');
-
-            $salesQuery = Receipt::where(
-                'type',
-                'Sales-Order'
-            )
+            $month = Carbon::now()->subMonths($i)->startOfMonth();
+            $monthEnd = $month->copy()->endOfMonth();
+            $chartLabels[] = $month->format('M Y');
+            $salesQuery = Receipt::where('type', 'Sales-Order')
                 ->whereBetween(
                     'receipt_date',
                     [
@@ -428,185 +173,45 @@ class DashboardController extends Controller
                         $monthEnd->format('Y-m-d'),
                     ]
                 );
-
-
             if (!$user->hasRole('Super-Admin')) {
-
-                $salesQuery
-                    ->where(
-                        'company_id',
-                        $user->company_id
-                    )
-                    ->where(
-                        'branch_id',
-                        $user->branch_id
-                    );
+                $salesQuery->where('company_id', $user->company_id)->where('branch_id', $user->branch_id);
             }
-
-
-            $salesData[] =
-                round(
-                    (float) $salesQuery->sum(
-                        'total_amount'
-                    ),
-                    2
-                );
-
-            $purchaseQuery = Receipt::where(
-                'type',
-                'Purchase-Order'
-            )
-                ->whereBetween(
-                    'receipt_date',
-                    [
-                        $month->format('Y-m-d'),
-                        $monthEnd->format('Y-m-d'),
-                    ]
-                );
-
-
+            $salesData[] = round((float) $salesQuery->sum('total_amount'), 2);
+            $purchaseQuery = Receipt::where('type', 'Purchase-Order')->whereBetween('receipt_date', [$month->format('Y-m-d'), $monthEnd->format('Y-m-d'),]);
             if (!$user->hasRole('Super-Admin')) {
-
-                $purchaseQuery
-                    ->where(
-                        'company_id',
-                        $user->company_id
-                    )
-                    ->where(
-                        'branch_id',
-                        $user->branch_id
-                    );
+                $purchaseQuery->where('company_id', $user->company_id)->where('branch_id', $user->branch_id);
             }
-
-
-            $purchaseData[] =
-                round(
-                    (float) $purchaseQuery->sum(
-                        'total_amount'
-                    ),
-                    2
-                );
+            $purchaseData[] = round((float) $purchaseQuery->sum('total_amount'), 2);
         }
 
-        $topCustomerQuery =
-            Receipt::select(
-                'party_id',
-                DB::raw(
-                    'SUM(total_amount) as total'
-                )
-            )
-            ->whereIn(
-                'type',
-                [
-                    'Sales-Order',
-                    'Direct-Income',
-                ]
-            )
-            ->whereNotNull('party_id')
-            ->tap($receiptScope)
-            ->groupBy('party_id')
-            ->orderByDesc('total')
-            ->limit(10)
-            ->get();
+        $topCustomerQuery = Receipt::select('party_id', DB::raw('SUM(total_amount) as total'))->whereIn('type', ['Sales-Order', 'Direct-Income',])->whereNotNull('party_id')->tap($receiptScope)->groupBy('party_id')->orderByDesc('total')->limit(10)->get();
 
+        $topCustomers = $topCustomerQuery->map(
+            function ($row) {
+                $party = Party::find($row->party_id);
+                return (object) ['name' => $party?->name ?? 'Unknown', 'total' => (float) $row->total,];
+            }
+        );
 
-        $topCustomers =
-            $topCustomerQuery->map(
-                function ($row) {
-
-                    $party =
-                        Party::find(
-                            $row->party_id
-                        );
-
-                    return (object) [
-
-                        'name' =>
-                        $party?->name
-                            ?? 'Unknown',
-
-                        'total' =>
-                        (float) $row->total,
-                    ];
-                }
-            );
-
-        $topSupplierQuery =
-            Receipt::select(
-                'party_id',
-                DB::raw(
-                    'SUM(total_amount) as total'
-                )
-            )
-            ->whereIn(
-                'type',
-                [
-                    'Purchase-Order',
-                    'Expense',
-                ]
-            )
-            ->whereNotNull('party_id')
-            ->tap($receiptScope)
-            ->groupBy('party_id')
-            ->orderByDesc('total')
-            ->limit(10)
-            ->get();
-
-
-        $topSuppliers =
-            $topSupplierQuery->map(
-                function ($row) {
-
-                    $party =
-                        Party::find(
-                            $row->party_id
-                        );
-
-                    return (object) [
-
-                        'name' =>
-                        $party?->name
-                            ?? 'Unknown',
-
-                        'total' =>
-                        (float) $row->total,
-                    ];
-                }
-            );
-
-        $totalIncome =
-            Receipt::where(
-                'type',
-                'Sales-Order'
-            )
-            ->tap($receiptScope)
-            ->sum('total_amount');
-
-
-        $totalExpense =
-            Receipt::where(
-                'type',
-                'Purchase-Order'
-            )
-            ->tap($receiptScope)
-            ->sum('total_amount');
-
+        $topSupplierQuery = Receipt::select('party_id', DB::raw('SUM(total_amount) as total'))->whereIn('type', ['Purchase-Order', 'Expense',])->whereNotNull('party_id')->tap($receiptScope)->groupBy('party_id')->orderByDesc('total')->limit(10)->get();
+        $topSuppliers = $topSupplierQuery->map(
+            function ($row) {
+                $party = Party::find($row->party_id);
+                return (object) ['name' => $party?->name ?? 'Unknown', 'total' => (float) $row->total,];
+            }
+        );
+        $totalIncome = Receipt::where('type', 'Sales-Order')->tap($receiptScope)->sum('total_amount');
+        $totalExpense = Receipt::where('type', 'Purchase-Order')->tap($receiptScope)->sum('total_amount');
         $package = null;
-
         if (method_exists($user, 'package')) {
-
-            $package =
-                $user->package()
-                ->with('package')
-                ->latest()
-                ->first();
+            $package = $user->package()->with('package')->latest()->first();
         }
 
         return view(
             'BackEnd.Dashboard.dashboard',
             compact(
-
                 'package',
+                'totalStockValue',
 
                 // Today's financials
                 'todaySale',

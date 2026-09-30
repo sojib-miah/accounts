@@ -10,21 +10,26 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('branch.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Branch">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('branch.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('branch-create')
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBranchModal">
@@ -61,27 +66,42 @@
                                     <td>{{ $branch->phone_two ?? '-' }}</td>
                                     <td>{{ $branch->email ?? '-' }}</td>
                                     <td>{{ $branch->address ?? '-' }}</td>
-                                    <td>
-                                        @can('branch-edit')
-                                            <button class="btn btn-warning btn-sm editBtn" data-id="{{ $branch->id }}"
-                                                data-company="{{ $branch->company_id }}"
-                                                data-branch="{{ $branch->branch_id }}" data-name="{{ $branch->name }}"
-                                                data-phone1="{{ $branch->phone_one }}" data-phone2="{{ $branch->phone_two }}"
-                                                data-email="{{ $branch->email }}" data-address="{{ $branch->address }}">
-                                                <i class="fa fa-edit"></i>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
                                             </button>
-                                        @endcan
-                                        @can('branch-delete')
-                                            <form method="POST" action="{{ route('branch.destroy', $branch) }}"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button onclick="return confirm('Delete Branch?')"
-                                                    class="btn btn-danger btn-sm">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    @can('branch-edit')
+                                                        <button class="btn btn-warning w-100 btn-sm editBtn"
+                                                            data-id="{{ $branch->id }}"
+                                                            data-company="{{ $branch->company_id }}"
+                                                            data-branch="{{ $branch->branch_id }}"
+                                                            data-name="{{ $branch->name }}"
+                                                            data-phone1="{{ $branch->phone_one }}"
+                                                            data-phone2="{{ $branch->phone_two }}"
+                                                            data-email="{{ $branch->email }}"
+                                                            data-address="{{ $branch->address }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                    @endcan
+                                                </li>
+                                                <li>
+                                                    @can('branch-delete')
+                                                        <form method="POST" action="{{ route('branch.destroy', $branch) }}"
+                                                            class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button onclick="return confirm('Delete Branch?')"
+                                                                class="btn btn-danger btn-sm w-100">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -91,6 +111,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 pe-3 ps-3">
+                    {{ $branches->links() }}
                 </div>
             </div>
         </div>

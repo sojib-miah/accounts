@@ -364,7 +364,7 @@
                     <div class="flex items-center gap-1.5 sm:gap-2">
                         <i class="fa-solid fa-phone text-cyan-500 text-xs sm:text-sm"></i>
                         <span class="text-xs sm:text-sm md:text-base font-medium text-slate-600">
-                            +880 152121212212
+                            +880 1711-257224
                         </span>
                     </div>
                     <!-- Language Selector -->
@@ -769,15 +769,9 @@
                             <i class="fa-solid fa-headset"></i>
                             Contact Us
                         </span>
-                        <h2 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
-                            Request a Free Demo
-                        </h2>
-                        <p class="mt-3 text-base lg:text-lg text-slate-600">
-                            Fill out the form below and our representative will contact you shortly.
-                        </p>
                     </div>
                     <!-- Contact Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                         <!-- Address -->
                         <div
                             class="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 text-center shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
@@ -1101,7 +1095,7 @@
                 <div class="bg-slate-900 text-slate-300 py-4 border-t border-slate-800">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
                         <p>
-                            Copyright © 2026 <a href="#"
+                            Copyright &copy; {{ date('Y') }} <a href="https://comitsbd.com" target="_blank"
                                 class="text-cyan-400 font-medium hover:underline">ComitsBD</a>. All
                             rights reserved.
                         </p>

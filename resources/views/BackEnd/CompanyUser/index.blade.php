@@ -10,21 +10,26 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('user.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Company User">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
                         @if (request('search'))
                             <a href="{{ route('user.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('company-user-create')
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -62,26 +67,38 @@
                                     <td>{{ $user->creator->name ?? 'Self Created' }}</td>
                                     <td class="text-center">
                                         @if (!$user->hasRole('Super-Admin'))
-                                            @can('company-user-edit')
-                                                <button type="button" class="btn btn-sm btn-warning editBtn"
-                                                    data-id="{{ $user->id }}" data-name="{{ $user->name }}"
-                                                    data-email="{{ $user->email }}" data-phone="{{ $user->phone }}"
-                                                    data-company="{{ $user->company_id }}"
-                                                    data-branch="{{ $user->branch_id }}">
-                                                    <i class="fa fa-edit"></i>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('company-user-delete')
-                                                <form action="{{ route('user.destroy', $user->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"
-                                                        onclick="return confirm('Are you sure you want to delete this user?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @can('company-user-edit')
+                                                            <button type="button" class="btn btn-sm btn-warning w-100 editBtn"
+                                                                data-id="{{ $user->id }}" data-name="{{ $user->name }}"
+                                                                data-email="{{ $user->email }}"
+                                                                data-phone="{{ $user->phone }}"
+                                                                data-company="{{ $user->company_id }}"
+                                                                data-branch="{{ $user->branch_id }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('company-user-delete')
+                                                            <form action="{{ route('user.destroy', $user->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn w-100 btn-sm btn-danger"
+                                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>
@@ -94,6 +111,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 pe-3 ps-3">
+                    {{ $users->links() }}
                 </div>
             </div>
         </div>

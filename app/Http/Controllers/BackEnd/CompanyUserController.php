@@ -21,10 +21,11 @@ class CompanyUserController extends Controller
         $user = Auth::user();
 
         $users = User::with(['company', 'branch', 'creator'])
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
             ->when($request->filled('search'), function ($query) use ($request) {
-
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
@@ -43,9 +44,7 @@ class CompanyUserController extends Controller
                 } else {
                     $query->where('id', $user->id);
                 }
-            })
-            ->latest()
-            ->get();
+            })->latest()->paginate(10)->withQueryString();
 
         $companies = Company::orderBy('name')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {

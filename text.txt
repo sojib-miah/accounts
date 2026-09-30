@@ -1,5 +1,7 @@
-receipts table party_id nullable
+ALTER TABLE customer_companies
+ADD COLUMN company_id BIGINT UNSIGNED NULL AFTER id,
+ADD CONSTRAINT customer_companies_company_id_foreign
+    FOREIGN KEY (company_id)
+    REFERENCES companies(id)
+    ON DELETE CASCADE;
 
-ALTER TABLE receipts
-ADD COLUMN customer_name VARCHAR(255) NULL AFTER status,
-ADD COLUMN customer_phone VARCHAR(255) NULL AFTER customer_name;

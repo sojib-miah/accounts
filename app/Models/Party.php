@@ -42,4 +42,9 @@ class Party extends Model
     {
         return $this->belongsTo(CustomerCompany::class, 'customer_company_id');
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

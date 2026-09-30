@@ -88,27 +88,39 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>
-                                        @can('company-edit')
-                                            <button class="btn btn-warning btn-sm editBtn" data-id="{{ $company->id }}"
-                                                data-name="{{ $company->name }}" data-logo="{{ asset($company->logo) }}"
-                                                data-hologram="{{ asset($company->hologram) }}"
-                                                data-seal="{{ asset($company->seal) }}"
-                                                data-signature="{{ asset($company->signature) }}">
-                                                <i class="fa fa-edit"></i>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
                                             </button>
-                                        @endcan
-                                        @can('company-delete')
-                                            <form action="{{ route('company.destroy', $company->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Delete Company?')">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    @can('company-edit')
+                                                        <button class="btn btn-warning w-100 btn-sm editBtn"
+                                                            data-id="{{ $company->id }}" data-name="{{ $company->name }}"
+                                                            data-logo="{{ asset($company->logo) }}"
+                                                            data-hologram="{{ asset($company->hologram) }}"
+                                                            data-seal="{{ asset($company->seal) }}"
+                                                            data-signature="{{ asset($company->signature) }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                    @endcan
+                                                </li>
+                                                <li>
+                                                    @can('company-delete')
+                                                        <form action="{{ route('company.destroy', $company->id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button class="btn btn-danger w-100 btn-sm"
+                                                                onclick="return confirm('Delete Company?')">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -118,6 +130,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 pe-3 ps-3">
+                    {{ $companies->links() }}
                 </div>
             </div>
         </div>

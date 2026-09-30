@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card shadow-sm">
+        <div class="card mt-3 shadow-sm">
             {{-- HEADER --}}
             <div class="card-header">
                 <div class="row align-items-center">

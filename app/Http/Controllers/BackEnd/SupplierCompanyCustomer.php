@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,22 +22,27 @@ class SupplierCompanyCustomer extends Controller
                     $query->where('created_by', $user->id);
                 }
             )
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%")
                         ->orWhere('address', 'like', "%{$search}%");
                 });
-            })
+            })->latest()->paginate(10)->withQueryString();
 
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
-        return view('BackEnd.SupplierCustomer.index', compact('customerCompanies'));
+        return view('BackEnd.SupplierCustomer.index', compact('customerCompanies', 'companies'));
     }
 
     public function store(Request $request)
@@ -47,10 +53,9 @@ class SupplierCompanyCustomer extends Controller
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
         ]);
-
         try {
-
             CustomerCompany::create([
+                'company_id' => Auth::user()->company_id,
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -58,17 +63,9 @@ class SupplierCompanyCustomer extends Controller
                 'status' => 'Supplier',
                 'created_by' => Auth::id(),
             ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Supplier Company created successfully.',
-            ]);
+            return response()->json(['success' => true, 'message' => 'Supplier Company created successfully.',]);
         } catch (\Exception $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage(),], 500);
         }
     }
 

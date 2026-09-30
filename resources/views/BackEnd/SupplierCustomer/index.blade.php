@@ -1,5 +1,7 @@
 @extends('BackEnd.Layouts.layout')
 
+@section('title', 'Supplier companies')
+
 @section('content')
     <div class="p-5">
         <div class="mt-3">
@@ -10,17 +12,28 @@
                     <small class="text-muted">Manage Supplier companies</small>
                 </div>
                 <div class="d-flex gap-3 align-items-center">
-                    <form action="{{ route('supplier.index') }}" method="GET" class="d-flex gap-2">
+                    <form action="{{ route('supplier-company.index') }}" method="GET" class="d-flex gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search supplier...">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-                        <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
-                            <i class="fa fa-refresh me-1"></i>
-                            Reset
-                        </a>
+                        @if (request('search') || request('company_id'))
+                            <a href="{{ route('supplier-company.index') }}" class="btn btn-secondary">
+                                <i class="fa fa-refresh me-1"></i>
+                                Reset
+                            </a>
+                        @endif
                     </form>
                     <button type="button" class="btn btn-primary" id="addCustomerCompany">
                         <i class="fa fa-plus me-1"></i>
@@ -36,7 +49,8 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
-                                    <th>Company Name</th>
+                                    <th>Company</th>
+                                    <th>Supplier Company</th>
                                     <th>Email</th>
                                     <th>Phone</th>
                                     <th>Address</th>
@@ -49,7 +63,10 @@
                                     <tr id="row-{{ $company->id }}">
                                         <td>{{ $key + 1 }}</td>
                                         <td>
-                                            <strong>{{ $company->name }}</strong>
+                                            <strong>{{ $company->company->name ?? '-' }}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{{ $company->name ?? '-' }}</strong>
                                         </td>
                                         <td>{{ $company->email ?: '-' }}</td>
                                         <td>{{ $company->phone ?: '-' }}</td>
@@ -58,30 +75,35 @@
                                             <span class="badge bg-success">{{ $company->status ?: '-' }}</span>
                                         </td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-info editCompany"
-                                                data-id="{{ $company->id }}">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            {{-- <button type="button" class="btn btn-sm btn-danger deleteCompany"
-                                                data-id="{{ $company->id }}" data-name="{{ $company->name }}">
-                                                <i class="fa fa-trash"></i>
-                                            </button> --}}
-                                            <form action="{{ route('supplier-company.destroy', $company->id) }}"
-                                                method="POST" style="display:inline;">
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    <i class="fa fa-trash"></i>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            </form>
-
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        <button type="button" class="btn w-100 btn-sm btn-info editCompany"
+                                                            data-id="{{ $company->id }}">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <form
+                                                            action="{{ route('supplier-company.destroy', $company->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn w-100 btn-sm btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
+                                        <td colspan="8" class="text-center text-muted py-4">
                                             No Supplier Company Found
                                         </td>
                                     </tr>

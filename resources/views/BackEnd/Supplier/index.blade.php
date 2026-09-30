@@ -10,13 +10,22 @@
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('supplier.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
+                        <select name="company_id" class="form-select select2 form-control">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Customer">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
@@ -38,6 +47,7 @@
                             <th>SL</th>
                             <th>Supplier ID</th>
                             <th>Company</th>
+                            <th>Supplier Company</th>
                             <th>Name</th>
                             <th>Designation</th>
                             <th>Phone</th>
@@ -55,6 +65,9 @@
                                 <td>{{ $loop->iteration ?? '-' }}</td>
                                 <td>{{ $supplier->party_id ?? '-' }}</td>
                                 <td>
+                                    {{ $supplier->company->name ?? '-' }}
+                                </td>
+                                <td>
                                     {{ $supplier->customerCompany->name ?? '-' }}
                                 </td>
                                 <td>{{ $supplier->name ?? '-' }}</td>
@@ -65,28 +78,42 @@
                                 <td>{{ $supplier->creator->name ?? '-' }}</td>
                                 <td>{{ date('d-m-Y', strtotime($supplier->created_at)) ?? '-' }}</td>
                                 <td>{{ $supplier->status ?? '-' }}</td>
-                                <td>
-                                    @can('supplier-edit')
-                                        <button type="button" class="btn btn-warning btn-sm editSupplier"
-                                            data-id="{{ $supplier->id }}">
-                                            <i class="fa fa-edit"></i>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                            <i class="fa fa-ellipsis-v"></i>
                                         </button>
-                                    @endcan
-                                    @can('supplier-delete')
-                                        <button class="btn btn-danger btn-sm deleteSupplier" data-id="{{ $supplier->id }}">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    @endcan
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                            <li class="mb-2">
+                                                @can('supplier-edit')
+                                                    <button type="button" class="btn w-100 btn-warning btn-sm editSupplier"
+                                                        data-id="{{ $supplier->id }}">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                @endcan
+                                            </li>
+                                            <li>
+                                                @can('supplier-delete')
+                                                    <button class="btn btn-danger w-100 btn-sm deleteSupplier"
+                                                        data-id="{{ $supplier->id }}">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                @endcan
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="text-center">No Supplier Found</td>
+                                <td colspan="13" class="text-center">No Supplier Found</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                {{ $suppliers->links() }}
+                <div class="mt-3">
+                    {{ $suppliers->links() }}
+                </div>
             </div>
         </div>
     </div>

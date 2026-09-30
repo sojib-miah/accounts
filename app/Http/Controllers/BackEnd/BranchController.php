@@ -17,9 +17,11 @@ class BranchController extends Controller
         $user = Auth::user();
 
         $branches = Branch::with('company')
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('branch_id', 'like', "%{$search}%")
@@ -34,21 +36,16 @@ class BranchController extends Controller
             })
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where(function ($q) use ($user) {
-                    $q->where('company_id', $user->company_id)
-                        ->orWhere('created_by', $user->id);
+                    $q->where('company_id', $user->company_id)->orWhere('created_by', $user->id);
                 });
-            })
-            ->latest()
-            ->get();
+            })->latest()->paginate(10)->withQueryString();
 
         $companies = Company::orderBy('name')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where(function ($q) use ($user) {
-                    $q->where('id', $user->company_id)
-                        ->orWhere('created_by', $user->id);
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
                 });
-            })
-            ->get();
+            })->get();
 
         return view('BackEnd.Branch.index', compact('branches', 'companies'));
     }
