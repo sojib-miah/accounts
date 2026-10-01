@@ -63,17 +63,13 @@ class PurchaseController extends Controller
             $query->whereDate('receipt_date', '<=', $request->to_date);
         }
 
-        $purchases = $query->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $purchases = $query->latest()->paginate(10)->withQueryString();
 
         $suppliers = Party::whereIn('type', ['Supplier', 'Both'])
             ->where('status', 'Active')
             ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('created_by', auth()->id());
-            })
-            ->orderBy('name')
-            ->get();
+            })->orderBy('name')->get();
 
         return view('BackEnd.Purchase.index', compact('purchases', 'suppliers'));
     }

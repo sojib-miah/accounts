@@ -49,6 +49,9 @@
                                 <label>Status</label>
                                 <select name="status" class="form-select">
                                     <option value="">All</option>
+                                    <option value="Draft" {{ request('status') == 'Draft' ? 'selected' : '' }}>
+                                        Draft
+                                    </option>
                                     <option value="Completed" {{ request('status') == 'Completed' ? 'selected' : '' }}>
                                         Completed
                                     </option>
@@ -62,9 +65,11 @@
                                     <i class="fa fa-search"></i>
                                     Search
                                 </button>
-                                <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
-                                    Reset
-                                </a>
+                                @if (request('search') || request('supplier') || request('from_date') || request('to_date') || request('status'))
+                                    <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </form>
@@ -76,6 +81,7 @@
                         <thead>
                             <tr>
                                 <th width="60">SN</th>
+                                <th>Company Name</th>
                                 <th>Date</th>
                                 <th>PO No</th>
                                 <th>Supplier name</th>
@@ -93,8 +99,9 @@
                             @forelse($purchases as $purchase)
                                 <tr>
                                     <td>{{ $loop->iteration + ($purchases->firstItem() - 1) }}</td>
+                                    <td>{{ $purchase->company->name ?? '-' }}</td>
                                     <td>{{ date('d-m-Y', strtotime($purchase->receipt_date)) }}</td>
-                                    <td>{{ $purchase->receipt_no }}</td>
+                                    <td>{{ $purchase->receipt_no ?? '-' }}</td>
                                     <td>{{ $purchase->supplier->customerCompany->name ?? '-' }}</td>
                                     <td>
                                         @foreach ($purchase->items as $item)

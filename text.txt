@@ -1,14 +1,1 @@
-ALTER TABLE customer_companies
-ADD COLUMN company_id BIGINT UNSIGNED NULL AFTER id,
-ADD CONSTRAINT customer_companies_company_id_foreign
-    FOREIGN KEY (company_id)
-    REFERENCES companies(id)
-    ON DELETE CASCADE;
-
-ALTER TABLE payment_types
-ADD COLUMN company_id BIGINT UNSIGNED NULL AFTER id,
-ADD CONSTRAINT payment_types_company_id_foreign
-    FOREIGN KEY (company_id)
-    REFERENCES companies(id)
-    ON DELETE CASCADE;
 

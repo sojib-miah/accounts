@@ -56,11 +56,22 @@
             <div class="card-body">
                 <form>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <select name="company_id" class="form-select select2 form-control">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <input type="text" name="search" class="form-control" placeholder="Search..."
                                 value="{{ request('search') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select name="category" class="form-select select2">
                                 <option value="">
                                     All Category
@@ -92,9 +103,11 @@
                                     <button class="btn btn-primary">
                                         Search
                                     </button>
-                                    <a href="{{ route('product.index') }}" class="btn btn-secondary">
-                                        Reset
-                                    </a>
+                                    @if (request('search') || request('company_id') || request('category') || request('status'))
+                                        <a href="{{ route('product.index') }}" class="btn btn-secondary">
+                                            Reset
+                                        </a>
+                                    @endif
                                 </div>
                                 @can('product-create')
                                     <button type="button" class="ms-3 btn btn-primary" data-bs-toggle="modal"
@@ -115,6 +128,7 @@
                     <thead>
                         <tr>
                             <th>SN</th>
+                            <th>Company Name</th>
                             <th>Product Code</th>
                             <th>Part No</th>
                             <th>Category</th>
@@ -122,32 +136,19 @@
                             <th>Description</th>
                             <th>Stock</th>
                             <th>Status</th>
-                            <th width="80">
-                                Action
-                            </th>
+                            <th width="80">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($products as $product)
                             <tr>
-                                <td>
-                                    {{ $loop->iteration }}
-                                </td>
-                                <td>
-                                    {{ $product->product_code }}
-                                </td>
-                                <td>
-                                    {{ $product->sku }}
-                                </td>
-                                <td>
-                                    {{ $product->category->name ?? '-' }}
-                                </td>
-                                <td>
-                                    {{ $product->name }}
-                                </td>
-                                <td>
-                                    {{ $product->description }}
-                                </td>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $product->company->name ?? '-' }}</td>
+                                <td>{{ $product->product_code ?? '-' }}</td>
+                                <td>{{ $product->sku ?? '-' }}</td>
+                                <td>{{ $product->category->name ?? '-' }}</td>
+                                <td>{{ $product->name ?? '-' }}</td>
+                                <td>{{ $product->description ?? '-' }}</td>
                                 <td>
                                     @if ($product->current_stock <= $product->minimum_stock)
                                         <span class="badge bg-danger">
@@ -206,7 +207,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">
+                                <td colspan="10" class="text-center">
                                     No Product Found
                                 </td>
                             </tr>

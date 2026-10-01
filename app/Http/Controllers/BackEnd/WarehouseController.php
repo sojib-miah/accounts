@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\Receipt;
@@ -39,6 +40,9 @@ class WarehouseController extends Controller
                     $query->where('created_by', $user->id);
                 }
             )
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     // PO No
@@ -67,7 +71,14 @@ class WarehouseController extends Controller
                 $query->where('status', $status);
             })->latest();
         $pendingCount = (clone $purchaseQuery)->where('status', 'Draft')->count();
-        $purchases = $purchaseQuery->paginate(20)->withQueryString();
+        $purchases = $purchaseQuery->paginate(10)->withQueryString();
+
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
         return view(
             'BackEnd.Warehouse.index',
@@ -77,7 +88,8 @@ class WarehouseController extends Controller
                 'search',
                 'supplierId',
                 'status',
-                'pendingCount'
+                'pendingCount',
+                'companies',
             )
         );
     }

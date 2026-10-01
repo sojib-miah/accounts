@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +27,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $query = Product::with('category');
 
         if (!Auth::user()->hasRole('Super-Admin')) {
@@ -44,6 +47,10 @@ class ProductController extends Controller
             });
         }
 
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
@@ -52,24 +59,18 @@ class ProductController extends Controller
             $query->where('status', $request->status);
         }
 
-        $products = $query->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $products = $query->latest()->paginate(10)->withQueryString();
 
         $categories = Category::where('type', 'Product')
             ->where('status', 'Active')
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
                 $q->where('created_by', Auth::id());
-            })
-            ->orderBy('name')
-            ->get();
+            })->orderBy('name')->get();
 
         $brands = Brand::where('status', 'Active')
             ->when(!Auth::user()->hasRole('Super-Admin'), function ($q) {
                 $q->where('created_by', Auth::id());
-            })
-            ->orderBy('name')
-            ->get();
+            })->orderBy('name')->get();
 
         $statisticsQuery = Product::query();
 
@@ -89,7 +90,14 @@ class ProductController extends Controller
                 ->count(),
         ];
 
-        return view('BackEnd.Product.index', compact('products', 'categories', 'brands', 'statistics'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.Product.index', compact('products', 'categories', 'brands', 'statistics', 'companies'));
     }
 
     /**

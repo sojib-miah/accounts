@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\AccountTransaction;
+use App\Models\Company;
 use App\Models\PaymentType;
 use App\Models\Receipt;
 use App\Models\ReceiptPayment;
@@ -35,32 +36,32 @@ class PurchasePaymentController extends Controller
                         ->where('created_by', $user->id);
                 }
             )
-
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
             ->when($request->filled('search'), function ($query) use ($request) {
-
                 $search = $request->search;
-
                 $query->where(function ($q) use ($search) {
-
                     $q->where('receipt_no', 'like', "%{$search}%")
                         ->orWhere('po_no', 'like', "%{$search}%")
-
                         ->orWhereHas('party', function ($party) use ($search) {
                             $party->where('name', 'like', "%{$search}%")
                                 ->orWhere('phone', 'like', "%{$search}%");
                         })
-
                         ->orWhereHas('customerCompany', function ($company) use ($search) {
                             $company->where('name', 'like', "%{$search}%");
                         });
                 });
-            })
+            })->latest()->paginate(10)->withQueryString();
 
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
-        return view('BackEnd.PurchasePayment.index', compact('purchases'));
+        return view('BackEnd.PurchasePayment.index', compact('purchases', 'companies'));
     }
 
 

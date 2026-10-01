@@ -11,13 +11,22 @@
                     Make Payment
                 </h4>
                 <form action="{{ route('purchase.payment.index') }}" method="GET" class="d-flex gap-2">
+                    <select name="company_id" class="form-select select2 form-control">
+                        <option value="">Select Company</option>
+                        @foreach ($companies as $company)
+                            <option value="{{ $company->id }}"
+                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                {{ $company->name }}
+                            </option>
+                        @endforeach
+                    </select>
                     <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                         placeholder="Search PO / Supplier">
                     <button class="btn btn-primary">
                         <i class="fa fa-search"></i>
                         Search
                     </button>
-                    @if (request('search'))
+                    @if (request('search') || request('company_id'))
                         <a href="{{ route('purchase.payment.index') }}" class="btn btn-secondary">
                             Reset
                         </a>
@@ -31,6 +40,7 @@
                             <thead>
                                 <tr>
                                     <th>SN</th>
+                                    <th>Company Name</th>
                                     <th>PO No</th>
                                     <th>Date</th>
                                     <th>Supplier Company</th>
@@ -39,60 +49,36 @@
                                     <th>Paid</th>
                                     <th>Due</th>
                                     <th>Status</th>
-                                    <th width="120">
-                                        Action
-                                    </th>
+                                    <th width="120">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($purchases as $purchase)
                                     <tr>
+                                        <td>{{ $purchases->firstItem() + $loop->index }}</td>
+                                        <td>{{ $purchase->company->name ?? '-' }}</td>
                                         <td>
-                                            {{ $purchases->firstItem() + $loop->index }}
+                                            <strong>{{ $purchase->po_no ?? ($purchase->receipt_no ?? '-') }}</strong>
                                         </td>
-                                        <td>
-                                            <strong>
-                                                {{ $purchase->po_no ?? $purchase->receipt_no }}
-                                            </strong>
-                                        </td>
-                                        <td>
-                                            {{ \Carbon\Carbon::parse($purchase->receipt_date)->format('d-m-Y') }}
-                                        </td>
-                                        <td>
-                                            {{ $purchase->party->customerCompany->name ?? '-' }}
-                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($purchase->receipt_date)->format('d-m-Y') }}</td>
+                                        <td>{{ $purchase->party->customerCompany->name ?? '-' }}</td>
                                         <td>
                                             {{ $purchase->party->name ?? '-' }}
                                             @if ($purchase->party?->phone)
                                                 <br>
-                                                <small class="text-muted">
-                                                    {{ $purchase->party->phone }}
-                                                </small>
+                                                <small class="text-muted">{{ $purchase->party->phone }}</small>
                                             @endif
                                         </td>
+                                        <td>{{ number_format($purchase->total_amount, 2) }}</td>
+                                        <td class="text-success">{{ number_format($purchase->paid_amount, 2) }}</td>
+                                        <td class="text-danger fw-bold">{{ number_format($purchase->due_amount, 2) }}</td>
                                         <td>
-                                            {{ number_format($purchase->total_amount, 2) }}
-                                        </td>
-                                        <td class="text-success">
-                                            {{ number_format($purchase->paid_amount, 2) }}
-                                        </td>
-                                        <td class="text-danger fw-bold">
-                                            {{ number_format($purchase->due_amount, 2) }}
-                                        </td>
-                                        <td>
-
                                             @if ($purchase->payment_status === 'Pending')
-                                                <span class="badge bg-danger">
-                                                    Pending
-                                                </span>
+                                                <span class="badge bg-danger">Pending</span>
                                             @elseif($purchase->payment_status === 'Partial')
-                                                <span class="badge bg-warning">
-                                                    Partial
-                                                </span>
+                                                <span class="badge bg-warning">Partial</span>
                                             @else
-                                                <span class="badge bg-success">
-                                                    Paid
-                                                </span>
+                                                <span class="badge bg-success">Paid</span>
                                             @endif
                                         </td>
                                         <td>
