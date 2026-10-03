@@ -85,6 +85,17 @@
                 </div>
                 <form method="GET" action="{{ route('inventory.lowStock') }}" class="mb-3">
                     <div class="row g-2">
+                        <div class="col-md-3">
+                            <select name="company_id" class="form-select select2 form-control">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-5">
                             <div class="input-group">
                                 <input type="text" name="search" class="form-control"
@@ -96,7 +107,7 @@
                                 </button>
                             </div>
                         </div>
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <div class="col-md-2">
                                 <a href="{{ route('inventory.lowStock') }}" class="btn btn-secondary">
                                     <i class="fa fa-refresh me-2"></i>
@@ -111,6 +122,7 @@
                         <thead>
                             <tr>
                                 <th width="60">SN</th>
+                                <th>Company Name</th>
                                 <th>Product Code</th>
                                 <th>Part No</th>
                                 <th>Category</th>
@@ -131,25 +143,18 @@
                                     $stockValue = (float) $product->current_stock * (float) $product->purchase_price;
                                 @endphp
                                 <tr>
-                                    {{-- SL --}}
                                     <td>{{ $products->firstItem() + $loop->index }}</td>
-                                    {{-- PRODUCT CODE --}}
+                                    <td>{{ $product->company->name ?? '-' }}</td>
                                     <td>
                                         <span class="fw-semibold">{{ $product->product_code ?? '-' }}</span>
                                     </td>
-                                    {{-- PRODUCT part no --}}
                                     <td>
                                         <span class="fw-semibold">{{ $product->sku ?? '-' }}</span>
                                     </td>
-                                    {{-- CATEGORY --}}
                                     <td>{{ $product->category->name ?? '-' }}</td>
-                                    {{-- BRAND --}}
                                     <td>{{ $product->brand->name ?? '-' }}</td>
-                                    {{-- PRODUCT NAME --}}
                                     <td><strong>{{ $product->name }}</strong></td>
-                                    {{-- UNIT --}}
                                     <td>{{ $product->unit ?? '-' }}</td>
-                                    {{-- CURRENT STOCK --}}
                                     <td class="text-end">
                                         @if ($product->current_stock <= 0)
                                             <span class="badge bg-danger">
@@ -161,19 +166,14 @@
                                             </span>
                                         @endif
                                     </td>
-                                    {{-- MINIMUM STOCK --}}
                                     <td class="text-end">
                                         <span class="fw-semibold">{{ number_format($product->minimum_stock) }}</span>
                                     </td>
-                                    {{-- PURCHASE PRICE --}}
                                     <td class="text-end">{{ number_format($product->purchase_price, 2) }}</td>
-                                    {{-- SALE PRICE --}}
                                     <td class="text-end">{{ number_format($product->sale_price, 2) }}</td>
-                                    {{-- STOCK VALUE --}}
                                     <td class="text-end">
                                         <strong>{{ number_format($stockValue, 2) }}</strong>
                                     </td>
-                                    {{-- STATUS --}}
                                     <td>
                                         @if ($product->current_stock <= 0)
                                             <span class="badge bg-danger">
@@ -190,7 +190,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="13" class="text-center py-5">
+                                    <td colspan="14" class="text-center py-5">
                                         <i class="fa fa-circle-check fa-2x text-success mb-2"></i>
                                         <br>
                                         <strong>No Low Stock Products Found</strong>
@@ -204,7 +204,7 @@
                         @if ($products->count())
                             <tfoot>
                                 <tr>
-                                    <th colspan="7" class="text-end">Page Total:</th>
+                                    <th colspan="8" class="text-end">Page Total:</th>
                                     <th class="text-end">{{ number_format($products->sum('current_stock')) }}</th>
                                     <th></th>
                                     <th></th>

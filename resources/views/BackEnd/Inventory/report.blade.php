@@ -30,6 +30,17 @@
                 <form method="GET" action="{{ route('inventory.report') }}" class="mb-4">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-3">
+                            <select name="company_id" class="form-select select2 form-control">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">From Date</label>
                             <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
                         </div>
@@ -44,9 +55,12 @@
                             </button>
                         </div>
                         <div class="col-md-1">
-                            <a href="{{ route('inventory.report') }}" class="btn btn-secondary w-100">
-                                <i class="fa fa-refresh me-1"></i>
-                                Reset
+                            @if (request()->hasAny(['from_date', 'to_date', 'company_id']))
+                                <a href="{{ route('inventory.report') }}" class="btn btn-secondary w-100">
+                                    <i class="fa fa-refresh me-1"></i>
+                                    Reset
+                                </a>
+                            @endif
                             </a>
                         </div>
                     </div>
@@ -114,6 +128,7 @@
                         <thead>
                             <tr>
                                 <th width="50">SN</th>
+                                <th>Company Name</th>
                                 <th>Product Code</th>
                                 <th>Part No</th>
                                 <th>Category</th>
@@ -141,6 +156,7 @@
                                 @endphp
                                 <tr>
                                     <td>{{ $products->firstItem() + $loop->index }}</td>
+                                    <td>{{ $product->company->name ?? '-' }}</td>
                                     <td>{{ $product->product_code ?? '-' }}</td>
                                     <td>{{ $product->sku ?? '-' }}</td>
                                     <td>{{ $product->category->name ?? '-' }}</td>
@@ -162,7 +178,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center py-5">No Stock Data Found.</td>
+                                    <td colspan="13" class="text-center py-5">No Stock Data Found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -170,7 +186,7 @@
                         @if ($products->count())
                             <tfoot>
                                 <tr>
-                                    <th colspan="7" class="text-end">Page Total</th>
+                                    <th colspan="8" class="text-end">Page Total</th>
                                     <th class="text-end">
                                         {{ number_format(
                                             $products->sum(function ($product) {

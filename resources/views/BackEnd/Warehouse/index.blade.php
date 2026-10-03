@@ -18,43 +18,51 @@
                     <div class="">
                         <form action="{{ route('warehouse.index') }}" method="GET"
                             class="d-flex justify-content-center align-items-center gap-2">
-                            <select name="company_id" class="form-select select2 form-control">
-                                <option value="">Select Company</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}"
-                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                        {{ $company->name }}
+                            <div style="width: 200px;">
+                                <select name="company_id" class="form-select select2 w-100">
+                                    <option value="">Select Company</option>
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->id }}"
+                                            {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                            {{ $company->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <input type="search" name="search" class="form-control" value="{{ $search }}"
+                                    placeholder="PO No, Part No, Item Name...">
+                            </div>
+                            <div style="width: 200px;">
+                                <select name="party_id" class="form-select select2 w-100">
+                                    <option value="">
+                                        All Suppliers
                                     </option>
-                                @endforeach
-                            </select>
-                            <input type="search" name="search" class="form-control" value="{{ $search }}"
-                                placeholder="PO No, Part No, Item Name...">
-                            <select name="party_id" class="form-select select2">
-                                <option value="">
-                                    All Suppliers
-                                </option>
-                                @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}"
-                                        {{ $supplierId == $supplier->id ? 'selected' : '' }}>
-                                        {{ $supplier->name }}
+                                    @foreach ($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}"
+                                            {{ $supplierId == $supplier->id ? 'selected' : '' }}>
+                                            {{ $supplier->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div style="width: 200px;">
+                                <select name="status" class="form-select select2 w-100">
+                                    <option value="">
+                                        All Status
                                     </option>
-                                @endforeach
-                            </select>
-                            <select name="status" class="form-select">
-                                <option value="">
-                                    All Status
-                                </option>
-                                <option value="Draft" {{ $status == 'Draft' ? 'selected' : '' }}>
-                                    Waiting Receive
-                                </option>
-                                <option value="Completed" {{ $status == 'Completed' ? 'selected' : '' }}>
-                                    Completed
-                                </option>
-                                <option value="Cancelled" {{ $status == 'Cancelled' ? 'selected' : '' }}>
-                                    Cancelled
-                                </option>
-                            </select>
-                            <button type="submit" class="btn btn-primary w-100">
+                                    <option value="Draft" {{ $status == 'Draft' ? 'selected' : '' }}>
+                                        Waiting Receive
+                                    </option>
+                                    <option value="Completed" {{ $status == 'Completed' ? 'selected' : '' }}>
+                                        Completed
+                                    </option>
+                                    <option value="Cancelled" {{ $status == 'Cancelled' ? 'selected' : '' }}>
+                                        Cancelled
+                                    </option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fa fa-search me-1"></i>
                                 Search
                             </button>
@@ -168,11 +176,20 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <a href="{{ route('warehouse.show', $purchase) }}" class="btn btn-info btn-sm"
-                                            title="View">
-                                            <i class="fa fa-eye"></i>
-                                        </a>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    <a href="{{ route('warehouse.show', $purchase) }}"
+                                                        class="btn btn-info btn-sm w-100" title="View">
+                                                        <i class="fa fa-eye"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

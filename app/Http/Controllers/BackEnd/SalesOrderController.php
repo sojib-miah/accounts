@@ -50,9 +50,18 @@ class SalesOrderController extends Controller
         if ($request->filled('status')) {
             $query->where('payment_status', $request->status);
         }
-        $perPage = $request->per_page ?? 24;
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+        $perPage = $request->per_page ?? 10;
         $receipts = $query->latest()->paginate($perPage)->withQueryString();
-        return view('BackEnd.SalesOrder.index', compact('receipts'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+        return view('BackEnd.SalesOrder.index', compact('receipts', 'companies'));
     }
 
     public function createIncome()

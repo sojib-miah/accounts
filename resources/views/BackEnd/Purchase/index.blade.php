@@ -18,15 +18,27 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <form method="GET">
-                        <div class="row">
-                            <div class="col-md-2">
+                        <div class="d-flex justify-around-between align-items-center gap-3">
+                            <div style="width: 200px;">
+                                <label>Select Company</label>
+                                <select name="company_id" class="form-select select2 w-100">
+                                    <option value="">Select Company</option>
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->id }}"
+                                            {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                            {{ $company->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
                                 <label>PO No</label>
                                 <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                                     placeholder="PO No">
                             </div>
-                            <div class="col-md-2">
+                            <div style="min-width: 200px;">
                                 <label>Supplier</label>
-                                <select name="supplier" class="form-select select2">
+                                <select name="supplier" class="form-select select2 w-100">
                                     <option value="">All Supplier</option>
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}"
@@ -36,18 +48,18 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div>
                                 <label>From</label>
                                 <input type="date" name="from_date" class="form-control"
                                     value="{{ request('from_date') }}">
                             </div>
-                            <div class="col-md-2">
+                            <div>
                                 <label>To</label>
                                 <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                             </div>
-                            <div class="col-md-2">
+                            <div style="min-width: 200px;">
                                 <label>Status</label>
-                                <select name="status" class="form-select">
+                                <select name="status" class="form-select select2 w-100">
                                     <option value="">All</option>
                                     <option value="Draft" {{ request('status') == 'Draft' ? 'selected' : '' }}>
                                         Draft
@@ -60,12 +72,17 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-2 mt-5">
+                            <div class="mt-5">
                                 <button class="btn btn-primary">
                                     <i class="fa fa-search"></i>
                                     Search
                                 </button>
-                                @if (request('search') || request('supplier') || request('from_date') || request('to_date') || request('status'))
+                                @if (request('search') ||
+                                        request('supplier') ||
+                                        request('from_date') ||
+                                        request('to_date') ||
+                                        request('status') ||
+                                        request('company_id'))
                                     <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
                                         Reset
                                     </a>
@@ -200,7 +217,7 @@
                                 </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="text-center">
+                                        <td colspan="13" class="text-center">
                                             No Purchase Found
                                         </td>
                                     </tr>

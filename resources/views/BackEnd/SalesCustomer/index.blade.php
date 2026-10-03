@@ -12,17 +12,21 @@
             </div>
             <div class="d-flex gap-3 align-items-center">
                 <form action="{{ route('customer-company.index') }}" method="GET" class="d-flex gap-2">
-                    <select name="company_id" class="form-select select2 form-control">
-                        <option value="">Select Company</option>
-                        @foreach ($companies as $company)
-                            <option value="{{ $company->id }}"
-                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                {{ $company->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Search Customer Company...">
+                    <div style="width: 200px;">
+                        <select name="company_id" class="form-select select2 w-100">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search Customer...">
+                    </div>
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-search me-1"></i>
                         Search

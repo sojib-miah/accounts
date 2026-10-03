@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\CustomerCompany;
 use App\Models\Party;
 use App\Models\Product;
@@ -32,6 +33,8 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $query = Receipt::with('supplier')
             ->where('type', 'Purchase-Order')
             ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
@@ -62,6 +65,9 @@ class PurchaseController extends Controller
         if ($request->filled('to_date')) {
             $query->whereDate('receipt_date', '<=', $request->to_date);
         }
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
 
         $purchases = $query->latest()->paginate(10)->withQueryString();
 
@@ -70,8 +76,14 @@ class PurchaseController extends Controller
             ->when(!auth()->user()->hasRole('Super-Admin'), function ($query) {
                 $query->where('created_by', auth()->id());
             })->orderBy('name')->get();
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
-        return view('BackEnd.Purchase.index', compact('purchases', 'suppliers'));
+        return view('BackEnd.Purchase.index', compact('purchases', 'suppliers', 'companies'));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Product;
 use App\Models\Receipt;
 use App\Models\ReceiptItem;
@@ -47,6 +48,11 @@ class InventoryController extends Controller
                 }
             );
         }
+        if ($request->filled('company_id')) {
+            $query->whereHas('receipt', function ($q) use ($request) {
+                $q->where('company_id', $request->company_id);
+            });
+        }
         $query->groupBy('receipt_items.product_id');
         $products = $query->orderByDesc('total_qty')->paginate(20)->withQueryString();
         $totalQuery = ReceiptItem::query()
@@ -61,13 +67,20 @@ class InventoryController extends Controller
         $totalProducts = (clone $totalQuery)->distinct('product_id')->count('product_id');
         $totalQty = (clone $totalQuery)->sum('qty');
         $totalValue = (clone $totalQuery)->sum('amount');
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
         return view(
             'BackEnd.Inventory.index',
             compact(
                 'products',
                 'totalProducts',
                 'totalQty',
-                'totalValue'
+                'totalValue',
+                'companies'
             )
         );
     }
@@ -180,6 +193,9 @@ class InventoryController extends Controller
                     });
             });
         }
+        if ($request->filled('company_id')) {
+            $lowStockQuery->where('company_id', $request->company_id);
+        }
         $products = $lowStockQuery->orderBy('current_stock')->paginate(20)->withQueryString();
         $lowStockCount = (clone $baseQuery)->whereColumn('current_stock', '<=', 'minimum_stock')->count();
         $outOfStockCount = (clone $baseQuery)->where('current_stock', '<=', 0)->count();
@@ -194,6 +210,14 @@ class InventoryController extends Controller
         $totalProductCount = (clone $baseQuery)->count();
 
         $totalCurrentStock = (clone $baseQuery)->sum('current_stock');
+
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
         return view(
             'BackEnd.Inventory.low-stock',
             compact(
@@ -203,7 +227,8 @@ class InventoryController extends Controller
                 'lowStockQty',
                 'lowStockValue',
                 'totalProductCount',
-                'totalCurrentStock'
+                'totalCurrentStock',
+                'companies'
             )
         );
     }
@@ -219,9 +244,11 @@ class InventoryController extends Controller
                 if ($request->filled('from_date')) {
                     $q->whereDate('received_date', '>=', $request->from_date);
                 }
-
                 if ($request->filled('to_date')) {
                     $q->whereDate('received_date', '<=', $request->to_date);
+                }
+                if ($request->filled('company_id')) {
+                    $q->where('company_id', $request->company_id);
                 }
             });
 
@@ -237,6 +264,8 @@ class InventoryController extends Controller
      */
     public function report(Request $request)
     {
+        $user = Auth::user();
+
         $products = $this->stockReportQuery($request)->orderBy('name')->paginate(20)->withQueryString();
         $summaryQuery = $this->stockReportQuery($request);
         $totalProducts = (clone $summaryQuery)->count();
@@ -257,6 +286,15 @@ class InventoryController extends Controller
         if ($request->filled('to_date')) {
             $receivedQuery->whereDate('received_date', '<=', $request->to_date);
         }
+        if ($request->filled('company_id')) {
+            $receivedQuery->where('company_id', $request->company_id);
+        }
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
         $totalReceivedQty = $receivedQuery->withSum('items', 'qty')->get()->sum('items_sum_qty');
 
@@ -268,7 +306,8 @@ class InventoryController extends Controller
                 'totalCurrentStock',
                 'totalStockValue',
                 'totalSaleValue',
-                'totalReceivedQty'
+                'totalReceivedQty',
+                'companies'
             )
         );
     }

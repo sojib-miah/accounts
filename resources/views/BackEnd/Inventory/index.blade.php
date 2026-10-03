@@ -25,6 +25,17 @@
             <div class="card-body">
                 <form method="GET" action="{{ route('inventory.index') }}" class="mb-4">
                     <div class="row">
+                        <div class="col-md-3">
+                            <select name="company_id" class="form-select select2 form-control">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-5">
                             <input type="text" name="search" class="form-control"
                                 placeholder="Search Product / SKU / Code..." value="{{ request('search') }}">
@@ -34,9 +45,10 @@
                                 <i class="fa fa-search me-1"></i>
                                 Search
                             </button>
-                            @if (request('search'))
+                            @if (request('search') || request('company_id'))
                                 <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
                                     <i class="fa fa-times"></i>
+                                    Clear
                                 </a>
                             @endif
                         </div>
@@ -73,6 +85,7 @@
                         <thead>
                             <tr>
                                 <th width="60">SN</th>
+                                <th>Company Name</th>
                                 <th>Product Code</th>
                                 <th>Part No</th>
                                 <th>Category</th>
@@ -94,6 +107,7 @@
                                 @endphp
                                 <tr>
                                     <td>{{ $products->firstItem() + $loop->index }}</td>
+                                    <td>{{ $product->company->name ?? '-' }}</td>
                                     <td>{{ $product->product_code ?? '-' }}</td>
                                     <td>{{ $product->sku ?? '-' }}</td>
                                     <td>{{ $product->category->name ?? '-' }}</td>
@@ -110,16 +124,25 @@
                                         <strong>{{ number_format($row->total_value, 2) }}</strong>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('inventory.product.show', $product) }}"
-                                            class="btn btn-primary btn-sm" title="View Product Details">
-                                            <i class="fa fa-eye me-1"></i>
-                                            View
-                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                <li class="mb-2">
+                                                    <a href="{{ route('inventory.product.show', $product) }}"
+                                                        class="btn btn-primary btn-sm w-100" title="View Product Details">
+                                                        <i class="fa fa-eye me-1"></i>
+                                                        View
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center py-5">
+                                    <td colspan="13" class="text-center py-5">
                                         <i class="fa fa-box-open fa-2x text-muted"></i>
                                         <br>
                                         <span class="text-muted">No Inventory Found</span>

@@ -10,22 +10,26 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('user.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-                        <select name="company_id" class="form-select select2 form-control">
-                            <option value="">Select Company</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}"
-                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                    {{ $company->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search Company User">
+                        <div style="width: 200px;">
+                            <select name="company_id" class="form-select select2 w-100">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Search Company User">
+                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('user.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>

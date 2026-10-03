@@ -11,17 +11,21 @@
                     Make Payment
                 </h4>
                 <form action="{{ route('purchase.payment.index') }}" method="GET" class="d-flex gap-2">
-                    <select name="company_id" class="form-select select2 form-control">
-                        <option value="">Select Company</option>
-                        @foreach ($companies as $company)
-                            <option value="{{ $company->id }}"
-                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                {{ $company->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Search PO / Supplier">
+                    <div style="width: 200px;">
+                        <select name="company_id" class="form-select select2 w-100">
+                            <option value="">Select Company</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}"
+                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                            placeholder="Search PO / Supplier">
+                    </div>
                     <button class="btn btn-primary">
                         <i class="fa fa-search"></i>
                         Search
@@ -81,20 +85,29 @@
                                                 <span class="badge bg-success">Paid</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @if ($purchase->payment_status != 'Paid')
-                                                <a href="{{ route('purchase.payment.show', $purchase->id) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    <i class="fa fa-money-bill-wave me-2"></i>
-                                                    Payment
-                                                </a>
-                                            @else
-                                                <a href="{{ route('purchase.payment.show', $purchase->id) }}"
-                                                    class="btn btn-success btn-sm">
-                                                    <i class="fa-regular fa-eye me-2"></i>
-                                                    View
-                                                </a>
-                                            @endif
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @if ($purchase->payment_status != 'Paid')
+                                                            <a href="{{ route('purchase.payment.show', $purchase->id) }}"
+                                                                class="btn btn-primary btn-sm w-100">
+                                                                <i class="fa fa-money-bill-wave me-2"></i>
+                                                                Payment
+                                                            </a>
+                                                        @else
+                                                            <a href="{{ route('purchase.payment.show', $purchase->id) }}"
+                                                                class="btn btn-success btn-sm w-100">
+                                                                <i class="fa-regular fa-eye me-2"></i>
+                                                                View
+                                                            </a>
+                                                        @endif
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

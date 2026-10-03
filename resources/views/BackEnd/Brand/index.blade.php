@@ -13,28 +13,21 @@
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('brand.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-                        <select name="company_id" class="form-select select2 form-control">
-                            <option value="">Select Company</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}"
-                                    {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                    {{ $company->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <input type="text" name="search" class="form-control" placeholder="Search Brand..."
-                            value="{{ request('search') }}">
-                        <select name="status" class="form-select">
-                            <option value="">
-                                All Status
-                            </option>
-                            <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>
-                                Active
-                            </option>
-                            <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>
-                                Inactive
-                            </option>
-                        </select>
+                        <div style="width: 200px;">
+                            <select name="company_id" class="form-select select2 w-100">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <input type="text" name="search" class="form-control" placeholder="Search Brand..."
+                                value="{{ request('search') }}">
+                        </div>
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-search me-2"></i>
                             Search
