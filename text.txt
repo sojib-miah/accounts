@@ -1,1 +1,8 @@
+ALTER TABLE account_heads
+ADD COLUMN company_id BIGINT UNSIGNED NULL AFTER id,
+ADD CONSTRAINT account_heads_company_id_foreign
+    FOREIGN KEY (company_id)
+    REFERENCES companies(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
 

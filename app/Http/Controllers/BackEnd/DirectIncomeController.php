@@ -46,9 +46,18 @@ class DirectIncomeController extends Controller
         if ($request->filled('status')) {
             $query->where('payment_status', $request->status);
         }
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
         $perPage = $request->per_page ?? 24;
         $receipts = $query->latest()->paginate($perPage)->withQueryString();
-        return view('BackEnd.DirectIncome.index', compact('receipts'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+        return view('BackEnd.DirectIncome.index', compact('receipts', 'companies'));
     }
 
     public function createIncome()
@@ -516,17 +525,36 @@ class DirectIncomeController extends Controller
                         'Cash payment type is not available or inactive. Please create/activate the Cash payment type first.'
                     );
                 }
-                $cashAccountQuery = Account::where('payment_type_id', $paymentType->id)->where('is_default', true)->where('status', 'Active');
+                // $cashAccountQuery = Account::where('payment_type_id', $paymentType->id)->where('is_default', true)->where('status', 'Active');
+                // if (!$user->hasRole('Super-Admin')) {
+                //     $cashAccountQuery->where('company_id', $companyId)->where('branch_id', $branchId);
+                // } else {
+                //     $cashAccountQuery
+                //         ->where(function ($query) use ($companyId) {
+                //             $query->where('company_id', $companyId)->orWhereNull('company_id');
+                //         })
+                //         ->where(function ($query) use ($branchId) {
+                //             $query->where('branch_id', $branchId)->orWhereNull('branch_id');
+                //         });
+                // }
+                $cashAccountQuery = Account::where(
+                    'payment_type_id',
+                    $paymentType->id
+                )
+                    ->where('is_default', true)
+                    ->where('status', 'Active');
+
                 if (!$user->hasRole('Super-Admin')) {
-                    $cashAccountQuery->where('company_id', $companyId)->where('branch_id', $branchId);
-                } else {
-                    $cashAccountQuery
-                        ->where(function ($query) use ($companyId) {
-                            $query->where('company_id', $companyId)->orWhereNull('company_id');
-                        })
-                        ->where(function ($query) use ($branchId) {
-                            $query->where('branch_id', $branchId)->orWhereNull('branch_id');
-                        });
+
+                    $cashAccountQuery->where(function ($query) use ($companyId) {
+                        $query->where('company_id', $companyId)
+                            ->orWhereNull('company_id');
+                    });
+
+                    $cashAccountQuery->where(function ($query) use ($branchId) {
+                        $query->where('branch_id', $branchId)
+                            ->orWhereNull('branch_id');
+                    });
                 }
                 $cashAccount = $cashAccountQuery->lockForUpdate()->first();
                 if (!$cashAccount) {

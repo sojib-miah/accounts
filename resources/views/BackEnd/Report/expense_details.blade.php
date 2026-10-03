@@ -117,18 +117,32 @@
                 <div class="card-body">
                     <form method="GET">
                         <div class="row">
-                            <div class="col-lg-3 mb-3">
+                            <div class="col-lg-2">
+                                <label class="form-label fw-bold">
+                                    Company Name
+                                </label>
+                                <select name="company_id" class="form-select select2">
+                                    <option value="">Select Company</option>
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->id }}"
+                                            {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                            {{ $company->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2">
                                 <label class="form-label fw-bold">
                                     Search
                                 </label>
                                 <input type="text" class="form-control" name="search" value="{{ request('search') }}"
                                     placeholder="Receipt No / Customer">
                             </div>
-                            <div class="col-lg-2 mb-3">
+                            <div class="col-lg-2">
                                 <label class="form-label fw-bold">
                                     Payment Status
                                 </label>
-                                <select name="payment_status" class="form-select">
+                                <select name="payment_status" class="form-select select2">
                                     <option value="">
                                         All
                                     </option>
@@ -143,33 +157,38 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-lg-2 mb-3">
+                            <div class="col-lg-2">
                                 <label class="form-label fw-bold">
                                     From Date
                                 </label>
                                 <input type="date" name="from_date" value="{{ request('from_date') }}"
                                     class="form-control">
                             </div>
-                            <div class="col-lg-2 mb-3">
+                            <div class="col-lg-2">
                                 <label class="form-label fw-bold">
                                     To Date
                                 </label>
                                 <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
                             </div>
-
-                            <div class="col-lg-3 d-flex align-items-end mb-3">
-                                <button class="btn btn-primary me-2">
+                            <div class="col-lg-2 d-flex align-items-end gap-2">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search"></i>
                                     Search
                                 </button>
-                                <a href="{{ route('expense.details') }}" class="btn btn-secondary me-2">
-                                    <i class="fas fa-rotate-left"></i>
-                                    Reset
-                                </a>
+                                @if (request()->has('search') ||
+                                        request()->has('from_date') ||
+                                        request()->has('to_date') ||
+                                        request()->has('company_id') ||
+                                        request()->has('payment_status'))
+                                    <a href="{{ route('expense.details') }}" class="btn btn-secondary">
+                                        <i class="fas fa-rotate-left"></i>
+                                        Reset
+                                    </a>
+                                @endif
                                 {{-- <button type="button" class="btn btn-success" onclick="window.print()">
                                 <i class="fas fa-print"></i>
                                 Print
-                            </button> --}}
+                                </button> --}}
                             </div>
                         </div>
                     </form>
@@ -192,6 +211,7 @@
                             <thead class="text-center">
                                 <tr>
                                     <th width="60">SL</th>
+                                    <th width="110">Company Name</th>
                                     <th width="110">Date</th>
                                     <th width="120">Receipt No</th>
                                     <th width="180">Customer / Party</th>
@@ -210,19 +230,23 @@
                                             {{ $receipts->firstItem() + $key }}
                                         </td>
                                         <td class="text-center">
+                                            {{ $receipt->company->name ?? '-' }}
+                                        </td>
+                                        <td class="text-center">
                                             {{ date('d-M-Y', strtotime($receipt->receipt_date)) }}
                                         </td>
                                         <td class="text-center fw-bold text-primary">
-                                            {{ $receipt->receipt_no }}
+                                            {{ $receipt->receipt_no ?? '-' }}
                                         </td>
                                         <td>
                                             <strong>
-                                                {{ optional($receipt->party)->name }}
+                                                {{ optional($receipt->party)->name ?? '-' }}
                                             </strong>
                                             @if ($receipt->party)
                                                 <br>
                                                 <small class="text-muted">
-                                                    {{ $receipt->party->phone }}
+                                                    {{ $receipt->party->phone ?? '-' }}|
+                                                    {{ $receipt->party->email ?? '-' }}
                                                 </small>
                                             @endif
                                         </td>
@@ -230,21 +254,21 @@
                                             @forelse($receipt->items as $item)
                                                 <div class="border rounded p-2 mb-1 bg-light">
                                                     <strong>
-                                                        {{ optional($item->accountHead)->name }}
+                                                        {{ optional($item->accountHead)->name ?? '-' }}
                                                     </strong>
                                                     @if ($item->details)
                                                         <br>
                                                         <small class="text-muted">
-                                                            {{ $item->details }}
+                                                            {{ $item->details ?? '-' }}
                                                         </small>
                                                     @endif
                                                     <div class="small mt-1">
                                                         Qty :
-                                                        <strong>{{ number_format($item->qty) }}</strong>
+                                                        <strong>{{ number_format($item->qty ?? 0) }}</strong>
                                                         |
                                                         Amount :
                                                         <strong class="text-success">
-                                                            {{ number_format($item->amount, 2) }}
+                                                            {{ number_format($item->amount ?? 0, 2) }}
                                                         </strong>
                                                     </div>
                                                 </div>
@@ -255,13 +279,13 @@
                                             @endforelse
                                         </td>
                                         <td class="text-end fw-bold text-danger">
-                                            {{ number_format($receipt->total_amount, 2) }}
+                                            {{ number_format($receipt->total_amount ?? 0, 2) }}
                                         </td>
                                         <td class="text-end text-success fw-bold">
-                                            {{ number_format($receipt->paid_amount, 2) }}
+                                            {{ number_format($receipt->paid_amount ?? 0, 2) }}
                                         </td>
                                         <td class="text-end text-danger fw-bold">
-                                            {{ number_format($receipt->due_amount, 2) }}
+                                            {{ number_format($receipt->due_amount ?? 0, 2) }}
                                         </td>
                                         <td class="text-center">
                                             @if ($receipt->payment_status == 'Paid')
@@ -279,21 +303,30 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group">
-                                                <a href="{{ route('receipt.show', $receipt->id) }}"
-                                                    class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank"
-                                                    class="btn btn-sm btn-success">
-                                                    <i class="fas fa-print"></i>
-                                                </a>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        <a href="{{ route('receipt.show', $receipt->id) }}"
+                                                            class="btn btn-sm btn-primary w-100">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('receipt.print', $receipt->id) }}"
+                                                            target="_blank" class="btn btn-sm w-100 btn-success">
+                                                            <i class="fas fa-print"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center py-5">
+                                        <td colspan="11" class="text-center py-5">
                                             <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
                                             <h5 class="text-muted">
                                                 No Expense Found
@@ -320,6 +353,9 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+                    <div class="p-3">
+                        {{ $receipts->links() }}
                     </div>
                 </div>
             </div>
@@ -362,88 +398,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Pagination -->
-            @if ($receipts->hasPages())
-                <div class="card shadow-sm mt-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                Showing
-                                <strong>{{ $receipts->firstItem() }}</strong>
-                                to
-                                <strong>{{ $receipts->lastItem() }}</strong>
-                                of
-                                <strong>{{ $receipts->total() }}</strong>
-                                Records
-                            </div>
-                            <div>
-                                {{ $receipts->links() }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
 @endsection
-
-@push('css')
-    <style>
-        .table td {
-            vertical-align: middle;
-        }
-
-        .table thead th {
-            white-space: nowrap;
-        }
-
-        .table tbody tr:hover {
-            background: #f8fbff;
-        }
-
-        .card {
-            border-radius: 10px;
-        }
-
-        .badge {
-            padding: 8px 12px;
-            font-size: 13px;
-        }
-
-        .btn {
-            border-radius: 6px;
-        }
-
-        .table tbody td {
-            font-size: 14px;
-        }
-
-        .table tfoot th {
-            font-size: 15px;
-        }
-
-        .border-start {
-            border-left-width: 5px !important;
-        }
-
-        @media print {
-
-            .btn,
-            .pagination,
-            form,
-            .card-header {
-                display: none !important;
-            }
-
-            body {
-                background: #fff;
-            }
-
-            .card {
-                border: none;
-                box-shadow: none !important;
-            }
-        }
-    </style>
-@endpush

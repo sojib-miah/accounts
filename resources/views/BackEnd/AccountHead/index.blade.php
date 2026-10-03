@@ -12,16 +12,26 @@
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('account-head.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
-                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search Expense List">
-
+                        <div style="width: 200px;">
+                            <select name="company_id" class="form-select select2 w-100">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Search Expense List">
+                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('account-head.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
@@ -44,6 +54,7 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
+                                    <th>Company Name</th>
                                     <th>Category</th>
                                     <th>Description</th>
                                     <th>Type</th>
@@ -57,6 +68,7 @@
                                 @forelse($accountHeads as $head)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $head->company->name ?? '-' }}</td>
                                         <td>{{ $head->category->name ?? '-' }}</td>
                                         <td>{{ $head->name ?? '-' }}</td>
                                         <td>
@@ -87,36 +99,52 @@
                                         <td>
                                             {{ date('d-m-Y', strtotime($head->created_at)) ?? '-' }}
                                         </td>
-                                        <td>
-                                            @can('expense-list-edit')
-                                                <button class="btn btn-warning btn-sm editBtn" data-id="{{ $head->id }}"
-                                                    data-category="{{ $head->category_id }}" data-name="{{ $head->name }}"
-                                                    data-status="{{ $head->status }}">
-                                                    <i class="fa fa-edit"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('expense-list-delete')
-                                                <form action="{{ route('account-head.destroy', $head->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Delete this Expense?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @can('expense-list-edit')
+                                                            <button class="btn btn-warning btn-sm editBtn"
+                                                                data-id="{{ $head->id }}"
+                                                                data-category="{{ $head->category_id }}"
+                                                                data-name="{{ $head->name }}"
+                                                                data-status="{{ $head->status }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('expense-list-delete')
+                                                            <form action="{{ route('account-head.destroy', $head->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="btn btn-danger btn-sm"
+                                                                    onclick="return confirm('Delete this Expense Description?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">
-                                            No Expense Found.
+                                        <td colspan="10" class="text-center">
+                                            No Expense Description Found.
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="p-3">
+                        {{ $accountHeads->links() }}
                     </div>
                 </div>
             </div>

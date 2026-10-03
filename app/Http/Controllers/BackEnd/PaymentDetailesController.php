@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Receipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +19,9 @@ class PaymentDetailesController extends Controller
             'branch',
             'items.accountHead',
             'payments.paymentType',
-            'creator'
-        ])
-            ->where('type', 'Expense')
+            'creator',
+            'company'
+        ])->where('type', 'Expense')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
             });
@@ -28,11 +29,8 @@ class PaymentDetailesController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('receipt_no', 'like', "%{$search}%")
-
                     ->orWhereHas('party', function ($party) use ($search) {
                         $party->where('name', 'like', "%{$search}%");
                     });
@@ -52,33 +50,30 @@ class PaymentDetailesController extends Controller
         if ($request->filled('to_date')) {
             $query->whereDate('receipt_date', '<=', $request->to_date);
         }
-
-        $receipts = $query->latest()
-            ->paginate(10)
-            ->withQueryString();
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+        $receipts = $query->latest()->paginate(10)->withQueryString();
 
         // Summary Query
         $summary = Receipt::where('type', 'Expense')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);
             });
-
-        $todayExpense = (clone $summary)
-            ->whereDate('receipt_date', today())
-            ->sum('total_amount');
-
-        $monthExpense = (clone $summary)
-            ->whereMonth('receipt_date', now()->month)
-            ->whereYear('receipt_date', now()->year)
-            ->sum('total_amount');
-
-        $yearExpense = (clone $summary)
-            ->whereYear('receipt_date', now()->year)
-            ->sum('total_amount');
+        $todayExpense = (clone $summary)->whereDate('receipt_date', today())->sum('total_amount');
+        $monthExpense = (clone $summary)->whereMonth('receipt_date', now()->month)->whereYear('receipt_date', now()->year)->sum('total_amount');
+        $yearExpense = (clone $summary)->whereYear('receipt_date', now()->year)->sum('total_amount');
 
         $totalExpense = (clone $summary)->sum('total_amount');
         $totalPaid = (clone $summary)->sum('paid_amount');
         $totalDue = (clone $summary)->sum('due_amount');
+
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
         return view(
             'BackEnd.Report.expense_details',
@@ -89,7 +84,8 @@ class PaymentDetailesController extends Controller
                 'yearExpense',
                 'totalExpense',
                 'totalPaid',
-                'totalDue'
+                'totalDue',
+                'companies'
             )
         );
     }
@@ -118,95 +114,50 @@ class PaymentDetailesController extends Controller
         ]);
 
         if ($request->filled('search')) {
-
             $search = trim($request->search);
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('receipt_no', 'like', "%{$search}%")
                     ->orWhere('inv_no', 'like', "%{$search}%")
                     ->orWhere('so_no', 'like', "%{$search}%")
                     ->orWhere('remarks', 'like', "%{$search}%")
-
                     ->orWhereHas('party', function ($party) use ($search) {
-
                         $party->where('name', 'like', "%{$search}%")
                             ->orWhere('phone', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
-
         if ($request->filled('payment_status')) {
-
-            $query->where(
-                'payment_status',
-                $request->payment_status
-            );
+            $query->where('payment_status', $request->payment_status);
         }
-
         if ($request->filled('from_date')) {
-
-            $query->whereDate(
-                'receipt_date',
-                '>=',
-                $request->from_date
-            );
+            $query->whereDate('receipt_date', '>=', $request->from_date);
         }
-
         if ($request->filled('to_date')) {
-
-            $query->whereDate(
-                'receipt_date',
-                '<=',
-                $request->to_date
-            );
+            $query->whereDate('receipt_date', '<=', $request->to_date);
         }
-        $receipts = $query
-            ->latest('receipt_date')
-            ->latest('id')
-            ->paginate(20)
-            ->withQueryString();
-
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+        $receipts = $query->latest('receipt_date')->latest('id')->paginate(10)->withQueryString();
         $summary = clone $baseQuery;
+        $todayIncome = (clone $summary)->whereDate('receipt_date', today())->sum('total_amount');
+        $monthIncome = (clone $summary)->whereMonth('receipt_date', now()->month)->whereYear('receipt_date', now()->year)->sum('total_amount');
+        $yearIncome = (clone $summary)->whereYear('receipt_date', now()->year)->sum('total_amount');
+        $totalIncome = (clone $summary)->sum('total_amount');
+        $totalPaid = (clone $summary)->sum('paid_amount');
+        $totalDue = (clone $summary)->sum('due_amount');
+        $totalInvoice = (clone $summary)->count();
+        $paidInvoice = (clone $summary)->where('payment_status', 'Paid')->count();
+        $partialInvoice = (clone $summary)->where('payment_status', 'Partial')->count();
+        $pendingInvoice = (clone $summary)->where('payment_status', 'Pending')->count();
 
-        $todayIncome = (clone $summary)
-            ->whereDate('receipt_date', today())
-            ->sum('total_amount');
-
-        $monthIncome = (clone $summary)
-            ->whereMonth('receipt_date', now()->month)
-            ->whereYear('receipt_date', now()->year)
-            ->sum('total_amount');
-
-        $yearIncome = (clone $summary)
-            ->whereYear('receipt_date', now()->year)
-            ->sum('total_amount');
-
-        $totalIncome = (clone $summary)
-            ->sum('total_amount');
-
-        $totalPaid = (clone $summary)
-            ->sum('paid_amount');
-
-        $totalDue = (clone $summary)
-            ->sum('due_amount');
-
-        $totalInvoice = (clone $summary)
-            ->count();
-
-        $paidInvoice = (clone $summary)
-            ->where('payment_status', 'Paid')
-            ->count();
-
-        $partialInvoice = (clone $summary)
-            ->where('payment_status', 'Partial')
-            ->count();
-
-        $pendingInvoice = (clone $summary)
-            ->where('payment_status', 'Pending')
-            ->count();
-
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
 
         return view(
             'BackEnd.Report.income_invoice',
@@ -221,7 +172,8 @@ class PaymentDetailesController extends Controller
                 'totalInvoice',
                 'paidInvoice',
                 'partialInvoice',
-                'pendingInvoice'
+                'pendingInvoice',
+                'companies'
             )
         );
     }

@@ -96,13 +96,13 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     @can('company-edit')
-                                                        <button class="btn btn-warning w-100 btn-sm editBtn"
-                                                            data-id="{{ $company->id }}" data-name="{{ $company->name }}"
+                                                        <button class="dropdown-item editBtn" data-id="{{ $company->id }}"
+                                                            data-name="{{ $company->name }}"
                                                             data-logo="{{ asset($company->logo) }}"
                                                             data-hologram="{{ asset($company->hologram) }}"
                                                             data-seal="{{ asset($company->seal) }}"
                                                             data-signature="{{ asset($company->signature) }}">
-                                                            <i class="fa fa-edit"></i>
+                                                            <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     @endcan
                                                 </li>
@@ -112,9 +112,9 @@
                                                             method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button class="btn btn-danger w-100 btn-sm"
+                                                            <button class="dropdown-item btn-sm"
                                                                 onclick="return confirm('Delete Company?')">
-                                                                <i class="fa fa-trash"></i>
+                                                                <i class="fa fa-trash"></i> Delete
                                                             </button>
                                                         </form>
                                                     @endcan

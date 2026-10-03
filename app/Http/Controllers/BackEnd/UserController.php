@@ -18,26 +18,38 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         $users = User::with([
             'roles',
             'company',
             'companyPackage.package'
-        ])->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhereHas('roles', function ($roles) use ($search) {
-                        $roles->where('name', 'like', "%{$search}%");
-                    });
-            });
-        })->latest()->paginate(10)->withQueryString();
+        ])->when($request->filled('company_id'), function ($query) use ($request) {
+            $query->where('company_id', $request->company_id);
+        })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhereHas('roles', function ($roles) use ($search) {
+                            $roles->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })->latest()->paginate(10)->withQueryString();
 
         $roles = Role::orderBy('name')->get();
         $packages = Package::where('is_active', true)->orderBy('name')->get();
 
-        return view('BackEnd.Users.user', compact('users', 'roles', 'packages'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.Users.user', compact('users', 'roles', 'packages', 'companies'));
     }
 
     public function store(Request $request)

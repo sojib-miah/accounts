@@ -179,14 +179,14 @@
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('product.show', $product->id) }}">
-                                                    View
+                                                    <i class="fa fa-eye"></i> View
                                                 </a>
                                             </li>
                                             @can('product-edit')
                                                 <li>
                                                     <button type="button" class="dropdown-item editProduct"
                                                         data-id="{{ $product->id }}">
-                                                        Edit
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
                                             @endcan
@@ -196,7 +196,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="dropdown-item text-danger delete-btn">
-                                                            Delete
+                                                            <i class="fa fa-trash"></i> Delete
                                                         </button>
                                                     </form>
                                                 </li>

@@ -64,7 +64,7 @@
                                     <i class="fa fa-search me-2"></i>
                                     Search
                                 </button>
-                                @if (request('search') || request('status') || request('company_id'))
+                                @if (request('search') || request('status') || request('company_id') || request('per_page'))
                                     <a href="{{ route('sales.order.index') }}" class="btn btn-secondary">
                                         Reset
                                     </a>

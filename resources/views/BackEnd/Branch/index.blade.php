@@ -78,8 +78,7 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     @can('branch-edit')
-                                                        <button class="btn btn-warning w-100 btn-sm editBtn"
-                                                            data-id="{{ $branch->id }}"
+                                                        <button class="dropdown-item editBtn" data-id="{{ $branch->id }}"
                                                             data-company="{{ $branch->company_id }}"
                                                             data-branch="{{ $branch->branch_id }}"
                                                             data-name="{{ $branch->name }}"
@@ -87,7 +86,7 @@
                                                             data-phone2="{{ $branch->phone_two }}"
                                                             data-email="{{ $branch->email }}"
                                                             data-address="{{ $branch->address }}">
-                                                            <i class="fa fa-edit"></i>
+                                                            <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     @endcan
                                                 </li>
@@ -98,8 +97,8 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button onclick="return confirm('Delete Branch?')"
-                                                                class="btn btn-danger btn-sm w-100">
-                                                                <i class="fa fa-trash"></i>
+                                                                class="dropdown-item">
+                                                                <i class="fa fa-trash"></i> Delete
                                                             </button>
                                                         </form>
                                                     @endcan

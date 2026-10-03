@@ -53,7 +53,7 @@ class SalesOrderController extends Controller
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
         }
-        $perPage = $request->per_page ?? 10;
+        $perPage = $request->per_page ?? 24;
         $receipts = $query->latest()->paginate($perPage)->withQueryString();
         $companies = Company::orderBy('name')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {

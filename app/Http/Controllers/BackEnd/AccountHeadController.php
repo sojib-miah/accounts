@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\AccountHead;
 use App\Models\Category;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,26 +13,39 @@ class AccountHeadController extends Controller
 {
     public function index(Request $request)
     {
-        $accountHeads = AccountHead::with(['category', 'creator'])->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
+        $user = Auth::user();
 
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('type', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($category) use ($search) {
-                        $category->where('name', 'like', "%{$search}%");
-                    });
-            });
-        })->where('type', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
-            $query->where('created_by', Auth::id());
-        })->latest()->get();
+        $accountHeads = AccountHead::with(['category', 'creator', 'company'])
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->company_id);
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('type', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%")
+                        ->orWhereHas('category', function ($category) use ($search) {
+                            $category->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })->where('type', 'Expense')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
+                $query->where('created_by', Auth::id());
+            })->latest()->paginate(10)->withQueryString();
 
         $categories = Category::where('status', 'Active')->where('type', 'Expense')->orderBy('name')->when(!Auth::user()->hasRole('Super-Admin'), function ($query) {
             $query->where('created_by', Auth::id());
         })->get();
 
-        return view('BackEnd.AccountHead.index', compact('accountHeads', 'categories'));
+        $companies = Company::orderBy('name')
+            ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('id', $user->company_id)->orWhere('created_by', $user->id);
+                });
+            })->get();
+
+        return view('BackEnd.AccountHead.index', compact('accountHeads', 'categories', 'companies'));
     }
 
     public function store(Request $request)
@@ -42,6 +56,7 @@ class AccountHeadController extends Controller
             'status' => 'required|in:Active,Inactive',
         ]);
         AccountHead::create([
+            'company_id' => auth()->user()->company_id,
             'category_id' => $request->category_id,
             'name' => $request->name,
             'type' => 'Expense',

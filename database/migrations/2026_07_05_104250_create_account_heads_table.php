@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('account_heads', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
             $table->string('name');
             $table->enum('type', ['Income', 'Expense']);

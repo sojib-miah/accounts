@@ -14,21 +14,37 @@
                 <div class="card-body">
                     {{-- Top Filter --}}
                     <form method="GET" action="{{ route('direct.income.index') }}">
-                        <div class="row mb-3">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-8">
-                                <div class="d-flex justify-content-end flex-wrap gap-2">
-                                    <input type="text" name="search" class="form-control" style="max-width:220px"
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-end align-items-center gap-2">
+                                <div style="width: 200px;">
+                                    <select name="company_id" class="form-select select2 w-100">
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}"
+                                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="text" name="search" class="form-control"
                                         placeholder="Search Receipt / Party" value="{{ request('search') }}">
-                                    <select name="per_page" class="form-select" style="width:90px">
-                                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                </div>
+                                <div style="width: 200px;">
+                                    <select name="per_page" class="form-select select2 w-100">
+                                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10
+                                        </option>
                                         <option value="24" {{ request('per_page', 24) == 24 ? 'selected' : '' }}>24
                                         </option>
-                                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50
+                                        </option>
                                         <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100
                                         </option>
                                     </select>
-                                    <select name="status" class="form-select" style="width:140px">
+                                </div>
+                                <div style="width: 200px;">
+                                    <select name="status" class="form-select select2 w-100">
                                         <option value="">All Status</option>
                                         <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>
                                             Pending
@@ -43,22 +59,24 @@
                                             Cancelled
                                         </option>
                                     </select>
-                                    <button class="btn btn-primary">
-                                        <i class="fa fa-search me-2"></i>
-                                        Search
-                                    </button>
-                                    @if (request('search'))
-                                        <a href="{{ route('direct.income.index') }}" class="btn btn-secondary">
-                                            Reset
-                                        </a>
-                                    @endif
-                                    @can('income-receipt-create')
+                                </div>
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-search me-2"></i>
+                                    Search
+                                </button>
+                                @if (request('search') || request('company_id') || request('status') || request('per_page'))
+                                    <a href="{{ route('direct.income.index') }}" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+                                @endif
+                                @can('income-receipt-create')
+                                    <div>
                                         <a href="{{ route('direct.income.create') }}" class="btn btn-success">
                                             <i class="fa fa-plus me-2"></i>
                                             Create Direct Sales
                                         </a>
-                                    @endcan
-                                </div>
+                                    </div>
+                                @endcan
                             </div>
                         </div>
                     </form>
@@ -68,6 +86,7 @@
                             <thead>
                                 <tr>
                                     <th>SN</th>
+                                    <th class="text-center">Company Name</th>
                                     <th class="text-center">Order NO</th>
                                     <th class="text-center">Detailes</th>
                                     <th class="text-center">Quantity</th>
@@ -82,6 +101,7 @@
                                 @forelse($receipts as $receipt)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
+                                        <td class="text-center">{{ $receipt->company->name ?? '-' }}</td>
                                         <td class="text-center">
                                             <a href="{{ route('direct.income.show', $receipt->id) }}"
                                                 class="text-decoration-none fw-semibold">
@@ -129,7 +149,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" class="text-center py-5">
+                                        <td colspan="11" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
                                             No Direct Sales Receipt Found
@@ -139,23 +159,9 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-            {{-- Pagination --}}
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <div>
-                    <small class="text-muted">
-                        Showing
-                        {{ $receipts->firstItem() ?? 0 }}
-                        to
-                        {{ $receipts->lastItem() ?? 0 }}
-                        of
-                        {{ $receipts->total() }}
-                        Entries
-                    </small>
-                </div>
-                <div>
-                    {{ $receipts->links() }}
+                    <div class="p-3">
+                        {{ $receipts->links() }}
+                    </div>
                 </div>
             </div>
         </div>

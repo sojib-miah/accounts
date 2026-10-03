@@ -10,21 +10,30 @@
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('category.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
-                        <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search Expense Category List">
-
+                        <div style="width: 200px;">
+                            <select name="company_id" class="form-select select2 w-100">
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Search Expense Category List">
+                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
-                        @if (request('search'))
+                        @if (request('search') || request('company_id'))
                             <a href="{{ route('category.index') }}" class="btn btn-secondary">
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('expense-category-list-create')
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -43,6 +52,7 @@
                             <thead>
                                 <tr>
                                     <th width="60">SN</th>
+                                    <th>Company Name</th>
                                     <th>Category Name</th>
                                     <th>Type</th>
                                     <th>Status</th>
@@ -56,7 +66,8 @@
                                 @forelse($categories as $category)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $category->name }}</td>
+                                        <td>{{ $category->company->name ?? '-' }}</td>
+                                        <td>{{ $category->name ?? '-' }}</td>
                                         <td>
                                             @if ($category->type == 'Income')
                                                 <span class="badge bg-success">
@@ -85,36 +96,51 @@
                                         <td>
                                             {{ date('d-m-Y', strtotime($category->created_at)) }}
                                         </td>
-                                        <td>
-                                            @can('expense-category-list-edit')
-                                                <button type="button" class="btn btn-warning btn-sm editBtn"
-                                                    data-id="{{ $category->id }}" data-name="{{ $category->name }}"
-                                                    data-status="{{ $category->status }}">
-                                                    <i class="fa fa-edit"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('expense-category-list-delete')
-                                                <form action="{{ route('category.destroy', $category->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Delete this category?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li class="mb-2">
+                                                        @can('expense-category-list-edit')
+                                                            <button type="button" class="btn btn-warning w-100 btn-sm editBtn"
+                                                                data-id="{{ $category->id }}"
+                                                                data-name="{{ $category->name }}"
+                                                                data-status="{{ $category->status }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('expense-category-list-delete')
+                                                            <form action="{{ route('category.destroy', $category->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger w-100 btn-sm"
+                                                                    onclick="return confirm('Delete this category?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center">
+                                        <td colspan="9" class="text-center">
                                             No Category Found.
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="p-3">
+                        {{ $categories->links() }}
                     </div>
                 </div>
             </div>

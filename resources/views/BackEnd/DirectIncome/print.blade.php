@@ -7,6 +7,7 @@
             Direct Income - {{ $receipt->receipt_no }}
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="{{ asset('uploads/settings/' . setting()->logo) }}" type="image/x-icon">
         <style>
             * {
                 box-sizing: border-box;
@@ -337,7 +338,7 @@
                 </div>
                 <div class="document-info">
                     <div class="document-title">
-                        DIRECT INCOME
+                        DIRECT SALES
                     </div>
                     <table>
                         <tr>
@@ -376,7 +377,13 @@
                         <tr>
                             <td>Name:</td>
                             <td>
-                                {{ $receipt->customerCompany->name ?? '' }}
+                                @if ($receipt->customer_name)
+                                    {{ $receipt->customer_name ?? '' }}
+                                @elseif ($receipt->customerCompany->name)
+                                    {{ $receipt->customerCompany->name ?? '' }}
+                                @else
+                                    {{ $receipt->customer_name ?? '' }} | {{ $receipt->customerCompany->name ?? '' }}
+                                @endif
                             </td>
                         </tr>
                         @if ($receipt->customerCompany)
@@ -412,37 +419,66 @@
                         Contact Person
                     </div>
                     <table class="info-table">
-                        <tr>
-                            <td>Name:</td>
-                            <td>
-                                {{ $receipt->party->name ?? '' }}
-                            </td>
-                        </tr>
+                        @if ($receipt->customer_phone)
+                            <tr>
+                                <td>Phone:</td>
+                                <td>
+                                    {{ $receipt->customer_phone ?? '' }}
+                                </td>
+                            </tr>
+                        @elseif ($receipt->party->name)
+                            <tr>
+                                <td>Name:</td>
+                                <td>
+                                    {{ $receipt->party->name ?? '' }}
+                                </td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td>Phone:</td>
+                                <td>
+                                    {{ $receipt->customer_phone ?? '' }}
+                                </td>
+                                <td>Name:</td>
+                                <td>
+                                    {{ $receipt->party->name ?? '' }}
+                                </td>
+                            </tr>
+                        @endif
+
                         @if ($receipt->party)
-                            <tr>
-                                <td>Designation:</td>
-                                <td>
-                                    {{ $receipt->party->designation ?? '' }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Mobile:</td>
-                                <td>
-                                    {{ $receipt->party->phone ?? '' }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Email:</td>
-                                <td>
-                                    {{ $receipt->party->email ?? '' }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Address:</td>
-                                <td>
-                                    {{ $receipt->party->address ?? '' }}
-                                </td>
-                            </tr>
+                            @if ($receipt->party->designation)
+                                <tr>
+                                    <td>Designation:</td>
+                                    <td>
+                                        {{ $receipt->party->designation ?? '' }}
+                                    </td>
+                                </tr>
+                            @endif
+                            @if ($receipt->party->phone)
+                                <tr>
+                                    <td>Mobile:</td>
+                                    <td>
+                                        {{ $receipt->party->phone ?? '' }}
+                                    </td>
+                                </tr>
+                            @endif
+                            @if ($receipt->party->email)
+                                <tr>
+                                    <td>Email:</td>
+                                    <td>
+                                        {{ $receipt->party->email ?? '' }}
+                                    </td>
+                                </tr>
+                            @endif
+                            @if ($receipt->party->address)
+                                <tr>
+                                    <td>Address:</td>
+                                    <td>
+                                        {{ $receipt->party->address ?? '' }}
+                                    </td>
+                                </tr>
+                            @endif
                         @endif
                     </table>
                 </div>

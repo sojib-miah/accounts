@@ -55,21 +55,30 @@
                         <div class="d-flex align-items-center gap-2">
                             <form action="{{ route('users.index') }}" method="GET"
                                 class="d-flex justify-content-center align-items-center gap-2">
-
-                                <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                    placeholder="Search Users">
-
+                                <div style="width: 200px;">
+                                    <select name="company_id" class="form-select select2 w-100">
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}"
+                                                {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <input type="search" name="search" value="{{ request('search') }}"
+                                        class="form-control" placeholder="Search Users">
+                                </div>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
-
-                                @if (request('search'))
+                                @if (request('search') || request('company_id'))
                                     <a href="{{ route('users.index') }}" class="btn btn-secondary">
                                         Reset
                                     </a>
                                 @endif
-
                             </form>
                             @can('user-create')
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
@@ -136,34 +145,45 @@
                                         @endif
                                     </td>
                                     <td>{{ $user->created_at->format('d M Y') }}</td>
-                                    <td>
-                                        @if (!$user->hasRole('Super-Admin'))
-                                            @can('user-edit')
-                                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#editUser{{ $user->id }}">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                            @endcan
-                                            @can('user-delete')
-                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"
-                                                        onclick="return confirm('Delete User?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        @endif
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                @if (!$user->hasRole('Super-Admin'))
+                                                    <li class="mb-2">
+                                                        @can('user-edit')
+                                                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                                data-bs-target="#editUser{{ $user->id }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('user-delete')
+                                                            <form action="{{ route('users.destroy', $user->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                                    onclick="return confirm('Delete User?')">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    <div class="py-5">
-                        {{ $users->links() }}
-                    </div>
+                </div>
+                <div class="p-3">
+                    {{ $users->links() }}
                 </div>
             </div>
         </div>
