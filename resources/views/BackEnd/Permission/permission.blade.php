@@ -63,24 +63,35 @@
                                         <td>
                                             {{ $permission->created_at->format('d M Y') }}
                                         </td>
-                                        <td>
-                                            @can('permission-edit')
-                                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#editPermissionModal{{ $permission->id }}">
-                                                    <i class="fa fa-edit"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                            @endcan
-                                            @can('permission-delete')
-                                                <form action="{{ route('permissions.destroy', $permission->id) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"
-                                                        onclick="return confirm('Delete Permission?')">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li>
+                                                        @can('permission-edit')
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editPermissionModal{{ $permission->id }}">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+                                                        @endcan
+                                                    </li>
+                                                    <li>
+                                                        @can('permission-delete')
+                                                            <form action="{{ route('permissions.destroy', $permission->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item text-danger"
+                                                                    onclick="return confirm('Are you sure you want to delete this permission?')">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

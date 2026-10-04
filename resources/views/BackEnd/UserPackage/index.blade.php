@@ -14,10 +14,54 @@
                         Manage company and user package subscriptions
                     </small>
                 </div>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPackageModal">
-                    <i class="fa fa-plus-circle me-1"></i>
-                    Assign Package
-                </button>
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <form action="{{ route('admin.company-package.index') }}" method="GET"
+                        class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+
+                        {{-- Company --}}
+                        <div style="width: 220px;">
+                            <select name="company_id" class="form-select select2 w-100">
+                                <option value="">All Companies</option>
+
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ request('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+                        {{-- Search --}}
+                        <div style="width: 280px;">
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Search User / Package / Company...">
+                        </div>
+
+
+                        {{-- Search Button --}}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search me-1"></i>
+                            Search
+                        </button>
+
+
+                        {{-- Reset --}}
+                        @if (request()->filled('search') || request()->filled('company_id'))
+                            <a href="{{ route('admin.company-package.index') }}" class="btn btn-secondary">
+                                <i class="fa fa-refresh me-1"></i>
+                                Reset
+                            </a>
+                        @endif
+
+                    </form>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#createPackageModal">
+                        <i class="fa fa-plus-circle me-1"></i>
+                        Assign Package
+                    </button>
+                </div>
             </div>
 
             @if ($errors->any())
@@ -109,25 +153,33 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <div class="d-flex gap-1">
-                                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editPackageModal{{ $companyPackage->id }}"
-                                                    title="Edit">
-                                                    <i class="fa fa-pencil"></i>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                    <i class="fa fa-ellipsis-v"></i>
                                                 </button>
-                                                {{-- DELETE --}}
-                                                <form
-                                                    action="{{ route('admin.company-package.destroy', $companyPackage->id) }}"
-                                                    method="POST" class="delete-form">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        title="Delete">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editPackageModal{{ $companyPackage->id }}"
+                                                            title="Edit Package Assignment">
+                                                            <i class="fa fa-pencil"></i> Edit
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <form
+                                                            action="{{ route('admin.company-package.destroy', $companyPackage->id) }}"
+                                                            method="POST" class="delete-form">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item text-danger"
+                                                                onclick="return confirm('Are you sure you want to delete this package assignment?')"
+                                                                title="Delete Package Assignment">
+                                                                <i class="fa fa-trash"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
@@ -233,6 +285,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="p-3">
+                        {{ $companyPackages->links() }}
                     </div>
                 </div>
             </div>

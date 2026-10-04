@@ -154,9 +154,9 @@
                                                 @if (!$user->hasRole('Super-Admin'))
                                                     <li class="mb-2">
                                                         @can('user-edit')
-                                                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                            <button class="dropdown-item" data-bs-toggle="modal"
                                                                 data-bs-target="#editUser{{ $user->id }}">
-                                                                <i class="fa fa-edit"></i>
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
                                                     </li>
@@ -166,9 +166,9 @@
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                                    onclick="return confirm('Delete User?')">
-                                                                    <i class="fa fa-trash"></i>
+                                                                <button type="submit" class="dropdown-item text-danger"
+                                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endcan

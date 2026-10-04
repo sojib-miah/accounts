@@ -107,12 +107,11 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('expense-list-edit')
-                                                            <button class="btn btn-warning btn-sm editBtn"
-                                                                data-id="{{ $head->id }}"
+                                                            <button class="dropdown-item editBtn" data-id="{{ $head->id }}"
                                                                 data-category="{{ $head->category_id }}"
                                                                 data-name="{{ $head->name }}"
                                                                 data-status="{{ $head->status }}">
-                                                                <i class="fa fa-edit"></i>
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
                                                     </li>
@@ -122,9 +121,9 @@
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button class="btn btn-danger btn-sm"
+                                                                <button class="dropdown-item text-danger" type="submit"
                                                                     onclick="return confirm('Delete this Expense Description?')">
-                                                                    <i class="fa fa-trash"></i>
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endcan

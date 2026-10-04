@@ -3,8 +3,8 @@
 @section('title', 'Package')
 
 @section('content')
-    <div class="py-5 px-5">
-        <div class="card">
+    <div class="p-5">
+        <div class="card mt-5">
             <div class="card-header">
                 <div class="row align-items-center">
                     <div class="col-md-4">
@@ -15,19 +15,26 @@
                     </div>
                     <div class="col-md-8">
                         <form method="GET">
-                            <div class="row">
-                                <div class="col-md-8">
+                            <div class="d-flex justify-content-end align-items-center gap-2">
+                                <div>
                                     <input type="text" name="search" class="form-control"
                                         placeholder="Search Package..." value="{{ request('search') }}">
                                 </div>
-                                <div class="col-md-2 d-grid">
-                                    <button class="btn btn-primary">
+                                <div>
+                                    <button class="btn btn-primary w-100" type="submit">
                                         <i class="fa fa-search me-2"></i>
                                         Search
                                     </button>
                                 </div>
-                                <div class="col-md-2 d-grid">
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                <div>
+                                    @if (request('search'))
+                                        <a href="{{ route('package.index') }}" class="btn btn-secondary w-100">
+                                            Reset
+                                        </a>
+                                    @endif
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-success w-100" data-bs-toggle="modal"
                                         data-bs-target="#addPackageModal">
                                         <i class="fa fa-plus me-2"></i>
                                         Add
@@ -121,7 +128,7 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
                                                 <i class="fa fa-ellipsis-v"></i>
@@ -129,13 +136,13 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li>
                                                     <a href="{{ route('package.show', $package->id) }}"
-                                                        class="btn btn-info btn-sm w-100 mb-1">
-                                                        <i class="fa fa-eye"></i>
+                                                        class="dropdown-item" title="View Package Details">
+                                                        <i class="fa fa-eye"></i> View
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <button class="btn btn-warning btn-sm editBtn w-100 mb-1"
-                                                        data-id="{{ $package->id }}" data-name="{{ $package->name }}"
+                                                    <button class="dropdown-item editBtn" data-id="{{ $package->id }}"
+                                                        data-name="{{ $package->name }}"
                                                         data-price="{{ $package->price }}"
                                                         data-user="{{ $package->user_limit }}"
                                                         data-company="{{ $package->company_limit }}"
@@ -153,17 +160,17 @@
                                                         data-storage="{{ $package->storage_limit }}"
                                                         data-status="{{ $package->is_active }}"
                                                         data-remarks="{{ $package->remarks }}">
-                                                        <i class="fa fa-edit"></i>
-
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
                                                 <li>
                                                     <form action="{{ route('package.destroy', $package->id) }}"
-                                                        method="POST" class="deleteForm d-inline">
+                                                        method="POST" class="deleteForm">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="btn btn-danger btn-sm w-100 mb-1">
-                                                            <i class="fa fa-trash"></i>
+                                                        <button class="dropdown-item text-danger" type="submit"
+                                                            onclick="return confirm('Are you sure you want to delete this package?')">
+                                                            <i class="fa fa-trash"></i> Delete
                                                         </button>
                                                     </form>
                                                 </li>
@@ -181,17 +188,13 @@
                                     </td>
                                 </tr>
                             @endforelse
-
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            @if ($packages->hasPages())
-                <div class="card-footer">
+                <div class="p-3">
                     {{ $packages->links() }}
                 </div>
-            @endif
+            </div>
         </div>
     </div>
     {{-- Add Modal --}}

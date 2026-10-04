@@ -22,7 +22,7 @@
 
             {{-- Contact Table Card --}}
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
+                <div class="card-header py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             Contact Requests
@@ -36,7 +36,7 @@
                     @if ($contacts->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th class="px-4">#</th>
                                         <th>Name</th>
@@ -100,21 +100,27 @@
                                                     {{ $contact->created_at->format('h:i A') }}
                                                 </small>
                                             </td>
-                                            {{-- Actions --}}
-                                            <td class="text-end px-4">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    {{-- View Button --}}
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#contactModal{{ $contact->id }}">
-                                                        <i class="fa fa-eye me-1"></i>
+                                            <td class="text-center">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                        <i class="fa fa-ellipsis-v"></i>
                                                     </button>
-                                                    {{-- Delete Button --}}
-                                                    <button type="button" class="btn btn-sm btn-danger"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal{{ $contact->id }}">
-                                                        <i class="fa fa-trash me-1"></i>
-                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                        <li>
+                                                            <button type="button" class="dropdown-item"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#contactModal{{ $contact->id }}">
+                                                                <i class="fa fa-eye me-1"></i> View Details
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item text-danger"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#deleteModal{{ $contact->id }}">
+                                                                <i class="fa fa-trash me-1"></i> Delete Contact
+                                                            </button>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
@@ -260,7 +266,7 @@
                                                     <div class="modal-body text-center py-4">
                                                         <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
                                                             style="width: 60px; height: 60px;">
-                                                            <i class="bi bi-trash fs-4"></i>
+                                                            <i class="fa fa-trash fs-4"></i>
                                                         </div>
                                                         <h5>
                                                             Are you sure?
@@ -298,6 +304,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="p-3">
+                            {{ $contacts->links() }}
                         </div>
                     @else
                         {{-- Empty State --}}

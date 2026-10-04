@@ -30,22 +30,36 @@
                                 <td>{{ optional($user->company)->name }}</td>
                                 <td>{{ optional($user->branch)->name }}</td>
                                 <td>{{ $user->deleted_at->format('d M Y h:i A') }}</td>
-                                <td>
-                                    <form action="{{ route('users.restore', $user->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PUT')
-                                        <button class="btn btn-success btn-sm" title="Restore User">
-                                            <i class="fa fa-sync"></i>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                            <i class="fa fa-ellipsis-v"></i>
                                         </button>
-                                    </form>
-                                    <form action="{{ route('users.forceDelete', $user->id) }}" method="POST"
-                                        class="d-inline" onsubmit="return confirm('Permanently delete this user?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" title="Permanent Delete User">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                            <li>
+                                                <form action="{{ route('users.restore', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button class="dropdown-item" type="submit"
+                                                        onclick="return confirm('Are you sure you want to restore this user?')"
+                                                        title="Restore User">
+                                                        <i class="fa fa-sync"></i> Restore
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('users.forceDelete', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="dropdown-item text-danger" type="submit"
+                                                        title="Permanent Delete User"
+                                                        onclick="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')">
+                                                        <i class="fa fa-trash"></i> Permanent Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

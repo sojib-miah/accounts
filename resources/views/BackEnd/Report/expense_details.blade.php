@@ -310,14 +310,14 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         <a href="{{ route('receipt.show', $receipt->id) }}"
-                                                            class="btn btn-sm btn-primary w-100">
-                                                            <i class="fas fa-eye"></i>
+                                                            class="dropdown-item" title="View Expense Details">
+                                                            <i class="fas fa-eye"></i> View
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <a href="{{ route('receipt.print', $receipt->id) }}"
-                                                            target="_blank" class="btn btn-sm w-100 btn-success">
-                                                            <i class="fas fa-print"></i>
+                                                            target="_blank" class="dropdown-item" title="Print Receipt">
+                                                            <i class="fas fa-print"></i> Print
                                                         </a>
                                                     </li>
                                                 </ul>

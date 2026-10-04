@@ -13,22 +13,33 @@ use Illuminate\Validation\Rule;
 
 class CompanyPackageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-
-        $query = CompanyPackage::with([
-            'company',
-            'user',
-            'package',
-        ])->latest();
-
+        $query = CompanyPackage::with(['company', 'user', 'package',])->latest();
         if (!$user->hasRole('Super-Admin')) {
             $query->where('company_id', $user->company_id);
         }
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('company', function ($companyQuery) use ($search) {
+                    $companyQuery->where('name', 'like', '%' . $search . '%');
+                })
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('package', function ($packageQuery) use ($search) {
+                        $packageQuery->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
 
-        $companyPackages = $query->get();
-
+        $companyPackages = $query->paginate(10)->withQueryString();
         $companiesQuery = Company::query();
 
         if (!$user->hasRole('Super-Admin')) {
@@ -36,18 +47,12 @@ class CompanyPackageController extends Controller
         }
 
         $companies = $companiesQuery->orderBy('name')->get();
-
         $usersQuery = User::query();
 
         if (!$user->hasRole('Super-Admin')) {
-            $usersQuery->where(
-                'company_id',
-                $user->company_id
-            );
+            $usersQuery->where('company_id', $user->company_id);
         }
-
         $users = $usersQuery->orderBy('name')->get();
-
         $packages = Package::where('is_active', true)->orderBy('name')->get();
 
         return view(
