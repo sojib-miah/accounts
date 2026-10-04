@@ -90,17 +90,17 @@
                                         <ul class="dropdown-menu dropdown-menu-end shadow">
                                             <li class="mb-2">
                                                 @can('supplier-edit')
-                                                    <button type="button" class="btn w-100 btn-warning btn-sm editSupplier"
+                                                    <button type="button" class="dropdown-item editSupplier"
                                                         data-id="{{ $supplier->id }}">
-                                                        <i class="fa fa-edit"></i>
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 @endcan
                                             </li>
                                             <li>
                                                 @can('supplier-delete')
-                                                    <button class="btn btn-danger w-100 btn-sm deleteSupplier"
+                                                    <button class="dropdown-item text-danger deleteSupplier"
                                                         data-id="{{ $supplier->id }}">
-                                                        <i class="fa fa-trash"></i>
+                                                        <i class="fa fa-trash"></i> Delete
                                                     </button>
                                                 @endcan
                                             </li>

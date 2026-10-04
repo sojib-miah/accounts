@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="p-5">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mt-5">
             <div class="card-header">
                 <div class="row align-items-center">
                     <div class="col-md-6">

@@ -184,8 +184,8 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     <a href="{{ route('warehouse.show', $purchase) }}"
-                                                        class="btn btn-info btn-sm w-100" title="View">
-                                                        <i class="fa fa-eye"></i>
+                                                        class="dropdown-item" title="View">
+                                                        <i class="fa fa-eye"></i> View
                                                     </a>
                                                 </li>
                                             </ul>

@@ -97,7 +97,7 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button onclick="return confirm('Delete Branch?')"
-                                                                class="dropdown-item">
+                                                                class="dropdown-item text-danger" type="submit">
                                                                 <i class="fa fa-trash"></i> Delete
                                                             </button>
                                                         </form>

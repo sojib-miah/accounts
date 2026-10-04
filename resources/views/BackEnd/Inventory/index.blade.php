@@ -3,9 +3,8 @@
 @section('title', 'Inventory')
 
 @section('content')
-
     <div class="p-5">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mt-5">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
@@ -131,7 +130,7 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     <a href="{{ route('inventory.product.show', $product) }}"
-                                                        class="btn btn-primary btn-sm w-100" title="View Product Details">
+                                                        class="dropdown-item" title="View Product Details">
                                                         <i class="fa fa-eye me-1"></i>
                                                         View
                                                     </a>

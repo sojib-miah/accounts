@@ -84,20 +84,21 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
-                                                    <button class="btn w-100 btn-warning btn-sm editBrand"
-                                                        data-id="{{ $brand->id }}" data-name="{{ $brand->name }}"
+                                                    <button class="dropdown-item editBrand" data-id="{{ $brand->id }}"
+                                                        data-name="{{ $brand->name }}"
                                                         data-description="{{ $brand->description }}"
                                                         data-status="{{ $brand->status }}" data-bs-toggle="modal"
                                                         data-bs-target="#editBrandModal">
-                                                        <i class="fa fa-edit"></i>
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
                                                 <li>
                                                     <form action="{{ route('brand.destroy', $brand->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm w-100">
-                                                            <i class="fa fa-trash"></i>
+                                                        <button type="submit" class="dropdown-item text-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this brand?')">
+                                                            <i class="fa fa-trash"></i> Delete
                                                         </button>
                                                     </form>
                                                 </li>

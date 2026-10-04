@@ -115,7 +115,7 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('account-edit')
-                                                            <button type="button" class="btn w-100 btn-warning btn-sm editBtn"
+                                                            <button type="button" class="dropdown-item editBtn"
                                                                 data-id="{{ $account->id }}"
                                                                 data-company="{{ $account->company_id }}"
                                                                 data-branch="{{ $account->branch_id }}"
@@ -127,7 +127,7 @@
                                                                 data-opening="{{ $account->opening_balance }}"
                                                                 data-status="{{ $account->status }}"
                                                                 data-is_default="{{ $account->is_default }}">
-                                                                <i class="fa fa-edit"></i>
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
                                                     </li>
@@ -137,9 +137,9 @@
                                                                 method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button class="btn btn-danger btn-sm w-100"
-                                                                    onclick="return confirm('Delete this account?')">
-                                                                    <i class="fa fa-trash"></i>
+                                                                <button class="dropdown-item text-danger" type="submit"
+                                                                    onclick="return confirm('Are you sure you want to delete this account?')">
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endcan

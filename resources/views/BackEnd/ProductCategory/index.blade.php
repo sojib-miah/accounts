@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>SL</th>
@@ -77,9 +77,9 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow">
                                             <li class="mb-2">
-                                                <button type="button" class="btn btn-warning btn-sm editBtn w-100"
+                                                <button type="button" class="dropdown-item editBtn"
                                                     data-id="{{ $category->id }}">
-                                                    <i class="fa fa-edit"></i>
+                                                    <i class="fa fa-edit"></i> Edit
                                                 </button>
                                             </li>
                                             <li>
@@ -87,9 +87,9 @@
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm w-100"
-                                                        onclick="return confirm('Delete?')">
-                                                        <i class="fa fa-trash"></i>
+                                                    <button type="submit" class="dropdown-item text-danger" type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this category?')">
+                                                        <i class="fa fa-trash"></i> Delete
                                                     </button>
                                                 </form>
                                             </li>

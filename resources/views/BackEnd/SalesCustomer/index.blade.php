@@ -92,9 +92,9 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
-                                                    <button type="button" class="btn w-100 btn-sm btn-info editCompany"
+                                                    <button type="button" class="dropdown-item editCompany"
                                                         data-id="{{ $company->id }}">
-                                                        <i class="fa fa-edit"></i>
+                                                        <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
                                                 <li>
@@ -102,8 +102,9 @@
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn w-100 btn-sm btn-danger">
-                                                            <i class="fa fa-trash"></i>
+                                                        <button type="submit" class="dropdown-item text-danger"
+                                                            onclick="return confirm('Are you sure you want to delete this company?')">
+                                                            <i class="fa fa-trash"></i> Delete
                                                         </button>
                                                     </form>
                                                 </li>

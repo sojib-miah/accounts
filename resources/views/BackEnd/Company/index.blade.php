@@ -112,7 +112,7 @@
                                                             method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button class="dropdown-item btn-sm"
+                                                            <button class="dropdown-item text-danger" type="submit"
                                                                 onclick="return confirm('Delete Company?')">
                                                                 <i class="fa fa-trash"></i> Delete
                                                             </button>

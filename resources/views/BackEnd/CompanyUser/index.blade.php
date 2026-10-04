@@ -78,13 +78,13 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('company-user-edit')
-                                                            <button type="button" class="btn btn-sm btn-warning w-100 editBtn"
+                                                            <button type="button" class="dropdown-item editBtn"
                                                                 data-id="{{ $user->id }}" data-name="{{ $user->name }}"
                                                                 data-email="{{ $user->email }}"
                                                                 data-phone="{{ $user->phone }}"
                                                                 data-company="{{ $user->company_id }}"
                                                                 data-branch="{{ $user->branch_id }}">
-                                                                <i class="fa fa-edit"></i>
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
                                                     </li>
@@ -94,9 +94,10 @@
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn w-100 btn-sm btn-danger"
+                                                                <button type="submit" class="dropdown-item text-danger"
+                                                                    type="submit"
                                                                     onclick="return confirm('Are you sure you want to delete this user?')">
-                                                                    <i class="fa fa-trash"></i>
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endcan

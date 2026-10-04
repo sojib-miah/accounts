@@ -108,15 +108,15 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('receiver-list-edit')
-                                                            <button class="btn btn-warning w-100 btn-sm editBtn"
-                                                                data-id="{{ $party->id }}" data-name="{{ $party->name }}"
+                                                            <button class="dropdown-item editBtn" data-id="{{ $party->id }}"
+                                                                data-name="{{ $party->name }}"
                                                                 data-phone="{{ $party->phone }}"
                                                                 data-email="{{ $party->email }}"
                                                                 data-address="{{ $party->address }}"
                                                                 data-status="{{ $party->status }}"
                                                                 data-customer_company_id="{{ $party->customer_company_id }}"
                                                                 data-designation="{{ $party->designation }}">
-                                                                <i class="fa fa-edit"></i>
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
                                                     </li>
@@ -126,9 +126,9 @@
                                                                 method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button class="btn btn-danger btn-sm w-100"
-                                                                    onclick="return confirm('Are you sure you want to delete this receiver?')">
-                                                                    <i class="fa fa-trash"></i>
+                                                                <button class="dropdown-item text-danger"
+                                                                    onclick="return confirm('Are you sure you want to delete this Customer?')">
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endcan

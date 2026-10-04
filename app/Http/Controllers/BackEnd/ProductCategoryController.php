@@ -118,7 +118,13 @@ class ProductCategoryController extends Controller
     public function destroy(Category $product_category)
     {
         abort_if($product_category->type != 'Product', 404);
+
+        if ($product_category->products()->exists()) {
+            return redirect()->route('product-category.index')->with('error', 'This category cannot be deleted because it is already used in one or more products.');
+        }
+
         $product_category->delete();
+
         return redirect()->route('product-category.index')->with('success', 'Category deleted successfully.');
     }
 }

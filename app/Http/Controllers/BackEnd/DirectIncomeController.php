@@ -416,7 +416,6 @@ class DirectIncomeController extends Controller
     public function update(Request $request, Receipt $receipt)
     {
         $user = Auth::user();
-        // Make sure this is a Direct Income receipt
         abort_unless($receipt->type === 'Direct-Income', 404);
         $request->validate([
             'receipt_date' => ['required', 'date'],
@@ -525,38 +524,12 @@ class DirectIncomeController extends Controller
                         'Cash payment type is not available or inactive. Please create/activate the Cash payment type first.'
                     );
                 }
-                // $cashAccountQuery = Account::where('payment_type_id', $paymentType->id)->where('is_default', true)->where('status', 'Active');
-                // if (!$user->hasRole('Super-Admin')) {
-                //     $cashAccountQuery->where('company_id', $companyId)->where('branch_id', $branchId);
-                // } else {
-                //     $cashAccountQuery
-                //         ->where(function ($query) use ($companyId) {
-                //             $query->where('company_id', $companyId)->orWhereNull('company_id');
-                //         })
-                //         ->where(function ($query) use ($branchId) {
-                //             $query->where('branch_id', $branchId)->orWhereNull('branch_id');
-                //         });
-                // }
-                $cashAccountQuery = Account::where(
-                    'payment_type_id',
-                    $paymentType->id
-                )
+                $cashAccount = Account::where('payment_type_id', $paymentType->id)
                     ->where('is_default', true)
-                    ->where('status', 'Active');
+                    ->where('status', 'Active')
+                    ->lockForUpdate()
+                    ->first();
 
-                if (!$user->hasRole('Super-Admin')) {
-
-                    $cashAccountQuery->where(function ($query) use ($companyId) {
-                        $query->where('company_id', $companyId)
-                            ->orWhereNull('company_id');
-                    });
-
-                    $cashAccountQuery->where(function ($query) use ($branchId) {
-                        $query->where('branch_id', $branchId)
-                            ->orWhereNull('branch_id');
-                    });
-                }
-                $cashAccount = $cashAccountQuery->lockForUpdate()->first();
                 if (!$cashAccount) {
                     throw new \Exception(
                         'Default Cash account not found. Please create a Cash account and set it as Default.'

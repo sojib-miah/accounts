@@ -94,13 +94,13 @@
                                                     <li class="mb-2">
                                                         @if ($purchase->payment_status != 'Paid')
                                                             <a href="{{ route('purchase.payment.show', $purchase->id) }}"
-                                                                class="btn btn-primary btn-sm w-100">
+                                                                class="dropdown-item">
                                                                 <i class="fa fa-money-bill-wave me-2"></i>
                                                                 Payment
                                                             </a>
                                                         @else
                                                             <a href="{{ route('purchase.payment.show', $purchase->id) }}"
-                                                                class="btn btn-success btn-sm w-100">
+                                                                class="dropdown-item">
                                                                 <i class="fa-regular fa-eye me-2"></i>
                                                                 View
                                                             </a>

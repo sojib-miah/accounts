@@ -181,16 +181,16 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a href="{{ route('purchase.show', $purchase->id) }}"
-                                                        class="btn btn-info btn-sm w-100 mb-1" title="View Full Page">
-                                                        <i class="fa fa-eye"></i>
+                                                        class="dropdown-item" title="View Full Page">
+                                                        <i class="fa fa-eye"></i> View
                                                     </a>
                                                 </li>
                                                 @can('purchase-edit')
                                                     @if ($purchase->status !== 'Completed')
                                                         <li>
                                                             <a href="{{ route('purchase.edit', $purchase->id) }}"
-                                                                class="btn btn-warning btn-sm w-100 mb-1" title="Edit Purchase">
-                                                                <i class="fa fa-edit"></i>
+                                                                class="dropdown-item" title="Edit Purchase">
+                                                                <i class="fa fa-edit"></i> Edit
                                                             </a>
                                                         </li>
                                                     @endif
@@ -202,10 +202,10 @@
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('PATCH')
-                                                                <button class="btn btn-danger btn-sm w-100 mb-1"
+                                                                <button class="dropdown-item text-danger" type="submit"
                                                                     onclick="return confirm('Cancel this Purchase?')"
-                                                                    title="Cancle Purchase">
-                                                                    <i class="fa fa-ban"></i>
+                                                                    title="Cancel Purchase">
+                                                                    <i class="fa fa-ban"></i> Cancel
                                                                 </button>
                                                             </form>
                                                         @endif
