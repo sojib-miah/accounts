@@ -94,6 +94,7 @@
                                     <th class="text-center">Quantity</th>
                                     <th class="text-center">Created BY</th>
                                     <th class="text-center">DATE & TIME</th>
+                                    <th class="text-center">Payment STATUS</th>
                                     <th class="text-center">STATUS</th>
                                     <th class="text-center" width="90">ACTION</th>
                                 </tr>
@@ -144,6 +145,21 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
+                                            @if ($receipt->status == 'Completed')
+                                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
+                                                    Completed
+                                                </span>
+                                            @elseif($receipt->status == 'Draft')
+                                                <span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">
+                                                    Draft
+                                                </span>
+                                            @elseif($receipt->status == 'Cancelled')
+                                                <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2">
+                                                    Cancelled
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
                                             <div class="dropdown">
                                                 <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
                                                     <i class="fa fa-ellipsis-v"></i>
@@ -155,6 +171,23 @@
                                                             <i class="fa fa-eye text-primary me-2"></i>
                                                             View
                                                         </a>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ route('receipt.toggle-status', $receipt->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+
+                                                            <button type="submit" class="dropdown-item">
+                                                                @if ($receipt->status === 'Completed')
+                                                                    <i class="fa-regular fa-file me-2"></i>
+                                                                    Draft
+                                                                @else
+                                                                    <i class="fa-solid fa-check me-2"></i>
+                                                                    Completed
+                                                                @endif
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                     @if ($receipt->status != 'Cancelled')
                                                         <li>
@@ -189,7 +222,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="11" class="text-center py-5">
+                                        <td colspan="12" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
                                             No Expense Receipt Found

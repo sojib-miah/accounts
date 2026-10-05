@@ -193,14 +193,21 @@
                                         </tr>
                                     </table>
 
-                                    <div class="d-flex gap-5 mt-3">
-                                        <a href="{{ route('sales.order.index') }}" class="btn btn-secondary w-100">
-                                            <i class="fa-solid fa-arrow-left me-2"></i>
-                                            Back
-                                        </a>
-                                        <button class="btn btn-primary w-100" type="submit">
-                                            <i class="fa-regular fa-floppy-disk me-2"></i>
-                                            Save Sales Order
+                                    <div class="d-flex gap-3">
+                                        <button type="button" onclick="location.reload();"
+                                            class="btn w-100 btn-secondary mt-3">
+                                            <i class="fa-solid fa-undo me-1"></i>
+                                            Reset
+                                        </button>
+                                        <button type="submit" name="status" value="Draft"
+                                            class="btn btn-primary mt-3 w-100">
+                                            <i class="fa-regular fa-floppy-disk me-1"></i>
+                                            Save As Draft
+                                        </button>
+                                        <button type="submit" name="status" value="Completed"
+                                            class="btn btn-success mt-3 w-100">
+                                            <i class="fa-regular fa-floppy-disk me-1"></i>
+                                            Save Complete
                                         </button>
                                     </div>
                                 </div>

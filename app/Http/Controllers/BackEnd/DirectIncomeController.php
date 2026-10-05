@@ -108,6 +108,7 @@ class DirectIncomeController extends Controller
             'remarks' => ['nullable', 'string'],
             'customer_name' => ['nullable', 'string'],
             'customer_phone' => ['nullable', 'string'],
+            'status' => ['required', 'in:Draft,Completed'],
         ]);
         DB::beginTransaction();
         try {
@@ -214,7 +215,7 @@ class DirectIncomeController extends Controller
                 'paid_amount' => $paidAmount,
                 'due_amount' => $dueAmount,
                 'payment_status' => $paymentStatus,
-                'status' => 'Draft',
+                'status' => $request->status,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
@@ -274,7 +275,7 @@ class DirectIncomeController extends Controller
                 ]);
             }
             DB::commit();
-            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Income created successfully.');
+            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Sales created successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());
@@ -425,6 +426,7 @@ class DirectIncomeController extends Controller
             'remarks' => ['nullable', 'string'],
             'customer_name' => ['nullable', 'string'],
             'customer_phone' => ['nullable', 'string'],
+            'status' => ['required', 'in:Draft,Completed'],
         ]);
         DB::beginTransaction();
         try {
@@ -612,6 +614,7 @@ class DirectIncomeController extends Controller
                 'paid_amount' => $newPaidAmount,
                 'due_amount' => $dueAmount,
                 'payment_status' => $paymentStatus,
+                'status' => $request->status,
                 'updated_by' => $user->id,
             ]);
             DB::commit();
@@ -875,6 +878,23 @@ class DirectIncomeController extends Controller
 
         return $pdf->stream(
             'Direct-Income-' . $receipt->receipt_no . '.pdf'
+        );
+    }
+
+    public function toggleStatus(Receipt $receipt)
+    {
+        $newStatus = $receipt->status === 'Draft'
+            ? 'Completed'
+            : 'Draft';
+
+        $receipt->update([
+            'status' => $newStatus,
+            'updated_by' => Auth::id(),
+        ]);
+
+        return back()->with(
+            'success',
+            "Receipt status changed to {$newStatus} successfully."
         );
     }
 }

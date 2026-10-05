@@ -135,6 +135,7 @@ class ReceiptController extends Controller
             'items' => 'required|string',
             'discount' => 'nullable|numeric|min:0',
             'vat' => 'nullable|numeric|min:0',
+            'status' => ['required', 'in:Draft,Completed'],
         ]);
         $user = Auth::user();
         if (!$user->hasRole('Super-Admin')) {
@@ -205,69 +206,34 @@ class ReceiptController extends Controller
                 'paid_amount' => 0,
                 'due_amount' => $grandTotal,
                 'payment_status' => 'Pending',
-                'status' => 'Completed',
+                'status' => $request->status,
                 'created_by' => $user->id,
             ]);
 
             foreach ($items as $item) {
-
                 $qty = (float) (
                     $item['qty'] ?? 1
                 );
-
                 $rate = (float) (
                     $item['rate'] ?? 0
                 );
-
-                $amount =
-                    $qty * $rate;
-
+                $amount = $qty * $rate;
                 ReceiptItem::create([
-
-                    'receipt_id' =>
-                    $receipt->id,
-
-                    'category_id' =>
-                    $item['category_id'],
-
-                    'account_head_id' =>
-                    $item['account_head_id'],
-
-                    'qty' =>
-                    $qty,
-
-                    'rate' =>
-                    $rate,
-
-                    'amount' =>
-                    $amount,
-
-                    'details' =>
-                    $item['details'] ?? null,
+                    'receipt_id' => $receipt->id,
+                    'category_id' => $item['category_id'],
+                    'account_head_id' => $item['account_head_id'],
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'amount' => $amount,
+                    'details' => $item['details'] ?? null,
                 ]);
             }
 
             DB::commit();
-
-            return redirect()
-                ->route(
-                    'receipt.show',
-                    $receipt->id
-                )
-                ->with(
-                    'success',
-                    'Expense Receipt Created Successfully.'
-                );
+            return redirect()->route('receipt.show', $receipt->id)->with('success', 'Expense Receipt Created Successfully.');
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -367,6 +333,7 @@ class ReceiptController extends Controller
             'party_id' => 'required|exists:parties,id',
             'receipt_date' => 'required|date',
             'items' => 'required',
+            'status' => ['required', 'in:Draft,Completed'],
         ]);
         DB::beginTransaction();
         try {
@@ -393,6 +360,7 @@ class ReceiptController extends Controller
                 'party_id' => $request->party_id,
                 'receipt_date' => $request->receipt_date,
                 'remarks' => $request->remarks,
+                'status' => $request->status,
                 'total_qty' => $totalQty,
                 'sub_total' => $subTotal,
                 'discount' => $discount,
@@ -546,11 +514,11 @@ class ReceiptController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($receipt->status !== 'Completed') {
-                throw new \Exception(
-                    'Payment can only be made for a completed expense.'
-                );
-            }
+            // if ($receipt->status !== 'Completed') {
+            //     throw new \Exception(
+            //         'Payment can only be made for a completed expense.'
+            //     );
+            // }
 
             if (
                 $receipt->payment_status === 'Paid' ||

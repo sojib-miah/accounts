@@ -506,12 +506,12 @@ class IncomeReceiptController extends Controller
                 );
             }
 
-            if ($receipt->status !== 'Completed') {
+            // if ($receipt->status !== 'Completed') {
 
-                throw new \Exception(
-                    'Payment can only be made for a completed receipt.'
-                );
-            }
+            //     throw new \Exception(
+            //         'Payment can only be made for a completed receipt.'
+            //     );
+            // }
 
             if ($receipt->payment_status === 'Paid') {
 

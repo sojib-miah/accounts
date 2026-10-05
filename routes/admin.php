@@ -303,6 +303,8 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/direct/income/{receipt}/print', [DirectIncomeController::class, 'print'])->name('direct.income.print');
         Route::get('/direct/income/{receipt}/pdf', [DirectIncomeController::class, 'pdf'])->name('direct.income.pdf');
 
+        Route::patch('receipt/{receipt}/toggle-status', [DirectIncomeController::class, 'toggleStatus'])->name('receipt.toggle-status');
+
         // company user package 
         Route::resource('company-package', CompanyPackageController::class)
             ->only(['index', 'store', 'update', 'destroy',])

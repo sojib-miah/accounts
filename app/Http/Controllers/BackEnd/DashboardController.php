@@ -106,8 +106,8 @@ class DashboardController extends Controller
 
         $todayProfit = $todaySale - $todayPurchase - $todayExpense;
 
-        $receivable = Receipt::whereIn('type', ['Sales-Order', 'Direct-Income', 'Income',])->tap($receiptScope)->sum('due_amount');
-        $payable = Receipt::whereIn('type', ['Purchase-Order', 'Expense',])->tap($receiptScope)->sum('due_amount');
+        $receivable = Receipt::whereIn('type', ['Sales-Order', 'Direct-Income', 'Income',])->where('status', 'Completed')->tap($receiptScope)->sum('due_amount');
+        $payable = Receipt::whereIn('type', ['Purchase-Order', 'Expense',])->where('status', 'Completed')->tap($receiptScope)->sum('due_amount');
         $customers = Party::where('type', 'Customer')->where('status', 'Active')
             ->when(
                 !$user->hasRole('Super-Admin'),
