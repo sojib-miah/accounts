@@ -67,7 +67,7 @@
                             return 'Unlimited';
                         }
                         if ($name === 'Storage') {
-                            return number_format($value) . ' GB';
+                            return number_format($value) . ' MB';
                         }
                         return number_format($value);
                     };
