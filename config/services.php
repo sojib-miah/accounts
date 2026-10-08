@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    // sslcommerze 
+    'sslcommerz' => [
+        'store_id' => env('SSLCOMMERZ_STORE_ID'),
+        'store_password' => env('SSLCOMMERZ_STORE_PASSWORD'),
+        'mode' => env('SSLCOMMERZ_MODE', 'sandbox'),
+
+        'success_url' => env('SSLCOMMERZ_SUCCESS_URL'),
+        'fail_url' => env('SSLCOMMERZ_FAIL_URL'),
+        'cancel_url' => env('SSLCOMMERZ_CANCEL_URL'),
+        'ipn_url' => env('SSLCOMMERZ_IPN_URL'),
+    ],
+
 ];

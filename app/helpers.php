@@ -34,8 +34,7 @@ class PackageHelper
             })
             ->where('status', 'Active')
             ->whereHas('package', function ($q) {
-                $q->where('is_active', 1)
-                    ->whereDate('end_date', '>=', now());
+                $q->where('is_active', 1);
             })
             ->first();
     }
@@ -50,10 +49,6 @@ class PackageHelper
 
         if (!$companyPackage->package->is_active) {
             return 'Your package is inactive.';
-        }
-
-        if (now()->gt($companyPackage->package->end_date)) {
-            return 'Your package has expired.';
         }
 
         $limit = $companyPackage->package->{$field};

@@ -27,30 +27,44 @@ class AdminAuthController extends Controller
     public function registerStore(Request $request)
     {
         $request->validate([
+            'name' => ['required', 'string', 'max:255',],
+            'email' => ['required', 'email', 'unique:users,email',],
+            'password' => ['required', 'confirmed', 'min:6',],
+        ]);
 
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:6',
-        ]);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-        $trialPackage = Package::where('name', 'Trial')->where('is_active', true)->first();
-        if ($trialPackage) {
-            CompanyPackage::create([
-                'company_id' => $request->company_id,
-                'user_id'    => $user->id,
-                'package_id' => $trialPackage->id,
-                'start_date' => now(),
-                'expire_date' => now()->addYear(), // or addDays(30) if your trial is 1 year
-                'status'     => 'Active',
+        DB::beginTransaction();
+
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'company_id' => null,
+                'branch_id' => null,
             ]);
-        }
-        $user->assignRole('User');
 
-        return redirect()->route('admin.login')->with('success', 'Registration successful');
+            $user->assignRole('User');
+
+            $trialPackage = Package::where('name', 'Trial')->where('is_active', true)->first();
+
+            if ($trialPackage) {
+                CompanyPackage::create([
+                    'company_id' => null,
+                    'user_id' => $user->id,
+                    'package_id' => $trialPackage->id,
+                    'start_date' => now()->toDateString(),
+                    // Change to addDays(30) addYear() if your trial is 30 days
+                    'expire_date' => now()->addDays(15)->toDateString(),
+                    'status' => 'Active',
+                ]);
+            }
+            DB::commit();
+            return redirect()->route('admin.login')->with('success', 'Registration successful. Please login.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return back()->withInput()->with('error', 'Registration failed. Please try again.');
+        }
     }
 
     /*

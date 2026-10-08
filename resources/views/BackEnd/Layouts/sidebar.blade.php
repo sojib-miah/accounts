@@ -475,6 +475,23 @@
             </li>
         @endcan
 
+        {{-- payment result  --}}
+        @can('menu-package-list')
+            <li class="menu-item {{ request()->routeIs('admin.payment.index') ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="fa-solid fa-money-bill me-3"></i>
+                    Payment List
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->routeIs('admin.payment.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.payment.index') }}" class="menu-link">
+                            Payment List
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endcan
+
         {{-- Settings  --}}
         @can('menu-setting-list')
             <li class="menu-item {{ request()->routeIs('settings*') ? 'active open' : '' }}">

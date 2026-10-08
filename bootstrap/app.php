@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'hasrole' => HasRole::class,
             'package' => CheckUserPackage::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'payment/sslcommerz/success',
+            'payment/sslcommerz/fail',
+            'payment/sslcommerz/cancel',
+            'payment/sslcommerz/ipn',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

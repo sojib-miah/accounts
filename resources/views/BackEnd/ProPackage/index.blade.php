@@ -133,12 +133,13 @@
                                 @endforeach
                             </div>
                             <div class="mt-3">
-                                <a href="#"
-                                    class="btn btn-{{ $style['class'] }}
-                                          package-button w-100 py-2">
-                                    Get Started
-                                    <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
+                                <form action="{{ route('payment.sslcommerz.initiate', $package->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-{{ $style['class'] }} package-button w-100 py-2">
+                                        Get Started
+                                        <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                </form>
                             </div>
                             <div class="text-center mt-2">
                                 <small class="text-muted">

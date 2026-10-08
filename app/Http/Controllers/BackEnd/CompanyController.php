@@ -5,6 +5,7 @@ namespace App\Http\Controllers\BackEnd;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CompanyPackage;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -52,9 +53,11 @@ class CompanyController extends Controller
             }
         }
 
+        $user = Auth::user();
         $company = new Company();
         $company->name = $request->name;
-        $company->created_by = Auth::id();
+        $company->created_by = $user->id;
+
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $name = time() . '_logo.' . $file->getClientOriginalExtension();
@@ -79,20 +82,13 @@ class CompanyController extends Controller
             $file->move(public_path('uploads/company'), $name);
             $company->signature = 'uploads/company/' . $name;
         }
+
         $company->save();
-        $user = Auth::user();
 
         if (is_null($user->company_id)) {
-
-            $user->update([
-                'company_id' => $company->id,
-            ]);
-
-            CompanyPackage::where('user_id', $user->id)
-                ->whereNull('company_id')
-                ->update([
-                    'company_id' => $company->id,
-                ]);
+            $user->update(['company_id' => $company->id,]);
+            CompanyPackage::where('user_id', $user->id)->whereNull('company_id')->update(['company_id' => $company->id,]);
+            Payment::where('user_id', $user->id)->whereNull('company_id')->update(['company_id' => $company->id,]);
         }
         return redirect()->route('company.index')->with('success', 'Company Created Successfully');
     }
