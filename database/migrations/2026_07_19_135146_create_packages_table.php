@@ -28,7 +28,6 @@ return new class extends Migration
             $table->integer('category_limit')->default(0);
             $table->integer('item_list_limit')->default(0);
             $table->integer('sales_order_limit')->default(0);
-            $table->timestamp('end_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('remarks')->nullable();
             $table->timestamps();

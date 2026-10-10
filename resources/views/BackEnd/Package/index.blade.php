@@ -66,7 +66,6 @@
                                 <th>Category</th>
                                 <th>Item list</th>
                                 <th>Sales Order</th>
-                                <th>End Date</th>
                                 <th>Storage</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -113,7 +112,6 @@
                                     <td>{{ $package->category_limit }}</td>
                                     <td>{{ $package->item_list_limit }}</td>
                                     <td>{{ $package->sales_order_limit }}</td>
-                                    <td>{{ $package->end_date ?? '-' }}</td>
                                     <td>
                                         {{ $package->storage_limit }}
                                     </td>

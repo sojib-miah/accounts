@@ -117,13 +117,6 @@
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Ending Date</label>
-                            <input type="date" name="end_date" class="form-control">
-                            @error('end_date', 'add')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-md-3 mb-3">
                             <label>Storage Limit (MB)</label>
                             <input type="number" name="storage_limit" class="form-control" value="0">
                             @error('storage_limit', 'add')
