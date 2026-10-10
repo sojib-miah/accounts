@@ -244,11 +244,11 @@
                                     </table>
 
                                     <div class="d-flex gap-3">
-                                        <button type="button" onclick="location.reload();"
+                                        <a href="{{ route('direct.income.index') }}"
                                             class="btn w-100 btn-secondary mt-3">
-                                            <i class="fa-solid fa-undo me-1"></i>
-                                            Reset
-                                        </button>
+                                            <i class="fa-solid fa-arrow-left me-1"></i>
+                                            Back
+                                        </a>
                                         <button type="submit" name="status" value="Draft"
                                             class="btn btn-primary mt-3 w-100">
                                             <i class="fa-regular fa-floppy-disk me-1"></i>
@@ -257,7 +257,7 @@
                                         <button type="submit" name="status" value="Completed"
                                             class="btn btn-success mt-3 w-100">
                                             <i class="fa-regular fa-floppy-disk me-1"></i>
-                                            Save Complete
+                                            Confirm
                                         </button>
                                     </div>
                                 </div>

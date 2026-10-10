@@ -275,6 +275,10 @@ class DirectIncomeController extends Controller
                 ]);
             }
             DB::commit();
+
+            if ($request->status === 'Draft') {
+                return redirect()->route('direct.income.index')->with('success', 'Direct Sales saved as Draft successfully.');
+            }
             return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Sales created successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -618,7 +622,11 @@ class DirectIncomeController extends Controller
                 'updated_by' => $user->id,
             ]);
             DB::commit();
-            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Income updated successfully.');
+
+            if ($request->status === 'Draft') {
+                return redirect()->route('direct.income.index')->with('success', 'Direct Sales saved as Draft successfully.');
+            }
+            return redirect()->route('direct.income.show', ['receipt' => $receipt->id])->with('success', 'Direct Sales created successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withInput()->with('error', $e->getMessage());

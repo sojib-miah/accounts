@@ -12,9 +12,13 @@ class Package extends Model
         'end_date' => 'datetime',
     ];
 
-
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_packages');
+    }
+
+    public function companyPackages()
+    {
+        return $this->hasMany(CompanyPackage::class);
     }
 }

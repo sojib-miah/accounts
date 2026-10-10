@@ -10,26 +10,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class SSLCommerzController extends Controller
 {
+    /**
+     * Initiate a new payment.
+     */
     public function initiate(Request $request, Package $package)
     {
         $user = Auth::user();
 
         if (!$user) {
-            return redirect()
-                ->route('admin.login')
-                ->with('error', 'Please login before making a payment.');
-        }
-        if (!$package->is_active) {
-            return back()->with(
-                'error',
-                'This package is currently unavailable.'
-            );
+            return redirect()->route('admin.login')
+                ->with('error', 'Please login before payment.');
         }
 
+        if (!$package->is_active) {
+            return back()->with('error', 'Package is unavailable.');
+        }
+
+        if (!is_numeric($package->price) || $package->price <= 0) {
+            return back()->with('error', 'Invalid package price.');
+        }
+
+        // Prevent duplicate pending payments for 30 minutes.
         $existingPayment = Payment::where('user_id', $user->id)
             ->where('package_id', $package->id)
             ->where('status', 'Pending')
@@ -38,52 +45,54 @@ class SSLCommerzController extends Controller
             ->first();
 
         if ($existingPayment) {
-            return back()->with(
-                'error',
-                'You already have a pending payment for this package. Please complete that payment before starting another one.'
-            );
+            return redirect()->route(
+                'payment.result',
+                $existingPayment->id
+            )->with('info', 'You already have a pending payment.');
         }
 
-        $tranId = 'COMITS_' .
-            now()->format('YmdHis') .
-            '_' .
-            strtoupper(Str::random(8));
+        $tranId = 'COMITS-' . now()->format('YmdHis')
+            . '-' . strtoupper(Str::random(8));
+
         $payment = Payment::create([
-            'user_id'    => $user->id,
-            'company_id' => $user->company_id,
-            'package_id' => $package->id,
-            'tran_id'    => $tranId,
-            'amount'     => $package->price,
-            'currency'   => 'BDT',
-            'status'     => 'Pending',
+            'user_id'       => $user->id,
+            'company_id'    => $user->company_id,
+            'package_id'    => $package->id,
+            'tran_id'       => $tranId,
+            'amount'        => $package->price,
+            'currency'      => 'BDT',
+            'status'        => 'Pending',
         ]);
 
-        $apiUrl = config('services.sslcommerz.mode') === 'live'
-            ? 'https://securepay.sslcommerz.com/gwprocess/v4/api.php'
-            : 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php';
+        $baseUrl = config('services.sslcommerz.mode') === 'live'
+            ? 'https://securepay.sslcommerz.com'
+            : 'https://sandbox.sslcommerz.com';
+
         $data = [
             'store_id'       => config('services.sslcommerz.store_id'),
             'store_passwd'   => config('services.sslcommerz.store_password'),
-
             'total_amount'   => number_format(
-                (float) $package->price,
+                (float) $payment->amount,
                 2,
                 '.',
                 ''
             ),
             'currency'       => 'BDT',
-            'tran_id'        => $tranId,
-            'success_url'    => route('payment.sslcommerz.success'),
-            'fail_url'       => route('payment.sslcommerz.fail'),
-            'cancel_url'     => route('payment.sslcommerz.cancel'),
-            'ipn_url'        => route('payment.sslcommerz.ipn'),
-            'cus_name'       => $user->name ?? 'Customer',
-            'cus_email'      => $user->email ?? 'customer@example.com',
-            'cus_add1'       => 'Bangladesh',
-            'cus_city'       => 'Dhaka',
-            'cus_country'    => 'Bangladesh',
-            'cus_phone'      => $user->phone ?? '01700000000',
-            'product_name'      => $package->name,
+            'tran_id'        => $payment->tran_id,
+
+            'success_url' => route('payment.sslcommerz.success'),
+            'fail_url'    => route('payment.sslcommerz.fail'),
+            'cancel_url'  => route('payment.sslcommerz.cancel'),
+            'ipn_url'     => route('payment.sslcommerz.ipn'),
+
+            'cus_name'    => $user->name ?: 'Customer',
+            'cus_email'   => $user->email ?: 'customer@example.com',
+            'cus_add1'    => 'Bangladesh',
+            'cus_city'    => 'Dhaka',
+            'cus_country' => 'Bangladesh',
+            'cus_phone'   => $user->phone ?: '01700000000',
+
+            'product_name'     => $package->name,
             'product_category' => 'Software Subscription',
             'product_profile'  => 'general',
 
@@ -91,50 +100,41 @@ class SSLCommerzController extends Controller
             'value_b' => (string) $package->id,
             'value_c' => (string) $user->id,
             'value_d' => (string) ($user->company_id ?? ''),
+
+            'success_url' => config('services.sslcommerz.success_url'),
+            'fail_url'    => config('services.sslcommerz.fail_url'),
+            'cancel_url'  => config('services.sslcommerz.cancel_url'),
+            'ipn_url'     => config('services.sslcommerz.ipn_url'),
         ];
 
         try {
             $response = Http::asForm()
-                ->acceptJson()
                 ->timeout(30)
-                ->post($apiUrl, $data);
+                ->post($baseUrl . '/gwprocess/v4/api.php', $data);
 
-            if (!$response->successful()) {
-
-                $payment->update([
-                    'status' => 'Failed',
-                    'gateway_response' => $response->body(),
-                ]);
-
-                return back()->with(
-                    'error',
-                    'Unable to connect with SSLCommerz. Please try again.'
-                );
-            }
-
-            $result = $response->json();
+            $result = $response->json() ?? [];
 
             if (
-                ($result['status'] ?? null) === 'SUCCESS' &&
-                !empty($result['GatewayPageURL'])
+                $response->successful()
+                && ($result['status'] ?? '') === 'SUCCESS'
+                && !empty($result['GatewayPageURL'])
             ) {
                 return redirect()->away($result['GatewayPageURL']);
             }
+
             $payment->update([
                 'status' => 'Failed',
                 'gateway_response' => json_encode(
-                    $result,
+                    $result ?: ['response' => $response->body()],
                     JSON_UNESCAPED_UNICODE
                 ),
             ]);
 
-            return back()->with(
-                'error',
-                $result['failedreason']
-                    ?? 'Unable to initialize payment.'
-            );
-        } catch (\Throwable $e) {
-
+            return redirect()->route(
+                'payment.result',
+                $payment->id
+            )->with('error', 'Unable to initialize SSLCommerz payment.');
+        } catch (Throwable $e) {
             report($e);
 
             $payment->update([
@@ -142,512 +142,431 @@ class SSLCommerzController extends Controller
                 'gateway_response' => $e->getMessage(),
             ]);
 
-            return back()->with(
-                'error',
-                'Payment initialization failed. Please try again.'
-            );
+            return redirect()->route(
+                'payment.result',
+                $payment->id
+            )->with('error', 'Payment initialization failed.');
         }
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SUCCESS
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Customer returns from SSLCommerz after payment.
+     */
     public function success(Request $request)
     {
+        Log::info('SSLCommerz SUCCESS callback received', [
+            'tran_id' => $request->input('tran_id'),
+            'val_id' => $request->input('val_id'),
+            'ip' => $request->ip(),
+        ]);
         return $this->processPayment($request, false);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | IPN
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Server-to-server notification.
+     */
     public function ipn(Request $request)
     {
+        Log::info('SSLCommerz IPN received', [
+            'tran_id' => $request->input('tran_id'),
+            'val_id' => $request->input('val_id'),
+        ]);
         return $this->processPayment($request, true);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | FAIL
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Payment failed.
+     */
     public function fail(Request $request)
     {
-        $tranId = $request->input('tran_id');
+        $payment = Payment::where(
+            'tran_id',
+            $request->input('tran_id')
+        )->first();
 
-        if ($tranId) {
+        if ($payment) {
+            DB::transaction(function () use ($payment, $request) {
+                $locked = Payment::whereKey($payment->id)
+                    ->lockForUpdate()
+                    ->first();
 
-            Payment::where('tran_id', $tranId)
-                ->where('status', 'Pending')
-                ->update([
-                    'status' => 'Failed',
-                    'gateway_response' => json_encode(
-                        $request->all(),
-                        JSON_UNESCAPED_UNICODE
-                    ),
-                ]);
+                // Never downgrade a successfully paid transaction.
+                if ($locked && $locked->status === 'Pending') {
+                    $locked->update([
+                        'status' => 'Failed',
+                        'gateway_response' => json_encode(
+                            $request->all(),
+                            JSON_UNESCAPED_UNICODE
+                        ),
+                    ]);
+                }
+            });
         }
 
-        return redirect()
-            ->route('dashboard.index')
-            ->with(
-                'error',
-                'Payment failed. Please try again.'
-            );
+        if ($payment) {
+            return redirect()->route(
+                'payment.result',
+                $payment->id
+            )->with('error', 'Payment failed. Please try again.');
+        }
+
+        return redirect()->route('dashboard.index')
+            ->with('error', 'Payment failed or transaction not found.');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CANCEL
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Customer cancelled payment.
+     */
     public function cancel(Request $request)
     {
-        $tranId = $request->input('tran_id');
+        $payment = Payment::where(
+            'tran_id',
+            $request->input('tran_id')
+        )->first();
 
-        if ($tranId) {
+        if ($payment) {
+            DB::transaction(function () use ($payment, $request) {
+                $locked = Payment::whereKey($payment->id)
+                    ->lockForUpdate()
+                    ->first();
 
-            Payment::where('tran_id', $tranId)
-                ->where('status', 'Pending')
-                ->update([
-                    'status' => 'Cancelled',
-                    'gateway_response' => json_encode(
-                        $request->all(),
-                        JSON_UNESCAPED_UNICODE
-                    ),
-                ]);
+                if ($locked && $locked->status === 'Pending') {
+                    $locked->update([
+                        'status' => 'Cancelled',
+                        'gateway_response' => json_encode(
+                            $request->all(),
+                            JSON_UNESCAPED_UNICODE
+                        ),
+                    ]);
+                }
+            });
+
+            return redirect()->route(
+                'payment.result',
+                $payment->id
+            )->with('info', 'Payment was cancelled.');
         }
 
-        return redirect()
-            ->route('dashboard.index')
-            ->with(
-                'error',
-                'Payment was cancelled.'
-            );
+        return redirect()->route('dashboard.index')
+            ->with('info', 'Payment was cancelled.');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | PROCESS PAYMENT
-    |--------------------------------------------------------------------------
-    */
-
+    /**
+     * Validate transaction with SSLCommerz and activate subscription.
+     */
     private function processPayment(Request $request, bool $isIpn = false)
     {
         $tranId = $request->input('tran_id');
-        $valId  = $request->input('val_id');
+        $valId = $request->input('val_id');
 
         if (!$tranId || !$valId) {
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Invalid payment response.',
-                ], 400);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Invalid payment response.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Invalid payment response.',
+                null,
+                400
+            );
         }
 
         $payment = Payment::where('tran_id', $tranId)->first();
 
         if (!$payment) {
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment record not found.',
-                ], 404);
-            }
-
-            return redirect()
-                ->route('package.index')
-                ->with(
-                    'error',
-                    'Payment record not found.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment record not found.',
+                null,
+                404
+            );
         }
 
+        // Safe for repeated IPN / browser callback after success.
         if ($payment->status === 'Paid') {
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'SUCCESS',
-                    'message' => 'Payment already processed.',
-                ]);
-            }
-
-            return redirect()
-                ->route('payment.result', $payment->id)
-                ->with(
-                    'success',
-                    'Payment already processed successfully.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'SUCCESS',
+                'Payment already processed.',
+                $payment,
+                200
+            );
         }
 
-        $validationUrl = config('services.sslcommerz.mode') === 'live'
-            ? 'https://securepay.sslcommerz.com/validator/api/validationserverAPI.php'
-            : 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php';
+        // Do not reactivate a failed or cancelled payment.
+        if ($payment->status !== 'Pending') {
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment is not pending.',
+                $payment,
+                400
+            );
+        }
+
+        $baseUrl = config('services.sslcommerz.mode') === 'live'
+            ? 'https://securepay.sslcommerz.com'
+            : 'https://sandbox.sslcommerz.com';
 
         try {
-
-            $validationResponse = Http::timeout(30)
-                ->acceptJson()
-                ->get($validationUrl, [
+            $response = Http::timeout(30)->get(
+                $baseUrl . '/validator/api/validationserverAPI.php',
+                [
                     'val_id'       => $valId,
                     'store_id'     => config('services.sslcommerz.store_id'),
                     'store_passwd' => config('services.sslcommerz.store_password'),
                     'format'       => 'json',
-                ]);
+                ]
+            );
 
-            if (!$validationResponse->successful()) {
-
-                if ($isIpn) {
-                    return response()->json([
-                        'status' => 'FAILED',
-                        'message' => 'Unable to validate payment.',
-                    ], 502);
-                }
-
-                return redirect()
-                    ->route('dashboard.index')
-                    ->with(
-                        'error',
-                        'Unable to validate payment.'
-                    );
+            if (!$response->successful()) {
+                return $this->callbackResponse(
+                    $isIpn,
+                    'FAILED',
+                    'Unable to validate payment.',
+                    $payment,
+                    502
+                );
             }
 
-            $validated = $validationResponse->json();
-        } catch (\Throwable $e) {
-
+            $validated = $response->json() ?? [];
+        } catch (Throwable $e) {
             report($e);
 
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment validation failed.',
-                ], 500);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Payment validation failed.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment validation unavailable.',
+                $payment,
+                502
+            );
         }
 
         if (!in_array(
-            $validated['status'] ?? null,
+            $validated['status'] ?? '',
             ['VALID', 'VALIDATED'],
             true
         )) {
-
-            $payment->update([
-                'status' => 'Failed',
-                'val_id' => $valId,
-                'gateway_response' => json_encode(
-                    $validated,
-                    JSON_UNESCAPED_UNICODE
-                ),
-            ]);
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment validation failed.',
-                ], 400);
-            }
-
-            return redirect()
-                ->route('package.index')
-                ->with(
-                    'error',
-                    'Payment validation failed.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'SSLCommerz validation failed.',
+                $payment,
+                400
+            );
         }
 
-        if (($validated['tran_id'] ?? null) !== $payment->tran_id) {
-
-            $payment->update([
-                'status' => 'Failed',
-                'val_id' => $valId,
-                'gateway_response' => json_encode(
-                    $validated,
-                    JSON_UNESCAPED_UNICODE
-                ),
-            ]);
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Transaction ID mismatch.',
-                ], 400);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Transaction ID mismatch.'
-                );
+        // Verify transaction, amount, and currency independently.
+        if (($validated['tran_id'] ?? '') !== $payment->tran_id) {
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Transaction ID mismatch.',
+                $payment,
+                400
+            );
         }
 
         $gatewayAmount = number_format(
-            (float) ($validated['amount'] ?? 0),
+            (float) ($validated['amount'] ?? -1),
             2,
             '.',
             ''
         );
 
-        $paymentAmount = number_format(
+        $localAmount = number_format(
             (float) $payment->amount,
             2,
             '.',
             ''
         );
 
-        if ($gatewayAmount !== $paymentAmount) {
-
-            $payment->update([
-                'status' => 'Failed',
-                'val_id' => $valId,
-                'gateway_response' => json_encode(
-                    $validated,
-                    JSON_UNESCAPED_UNICODE
-                ),
-            ]);
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment amount mismatch.',
-                ], 400);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Payment amount mismatch.'
-                );
+        if ($gatewayAmount !== $localAmount) {
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment amount mismatch.',
+                $payment,
+                400
+            );
         }
-        if (($validated['currency'] ?? null) !== 'BDT') {
 
-            $payment->update([
-                'status' => 'Failed',
-                'val_id' => $valId,
-                'gateway_response' => json_encode(
-                    $validated,
-                    JSON_UNESCAPED_UNICODE
-                ),
-            ]);
-
-            if ($isIpn) {
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment currency mismatch.',
-                ], 400);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Payment currency mismatch.'
-                );
+        if (strtoupper($validated['currency'] ?? '') !== 'BDT') {
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment currency mismatch.',
+                $payment,
+                400
+            );
         }
+
         try {
+            $payment = DB::transaction(function () use (
+                $payment,
+                $valId,
+                $validated
+            ) {
+                $lockedPayment = Payment::whereKey($payment->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            DB::beginTransaction();
+                // Success callback and IPN may arrive concurrently.
+                if ($lockedPayment->status === 'Paid') {
+                    return $lockedPayment;
+                }
 
-            $payment = Payment::where('id', $payment->id)
-                ->lockForUpdate()
-                ->first();
+                if ($lockedPayment->status !== 'Pending') {
+                    throw new \RuntimeException(
+                        'Payment is no longer pending.'
+                    );
+                }
 
-            if (!$payment) {
-                throw new \Exception(
-                    'Payment record no longer exists.'
+                $package = Package::findOrFail(
+                    $lockedPayment->package_id
                 );
-            }
 
-            if ($payment->status === 'Paid') {
+                $today = Carbon::today();
 
-                DB::commit();
+                $currentQuery = CompanyPackage::where(
+                    'status',
+                    'Active'
+                )->where(function ($query) use ($today) {
+                    $query->whereNull('expire_date')
+                        ->orWhereDate('expire_date', '>=', $today);
+                });
 
-                if ($isIpn) {
-                    return response()->json([
-                        'status' => 'SUCCESS',
-                        'message' => 'Payment already processed.',
+                if ($lockedPayment->company_id) {
+                    $currentQuery->where(
+                        'company_id',
+                        $lockedPayment->company_id
+                    );
+                } else {
+                    $currentQuery->whereNull('company_id')
+                        ->where('user_id', $lockedPayment->user_id);
+                }
+
+                $currentPackage = $currentQuery
+                    ->orderByDesc('expire_date')
+                    ->lockForUpdate()
+                    ->first();
+
+                // Continue from the current expiry date when renewing.
+                $startDate = $today;
+
+                if ($currentPackage) {
+                    $currentName = strtolower(
+                        trim($currentPackage->package->name ?? '')
+                    );
+
+                    if (
+                        $currentName !== 'trial'
+                        && $currentPackage->expire_date
+                    ) {
+                        $startDate = Carbon::parse(
+                            $currentPackage->expire_date
+                        );
+                    }
+
+                    $currentPackage->update([
+                        'status' => 'Cancelled',
                     ]);
                 }
 
-                return redirect()
-                    ->route('dashboard.index', $payment->id)
-                    ->with(
-                        'success',
-                        'Payment already processed.'
-                    );
-            }
+                // Assumes every paid package lasts one month.
+                // Change this if your packages have different durations.
+                $expireDate = $startDate->copy()
+                    ->addMonthNoOverflow();
 
-            $package = Package::find($payment->package_id);
-
-            if (!$package) {
-                throw new \Exception(
-                    'Package not found.'
-                );
-            }
-
-            $userId = $payment->user_id;
-            $companyId = $payment->company_id;
-
-            $currentPackage = CompanyPackage::with('package')
-                ->where('user_id', $userId)
-                ->where('status', 'Active')
-                ->where(function ($query) {
-                    $query
-                        ->whereNull('expire_date')
-                        ->orWhereDate(
-                            'expire_date',
-                            '>=',
-                            Carbon::today()
-                        );
-                })
-                ->latest('expire_date')
-                ->lockForUpdate()
-                ->first();
-
-            if ($currentPackage) {
-
-                $currentPackageName = strtolower(
-                    trim(
-                        $currentPackage->package->name ?? ''
-                    )
-                );
-
-                if ($currentPackageName === 'trial') {
-
-                    $startDate = Carbon::today();
-                } else {
-
-                    $startDate = Carbon::parse(
-                        $currentPackage->expire_date
-                    );
-                }
-
-                $currentPackage->update([
-                    'status' => 'Cancelled',
+                CompanyPackage::create([
+                    'company_id' => $lockedPayment->company_id,
+                    'user_id'    => $lockedPayment->user_id,
+                    'package_id' => $package->id,
+                    'start_date' => $startDate->toDateString(),
+                    'expire_date' => $expireDate->toDateString(),
+                    'status' => 'Active',
                 ]);
-            } else {
 
-                $startDate = Carbon::today();
-            }
+                $lockedPayment->update([
+                    'val_id' => $valId,
+                    'status' => 'Paid',
+                    'payment_method' =>
+                    $validated['card_type']
+                        ?? $validated['card_brand']
+                        ?? $validated['payment_method']
+                        ?? null,
+                    'gateway_response' => json_encode(
+                        $validated,
+                        JSON_UNESCAPED_UNICODE
+                    ),
+                    'paid_at' => now(),
+                ]);
 
-            $expireDate = $startDate
-                ->copy()
-                ->addMonthNoOverflow();
+                return $lockedPayment->fresh();
+            });
 
-            CompanyPackage::create([
-                'company_id' => $companyId,
-                'user_id' => $userId,
-                'package_id' => $package->id,
-                'start_date' => $startDate->toDateString(),
-                'expire_date' => $expireDate->toDateString(),
-                'status' => 'Active',
-            ]);
-
-            $paymentMethod =
-                $validated['card_type']
-                ?? $validated['card_brand']
-                ?? $validated['payment_method']
-                ?? $request->input('card_type')
-                ?? $request->input('card_brand')
-                ?? null;
-
-            $payment->update([
-                'val_id' => $valId,
-
-                'status' => 'Paid',
-
-                'payment_method' => $paymentMethod,
-
-                'gateway_response' => json_encode(
-                    $validated,
-                    JSON_UNESCAPED_UNICODE
-                ),
-
-                'paid_at' => now(),
-            ]);
-
-            DB::commit();
-
-            if ($isIpn) {
-
-                return response()->json([
-                    'status' => 'SUCCESS',
-                    'message' => 'Payment processed successfully.',
-                    'tran_id' => $payment->tran_id,
-                ], 200);
-            }
-
-            return redirect()
-                ->route('payment.result', $payment->id)
-                ->with(
-                    'success',
-                    'Payment completed successfully. Your package is now active.'
-                );
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-
+            return $this->callbackResponse(
+                $isIpn,
+                'SUCCESS',
+                'Payment completed successfully.',
+                $payment,
+                200
+            );
+        } catch (Throwable $e) {
             report($e);
 
-            if ($isIpn) {
-
-                return response()->json([
-                    'status' => 'FAILED',
-                    'message' => 'Payment received but subscription activation failed.',
-                ], 500);
-            }
-
-            return redirect()
-                ->route('dashboard.index')
-                ->with(
-                    'error',
-                    'Payment was received but subscription activation failed. Please contact support.'
-                );
+            return $this->callbackResponse(
+                $isIpn,
+                'FAILED',
+                'Payment could not be processed. Please contact support.',
+                $payment,
+                500
+            );
         }
     }
 
+    /**
+     * IPN gets a server response; browser callbacks get a result-page redirect.
+     */
+    private function callbackResponse(
+        bool $isIpn,
+        string $status,
+        string $message,
+        ?Payment $payment,
+        int $httpStatus = 200
+    ) {
+        if ($isIpn) {
+            return response()->json([
+                'status' => $status,
+                'message' => $message,
+                'tran_id' => $payment?->tran_id,
+            ], $httpStatus);
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAYMENT RESULT
-    |--------------------------------------------------------------------------
-    */
+        if ($payment) {
+            $redirect = redirect()->route(
+                'payment.result',
+                $payment->id
+            );
 
+            if ($status === 'SUCCESS') {
+                return $redirect->with('success', $message);
+            }
+
+            return $redirect->with('error', $message);
+        }
+
+        return redirect()->route('dashboard.index')
+            ->with('error', $message);
+    }
+
+    /**
+     * Payment result page.
+     */
     public function result(Payment $payment)
     {
-        return view(
-            'BackEnd.Payment.result',
-            compact('payment')
-        );
+        // Optional authorization check can be added here if
+        // the result must only be visible to its owner.
+
+        return view('BackEnd.Payment.result', compact('payment'));
     }
 }

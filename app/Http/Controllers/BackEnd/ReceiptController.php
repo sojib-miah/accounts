@@ -230,6 +230,10 @@ class ReceiptController extends Controller
             }
 
             DB::commit();
+
+            if ($request->status === 'Draft') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Expense Receipt saved as Draft successfully.');
+            }
             return redirect()->route('receipt.show', $receipt->id)->with('success', 'Expense Receipt Created Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -394,6 +398,10 @@ class ReceiptController extends Controller
             }
             $receipt->save();
             DB::commit();
+
+            if ($request->status === 'Draft') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Expense Receipt saved as Draft successfully.');
+            }
             return redirect()->route('receipt.show', $receipt->id)->with('success', 'Receipt Updated Successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
