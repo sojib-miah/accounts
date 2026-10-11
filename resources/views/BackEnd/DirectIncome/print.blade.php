@@ -7,7 +7,8 @@
             Direct Income - {{ $receipt->receipt_no }}
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="{{ asset('uploads/settings/' . setting()->logo) }}" type="image/x-icon">
+        <link rel="icon" type="image/x-icon"
+            href="{{ optional(setting())->favaicon ? public_path('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
         <style>
             * {
                 box-sizing: border-box;

@@ -6,7 +6,8 @@
         <title>
             Direct Income - {{ $receipt->receipt_no }}
         </title>
-        <link rel="shortcut icon" href="{{ public_path('uploads/settings/' . setting()->logo) }}" type="image/x-icon">
+        <link rel="icon" type="image/x-icon"
+            href="{{ optional(setting())->favaicon ? public_path('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
         <style>
             @page {
                 size: A4 portrait;
