@@ -144,4 +144,20 @@
 
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('addBrandModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editBrandModal')).show();
+            });
+        </script>
+    @endif
 @endpush

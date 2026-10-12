@@ -62,4 +62,16 @@ class Receipt extends Model
     {
         return $this->belongsTo(CustomerCompany::class, 'customer_company_id');
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function ($model) {
+            if (
+                in_array($model->type, ['Expense', 'Sales-Order', 'Direct-Income'])
+                && $model->payment_status === 'Paid'
+            ) {
+                $model->status = 'Completed';
+            }
+        });
+    }
 }

@@ -411,13 +411,13 @@
                 <form action="{{ route('direct.income.payment.store', $receipt->id) }}" method="POST" id="paymentForm">
                     @csrf
                     <!-- Header -->
-                    <div class="modal-header text-white border-0 px-4 py-3">
+                    <div class="modal-header border-0 px-4 py-3">
                         <div>
                             <h4 class="modal-title fw-bold mb-1" id="paymentModalLabel">
                                 <i class="fa fa-money-bill-wave me-2"></i>
                                 Bill Payment
                             </h4>
-                            <small class="opacity-75">
+                            <small>
                                 Receipt No: {{ $receipt->receipt_no }}
                             </small>
                         </div>

@@ -195,7 +195,7 @@
                                     Today's Sales
                                 </span>
                                 <h3>
-                                    ৳ {{ number_format($todaySale, 2) }}
+                                    ৳ {{ number_format($todaySales, 2) }}
                                 </h3>
                             </div>
                             <div class="stat-icon">
@@ -214,7 +214,7 @@
                                     Today's Purchase
                                 </span>
                                 <h3>
-                                    ৳ {{ number_format($todayPurchase, 2) }}
+                                    ৳ {{ number_format($todayPurchases, 2) }}
                                 </h3>
                             </div>
                             <div class="stat-icon">
@@ -271,7 +271,7 @@
                                     Today's Expense
                                 </span>
                                 <h3>
-                                    ৳ {{ number_format($todayExpense, 2) }}
+                                    ৳ {{ number_format($todayExpenses, 2) }}
                                 </h3>
                             </div>
                             <div class="stat-icon">

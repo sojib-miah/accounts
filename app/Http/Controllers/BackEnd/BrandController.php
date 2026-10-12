@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class BrandController extends Controller
 {
@@ -60,8 +61,14 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:100|unique:brands,name',
+        $request->validateWithBag('add', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('brands', 'name')
+                    ->where('company_id', Auth::user()->company_id),
+            ],
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Inactive',
         ]);
@@ -105,15 +112,18 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
-        if (
-            !Auth::user()->hasRole('Super-Admin') &&
-            $brand->created_by != Auth::id()
-        ) {
+        if (!Auth::user()->hasRole('Super-Admin') && $brand->created_by != Auth::id()) {
             abort(404);
         }
 
-        $request->validate([
-            'name' => 'required|string|max:100|unique:brands,name,' . $brand->id,
+        $request->validateWithBag('edit', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('brands', 'name')
+                    ->where('company_id', Auth::user()->company_id),
+            ],
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Inactive',
         ]);

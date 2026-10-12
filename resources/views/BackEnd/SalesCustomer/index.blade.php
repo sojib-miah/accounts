@@ -65,12 +65,8 @@
                             @forelse($customerCompanies as $key => $company)
                                 <tr id="row-{{ $company->id }}">
                                     <td>{{ $key + 1 }}</td>
-                                    <td>
-                                        <strong>{{ $company->company->name ?? '-' }}</strong>
-                                    </td>
-                                    <td>
-                                        <strong>{{ $company->name ?? '-' }}</strong>
-                                    </td>
+                                    <td>{{ $company->company->name ?? '-' }}</td>
+                                    <td>{{ $company->name ?? '-' }}</td>
                                     <td>{{ $company->email ?? '-' }}</td>
                                     <td>{{ $company->phone ?? '-' }}</td>
                                     <td>{{ $company->address ?? '-' }}</td>
@@ -114,7 +110,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">
+                                    <td colspan="8" class="text-center text-muted py-4">
                                         No Customer Company Found
                                     </td>
                                 </tr>

@@ -172,7 +172,7 @@
                                                             View
                                                         </a>
                                                     </li>
-                                                    <li>
+                                                    {{-- <li>
                                                         <form action="{{ route('receipt.toggle-status', $receipt->id) }}"
                                                             method="POST">
                                                             @csrf
@@ -188,7 +188,7 @@
                                                                 @endif
                                                             </button>
                                                         </form>
-                                                    </li>
+                                                    </li> --}}
                                                     @if ($receipt->status != 'Cancelled')
                                                         <li>
                                                             <form action="{{ route('receipt.cancel', $receipt->id) }}"
@@ -202,7 +202,7 @@
                                                             </form>
                                                         </li>
                                                     @endif
-                                                    @if ($receipt->payment_status == 'Pending')
+                                                    {{-- @if ($receipt->payment_status == 'Pending')
                                                         <li>
                                                             <form action="{{ route('receipt.destroy', $receipt->id) }}"
                                                                 method="POST">
@@ -215,7 +215,7 @@
                                                                 </button>
                                                             </form>
                                                         </li>
-                                                    @endif
+                                                    @endif --}}
                                                 </ul>
                                             </div>
                                         </td>

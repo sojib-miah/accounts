@@ -150,7 +150,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="text-center">No Account Found</td>
+                                        <td colspan="13" class="text-center">No Account Found</td>
                                     </tr>
                                 @endforelse
                             </tbody>

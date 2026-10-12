@@ -19,13 +19,25 @@
                                 Brand Name
                                 <span class="text-danger">*</span>
                             </label>
-                            <input type="text" name="name" id="edit_name" class="form-control" required>
+                            <input type="text" name="name" id="edit_name"
+                                class="form-control {{ $errors->add->has('name') ? 'is-invalid' : '' }}" required>
+                            @error('name', 'edit')
+                                <div class="text-danger small mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
                                 Description
                             </label>
-                            <textarea name="description" id="edit_description" rows="4" class="form-control"></textarea>
+                            <textarea name="description" id="edit_description" rows="4"
+                                class="form-control {{ $errors->add->has('description') ? 'is-invalid' : '' }}"></textarea>
+                            @error('description', 'edit')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">

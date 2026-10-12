@@ -159,7 +159,7 @@
                                                             View
                                                         </a>
                                                     </li>
-                                                    <li>
+                                                    {{-- <li>
                                                         <form action="{{ route('receipt.toggle-status', $receipt->id) }}"
                                                             method="POST">
                                                             @csrf
@@ -175,7 +175,7 @@
                                                                 @endif
                                                             </button>
                                                         </form>
-                                                    </li>
+                                                    </li> --}}
                                                 </ul>
                                             </div>
                                         </td>

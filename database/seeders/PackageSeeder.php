@@ -36,11 +36,7 @@ class PackageSeeder extends Seeder
 
                 // 1 GB = 1024 MB
                 'storage_limit' => 1024,
-
-                'end_date' => now()->addDays(30),
-
                 'remarks' => 'Perfect for trying the system with basic features for 30 days.',
-
                 'is_active' => true,
             ]
         );
@@ -68,11 +64,7 @@ class PackageSeeder extends Seeder
 
                 // 5 GB = 5120 MB
                 'storage_limit' => 5120,
-
-                'end_date' => null,
-
                 'remarks' => 'Great for small and growing businesses with essential business management features.',
-
                 'is_active' => true,
             ]
         );
@@ -100,11 +92,7 @@ class PackageSeeder extends Seeder
 
                 // 20 GB = 20480 MB
                 'storage_limit' => 20480,
-
-                'end_date' => null,
-
                 'remarks' => 'Ideal for established businesses requiring higher limits and advanced business operations.',
-
                 'is_active' => true,
             ]
         );
@@ -132,11 +120,7 @@ class PackageSeeder extends Seeder
 
                 // 100 GB = 102400 MB
                 'storage_limit' => 102400,
-
-                'end_date' => null,
-
                 'remarks' => 'Designed for large organizations with unlimited business management capabilities.',
-
                 'is_active' => true,
             ]
         );

@@ -13,27 +13,29 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
+
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
                                 Brand Name
                                 <span class="text-danger">*</span>
                             </label>
                             <input type="text" name="name"
-                                class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}"
-                                placeholder="Enter Brand Name" required>
-                            @error('name')
-                                <div class="invalid-feedback">
+                                class="form-control {{ $errors->add->has('name') ? 'is-invalid' : '' }}"
+                                value="{{ old('name') }}" placeholder="Enter Brand Name" required>
+                            @error('name', 'add')
+                                <div class="text-danger small mt-1">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
+
                         <div class="col-md-12 mb-3">
                             <label class="form-label">
                                 Description
                             </label>
-                            <textarea name="description" rows="4" class="form-control @error('description') is-invalid @enderror"
-                                placeholder="Brand Description">{{ old('description') }}</textarea>
-                            @error('description')
+                            <textarea name="description" rows="4"
+                                class="form-control {{ $errors->add->has('description') ? 'is-invalid' : '' }}" placeholder="Brand Description">{{ old('description') }}</textarea>
+                            @error('description', 'add')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

@@ -662,108 +662,53 @@ class DirectIncomeController extends Controller
                     'This receipt has already been fully paid.'
                 );
             }
-
-            $amount = round(
-                (float) $request->amount,
-                2
-            );
-
+            $amount = round((float) $request->amount, 2);
             if ($amount <= 0) {
                 throw new \Exception(
                     'Payment amount must be greater than zero.'
                 );
             }
-
-            $dueAmount = round(
-                (float) $receipt->due_amount,
-                2
-            );
-
+            $dueAmount = round((float) $receipt->due_amount, 2);
             if ($dueAmount <= 0) {
                 throw new \Exception(
                     'This Direct Income has no outstanding due amount.'
                 );
             }
-
             if ($amount > $dueAmount) {
                 throw new \Exception(
-                    'Payment amount cannot be greater than due amount. ' .
-                        'Remaining Due: ' .
-                        number_format($dueAmount, 2)
+                    'Payment amount cannot be greater than due amount. ' . 'Remaining Due: ' . number_format($dueAmount, 2)
                 );
             }
-
-            $paymentType = PaymentType::where(
-                'id',
-                $request->payment_type_id
-            )
-                ->where('status', 'Active')
-                ->first();
-
+            $paymentType = PaymentType::where('id', $request->payment_type_id)->where('status', 'Active')->first();
             if (!$paymentType) {
-
                 throw new \Exception(
                     'Selected payment type is inactive or invalid.'
                 );
             }
-
-            $account = Account::where(
-                'id',
-                $request->account_id
-            )
-                ->where('status', 'Active')
-                ->lockForUpdate()
-                ->first();
-
+            $account = Account::where('id', $request->account_id)->where('status', 'Active')->lockForUpdate()->first();
             if (!$account) {
-
                 throw new \Exception(
                     'Selected account is inactive or invalid.'
                 );
             }
-
-            if (
-                (int) $account->payment_type_id !==
-                (int) $paymentType->id
-            ) {
-
+            if ((int) $account->payment_type_id !== (int) $paymentType->id) {
                 throw new \Exception(
                     'Selected account does not belong to the selected payment type.'
                 );
             }
-
-            if (
-                !$user->hasRole('Super-Admin') &&
-                (int) $account->company_id !==
-                (int) $user->company_id
-            ) {
-
+            if (!$user->hasRole('Super-Admin') && (int) $account->company_id !== (int) $user->company_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
 
-            if (
-                !$user->hasRole('Super-Admin') &&
-                (int) $account->branch_id !==
-                (int) $user->branch_id
-            ) {
-
+            if (!$user->hasRole('Super-Admin') && (int) $account->branch_id !== (int) $user->branch_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
-
-            $currentBalance = round(
-                (float) $account->current_balance,
-                2
-            );
-
-            $newBalance = round(
-                $currentBalance + $amount,
-                2
-            );
-
+            $currentBalance = round((float) $account->current_balance, 2);
+            $newBalance = round($currentBalance + $amount, 2);
             $account->update([
                 'current_balance' => $newBalance,
                 'updated_by'      => $userId,
@@ -774,9 +719,7 @@ class DirectIncomeController extends Controller
                 'transaction_date' => $request->payment_date,
                 'voucher_no'       => $receipt->so_no ?? $receipt->receipt_no,
                 'transaction_type' => 'Direct-Income',
-                'purpose'          =>
-                'Direct Income Payment - ' .
-                    $receipt->receipt_no,
+                'purpose'          => 'Direct Income Payment - ' . $receipt->receipt_no,
                 'credit'           => $amount,
                 'debit'            => 0,
                 'balance'          => $newBalance,
@@ -793,44 +736,21 @@ class DirectIncomeController extends Controller
                 'note'            => $request->note,
                 'created_by'      => $userId,
             ]);
-
-            $oldPaidAmount = round(
-                (float) $receipt->paid_amount,
-                2
-            );
-
-            $newPaidAmount = round(
-                $oldPaidAmount + $amount,
-                2
-            );
-
-            $totalAmount = round(
-                (float) $receipt->total_amount,
-                2
-            );
-
-            $newDueAmount = round(
-                $totalAmount - $newPaidAmount,
-                2
-            );
-
+            $oldPaidAmount = round((float) $receipt->paid_amount, 2);
+            $newPaidAmount = round($oldPaidAmount + $amount, 2);
+            $totalAmount = round((float) $receipt->total_amount, 2);
+            $newDueAmount = round($totalAmount - $newPaidAmount, 2);
             if ($newDueAmount < 0) {
                 $newDueAmount = 0;
             }
-
             if ($newDueAmount <= 0) {
-
                 $newDueAmount = 0;
-
                 $paymentStatus = 'Paid';
             } elseif ($newPaidAmount > 0) {
-
                 $paymentStatus = 'Partial';
             } else {
-
                 $paymentStatus = 'Pending';
             }
-
             $receipt->update([
                 'paid_amount'    => $newPaidAmount,
                 'due_amount'     => $newDueAmount,
