@@ -8,6 +8,7 @@ use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class ReceiverController extends Controller
@@ -63,9 +64,17 @@ class ReceiverController extends Controller
 
     public function store(Request $request)
     {
+        $companyId = Auth::user()->company_id;
+
         $request->validateWithBag('add', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name'               => 'nullable|max:255',
+            'name'               =>  [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('parties', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
             'address'            => 'nullable|string',
@@ -74,26 +83,14 @@ class ReceiverController extends Controller
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $current = Party::where('created_by', Auth::id())
-                ->where('type', 'Customer')
-                ->count();
-
+            $current = Party::where('created_by', Auth::id())->where('type', 'Customer')->count();
             if ($message = PackageHelper::checkLimit('party_limit', $current)) {
                 return back()->with('error', $message);
             }
             if ($request->filled('customer_company_id')) {
-
-                $customerCompany = CustomerCompany::where('id', $request->customer_company_id)
-                    ->where('created_by', Auth::id())
-                    ->first();
-
+                $customerCompany = CustomerCompany::where('id', $request->customer_company_id)->where('created_by', Auth::id())->first();
                 if (!$customerCompany) {
-                    return back()
-                        ->withInput()
-                        ->withErrors([
-                            'customer_company_id' => 'Invalid customer company selected.'
-                        ], 'add');
+                    return back()->withInput()->withErrors(['customer_company_id' => 'Invalid customer company selected.'], 'add');
                 }
             }
         }
@@ -118,16 +115,28 @@ class ReceiverController extends Controller
             'created_by'          => auth()->id(),
         ]);
 
-        return redirect()
-            ->route('receiver.index')
-            ->with('success', 'Customer Created Successfully.');
+        return redirect()->route('receiver.index')->with('success', 'Customer Created Successfully.');
     }
 
     public function update(Request $request, Party $party)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $party->company_id === (int) $companyId,
+            404
+        );
+
         $request->validateWithBag('edit', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name'               => 'nullable|max:255',
+            'name'               => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('parties', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($party->id),
+            ],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
             'address'            => 'nullable|string',

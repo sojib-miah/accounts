@@ -31,7 +31,7 @@
                         </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Customer Name</label>
+                            <label class="form-label">Customer Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control" value="{{ old('name') }}"
                                 placeholder="Enter Receiver Name">
                             @error('name', 'add')

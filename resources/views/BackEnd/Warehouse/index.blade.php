@@ -194,7 +194,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center py-5">
+                                    <td colspan="13" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="fa fa-search fa-2x mb-2"></i>
                                             <div class="fw-semibold">

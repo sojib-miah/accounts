@@ -10,6 +10,7 @@ use App\Models\PaymentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class AccountsController extends Controller
@@ -71,10 +72,18 @@ class AccountsController extends Controller
 
     public function store(Request $request)
     {
+        $companyId = Auth::user()->company_id;
+
         $request->validateWithBag('add', [
             'company_id'          => 'required|exists:companies,id',
             'branch_id'           => 'required|exists:branches,id',
-            'account_name'        => 'required|string|max:255',
+            'account_name'        =>  [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('accounts', 'account_name')
+                    ->where('company_id', $companyId),
+            ],
             'address'             => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
             'account_number'      => 'required|string|max:255|unique:accounts,account_number',
@@ -143,10 +152,24 @@ class AccountsController extends Controller
 
     public function update(Request $request, Account $account)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $account->company_id === (int) $companyId,
+            404
+        );
+
         $request->validateWithBag('edit', [
             'company_id'          => 'required|exists:companies,id',
             'branch_id'           => 'required|exists:branches,id',
-            'account_name'        => 'required|max:255',
+            'account_name'        => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('accounts', 'account_name')
+                    ->where('company_id', $companyId)
+                    ->ignore($account->id),
+            ],
             'address'             => 'required|string|max:255',
             'account_holder_name' => 'required|max:255',
             'account_number'      => 'required|max:255|unique:accounts,account_number,' . $account->id,

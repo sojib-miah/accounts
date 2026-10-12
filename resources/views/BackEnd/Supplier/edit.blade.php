@@ -28,35 +28,35 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('customer_company_id')
+                            @error('customer_company_id', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label>Supplier Name</label>
+                            <label>Supplier Name <span class="text-danger">*</span></label>
                             <input type="text" id="edit_name" name="name" class="form-control">
-                            @error('name')
+                            @error('name', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Designation</label>
                             <input type="text" id="edit_designation" name="designation" class="form-control">
-                            @error('designation')
+                            @error('designation', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Phone</label>
                             <input type="text" id="edit_phone" name="phone" class="form-control">
-                            @error('phone')
+                            @error('phone', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Email</label>
                             <input type="email" id="edit_email" name="email" class="form-control">
-                            @error('email')
+                            @error('email', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -70,7 +70,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -79,7 +79,7 @@
                                 Address
                             </label>
                             <textarea id="edit_address" name="address" class="form-control"></textarea>
-                            @error('address')
+                            @error('address', 'edit')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>

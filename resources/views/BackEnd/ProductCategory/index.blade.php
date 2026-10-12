@@ -126,9 +126,9 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label>Name</label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                                required>
-                            @error('name')
+                            <input type="text" name="name"
+                                class="form-control @error('name', 'add') is-invalid @enderror" required>
+                            @error('name', 'add')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -170,8 +170,8 @@
                         <div class="mb-3">
                             <label>Name</label>
                             <input type="text" name="name" id="edit_name"
-                                class="form-control @error('name') is-invalid @enderror" required>
-                            @error('name')
+                                class="form-control @error('name', 'edit') is-invalid @enderror" required>
+                            @error('name', 'edit')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -214,4 +214,20 @@
             });
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('createModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            });
+        </script>
+    @endif
 @endsection

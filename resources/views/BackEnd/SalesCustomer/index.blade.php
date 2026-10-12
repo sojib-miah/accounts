@@ -38,7 +38,7 @@
                         </a>
                     @endif
                 </form>
-                <button type="button" class="btn btn-primary" id="addCustomerCompany">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
                     <i class="fa fa-plus me-1"></i>
                     Add Customer Company
                 </button>
@@ -88,8 +88,8 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
-                                                    <button type="button" class="dropdown-item editCompany"
-                                                        data-id="{{ $company->id }}">
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#editCustomerModal{{ $company->id }}">
                                                         <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
@@ -124,71 +124,126 @@
             </div>
         </div>
     </div>
-    {{-- ADD / EDIT MODAL --}}
-    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+    {{-- ADD MODAL --}}
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customerCompanyModalTitle">
-                        <i class="fa fa-building me-2"></i>
-                        Add Customer Company
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="customerCompanyForm">
+                <form action="{{ route('customer-company.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" id="company_id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCustomerModalLabel">
+                            Add Customer Company
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Company Name
-                                    <span class="text-danger">
-                                        *
-                                    </span>
-                                </label>
-                                <input type="text" name="name" id="company_name" class="form-control"
-                                    placeholder="Enter company name" required>
-                                <div class="invalid-feedback" id="error-name"></div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Email
-                                </label>
-                                <input type="email" name="email" id="company_email" class="form-control"
-                                    placeholder="company@example.com">
-                                <div class="invalid-feedback" id="error-email"></div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Phone
-                                </label>
-                                <input type="text" name="phone" id="company_phone" class="form-control"
-                                    placeholder="Enter phone number">
-                                <div class="invalid-feedback" id="error-phone"></div>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">
-                                    Address
-                                </label>
-                                <textarea name="address" id="company_address" class="form-control" rows="3"
-                                    placeholder="Enter company address"></textarea>
-                                <div class="invalid-feedback" id="error-address"></div>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company Name *</label>
+                            <input type="text" name="name" value="{{ old('name') }}"
+                                class="form-control @error('name', 'add') is-invalid @enderror">
+                            @error('name', 'add')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" value="{{ old('email') }}"
+                                class="form-control @error('email', 'add') is-invalid @enderror">
+                            @error('email', 'add')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}"
+                                class="form-control @error('phone', 'add') is-invalid @enderror">
+                            @error('phone', 'add')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" rows="3" class="form-control @error('address', 'add') is-invalid @enderror">{{ old('address') }}</textarea>
+                            @error('address', 'add')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
-                    {{-- FOOTER --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-primary" id="saveCompanyBtn">
-                            <i class="fa fa-save me-1"></i>
-                            <span id="saveCompanyText">
-                                Save
-                            </span>
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- edit modal  --}}
+    <div class="modal fade" id="editCustomerModal{{ $company->id }}" tabindex="-1"
+        aria-labelledby="editCustomerModalLabel{{ $company->id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('customer-company.update', $company->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="_edit_company_id" value="{{ $company->id }}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCustomerModalLabel{{ $company->id }}">
+                            Edit Customer Company
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Company Name *</label>
+
+                            <input type="text" name="name"
+                                value="{{ old('_edit_company_id') == $company->id ? old('name') : $company->name }}"
+                                class="form-control @error('name', 'edit') is-invalid @enderror" required>
+
+                            @error('name', 'edit')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+
+                            <input type="email" name="email"
+                                value="{{ old('_edit_company_id') == $company->id ? old('email') : $company->email }}"
+                                class="form-control @error('email', 'edit') is-invalid @enderror">
+
+                            @error('email', 'edit')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+
+                            <input type="text" name="phone"
+                                value="{{ old('_edit_company_id') == $company->id ? old('phone') : $company->phone }}"
+                                class="form-control @error('phone', 'edit') is-invalid @enderror">
+
+                            @error('phone', 'edit')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+
+                            <textarea name="address" rows="3" class="form-control @error('address', 'edit') is-invalid @enderror">{{ old('_edit_company_id') == $company->id ? old('address') : $company->address }}</textarea>
+
+                            @error('address', 'edit')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form>
             </div>
@@ -198,313 +253,33 @@
 
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            let editMode = false;
-            $('#addCustomerCompany').on('click', function() {
-                editMode = false;
-                $('#customerCompanyForm')[0].reset();
-                $('#company_id').val('');
-                clearErrors();
-                $('#customerCompanyModalTitle').html(
-                    '<i class="fa fa-building me-2"></i> Add Customer Company'
-                );
-                $('#saveCompanyText').text('Save');
-                $('#customerCompanyModal')
-                    .modal('show');
+    @if ($errors->getBag('add')->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const modalElement = document.getElementById('addCustomerModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
+        </script>
+    @endif
 
-            $(document).on('click', '.editCompany', function() {
-                let id = $(this).data('id');
-                editMode = true;
-                clearErrors();
-                $('#customerCompanyForm')[0].reset();
-                $('#customerCompanyModalTitle').html(
-                    '<i class="fa fa-edit me-2"></i> Edit Customer Company'
-                );
-                $('#saveCompanyText').text('Update');
-                $('#customerCompanyModal')
-                    .modal('show');
-                $.ajax({
-                    url: "{{ url('admin/customer-company') }}/" +
-                        id,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            let data = response.data;
-                            $('#company_id')
-                                .val(data.id);
-
-                            $('#company_name')
-                                .val(data.name);
-
-                            $('#company_email')
-                                .val(data.email);
-
-                            $('#company_phone')
-                                .val(data.phone);
-
-                            $('#company_address')
-                                .val(data.address);
-
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message
-                            });
-
-                        }
-
-                    },
-
-                    error: function() {
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Unable to load customer company.'
-                        });
-
-                    }
-
-                });
-
-            });
-
-            $('#customerCompanyForm').on(
-                'submit',
-                function(e) {
-
-                    e.preventDefault();
-
-                    clearErrors();
-
-                    let id = $('#company_id').val();
-
-                    let url = editMode ?
-                        "{{ url('admin/customer-company') }}/" + id :
-                        "{{ route('customer-company.store') }}";
-
-                    let method = editMode ?
-                        'PUT' :
-                        'POST';
-
-
-                    let formData = {
-                        _token: "{{ csrf_token() }}",
-                        name: $('#company_name').val(),
-                        email: $('#company_email').val(),
-                        phone: $('#company_phone').val(),
-                        address: $('#company_address').val(),
-                    };
-                    if (editMode) {
-                        formData._method = 'PUT';
-                    }
-                    $('#saveCompanyBtn')
-                        .prop('disabled', true);
-                    $('#saveCompanyText')
-                        .text(
-                            editMode ?
-                            'Updating...' :
-                            'Saving...'
+    @if ($errors->getBag('edit')->any())
+        @foreach ($companies as $company)
+            @if (old('_edit_company_id') == $company->id)
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const modalElement = document.getElementById(
+                            'editCustomerModal{{ $company->id }}'
                         );
-                    $.ajax({
 
-                        url: url,
-
-                        type: 'POST',
-
-                        data: formData,
-
-                        success: function(response) {
-
-                            if (response.success) {
-
-                                $('#customerCompanyModal')
-                                    .modal('hide');
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    text: response.message,
-                                    timer: 3000,
-                                    showConfirmButton: false,
-                                    timerProgressBar: true
-                                }).then(function() {
-
-                                    location.reload();
-
-                                });
-
-                            }
-
-                        },
-
-                        error: function(xhr) {
-
-                            if (xhr.status === 422) {
-
-                                let errors =
-                                    xhr.responseJSON.errors;
-
-                                $.each(
-                                    errors,
-                                    function(field, messages) {
-
-                                        let input =
-                                            $('[name="' + field + '"]');
-
-                                        input.addClass(
-                                            'is-invalid'
-                                        );
-
-                                        $('#error-' + field)
-                                            .text(messages[0]);
-
-                                    }
-                                );
-
-                            } else {
-
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong.'
-                                });
-
-                            }
-
-                        },
-
-                        complete: function() {
-
-                            $('#saveCompanyBtn')
-                                .prop('disabled', false);
-
-                            $('#saveCompanyText')
-                                .text(
-                                    editMode ?
-                                    'Update' :
-                                    'Save'
-                                );
-
+                        if (modalElement) {
+                            bootstrap.Modal.getOrCreateInstance(modalElement).show();
                         }
-
                     });
-
-                }
-            );
-
-            $(document).on(
-                'click',
-                '.deleteCompany',
-                function() {
-
-                    let id = $(this).data('id');
-
-                    let name = $(this).data('name');
-
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Delete Company?',
-                        text: 'Are you sure you want to delete "' +
-                            name +
-                            '"?',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-
-                        confirmButtonText: 'Yes, Delete',
-
-                        cancelButtonText: 'Cancel'
-
-                    }).then(function(result) {
-
-                        if (!result.isConfirmed) {
-                            return;
-                        }
-
-
-                        $.ajax({
-
-                            url: "{{ url('admin/customer-company') }}/" +
-                                id,
-
-                            type: 'POST',
-
-                            data: {
-
-                                _token: "{{ csrf_token() }}",
-
-                                _method: 'DELETE'
-
-                            },
-
-                            success: function(response) {
-
-                                if (response.success) {
-
-                                    $('#row-' + id)
-                                        .fadeOut(
-                                            300,
-                                            function() {
-
-                                                $(this).remove();
-
-                                            }
-                                        );
-
-
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        text: response.message,
-                                        timer: 3000,
-                                        showConfirmButton: false,
-                                        timerProgressBar: true
-                                    });
-
-                                }
-
-                            },
-
-                            error: function(xhr) {
-
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Unable to delete company.'
-                                });
-                            }
-                        });
-
-                    });
-
-                }
-            );
-
-            function clearErrors() {
-                $('.is-invalid')
-                    .removeClass('is-invalid');
-                $('.invalid-feedback')
-                    .text('');
-            }
-
-            $(document).on(
-                'input change',
-                '#customerCompanyForm input, #customerCompanyForm textarea, #customerCompanyForm select',
-                function() {
-                    $(this)
-                        .removeClass('is-invalid');
-
-                }
-            );
-
-        });
-    </script>
+                </script>
+            @endif
+        @endforeach
+    @endif
 @endpush

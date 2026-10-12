@@ -32,7 +32,7 @@
                         </div>
                         <!-- Receiver Name -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Customer Name</label>
+                            <label class="form-label">Customer Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" id="edit_name" class="form-control">
                             @error('name', 'edit')
                                 <small class="text-danger">{{ $message }}</small>

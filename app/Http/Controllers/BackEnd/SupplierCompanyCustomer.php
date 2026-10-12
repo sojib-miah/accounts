@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SupplierCompanyCustomer extends Controller
 {
@@ -47,98 +48,72 @@ class SupplierCompanyCustomer extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $companyId = Auth::user()->company_id;
+
+        $validated = $request->validateWithBag('add', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('customer_companies', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
+        ], [
+            'name.unique' => 'This supplier company already exists.',
         ]);
-        try {
-            CustomerCompany::create([
-                'company_id' => Auth::user()->company_id,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'status' => 'Supplier',
-                'created_by' => Auth::id(),
-            ]);
-            return response()->json(['success' => true, 'message' => 'Supplier Company created successfully.',]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage(),], 500);
-        }
-    }
 
-    public function show(CustomerCompany $customerCompany)
-    {
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'id' => $customerCompany->id,
-                'name' => $customerCompany->name,
-                'email' => $customerCompany->email,
-                'phone' => $customerCompany->phone,
-                'address' => $customerCompany->address,
-                'status' => $customerCompany->status,
-            ],
+        CustomerCompany::create([
+            'company_id' => $companyId,
+            'name' => $validated['name'],
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'status' => 'Supplier',
+            'created_by' => Auth::id(),
         ]);
+
+        return redirect()->route('supplier-company.index')->with('success', 'Supplier Company created successfully.');
     }
 
     public function update(Request $request, CustomerCompany $customerCompany)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $customerCompany->company_id === (int) $companyId,
+            404
+        );
+
+        $validated = $request->validateWithBag('edit', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('customer_companies', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($customerCompany->id),
+            ],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
+        ], [
+            'name.unique' => 'This supplier company already exists.',
         ]);
 
-        try {
+        $customerCompany->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'updated_by' => Auth::id(),
+        ]);
 
-            $customerCompany->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'updated_by' => Auth::id(),
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Supplier Company updated successfully.',
-            ]);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
-        }
+        return redirect()->route('supplier-company.index')->with('success', 'Supplier Company updated successfully.');
     }
 
-    // public function destroy(CustomerCompany $customerCompany)
-    // {
-    //     try {
-    //         if ($customerCompany->parties()->exists()) {
-    //             return back()->with(
-    //                 'error',
-    //                 'This Supplier Company has customers. It cannot be deleted.'
-    //             );
-    //         }
-    //         $customerCompany->delete();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Supplier Company deleted successfully.',
-    //         ]);
-    //     } catch (\Exception $e) {
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
     public function destroy(CustomerCompany $customerCompany)
     {
         if ($customerCompany->parties()->exists()) {

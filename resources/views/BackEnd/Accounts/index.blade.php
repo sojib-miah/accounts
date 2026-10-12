@@ -246,7 +246,7 @@
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Account Address
+                                    Account Address <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="address" class="form-control" value="{{ old('address') }}">
                                 @error('address', 'add')
@@ -279,8 +279,8 @@
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Opening Balance</label>
-                                <input type="number" step="0.01" min="0" name="opening_balance"
+                                <label class="form-label">Opening Balance <span class="text-danger">*</span></label>
+                                <input type="number" step="1" min="0" name="opening_balance"
                                     class="form-control">
                                 @error('opening_balance', 'add')
                                     <small class="text-danger">{{ $message }}</small>
@@ -408,7 +408,7 @@
                             </div>
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Account Address</label>
+                                <label class="form-label">Account Address <span class="text-danger">*</span></label>
                                 <input type="text" name="address" id="edit_address" class="form-control">
                                 @error('address', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
@@ -440,8 +440,8 @@
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Opening Balance</label>
-                                <input type="number" step="0.01" min="0" name="opening_balance"
+                                <label class="form-label">Opening Balance <span class="text-danger">*</span></label>
+                                <input type="number" step="1" min="0" name="opening_balance"
                                     id="edit_opening_balance" class="form-control">
                                 @error('opening_balance', 'edit')
                                     <small class="text-danger">{{ $message }}</small>

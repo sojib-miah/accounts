@@ -122,7 +122,8 @@ class BrandController extends Controller
                 'string',
                 'max:100',
                 Rule::unique('brands', 'name')
-                    ->where('company_id', Auth::user()->company_id),
+                    ->where('company_id', Auth::user()->company_id)
+                    ->ignore($brand->id),
             ],
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Inactive',

@@ -276,7 +276,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         // customer company route
         Route::get('/customer-company', [CustomerCompanyController::class, 'index'])->name('customer-company.index');
         Route::post('/customer-company/store', [CustomerCompanyController::class, 'store'])->name('customer-company.store');
-        Route::get('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'show'])->name('customer-company.show');
         Route::put('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'update'])->name('customer-company.update');
         Route::delete('/customer-company/{customerCompany}', [CustomerCompanyController::class, 'destroy'])->name('customer-company.destroy');
 
@@ -288,7 +287,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
 
         Route::get('/supplier-company', [SupplierCompanyCustomer::class, 'index'])->name('supplier-company.index');
         Route::post('/supplier-company/store', [SupplierCompanyCustomer::class, 'store'])->name('supplier-company.store');
-        Route::get('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'show'])->name('supplier-company.show');
         Route::put('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'update'])->name('supplier-company.update');
         Route::delete('/supplier-company/{customerCompany}', [SupplierCompanyCustomer::class, 'destroy'])->name('supplier-company.destroy');
 

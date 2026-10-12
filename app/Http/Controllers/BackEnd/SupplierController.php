@@ -9,6 +9,7 @@ use App\Models\Party;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SupplierController extends Controller
 {
@@ -89,9 +90,17 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $companyId = Auth::user()->company_id;
+
+        $request->validateWithBag('add', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('parties', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'
@@ -137,11 +146,25 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Party $supplier)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $supplier->company_id === (int) $companyId,
+            404
+        );
+
         abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
 
-        $request->validate([
+        $request->validateWithBag('edit', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('parties', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($supplier->id),
+            ],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'

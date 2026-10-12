@@ -141,7 +141,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="13" class="text-center py-5">
+                                    <td colspan="14" class="text-center py-5">
                                         <i class="fa fa-box-open fa-2x text-muted"></i>
                                         <br>
                                         <span class="text-muted">No Inventory Found</span>

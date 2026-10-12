@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ProductCategoryController extends Controller
 {
@@ -57,8 +58,16 @@ class ProductCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
+        $companyId = Auth::user()->company_id;
+
+        $request->validateWithBag('add', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'status' => 'required'
         ]);
 
@@ -96,10 +105,24 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, Category $product_category)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $product_category->company_id === (int) $companyId,
+            404
+        );
+
         abort_if($product_category->type != 'Product', 404);
 
-        $request->validate([
-            'name' => 'required|max:255',
+        $request->validateWithBag('edit', [
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($product_category->id),
+            ],
             'status' => 'required'
         ]);
 

@@ -90,10 +90,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h6 class="text-white-50">
+                                    <h6 class="text-white">
                                         Total Records
                                     </h6>
-                                    <h3 class="fw-bold">
+                                    <h3 class="fw-bold text-white">
                                         {{ $receipts->total() }}
                                     </h3>
                                 </div>

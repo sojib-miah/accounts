@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AccountHeadController extends Controller
 {
@@ -50,9 +51,17 @@ class AccountHeadController extends Controller
 
     public function store(Request $request)
     {
+        $companyId = Auth::user()->company_id;
+
         $request->validateWithBag('add', [
             'category_id' => 'required|exists:categories,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('account_heads', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'status' => 'required|in:Active,Inactive',
         ]);
         AccountHead::create([
@@ -68,9 +77,23 @@ class AccountHeadController extends Controller
 
     public function update(Request $request, AccountHead $accountHead)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $accountHead->company_id === (int) $companyId,
+            404
+        );
+
         $request->validateWithBag('edit', [
             'category_id' => 'required|exists:categories,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('account_heads', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($accountHead->id),
+            ],
             'status' => 'required|in:Active,Inactive',
         ]);
 

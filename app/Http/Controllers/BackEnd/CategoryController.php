@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\ReceiptItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class CategoryController extends Controller
@@ -42,8 +43,16 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $companyId = Auth::user()->company_id;
+
         $request->validateWithBag('add', [
-            'name'   => 'required|max:255',
+            'name'   => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')
+                    ->where('company_id', $companyId),
+            ],
             'status' => 'required|in:Active,Inactive',
         ]);
 
@@ -72,8 +81,22 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
+        $companyId = Auth::user()->company_id;
+
+        abort_unless(
+            (int) $category->company_id === (int) $companyId,
+            404
+        );
+
         $request->validateWithBag('edit', [
-            'name'   => 'required|max:255',
+            'name'   => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')
+                    ->where('company_id', $companyId)
+                    ->ignore($category->id),
+            ],
             'status' => 'required|in:Active,Inactive',
         ]);
 

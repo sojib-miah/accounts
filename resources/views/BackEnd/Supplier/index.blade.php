@@ -68,12 +68,8 @@
                             <tr>
                                 <td>{{ $loop->iteration ?? '-' }}</td>
                                 <td>{{ $supplier->party_id ?? '-' }}</td>
-                                <td>
-                                    {{ $supplier->company->name ?? '-' }}
-                                </td>
-                                <td>
-                                    {{ $supplier->customerCompany->name ?? '-' }}
-                                </td>
+                                <td>{{ $supplier->company->name ?? '-' }}</td>
+                                <td>{{ $supplier->customerCompany->name ?? '-' }}</td>
                                 <td>{{ $supplier->name ?? '-' }}</td>
                                 <td>{{ $supplier->designation ?? '-' }}</td>
                                 <td>{{ $supplier->phone ?? '-' }}</td>
@@ -235,4 +231,20 @@
             });
         });
     </script>
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('createSupplierModal')).show();
+            });
+        </script>
+    @endif
+
+    @if ($errors->edit->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
+            });
+        </script>
+    @endif
 @endpush

@@ -27,35 +27,35 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('customer_company_id')
+                            @error('customer_company_id', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label>Supplier Name</label>
+                            <label>Supplier Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control" required>
-                            @error('name')
+                            @error('name', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Designation</label>
                             <input type="text" name="designation" class="form-control">
-                            @error('designation')
+                            @error('designation', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Phone</label>
                             <input type="text" name="phone" class="form-control">
-                            @error('phone')
+                            @error('phone', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Email</label>
                             <input type="email" name="email" class="form-control">
-                            @error('email')
+                            @error('email', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -69,7 +69,7 @@
                                     Inactive
                                 </option>
                             </select>
-                            @error('status')
+                            @error('status', 'add')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>

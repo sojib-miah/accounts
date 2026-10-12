@@ -9,6 +9,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class CompanyController extends Controller
@@ -35,14 +36,20 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('companies', 'name')
+                    ->where('created_by', Auth::id()),
+            ],
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
-        if (!Auth::user()->hasRole('Super-Admin')) {
 
+        if (!Auth::user()->hasRole('Super-Admin')) {
             $totalCompany = Company::where(function ($q) {
                 $q->where('created_by', Auth::id())
                     ->orWhere('id', Auth::user()->company_id);
@@ -96,7 +103,14 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company)
     {
         $request->validateWithBag('edit', [
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('companies', 'name')
+                    ->where('created_by', Auth::id())
+                    ->ignore($company->id),
+            ],
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

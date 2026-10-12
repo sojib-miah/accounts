@@ -39,7 +39,8 @@
                             </a>
                         @endif
                     </form>
-                    <button type="button" class="btn btn-primary" id="addCustomerCompany">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addCustomerCompanyModal">
                         <i class="fa fa-plus me-1"></i>
                         Add Supplier Company
                     </button>
@@ -66,12 +67,8 @@
                                 @forelse($customerCompanies as $key => $company)
                                     <tr id="row-{{ $company->id }}">
                                         <td>{{ $key + 1 }}</td>
-                                        <td>
-                                            <strong>{{ $company->company->name ?? '-' }}</strong>
-                                        </td>
-                                        <td>
-                                            <strong>{{ $company->name ?? '-' }}</strong>
-                                        </td>
+                                        <td>{{ $company->company->name ?? '-' }}</td>
+                                        <td>{{ $company->name ?? '-' }}</td>
                                         <td>{{ $company->email ?: '-' }}</td>
                                         <td>{{ $company->phone ?: '-' }}</td>
                                         <td>{{ $company->address ?: '-' }}</td>
@@ -85,8 +82,8 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
-                                                        <button type="button" class="dropdown-item editCompany"
-                                                            data-id="{{ $company->id }}">
+                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editCustomerCompanyModal{{ $company->id }}">
                                                             <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     </li>
@@ -123,387 +120,178 @@
             </div>
         </div>
     </div>
-    {{-- ADD / EDIT MODAL --}}
-    <div class="modal fade" id="customerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-        data-bs-keyboard="false">
+
+    {{-- ADD MODAL --}}
+
+    <div class="modal fade" id="addCustomerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customerCompanyModalTitle">
-                        <i class="fa fa-building me-2"></i>
-                        Add Supplier Company
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="customerCompanyForm">
+                <form action="{{ route('supplier-company.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" id="company_id">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fa fa-building me-2"></i>
+                            Add Supplier Company
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Company Name
-                                    <span class="text-danger">
-                                        *
-                                    </span>
+                                    Company Name <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="name" id="company_name" class="form-control"
+                                <input type="text" name="name" value="{{ $errors->add->any() ? old('name') : '' }}"
+                                    class="form-control @error('name', 'add') is-invalid @enderror"
                                     placeholder="Enter company name" required>
-                                <div class="invalid-feedback" id="error-name"></div>
+                                @error('name', 'add')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Email
-                                </label>
-                                <input type="email" name="email" id="company_email" class="form-control"
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" value="{{ $errors->add->any() ? old('email') : '' }}"
+                                    class="form-control @error('email', 'add') is-invalid @enderror"
                                     placeholder="company@example.com">
-                                <div class="invalid-feedback" id="error-email"></div>
+                                @error('email', 'add')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Phone
-                                </label>
-                                <input type="text" name="phone" id="company_phone" class="form-control"
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" value="{{ $errors->add->any() ? old('phone') : '' }}"
+                                    class="form-control @error('phone', 'add') is-invalid @enderror"
                                     placeholder="Enter phone number">
-                                <div class="invalid-feedback" id="error-phone"></div>
+                                @error('phone', 'add')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">
-                                    Address
-                                </label>
-                                <textarea name="address" id="company_address" class="form-control" rows="3"
-                                    placeholder="Enter company address"></textarea>
-                                <div class="invalid-feedback" id="error-address"></div>
+                                <label class="form-label">Address</label>
+                                <textarea name="address" rows="3" class="form-control @error('address', 'add') is-invalid @enderror"
+                                    placeholder="Enter company address">{{ $errors->add->any() ? old('address') : '' }}</textarea>
+                                @error('address', 'add')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
-                    {{-- FOOTER --}}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-primary" id="saveCompanyBtn">
-                            <i class="fa fa-save me-1"></i>
-                            <span id="saveCompanyText">
-                                Save
-                            </span>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    {{-- edit modal  --}}
+    @foreach ($customerCompanies as $company)
+        <div class="modal fade" id="editCustomerCompanyModal{{ $company->id }}" tabindex="-1" aria-hidden="true"
+            data-bs-backdrop="static">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="{{ route('supplier-company.update', $company->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fa fa-edit me-2"></i>
+                                Edit Supplier Company
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Company Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="name"
+                                        value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('name') : $company->name }}"
+                                        class="form-control {{ $errors->edit->has('name') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}"
+                                        required>
+                                    @if ($errors->edit->has('name') && old('_edit_id') == $company->id)
+                                        <div class="invalid-feedback">
+                                            {{ $errors->edit->first('name') }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email"
+                                        value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('email') : $company->email }}"
+                                        class="form-control {{ $errors->edit->has('email') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">
+                                    @if ($errors->edit->has('email') && old('_edit_id') == $company->id)
+                                        <div class="invalid-feedback">
+                                            {{ $errors->edit->first('email') }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" name="phone"
+                                        value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('phone') : $company->phone }}"
+                                        class="form-control {{ $errors->edit->has('phone') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">
+                                    @if ($errors->edit->has('phone') && old('_edit_id') == $company->id)
+                                        <div class="invalid-feedback">
+                                            {{ $errors->edit->first('phone') }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="address" rows="3"
+                                        class="form-control {{ $errors->edit->has('address') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('address') : $company->address }}</textarea>
+                                    @if ($errors->edit->has('address') && old('_edit_id') == $company->id)
+                                        <div class="invalid-feedback">
+                                            {{ $errors->edit->first('address') }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <input type="hidden" name="_edit_id" value="{{ $company->id }}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-1"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+
 @endsection
 
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            let editMode = false;
-            $('#addCustomerCompany').on('click', function() {
-                editMode = false;
-                $('#customerCompanyForm')[0].reset();
-                $('#company_id').val('');
-                clearErrors();
-                $('#customerCompanyModalTitle').html(
-                    '<i class="fa fa-building me-2"></i> Add Supplier Company'
-                );
-                $('#saveCompanyText').text('Save');
-                $('#customerCompanyModal')
-                    .modal('show');
+
+    @if ($errors->add->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(
+                    document.getElementById('addCustomerCompanyModal')
+                ).show();
             });
-
-            $(document).on('click', '.editCompany', function() {
-                let id = $(this).data('id');
-                editMode = true;
-                clearErrors();
-                $('#customerCompanyForm')[0].reset();
-                $('#customerCompanyModalTitle').html(
-                    '<i class="fa fa-edit me-2"></i> Edit Supplier Company'
+        </script>
+    @elseif ($errors->edit->any() && old('_edit_id'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let modal = document.getElementById(
+                    'editCustomerCompanyModal{{ old('_edit_id') }}'
                 );
-                $('#saveCompanyText').text('Update');
-                $('#customerCompanyModal')
-                    .modal('show');
-                $.ajax({
-                    url: "{{ url('admin/supplier-company') }}/" +
-                        id,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            let data = response.data;
-                            $('#company_id')
-                                .val(data.id);
 
-                            $('#company_name')
-                                .val(data.name);
-
-                            $('#company_email')
-                                .val(data.email);
-
-                            $('#company_phone')
-                                .val(data.phone);
-
-                            $('#company_address')
-                                .val(data.address);
-
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message
-                            });
-
-                        }
-
-                    },
-
-                    error: function() {
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Unable to load customer company.'
-                        });
-
-                    }
-
-                });
-
+                if (modal) {
+                    new bootstrap.Modal(modal).show();
+                }
             });
+        </script>
+    @endif
 
-            $('#customerCompanyForm').on(
-                'submit',
-                function(e) {
-
-                    e.preventDefault();
-
-                    clearErrors();
-
-                    let id = $('#company_id').val();
-
-                    let url = editMode ?
-                        "{{ url('admin/supplier-company') }}/" + id :
-                        "{{ route('supplier-company.store') }}";
-
-                    let method = editMode ?
-                        'PUT' :
-                        'POST';
-
-
-                    let formData = {
-                        _token: "{{ csrf_token() }}",
-                        name: $('#company_name').val(),
-                        email: $('#company_email').val(),
-                        phone: $('#company_phone').val(),
-                        address: $('#company_address').val(),
-                    };
-                    if (editMode) {
-                        formData._method = 'PUT';
-                    }
-                    $('#saveCompanyBtn')
-                        .prop('disabled', true);
-                    $('#saveCompanyText')
-                        .text(
-                            editMode ?
-                            'Updating...' :
-                            'Saving...'
-                        );
-                    $.ajax({
-
-                        url: url,
-
-                        type: 'POST',
-
-                        data: formData,
-
-                        success: function(response) {
-
-                            if (response.success) {
-
-                                $('#customerCompanyModal')
-                                    .modal('hide');
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    text: response.message,
-                                    timer: 3000,
-                                    showConfirmButton: false,
-                                    timerProgressBar: true
-                                }).then(function() {
-
-                                    location.reload();
-
-                                });
-
-                            }
-
-                        },
-
-                        error: function(xhr) {
-
-                            if (xhr.status === 422) {
-
-                                let errors =
-                                    xhr.responseJSON.errors;
-
-                                $.each(
-                                    errors,
-                                    function(field, messages) {
-
-                                        let input =
-                                            $('[name="' + field + '"]');
-
-                                        input.addClass(
-                                            'is-invalid'
-                                        );
-
-                                        $('#error-' + field)
-                                            .text(messages[0]);
-
-                                    }
-                                );
-
-                            } else {
-
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong.'
-                                });
-
-                            }
-
-                        },
-
-                        complete: function() {
-
-                            $('#saveCompanyBtn')
-                                .prop('disabled', false);
-
-                            $('#saveCompanyText')
-                                .text(
-                                    editMode ?
-                                    'Update' :
-                                    'Save'
-                                );
-
-                        }
-
-                    });
-
-                }
-            );
-
-            $(document).on(
-                'click',
-                '.deleteCompany',
-                function() {
-
-                    let id = $(this).data('id');
-
-                    let name = $(this).data('name');
-
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Delete Company?',
-                        text: 'Are you sure you want to delete "' +
-                            name +
-                            '"?',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-
-                        confirmButtonText: 'Yes, Delete',
-
-                        cancelButtonText: 'Cancel'
-
-                    }).then(function(result) {
-
-                        if (!result.isConfirmed) {
-                            return;
-                        }
-
-
-                        $.ajax({
-
-                            url: "{{ url('admin/supplier-company') }}/" +
-                                id,
-
-                            type: 'POST',
-
-                            data: {
-
-                                _token: "{{ csrf_token() }}",
-
-                                _method: 'DELETE'
-
-                            },
-
-                            success: function(response) {
-
-                                if (response.success) {
-
-                                    $('#row-' + id)
-                                        .fadeOut(
-                                            300,
-                                            function() {
-
-                                                $(this).remove();
-
-                                            }
-                                        );
-
-
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        text: response.message,
-                                        timer: 3000,
-                                        showConfirmButton: false,
-                                        timerProgressBar: true
-                                    });
-
-                                }
-
-                            },
-
-                            error: function(xhr) {
-
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Unable to delete company.'
-                                });
-                            }
-                        });
-
-                    });
-
-                }
-            );
-
-            function clearErrors() {
-                $('.is-invalid')
-                    .removeClass('is-invalid');
-                $('.invalid-feedback')
-                    .text('');
-            }
-
-            $(document).on(
-                'input change',
-                '#customerCompanyForm input, #customerCompanyForm textarea, #customerCompanyForm select',
-                function() {
-                    $(this)
-                        .removeClass('is-invalid');
-
-                }
-            );
-
-        });
-    </script>
 @endpush

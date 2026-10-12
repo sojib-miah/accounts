@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Receipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class BranchController extends Controller
@@ -54,16 +55,21 @@ class BranchController extends Controller
     {
         $request->validateWithBag('add', [
             'company_id' => 'required|exists:companies,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('branches', 'name')
+                    ->where('company_id', Auth::user()->company_id),
+            ],
             'phone_one' => 'required|max:30',
             'phone_two' => 'nullable|max:30',
             'email' => 'nullable|email',
             'address' => 'nullable'
         ]);
+
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             $totalBranch = Branch::where('company_id', Auth::user()->company_id)->count();
-
             if ($message = PackageHelper::checkLimit('branch_limit', $totalBranch)) {
                 return back()->with('error', $message);
             }
@@ -99,7 +105,14 @@ class BranchController extends Controller
     {
         $request->validateWithBag('edit', [
             'company_id' => 'required|exists:companies,id',
-            'name' => 'required|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('branches', 'name')
+                    ->where('company_id', Auth::user()->company_id)
+                    ->ignore($branch->id),
+            ],
             'phone_one' => 'required|max:30',
             'phone_two' => 'nullable|max:30',
             'email' => 'nullable|email',

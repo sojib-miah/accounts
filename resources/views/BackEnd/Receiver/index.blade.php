@@ -59,7 +59,6 @@
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Address</th>
-                                    {{-- <th>Type</th> --}}
                                     <th>Created By</th>
                                     <th>Created Date</th>
                                     <th>Status</th>
@@ -82,15 +81,6 @@
                                         <td>{{ $party->phone ?? '-' }}</td>
                                         <td>{{ $party->email ?? '-' }}</td>
                                         <td>{{ $party->address ?? '-' }}</td>
-                                        {{-- <td>
-                                            @if ($party->type == 'Income')
-                                                <span class="badge bg-success">Income</span>
-                                            @elseif($party->type == 'Expense')
-                                                <span class="badge bg-danger">Expense</span>
-                                            @else
-                                                <span class="badge bg-primary">Both</span>
-                                            @endif
-                                        </td> --}}
                                         <td>{{ $party->creator->name ?? '-' }}</td>
                                         <td>{{ $party->created_at ?? '-' }}</td>
                                         <td>
