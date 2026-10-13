@@ -8,7 +8,6 @@ use App\Models\Company;
 use App\Models\ReceiptItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class CategoryController extends Controller
@@ -46,30 +45,22 @@ class CategoryController extends Controller
         $companyId = Auth::user()->company_id;
 
         $request->validateWithBag('add', [
-            'name'   => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('categories', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name'   => ['required', 'string', 'max:100'],
             'status' => 'required|in:Active,Inactive',
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             $totalCompany = Category::where(function ($q) {
                 $q->where('created_by', Auth::id())
                     ->orWhere('company_id', Auth::user()->company_id);
             })->where('type', 'Expense')->count();
-
             if ($message = PackageHelper::checkLimit('category_limit', $totalCompany)) {
                 return back()->with('error', $message);
             }
         }
 
         Category::create([
-            'company_id' => auth()->user()->company_id,
+            'company_id' => $companyId,
             'name'        => $request->name,
             'type'        => 'Expense',
             'status'      => $request->status,
@@ -81,22 +72,8 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $companyId = Auth::user()->company_id;
-
-        abort_unless(
-            (int) $category->company_id === (int) $companyId,
-            404
-        );
-
         $request->validateWithBag('edit', [
-            'name'   => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('categories', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($category->id),
-            ],
+            'name'   => ['required', 'string', 'max:100'],
             'status' => 'required|in:Active,Inactive',
         ]);
 
@@ -112,13 +89,8 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         foreach ($category->accountHeads as $head) {
-
             if (ReceiptItem::where('account_head_id', $head->id)->exists()) {
-
-                return back()->with(
-                    'error',
-                    'This category has been used in transactions and cannot be deleted.'
-                );
+                return back()->with('error', 'This category has been used in transactions and cannot be deleted.');
             }
         }
 

@@ -7,7 +7,6 @@ use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class SupplierCompanyCustomer extends Controller
 {
@@ -51,18 +50,10 @@ class SupplierCompanyCustomer extends Controller
         $companyId = Auth::user()->company_id;
 
         $validated = $request->validateWithBag('add', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('customer_companies', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
-        ], [
-            'name.unique' => 'This supplier company already exists.',
         ]);
 
         CustomerCompany::create([
@@ -80,27 +71,11 @@ class SupplierCompanyCustomer extends Controller
 
     public function update(Request $request, CustomerCompany $customerCompany)
     {
-        $companyId = Auth::user()->company_id;
-
-        abort_unless(
-            (int) $customerCompany->company_id === (int) $companyId,
-            404
-        );
-
         $validated = $request->validateWithBag('edit', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('customer_companies', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($customerCompany->id),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
-        ], [
-            'name.unique' => 'This supplier company already exists.',
         ]);
 
         $customerCompany->update([

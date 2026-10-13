@@ -504,18 +504,19 @@
             <div class="section-title mt-5 mb-3">
                 <div>
                     <h5 class="fw-bold mb-0">
-                        Sales vs Purchase
+                        Sales, Purchase, Expense & Direct Income
                     </h5>
                 </div>
             </div>
-            {{-- SALES VS PURCHASE CHART --}}
+
+            {{-- SALES, PURCHASE, EXPENSE & DIRECT INCOME CHART --}}
             <div class="card dashboard-panel mt-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="fw-bold mb-0">
                                 <i class="fa fa-chart-line text-primary me-2"></i>
-                                Sales vs Purchase
+                                Sales, Purchase, Expense & Direct Income
                             </h5>
                             <small class="text-muted">
                                 Monthly comparison for the last 12 months
@@ -659,71 +660,104 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             const chartElement = document.getElementById('salesPurchaseChart');
+
             if (!chartElement) {
                 return;
             }
+
             const labels = @json($chartLabels);
             const salesData = @json($salesData);
             const purchaseData = @json($purchaseData);
+            const expenseData = @json($expenseData);
+            const directIncomeData = @json($directIncomeData);
+
             new Chart(chartElement, {
                 type: 'line',
+
                 data: {
                     labels: labels,
+
                     datasets: [{
-                            label: 'Sales',
+                            label: 'Sales-Order',
                             data: salesData,
                             borderColor: '#198754',
                             backgroundColor: 'rgba(25, 135, 84, 0.08)',
                             borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
+                            fill: false,
+                            tension: 0.35,
                             pointRadius: 4,
                             pointHoverRadius: 6
                         },
                         {
-                            label: 'Purchase',
+                            label: 'Purchase-Order',
                             data: purchaseData,
                             borderColor: '#dc3545',
                             backgroundColor: 'rgba(220, 53, 69, 0.08)',
                             borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Expense',
+                            data: expenseData,
+                            borderColor: '#fd7e14',
+                            backgroundColor: 'rgba(253, 126, 20, 0.08)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Direct-Income',
+                            data: directIncomeData,
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.08)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.35,
                             pointRadius: 4,
                             pointHoverRadius: 6
                         }
                     ]
                 },
+
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+
                     interaction: {
                         intersect: false,
                         mode: 'index'
                     },
+
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top'
                         },
+
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label +
-                                        ': ৳ ' +
-                                        Number(context.raw).toLocaleString(
-                                            'en-BD', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }
-                                        );
+                                    return context.dataset.label + ': ৳ ' +
+                                        Number(context.raw).toLocaleString('en-BD', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        });
                                 }
                             }
                         }
                     },
+
                     scales: {
                         y: {
                             beginAtZero: true,
+
                             ticks: {
                                 callback: function(value) {
                                     return '৳ ' +

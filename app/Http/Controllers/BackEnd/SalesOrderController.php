@@ -254,6 +254,7 @@ class SalesOrderController extends Controller
                     'product_id' => $productId,
                     'qty' => $qty,
                     'rate' => $rate,
+                    'cost_price' => (float) $product->purchase_price,
                     'amount' => $amount,
                     'details' => $request->details[$key] ?? null,
                 ]);
@@ -602,15 +603,15 @@ class SalesOrderController extends Controller
                         "No available serial number found for " . $product->name . " in the selected branch."
                     );
                 }
-                $receiptItem =
-                    ReceiptItem::create([
-                        'receipt_id' => $receipt->id,
-                        'product_id' => $productId,
-                        'qty' => $qty,
-                        'rate' => $rate,
-                        'amount' => $amount,
-                        'details' => $request->details[$key] ?? null,
-                    ]);
+                $receiptItem = ReceiptItem::create([
+                    'receipt_id' => $receipt->id,
+                    'product_id' => $productId,
+                    'qty' => $qty,
+                    'rate' => $rate,
+                    'cost_price' => (float) $product->purchase_price,
+                    'amount' => $amount,
+                    'details' => $request->details[$key] ?? null,
+                ]);
                 foreach ($serials as $serial) {
                     $serialRecord = SerialNumber::where('product_id', $productId)->where('serial_no', $serial)->where('status', 'Available')
                         ->where(function ($query) use ($companyId) {

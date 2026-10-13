@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class ProductCategoryController extends Controller
 {
@@ -61,18 +60,12 @@ class ProductCategoryController extends Controller
         $companyId = Auth::user()->company_id;
 
         $request->validateWithBag('add', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('categories', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'status' => 'required'
         ]);
 
         Category::create([
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $companyId,
             'name' => $request->name,
             'type' => 'Product',
             'status' => $request->status,
@@ -95,8 +88,6 @@ class ProductCategoryController extends Controller
      */
     public function edit(Category $product_category)
     {
-        abort_if($product_category->type != 'Product', 404);
-
         return response()->json($product_category);
     }
 
@@ -105,24 +96,8 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, Category $product_category)
     {
-        $companyId = Auth::user()->company_id;
-
-        abort_unless(
-            (int) $product_category->company_id === (int) $companyId,
-            404
-        );
-
-        abort_if($product_category->type != 'Product', 404);
-
         $request->validateWithBag('edit', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('categories', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($product_category->id),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'status' => 'required'
         ]);
 
@@ -140,8 +115,6 @@ class ProductCategoryController extends Controller
      */
     public function destroy(Category $product_category)
     {
-        abort_if($product_category->type != 'Product', 404);
-
         if ($product_category->products()->exists()) {
             return redirect()->route('product-category.index')->with('error', 'This category cannot be deleted because it is already used in one or more products.');
         }

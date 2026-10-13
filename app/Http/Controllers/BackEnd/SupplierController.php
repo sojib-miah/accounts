@@ -9,7 +9,6 @@ use App\Models\Party;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class SupplierController extends Controller
 {
@@ -80,9 +79,7 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return response()->json([
-            'supplier_id' => $this->generateSupplierId()
-        ]);
+        return response()->json(['supplier_id' => $this->generateSupplierId()]);
     }
 
     /**
@@ -90,17 +87,9 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        $companyId = Auth::user()->company_id;
-
         $request->validateWithBag('add', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('parties', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'
@@ -136,8 +125,6 @@ class SupplierController extends Controller
      */
     public function edit(Party $supplier)
     {
-        abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
-
         return response()->json($supplier);
     }
 
@@ -146,25 +133,9 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Party $supplier)
     {
-        $companyId = Auth::user()->company_id;
-
-        abort_unless(
-            (int) $supplier->company_id === (int) $companyId,
-            404
-        );
-
-        abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
-
         $request->validateWithBag('edit', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('parties', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($supplier->id),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
             'status' => 'required'
@@ -181,11 +152,7 @@ class SupplierController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        // return redirect()->route('supplier.index')->with('success', 'Supplier updated successfully.');
-        return response()->json([
-            'status' => true,
-            'message' => 'Supplier updated successfully.'
-        ]);
+        return response()->json(['status' => true, 'message' => 'Supplier updated successfully.']);
     }
 
     /**
@@ -193,18 +160,11 @@ class SupplierController extends Controller
      */
     public function destroy(Party $supplier)
     {
-        abort_if(!in_array($supplier->type, ['Supplier', 'Both']), 404);
         try {
             $supplier->delete();
-            return response()->json([
-                'status' => true,
-                'message' => 'Supplier deleted successfully.'
-            ]);
+            return response()->json(['status' => true, 'message' => 'Supplier deleted successfully.']);
         } catch (QueryException $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'This supplier is already used in transactions. You cannot delete it.'
-            ], 422);
+            return response()->json(['status' => false, 'message' => 'This supplier is already used in transactions. You cannot delete it.'], 422);
         }
     }
 }

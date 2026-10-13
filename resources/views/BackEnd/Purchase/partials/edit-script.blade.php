@@ -62,7 +62,7 @@
                             <td>
                                 ${index + 1}
                             </td>
-                            <td>
+                            <td class="text-uppercase">
                                 ${escapeHtml(serial)}
                             </td>
                             <td class="text-center">

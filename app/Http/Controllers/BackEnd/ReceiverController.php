@@ -8,7 +8,6 @@ use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use PackageHelper;
 
 class ReceiverController extends Controller
@@ -68,13 +67,7 @@ class ReceiverController extends Controller
 
         $request->validateWithBag('add', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name'               =>  [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('parties', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name'               =>  ['required', 'string', 'max:100'],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
             'address'            => 'nullable|string',
@@ -102,7 +95,7 @@ class ReceiverController extends Controller
         }
 
         Party::create([
-            'company_id'          => auth()->user()->company_id,
+            'company_id'          => $companyId,
             'customer_company_id' => $request->customer_company_id,
             'party_id'            => random_int(100000, 999999),
             'name'                => $request->name,
@@ -120,23 +113,9 @@ class ReceiverController extends Controller
 
     public function update(Request $request, Party $party)
     {
-        $companyId = Auth::user()->company_id;
-
-        abort_unless(
-            (int) $party->company_id === (int) $companyId,
-            404
-        );
-
         $request->validateWithBag('edit', [
             'customer_company_id' => 'nullable|exists:customer_companies,id',
-            'name'               => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('parties', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($party->id),
-            ],
+            'name'               => ['required', 'string', 'max:100'],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
             'address'            => 'nullable|string',
@@ -145,23 +124,13 @@ class ReceiverController extends Controller
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-
             if ($party->created_by != Auth::id()) {
                 return back()->with('error', 'You are not allowed to update this customer.');
             }
-
             if ($request->filled('customer_company_id')) {
-
-                $customerCompany = CustomerCompany::where('id', $request->customer_company_id)
-                    ->where('created_by', Auth::id())
-                    ->first();
-
+                $customerCompany = CustomerCompany::where('id', $request->customer_company_id)->where('created_by', Auth::id())->first();
                 if (!$customerCompany) {
-                    return back()
-                        ->withInput()
-                        ->withErrors([
-                            'customer_company_id' => 'Invalid customer company selected.'
-                        ], 'edit');
+                    return back()->withInput()->withErrors(['customer_company_id' => 'Invalid customer company selected.'], 'edit');
                 }
             }
         }
@@ -191,11 +160,7 @@ class ReceiverController extends Controller
     public function destroy(Party $party)
     {
         if ($party->receipts()->exists()) {
-
-            return redirect()->back()->with(
-                'error',
-                'This Party has receipts. It cannot be deleted.'
-            );
+            return redirect()->back()->with('error', 'This Party has receipts. It cannot be deleted.');
         }
         $party->delete();
         return redirect()->route('receiver.index')->with('success', 'Receiver Deleted Successfully.');

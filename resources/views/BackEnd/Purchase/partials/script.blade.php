@@ -113,7 +113,7 @@
                             <td>
                                 ${index + 1}
                             </td>
-                            <td>
+                            <td class="text-uppercase">
                                 ${safeSerial}
                             </td>
                             <td class="text-center">

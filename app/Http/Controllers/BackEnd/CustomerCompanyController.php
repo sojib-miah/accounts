@@ -7,7 +7,6 @@ use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class CustomerCompanyController extends Controller
 {
@@ -51,13 +50,7 @@ class CustomerCompanyController extends Controller
         $companyId = Auth::user()->company_id;
 
         $validated = $request->validateWithBag('add', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('customer_companies', 'name')
-                    ->where('company_id', $companyId),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
@@ -78,26 +71,12 @@ class CustomerCompanyController extends Controller
 
     public function update(Request $request, CustomerCompany $customerCompany)
     {
-        abort_unless(
-            (int) $customerCompany->company_id === (int) Auth::user()->company_id,
-            404
-        );
-
         $request->merge([
             '_edit_company_id' => $customerCompany->id,
         ]);
 
-        $companyId = Auth::user()->company_id;
-
         $validated = $request->validateWithBag('edit', [
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('customer_companies', 'name')
-                    ->where('company_id', $companyId)
-                    ->ignore($customerCompany->id),
-            ],
+            'name' => ['required', 'string', 'max:100'],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
@@ -111,9 +90,7 @@ class CustomerCompanyController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()
-            ->route('customer-company.index')
-            ->with('success', 'Customer Company updated successfully.');
+        return redirect()->route('customer-company.index')->with('success', 'Customer Company updated successfully.');
     }
 
     public function destroy(CustomerCompany $customerCompany)
