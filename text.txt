@@ -1,2 +1,0 @@
-ALTER TABLE `receipt_items`
-ADD COLUMN `cost_price` DECIMAL(15,2) NOT NULL DEFAULT 0.00 AFTER `rate`;

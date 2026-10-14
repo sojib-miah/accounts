@@ -187,10 +187,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            Save
+                            <i class="fa fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
@@ -218,7 +218,8 @@
                                 <label class="form-label">
                                     Company Name
                                 </label>
-                                <input type="text" name="name" id="edit_name" class="form-control" required>
+                                <input type="text" name="name" id="edit_name" value="{{ old('name') }}"
+                                    class="form-control" required>
                                 @error('name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -275,7 +276,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-save me-1"></i>
@@ -292,17 +293,13 @@
     <script>
         document.querySelectorAll('.editBtn').forEach(function(button) {
             button.addEventListener('click', function() {
-                document.getElementById('edit_name').value = this.dataset.name;
-                document.getElementById('edit_logo_preview').src =
-                    this.dataset.logo;
-                document.getElementById('edit_hologram_preview').src =
-                    this.dataset.hologram;
-                document.getElementById('edit_seal_preview').src =
-                    this.dataset.seal;
-                document.getElementById('edit_signature_preview').src =
-                    this.dataset.signature;
-                document.getElementById('editForm').action =
-                    "{{ url('/admin/company/update') }}/" + this.dataset.id;
+                document.getElementById('edit_name').value = "{{ old('name') }}" || this.dataset.name;
+                document.getElementById('edit_logo_preview').src = this.dataset.logo;
+                document.getElementById('edit_hologram_preview').src = this.dataset.hologram;
+                document.getElementById('edit_seal_preview').src = this.dataset.seal;
+                document.getElementById('edit_signature_preview').src = this.dataset.signature;
+                document.getElementById('editForm').action = "{{ url('/admin/company/update') }}/" + this
+                    .dataset.id;
                 new bootstrap.Modal(
                     document.getElementById('editCompanyModal')
                 ).show();

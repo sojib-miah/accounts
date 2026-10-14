@@ -82,8 +82,8 @@
                                                             data-company="{{ $branch->company_id }}"
                                                             data-branch="{{ $branch->branch_id }}"
                                                             data-name="{{ $branch->name }}"
-                                                            data-phone1="{{ $branch->phone_one }}"
-                                                            data-phone2="{{ $branch->phone_two }}"
+                                                            data-phone_one="{{ $branch->phone_one }}"
+                                                            data-phone_two="{{ $branch->phone_two }}"
                                                             data-email="{{ $branch->email }}"
                                                             data-address="{{ $branch->address }}">
                                                             <i class="fa fa-edit"></i> Edit
@@ -139,7 +139,8 @@
                                 <select name="company_id" class="form-select select2" data-allow-clear="true" required>
                                     <option value="">Select Company</option>
                                     @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
+                                        <option {{ old('company_id') == $company->id ? 'selected' : '' }}
+                                            value="{{ $company->id }}">
                                             {{ $company->name }}
                                         </option>
                                     @endforeach
@@ -189,10 +190,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            Save
+                            <i class="fa fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
@@ -205,7 +206,7 @@
         data-bs-keyboard="false">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editForm" method="POST">
+                <form id="editForm" method="POST" action="{{ route('branch.update', $branch->id) }}">
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
@@ -219,7 +220,8 @@
                                 <select name="company_id" id="edit_company_id" class="form-select select2" required>
                                     <option value="">Select Company</option>
                                     @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
+                                        <option {{ old('company_id') == $company->id ? 'selected' : '' }}
+                                            value="{{ $company->id }}">
                                             {{ $company->name }}
                                         </option>
                                     @endforeach
@@ -230,36 +232,39 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Branch Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="edit_name" class="form-control" required>
+                                <input type="text" name="name" value="{{ old('name') }}" id="edit_name"
+                                    class="form-control" required>
                                 @error('name', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone One <span class="text-danger">*</span></label>
-                                <input type="text" name="phone_one" id="edit_phone_one" class="form-control"
-                                    required>
+                                <input type="text" name="phone_one" value="{{ old('phone_one') }}"
+                                    id="edit_phone_one" class="form-control" required>
                                 @error('phone_one', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone Two</label>
-                                <input type="text" name="phone_two" id="edit_phone_two" class="form-control">
+                                <input type="text" name="phone_two" id="edit_phone_two"
+                                    value="{{ old('phone_two') }}" class="form-control">
                                 @error('phone_two', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" id="edit_email" class="form-control">
+                                <input type="email" name="email" id="edit_email" class="form-control"
+                                    value="{{ old('email') }}">
                                 @error('email', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Address</label>
-                                <textarea name="address" id="edit_address" class="form-control" rows="3"></textarea>
+                                <textarea name="address" id="edit_address" class="form-control" rows="3">{{ old('address') }}</textarea>
                                 @error('address', 'edit')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -268,10 +273,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-success">
-                            Update Branch
+                            <i class="fa fa-save me-1"></i> Update Branch
                         </button>
                     </div>
                 </form>
@@ -285,17 +290,16 @@
         document.querySelectorAll('.editBtn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 $('#edit_company_id').val(this.dataset.company).trigger('change');
-                document.getElementById('edit_name').value = this.dataset.name;
-                document.getElementById('edit_phone_one').value = this.dataset.phone1;
-                document.getElementById('edit_phone_two').value = this.dataset.phone2;
-                document.getElementById('edit_email').value = this.dataset.email;
-                document.getElementById('edit_address').value = this.dataset.address;
-                document.getElementById('editForm').action = "{{ url('/admin/branch') }}/" + this.dataset
-                    .id;
-                var editModal = new bootstrap.Modal(
+
+                document.getElementById('edit_name').value = this.dataset.name || '';
+                document.getElementById('edit_phone_one').value = this.dataset.phone_one || '';
+                document.getElementById('edit_phone_two').value = this.dataset.phone_two || '';
+                document.getElementById('edit_email').value = this.dataset.email || '';
+                document.getElementById('edit_address').value = this.dataset.address || '';
+
+                bootstrap.Modal.getOrCreateInstance(
                     document.getElementById('editBranchModal')
-                );
-                editModal.show();
+                ).show();
             });
         });
     </script>

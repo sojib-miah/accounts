@@ -311,12 +311,21 @@
                     @endif
 
                     @if ($receipt->payment_status != 'Paid')
-                        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
-                            <i class="fa fa-money-bill-wave me-2"></i>
-                            Bill Pay
-                        </button>
+                        @if ($receipt->is_challan && $receipt->is_invoice)
+                            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                <i class="fa fa-money-bill-wave me-2"></i>
+                                Bill Pay
+                            </button>
+                        @else
+                            <button type="button" class="btn btn-primary btn-lg"
+                                onclick="alert('Please create Challan and Invoice first, then you can make payment.')">
+                                <i class="fa fa-money-bill-wave me-2"></i>
+                                Bill Pay
+                            </button>
+                        @endif
                     @endif
-                    @if ($receipt->status != 'Cancelled' && !$receipt->is_invoice)
+
+                    @if ($receipt->status != 'Cancelled' && $receipt->status != 'Paid' && !$receipt->is_invoice)
                         @can('income-receipt-edit')
                             <a href="{{ route('sales.order.edit', $receipt->id) }}"
                                 class="btn btn-warning btn-lg text-white">

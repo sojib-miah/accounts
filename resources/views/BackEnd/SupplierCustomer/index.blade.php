@@ -122,7 +122,6 @@
     </div>
 
     {{-- ADD MODAL --}}
-
     <div class="modal fade" id="addCustomerCompanyModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -177,7 +176,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                class="fa-solid fa-xmark me-1"></i> Close</button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-save me-1"></i> Save
                         </button>
@@ -255,7 +255,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                    class="fa-solid fa-xmark me-1"></i> Close</button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fa fa-save me-1"></i> Update
                             </button>
