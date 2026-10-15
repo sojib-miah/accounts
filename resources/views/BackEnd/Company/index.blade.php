@@ -6,25 +6,22 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Company List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Company List</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('company.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
-
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
                             placeholder="Search Company">
-
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
                             Search
                         </button>
-
                         @if (request('search'))
                             <a href="{{ route('company.index') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i>
                                 Reset
                             </a>
                         @endif
-
                     </form>
                     @can('company-create')
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
@@ -96,12 +93,8 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     @can('company-edit')
-                                                        <button class="dropdown-item editBtn" data-id="{{ $company->id }}"
-                                                            data-name="{{ $company->name }}"
-                                                            data-logo="{{ asset($company->logo) }}"
-                                                            data-hologram="{{ asset($company->hologram) }}"
-                                                            data-seal="{{ asset($company->seal) }}"
-                                                            data-signature="{{ asset($company->signature) }}">
+                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editCompanyModal{{ $company->id }}">
                                                             <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     @endcan
@@ -131,7 +124,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 pe-3 ps-3">
+                <div class="p-3">
                     {{ $companies->links() }}
                 </div>
             </div>
@@ -145,43 +138,49 @@
                 <form action="{{ route('company.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5>Add Company</h5>
+                        <h5><i class="fa fa-plus me-2"></i> Add Company</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Company Name</label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                            <label>Company Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" placeholder="Company Name..."
+                                class="form-control @error('name', 'add') is-invalid @enderror" value="{{ old('name') }}"
+                                required>
                             @error('name', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Logo</label>
-                            <input type="file" name="logo" class="form-control">
+                            <input type="file" name="logo"
+                                class="form-control @error('logo', 'add') is-invalid @enderror">
                             @error('logo', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Hologram</label>
-                            <input type="file" name="hologram" class="form-control">
+                            <input type="file" name="hologram"
+                                class="form-control @error('hologram', 'add') is-invalid @enderror">
                             @error('hologram', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Seal</label>
-                            <input type="file" name="seal" class="form-control">
+                            <input type="file" name="seal"
+                                class="form-control @error('seal', 'add') is-invalid @enderror">
                             @error('seal', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label>Signature</label>
-                            <input type="file" name="signature" class="form-control">
+                            <input type="file" name="signature"
+                                class="form-control @error('signature', 'add') is-invalid @enderror">
                             @error('signature', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                     </div>
@@ -199,126 +198,86 @@
     </div>
 
     <!-- Edit Company Modal -->
-    <div class="modal fade" id="editCompanyModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="editForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            Edit Company
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal">
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">
-                                    Company Name
-                                </label>
-                                <input type="text" name="name" id="edit_name" value="{{ old('name') }}"
-                                    class="form-control" required>
-                                @error('name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Logo -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Logo
-                                </label>
-                                <input type="file" name="logo" class="form-control">
-                                @error('logo', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                                <img id="edit_logo_preview" src="" class="mt-2 border rounded" width="100"
-                                    height="100">
-                            </div>
-                            <!-- Hologram -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Hologram
-                                </label>
-                                <input type="file" name="hologram" class="form-control">
-                                @error('hologram', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                                <img id="edit_hologram_preview" src="" class="mt-2 border rounded"
-                                    width="100" height="100">
-                            </div>
-                            <!-- Seal -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Seal
-                                </label>
-                                <input type="file" name="seal" class="form-control">
-                                @error('seal', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                                <img id="edit_seal_preview" src="" class="mt-2 border rounded" width="100"
-                                    height="100">
-                            </div>
-                            <!-- Signature -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Signature
-                                </label>
-                                <input type="file" name="signature" class="form-control">
-                                @error('signature', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                                <img id="edit_signature_preview" src="" class="mt-2 border rounded"
-                                    width="150" height="100">
+    @foreach ($companies as $company)
+        <div class="modal fade" id="editCompanyModal{{ $company->id }}" tabindex="-1" data-bs-backdrop="static"
+            data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('company.update', $company->id) }}"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fa fa-edit me-2"></i> Edit Company
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name"
+                                        value="{{ session('edit_company_id') == $company->id && $errors->getBag('edit')->any() ? old('name', $company->name) : $company->name }}"
+                                        class="form-control @error('name', 'edit') is-invalid @enderror"
+                                        placeholder="Company Name..." required>
+                                    @error('name', 'edit')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                @foreach (['logo' => 'Logo', 'hologram' => 'Hologram', 'seal' => 'Seal', 'signature' => 'Signature'] as $field => $label)
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">{{ $label }}</label>
+                                        <input type="file" name="{{ $field }}" class="form-control"
+                                            accept=".jpg,.jpeg,.png,.webp">
+                                        @error($field, 'edit')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                        @if ($company->$field)
+                                            <img src="{{ asset($company->$field) }}" class="mt-2 border rounded"
+                                                width="100" height="100" alt="{{ $label }}">
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fa-solid fa-xmark me-1"></i> Close
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save me-1"></i>
-                            Update Company
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa fa-close me-1"></i> Close
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save me-1"></i> Update Company
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                document.getElementById('edit_name').value = "{{ old('name') }}" || this.dataset.name;
-                document.getElementById('edit_logo_preview').src = this.dataset.logo;
-                document.getElementById('edit_hologram_preview').src = this.dataset.hologram;
-                document.getElementById('edit_seal_preview').src = this.dataset.seal;
-                document.getElementById('edit_signature_preview').src = this.dataset.signature;
-                document.getElementById('editForm').action = "{{ url('/admin/company/update') }}/" + this
-                    .dataset.id;
-                new bootstrap.Modal(
-                    document.getElementById('editCompanyModal')
-                ).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addCompanyModal')).show();
+                const modal = document.getElementById('addCompanyModal');
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_company_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editCompanyModal')).show();
+                const companyId = @json(session('edit_company_id'));
+                const modal = document.getElementById('editCompanyModal' + companyId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

@@ -1,12 +1,12 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Supplier List')
+@section('title', 'Manage Supplier List')
 
 @section('content')
     <div class="p-5">
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between">
-                <h4>Supplier List</h4>
+                <h4><i class="fa-solid fa-list-ul me-2"></i> Supplier List</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('supplier.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Customer">
+                                placeholder="Search Customer...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -31,6 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('supplier.index') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i>
                                 Reset
                             </a>
                         @endif
@@ -48,7 +49,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>SL</th>
+                            <th>SN</th>
                             <th>Supplier ID</th>
                             <th>Company</th>
                             <th>Supplier Company</th>
@@ -86,18 +87,24 @@
                                         <ul class="dropdown-menu dropdown-menu-end shadow">
                                             <li class="mb-2">
                                                 @can('supplier-edit')
-                                                    <button type="button" class="dropdown-item editSupplier"
-                                                        data-id="{{ $supplier->id }}">
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#editSupplierModal{{ $supplier->id }}">
                                                         <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 @endcan
                                             </li>
                                             <li>
                                                 @can('supplier-delete')
-                                                    <button class="dropdown-item text-danger deleteSupplier"
-                                                        data-id="{{ $supplier->id }}">
-                                                        <i class="fa fa-trash"></i> Delete
-                                                    </button>
+                                                    <form action="{{ route('supplier.destroy', $supplier->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this supplier?');">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="fa fa-trash me-1"></i> Delete
+                                                        </button>
+                                                    </form>
                                                 @endcan
                                             </li>
                                         </ul>
@@ -111,7 +118,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                <div class="mt-3">
+                <div class="p-3">
                     {{ $suppliers->links() }}
                 </div>
             </div>
@@ -123,127 +130,27 @@
 @endsection
 
 @push('scripts')
-    <script>
-        // EDIT LOAD
-        $(document).on('click', '.editSupplier', function() {
-            let id = $(this).data('id');
-            $.ajax({
-                url: '/admin/supplier/' + id + '/edit',
-                type: 'GET',
-                success: function(data) {
-                    $('#edit_supplier_id').val(data.id);
-                    $('#edit_customer_company_id').val(data.customer_company_id);
-                    $('#edit_name').val(data.name);
-                    $('#edit_designation').val(data.designation);
-                    $('#edit_phone').val(data.phone);
-                    $('#edit_email').val(data.email);
-                    $('#edit_status').val(data.status);
-                    $('#edit_address').val(data.address);
-                    $('#editSupplierModal').modal('show');
-                }
-            });
-        });
-        // UPDATE SUPPLIER
-        $('#editSupplierForm').submit(function(e) {
-            e.preventDefault();
-            let id = $('#edit_supplier_id').val();
-            $.ajax({
-                url: '/admin/supplier/' + id,
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function(res) {
-                    $('#editSupplierModal').modal('hide');
-                    Swal.fire({
-                        title: 'Updated',
-                        text: res.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        location.reload();
-                    });
-                },
-                error: function() {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Update failed',
-                        icon: 'error',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                }
-            });
-        });
-        // DELETE SUPPLIER
-        $(document).on('click', '.deleteSupplier', function() {
-            let id = $(this).data('id');
-            Swal.fire({
-                title: 'Delete Supplier?',
-                text: 'This action cannot be undone',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/admin/supplier/' + id,
-                        type: 'POST',
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            _method: 'DELETE'
-                        },
-                        success: function(res) {
-                            Swal.fire({
-                                title: 'Deleted',
-                                text: res.message,
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                location.reload();
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                title: 'Cannot Delete',
-                                text: xhr.responseJSON.message,
-                                icon: 'error',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        }
-                    });
-                }
-            });
-        });
-        // SELECT2 MODAL FIX
-        $('#createSupplierModal').on('shown.bs.modal', function() {
-            $(this).find('.select2').select2({
-                dropdownParent: '#createSupplierModal'
-            });
-        });
-        $('#editSupplierModal').on('shown.bs.modal', function() {
-            $(this).find('.select2').select2({
-                dropdownParent: '#editSupplierModal'
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('createSupplierModal')).show();
+                const modalElement = document.getElementById('createSupplierModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_supplier_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
+                const supplierId = @json(session('edit_supplier_id'));
+                const modal = document.getElementById('editSupplierModal' + supplierId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

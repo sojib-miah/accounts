@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Receipt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PackageHelper;
 
@@ -103,7 +104,7 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch)
     {
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'company_id' => 'required|exists:companies,id',
             'name' => [
                 'required',
@@ -118,6 +119,14 @@ class BranchController extends Controller
             'email' => 'nullable|email',
             'address' => 'nullable'
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('branch.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_branch_id', $branch->id);
+        }
 
         $branch->update([
             'company_id' => $request->company_id,

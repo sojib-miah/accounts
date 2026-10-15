@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Company User List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Company User List</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('user.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Company User">
+                                placeholder="Search Company User...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -31,6 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('user.index') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i>
                                 Reset
                             </a>
                         @endif
@@ -60,7 +61,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($users as $user)
+                            @forelse ($users as $user)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $user->company->name ?? '-' }}</td>
@@ -78,12 +79,8 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('company-user-edit')
-                                                            <button type="button" class="dropdown-item editBtn"
-                                                                data-id="{{ $user->id }}" data-name="{{ $user->name }}"
-                                                                data-email="{{ $user->email }}"
-                                                                data-phone="{{ $user->phone }}"
-                                                                data-company="{{ $user->company_id }}"
-                                                                data-branch="{{ $user->branch_id }}">
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editCompanyUserModal{{ $user->id }}">
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
@@ -117,7 +114,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 pe-3 ps-3">
+                <div class="p-3">
                     {{ $users->links() }}
                 </div>
             </div>
@@ -133,7 +130,7 @@
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addCompanyUserModalLabel">
-                            Add Company User
+                            <i class="fa fa-plus me-2"></i> Add Company User
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
@@ -144,10 +141,12 @@
                                 <label class="form-label">
                                     Company <span class="text-danger">*</span>
                                 </label>
-                                <select name="company_id" class="form-select select2" required>
+                                <select name="company_id"
+                                    class="form-select select2 @error('company_id', 'add') is-invalid @enderror" required>
                                     <option value="">Select Company</option>
                                     @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
+                                        <option value="{{ $company->id }}"
+                                            {{ old('company_id') == $company->id ? 'selected' : '' }}>
                                             {{ $company->name }}
                                         </option>
                                     @endforeach
@@ -161,10 +160,12 @@
                                 <label class="form-label">
                                     Branch <span class="text-danger">*</span>
                                 </label>
-                                <select name="branch_id" class="form-select select2" required>
+                                <select name="branch_id"
+                                    class="form-select select2 @error('branch_id', 'add') is-invalid @enderror" required>
                                     <option value="">Select Branch</option>
                                     @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">
+                                        <option value="{{ $branch->id }}"
+                                            {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
                                             {{ $branch->name }}
                                         </option>
                                     @endforeach
@@ -178,10 +179,11 @@
                                 <label class="form-label">
                                     Name <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="name" class="form-control" value="{{ old('name') }}"
-                                    placeholder="Enter Full Name" required>
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    class="form-control @error('name', 'add') is-invalid @enderror"
+                                    value="{{ old('name') }}" placeholder="Enter Full Name..." required>
                                 @error('name', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <!-- Email -->
@@ -189,10 +191,11 @@
                                 <label class="form-label">
                                     Email <span class="text-danger">*</span>
                                 </label>
-                                <input type="email" name="email" value="{{ old('email') }}" class="form-control"
-                                    placeholder="Enter Email" required>
+                                <input type="email" name="email" value="{{ old('email') }}"
+                                    class="form-control @error('email', 'add') is-invalid @enderror"
+                                    placeholder="Enter Email..." required>
                                 @error('email', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <!-- Phone -->
@@ -200,10 +203,11 @@
                                 <label class="form-label">
                                     Phone <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="phone" class="form-control"
-                                    placeholder="Enter Phone Number" value="{{ old('phone') }}" required>
+                                <input type="text" name="phone"
+                                    class="form-control @error('phone', 'add') is-invalid @enderror"
+                                    placeholder="Enter Phone Number..." value="{{ old('phone') }}" required>
                                 @error('phone', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <!-- Password -->
@@ -211,17 +215,18 @@
                                 <label class="form-label">
                                     Password <span class="text-danger">*</span>
                                 </label>
-                                <input type="password" name="password" class="form-control" placeholder="Enter Password"
-                                    required>
+                                <input type="password" name="password"
+                                    class="form-control @error('password', 'add') is-invalid @enderror"
+                                    placeholder="Enter Password..." required>
                                 @error('password', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-save me-1"></i>
@@ -234,87 +239,102 @@
     </div>
 
     <!-- Edit Company User Modal -->
-    <div class="modal fade" id="editCompanyUserModal" tabindex="-1" aria-labelledby="editCompanyUserModalLabel"
-        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="editUserForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editCompanyUserModalLabel">
-                            Edit Company User
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Company -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Company <span class="text-danger">*</span>
-                                </label>
-                                <select name="company_id" id="edit_company_id" class="form-select select2" required>
-                                    <option value="">Select Company</option>
-                                    @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
-                                            {{ $company->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('company_id', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Branch -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Branch <span class="text-danger">*</span>
-                                </label>
-                                <select name="branch_id" id="edit_branch_id" class="form-select select2" required>
-                                    <option value="">Select Branch</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">
-                                            {{ $branch->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('branch_id', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Name -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Name <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="name" id="edit_name" class="form-control" required>
-                                @error('name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Email -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Email <span class="text-danger">*</span>
-                                </label>
-                                <input type="email" name="email" id="edit_email" class="form-control" required>
-                                @error('email', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Phone -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Phone <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="phone" id="edit_phone" class="form-control" required>
-                                @error('phone', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <!-- Password -->
-                            {{-- <div class="col-md-6 mb-3">
+    @foreach ($users as $user)
+        <div class="modal fade" id="editCompanyUserModal{{ $user->id }}" tabindex="-1"
+            aria-labelledby="editCompanyUserModalLabel" aria-hidden="true" data-bs-backdrop="static"
+            data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('user.update', $user->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fa fa-edit me-2"></i> Edit Company User
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <!-- Company -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Company <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="company_id"
+                                        class="form-select select2 @error('company_id', 'edit') is-invalid @enderror">
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}"
+                                                {{ (string) old('company_id', $user->company_id) === (string) $company->id ? 'selected' : '' }}>
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('company_id', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <!-- Branch -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Branch <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="branch_id"
+                                        class="form-select select2 @error('branch_id', 'edit') is-invalid @enderror">
+                                        <option value="">Select Branch</option>
+                                        @foreach ($branches as $branch)
+                                            <option value="{{ $branch->id }}"
+                                                {{ (string) old('branch_id', $user->branch_id) === (string) $branch->id ? 'selected' : '' }}>
+                                                {{ $branch->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('branch_id', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <!-- Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="name"
+                                        value="{{ session('edit_user_id') == $user->id && $errors->getBag('edit')->any() ? old('name', $user->name) : $user->name }}"
+                                        class="form-control @error('name', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Full Name..." required>
+                                    @error('name', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" name="email"
+                                        value="{{ session('edit_user_id') == $user->id && $errors->getBag('edit')->any() ? old('email', $user->email) : $user->email }}"
+                                        class="form-control @error('email', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Email..." required>
+                                    @error('email', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <!-- Phone -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        Phone <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="phone"
+                                        value="{{ session('edit_user_id') == $user->id && $errors->getBag('edit')->any() ? old('phone', $user->phone) : $user->phone }}"
+                                        class="form-control @error('phone', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Phone Number..." required>
+                                    @error('phone', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <!-- Password -->
+                                {{-- <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Password <span class="text-danger">*</span>
                                 </label>
@@ -323,57 +343,46 @@
                             @error('password', 'edit')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror --}}
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save me-1"></i>
-                            Update User
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-1"></i> Close
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save me-1"></i>
+                                Update User
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(btn) {
-
-            btn.addEventListener('click', function() {
-
-                document.getElementById('edit_name').value = this.dataset.name;
-                document.getElementById('edit_email').value = this.dataset.email;
-                document.getElementById('edit_phone').value = this.dataset.phone;
-                $('#edit_company_id').val(this.dataset.company).trigger('change');
-                $('#edit_branch_id').val(this.dataset.branch).trigger('change');
-                document.getElementById('editUserForm').action =
-                    "{{ url('/admin/user') }}/" + this.dataset.id;
-
-                let modal = new bootstrap.Modal(document.getElementById('editCompanyUserModal'));
-                modal.show();
-
-            });
-
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addCompanyUserModal')).show();
+                const modalElement = document.getElementById('addCompanyUserModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_user_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editCompanyUserModal')).show();
+                const userId = @json(session('edit_user_id'));
+                const modal = document.getElementById('editCompanyUserModal' + userId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

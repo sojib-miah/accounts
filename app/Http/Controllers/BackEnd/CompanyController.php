@@ -9,6 +9,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PackageHelper;
 
@@ -102,7 +103,7 @@ class CompanyController extends Controller
 
     public function update(Request $request, Company $company)
     {
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
                 'string',
@@ -111,23 +112,37 @@ class CompanyController extends Controller
                     ->where('created_by', Auth::id())
                     ->ignore($company->id),
             ],
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('company.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_company_id', $company->id);
+        }
+
         $company->name = $request->name;
+
         foreach (['logo', 'hologram', 'seal', 'signature'] as $field) {
             if ($request->hasFile($field)) {
                 if ($company->$field && File::exists(public_path($company->$field))) {
                     File::delete(public_path($company->$field));
                 }
+
                 $file = $request->file($field);
                 $filename = time() . '_' . $field . '.' . $file->getClientOriginalExtension();
+
                 $file->move(public_path('uploads/company'), $filename);
+
                 $company->$field = 'uploads/company/' . $filename;
             }
         }
+
         $company->save();
         return redirect()->route('company.index')->with('success', 'Company Updated Successfully');
     }
@@ -135,11 +150,7 @@ class CompanyController extends Controller
     public function destroy(Company $company)
     {
         if ($company->branches()->exists()) {
-
-            return back()->with(
-                'error',
-                'Company cannot be deleted because it has branches.'
-            );
+            return back()->with('error', 'Company cannot be deleted because it has branches.');
         }
 
         foreach (['logo', 'hologram', 'seal', 'signature'] as $field) {

@@ -8,7 +8,7 @@
             {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h4 class="mb-0">Supplier Company</h4>
+                    <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Supplier Company List</h4>
                     <small class="text-muted">Manage Supplier companies</small>
                 </div>
                 <div class="d-flex gap-3 align-items-center">
@@ -142,7 +142,7 @@
                                 </label>
                                 <input type="text" name="name" value="{{ $errors->add->any() ? old('name') : '' }}"
                                     class="form-control @error('name', 'add') is-invalid @enderror"
-                                    placeholder="Enter company name" required>
+                                    placeholder="Enter company name..." required>
                                 @error('name', 'add')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -160,7 +160,7 @@
                                 <label class="form-label">Phone</label>
                                 <input type="text" name="phone" value="{{ $errors->add->any() ? old('phone') : '' }}"
                                     class="form-control @error('phone', 'add') is-invalid @enderror"
-                                    placeholder="Enter phone number">
+                                    placeholder="Enter phone number...">
                                 @error('phone', 'add')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -168,7 +168,7 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" rows="3" class="form-control @error('address', 'add') is-invalid @enderror"
-                                    placeholder="Enter company address">{{ $errors->add->any() ? old('address') : '' }}</textarea>
+                                    placeholder="Enter company address...">{{ $errors->add->any() ? old('address') : '' }}</textarea>
                                 @error('address', 'add')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -209,7 +209,7 @@
                                     <label class="form-label">
                                         Company Name <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" name="name"
+                                    <input type="text" name="name" placeholder="Enter company name..."
                                         value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('name') : $company->name }}"
                                         class="form-control {{ $errors->edit->has('name') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}"
                                         required>
@@ -221,7 +221,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email</label>
-                                    <input type="email" name="email"
+                                    <input type="email" name="email" placeholder="company@example.com"
                                         value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('email') : $company->email }}"
                                         class="form-control {{ $errors->edit->has('email') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">
                                     @if ($errors->edit->has('email') && old('_edit_id') == $company->id)
@@ -232,7 +232,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phone</label>
-                                    <input type="text" name="phone"
+                                    <input type="text" name="phone" placeholder="Enter phone number..."
                                         value="{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('phone') : $company->phone }}"
                                         class="form-control {{ $errors->edit->has('phone') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">
                                     @if ($errors->edit->has('phone') && old('_edit_id') == $company->id)
@@ -243,7 +243,7 @@
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Address</label>
-                                    <textarea name="address" rows="3"
+                                    <textarea name="address" rows="3" placeholder="Enter company address..."
                                         class="form-control {{ $errors->edit->has('address') && old('_edit_id') == $company->id ? 'is-invalid' : '' }}">{{ $errors->edit->any() && old('_edit_id') == $company->id ? old('address') : $company->address }}</textarea>
                                     @if ($errors->edit->has('address') && old('_edit_id') == $company->id)
                                         <div class="invalid-feedback">
@@ -266,13 +266,9 @@
             </div>
         </div>
     @endforeach
-
-
 @endsection
 
-
 @push('scripts')
-
     @if ($errors->add->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -287,12 +283,10 @@
                 let modal = document.getElementById(
                     'editCustomerCompanyModal{{ old('_edit_id') }}'
                 );
-
                 if (modal) {
                     new bootstrap.Modal(modal).show();
                 }
             });
         </script>
     @endif
-
 @endpush

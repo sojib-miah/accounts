@@ -9,6 +9,7 @@ use App\Models\Party;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SupplierController extends Controller
 {
@@ -75,24 +76,17 @@ class SupplierController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return response()->json(['supplier_id' => $this->generateSupplierId()]);
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $request->validateWithBag('add', [
-            'customer_company_id' => 'nullable|exists:customer_companies,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'name' => ['required', 'string', 'max:100'],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
-            'status' => 'required'
+            'status' => 'required',
+            'address' => 'nullable',
         ]);
 
         Party::create([
@@ -113,33 +107,26 @@ class SupplierController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Party $supplier)
-    {
-        return response()->json($supplier);
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Party $supplier)
     {
-        $request->validateWithBag('edit', [
-            'customer_company_id' => 'nullable|exists:customer_companies,id',
+        $validator = Validator::make($request->all(), [
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'name' => ['required', 'string', 'max:100'],
             'phone' => 'nullable|max:30',
             'email' => 'nullable|email',
-            'status' => 'required'
+            'status' => 'required',
+            'address' => 'nullable',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('supplier.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_supplier_id', $supplier->id);
+        }
 
         $supplier->update([
             'customer_company_id' => $request->customer_company_id,
@@ -152,7 +139,7 @@ class SupplierController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return response()->json(['status' => true, 'message' => 'Supplier updated successfully.']);
+        return redirect()->route('supplier.index')->with('success', 'Supplier updated successfully.');
     }
 
     /**
@@ -160,11 +147,14 @@ class SupplierController extends Controller
      */
     public function destroy(Party $supplier)
     {
+        if ($supplier->receipts()->exists()) {
+            return redirect()->route('supplier.index')->with('error', 'This supplier is already used in transactions. You cannot delete it.');
+        }
         try {
             $supplier->delete();
-            return response()->json(['status' => true, 'message' => 'Supplier deleted successfully.']);
+            return redirect()->route('supplier.index')->with('success', 'Supplier deleted successfully.');
         } catch (QueryException $e) {
-            return response()->json(['status' => false, 'message' => 'This supplier is already used in transactions. You cannot delete it.'], 422);
+            return redirect()->route('supplier.index')->with('error', 'This supplier is already used in other records. You cannot delete it.');
         }
     }
 }

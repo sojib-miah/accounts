@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Branch List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Branch List</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('branch.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Branch">
+                                placeholder="Search Branch...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -31,6 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('branch.index') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i>
                                 Reset
                             </a>
                         @endif
@@ -78,14 +79,8 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     @can('branch-edit')
-                                                        <button class="dropdown-item editBtn" data-id="{{ $branch->id }}"
-                                                            data-company="{{ $branch->company_id }}"
-                                                            data-branch="{{ $branch->branch_id }}"
-                                                            data-name="{{ $branch->name }}"
-                                                            data-phone_one="{{ $branch->phone_one }}"
-                                                            data-phone_two="{{ $branch->phone_two }}"
-                                                            data-email="{{ $branch->email }}"
-                                                            data-address="{{ $branch->address }}">
+                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editBranchModal{{ $branch->id }}">
                                                             <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     @endcan
@@ -115,7 +110,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 pe-3 ps-3">
+                <div class="p-3">
                     {{ $branches->links() }}
                 </div>
             </div>
@@ -129,14 +124,16 @@
                 <form action="{{ route('branch.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5>Add Branch</h5>
+                        <h5><i class="fa fa-plus me-2"></i> Add Branch</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label>Company</label>
-                                <select name="company_id" class="form-select select2" data-allow-clear="true" required>
+                                <label>Company <span class="text-danger">*</span></label>
+                                <select name="company_id"
+                                    class="form-select select2 @error('company_id', 'add') is-invalid @enderror"
+                                    data-allow-clear="true" required>
                                     <option value="">Select Company</option>
                                     @foreach ($companies as $company)
                                         <option {{ old('company_id') == $company->id ? 'selected' : '' }}
@@ -150,40 +147,47 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label>Branch Name</label>
-                                <input type="text" name="name" value="{{ old('name') }}" class="form-control"
-                                    required>
+                                <label>Branch Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    placeholder="Branch Name..."
+                                    class="form-control @error('name', 'add') is-invalid @enderror" required>
                                 @error('name', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label>Phone One</label>
-                                <input type="text" name="phone_one" value="{{ old('phone_one') }}" class="form-control"
-                                    required>
+                                <label>Phone One <span class="text-danger">*</span></label>
+                                <input type="text" name="phone_one" value="{{ old('phone_one') }}"
+                                    placeholder="Phone One..."
+                                    class="form-control @error('phone_one', 'add') is-invalid @enderror" required>
                                 @error('phone_one', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Phone Two</label>
-                                <input type="text" name="phone_two" value="{{ old('phone_two') }}" class="form-control">
+                                <input type="text" name="phone_two" value="{{ old('phone_two') }}"
+                                    placeholder="Phone Two..."
+                                    class="form-control @error('phone_two', 'add') is-invalid @enderror">
                                 @error('phone_two', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+                                <input type="email" name="email"
+                                    class="form-control @error('email', 'add') is-invalid @enderror"
+                                    value="{{ old('email') }}" placeholder="Email...">
                                 @error('email', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label>Address</label>
-                                <textarea name="address" class="form-control" rows="3">{{ old('address') }}</textarea>
+                                <textarea name="address" placeholder="Address..." class="form-control @error('address', 'add') is-invalid @enderror"
+                                    rows="3">{{ old('address') }}</textarea>
                                 @error('address', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                         </div>
@@ -202,120 +206,120 @@
     </div>
 
     <!-- Edit Branch Modal -->
-    <div class="modal fade" id="editBranchModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="editForm" method="POST" action="{{ route('branch.update', $branch->id) }}">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Branch</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Company <span class="text-danger">*</span></label>
-                                <select name="company_id" id="edit_company_id" class="form-select select2" required>
-                                    <option value="">Select Company</option>
-                                    @foreach ($companies as $company)
-                                        <option {{ old('company_id') == $company->id ? 'selected' : '' }}
-                                            value="{{ $company->id }}">
-                                            {{ $company->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('company_id', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Branch Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" value="{{ old('name') }}" id="edit_name"
-                                    class="form-control" required>
-                                @error('name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone One <span class="text-danger">*</span></label>
-                                <input type="text" name="phone_one" value="{{ old('phone_one') }}"
-                                    id="edit_phone_one" class="form-control" required>
-                                @error('phone_one', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone Two</label>
-                                <input type="text" name="phone_two" id="edit_phone_two"
-                                    value="{{ old('phone_two') }}" class="form-control">
-                                @error('phone_two', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="email" id="edit_email" class="form-control"
-                                    value="{{ old('email') }}">
-                                @error('email', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Address</label>
-                                <textarea name="address" id="edit_address" class="form-control" rows="3">{{ old('address') }}</textarea>
-                                @error('address', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+    @foreach ($branches as $branch)
+        <div class="modal fade" id="editBranchModal{{ $branch->id }}" tabindex="-1" aria-hidden="true"
+            data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form id="editForm" method="POST" action="{{ route('branch.update', $branch->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fa fa-edit me-2"></i> Edit Branch</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Company <span class="text-danger">*</span></label>
+                                    <select name="company_id"
+                                        class="form-select select2 @error('company_id', 'edit') is-invalid @enderror"
+                                        required>
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}"
+                                                {{ (string) old('company_id', $branch->company_id) === (string) $company->id ? 'selected' : '' }}>
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('company_id', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Branch Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" placeholder="Branch Name..."
+                                        value="{{ session('edit_branch_id') == $branch->id && $errors->getBag('edit')->any() ? old('name', $branch->name) : $branch->name }}"
+                                        class="form-control @error('name', 'edit') is-invalid @enderror" required>
+                                    @error('name', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone One <span class="text-danger">*</span></label>
+                                    <input type="text" name="phone_one" placeholder="Phone One..."
+                                        value="{{ session('edit_branch_id') == $branch->id && $errors->getBag('edit')->any() ? old('phone_one', $branch->phone_one) : $branch->phone_one }}"
+                                        class="form-control @error('phone_one', 'edit') is-invalid @enderror" required>
+                                    @error('phone_one', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Two</label>
+                                    <input type="text" name="phone_two" placeholder="Phone Two..."
+                                        value="{{ session('edit_branch_id') == $branch->id && $errors->getBag('edit')->any() ? old('phone_two', $branch->phone_two) : $branch->phone_two }}"
+                                        class="form-control @error('phone_two', 'edit') is-invalid @enderror">
+                                    @error('phone_two', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" placeholder="Email..."
+                                        class="form-control @error('email', 'edit') is-invalid @enderror"
+                                        value="{{ session('edit_branch_id') == $branch->id && $errors->getBag('edit')->any() ? old('email', $branch->email) : $branch->email }}">
+                                    @error('email', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="address" placeholder="Address..."
+                                        class="form-control @error('address', 'edit') is-invalid @enderror" rows="3">{{ session('edit_branch_id') == $branch->id && $errors->getBag('edit')->any() ? old('address', $branch->address) : $branch->address }}</textarea>
+                                    @error('address', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fa-solid fa-xmark me-1"></i> Close
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save me-1"></i> Update Branch
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-1"></i> Close
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save me-1"></i> Update Branch
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                $('#edit_company_id').val(this.dataset.company).trigger('change');
-
-                document.getElementById('edit_name').value = this.dataset.name || '';
-                document.getElementById('edit_phone_one').value = this.dataset.phone_one || '';
-                document.getElementById('edit_phone_two').value = this.dataset.phone_two || '';
-                document.getElementById('edit_email').value = this.dataset.email || '';
-                document.getElementById('edit_address').value = this.dataset.address || '';
-
-                bootstrap.Modal.getOrCreateInstance(
-                    document.getElementById('editBranchModal')
-                ).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addBranchModal')).show();
+                const modalElement = document.getElementById('addBranchModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_branch_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editBranchModal')).show();
+                const branchId = @json(session('edit_branch_id'));
+                const modal = document.getElementById('editBranchModal' + branchId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

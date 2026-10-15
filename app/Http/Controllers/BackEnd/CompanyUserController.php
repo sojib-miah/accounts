@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use PackageHelper;
 
 class CompanyUserController extends Controller
@@ -102,7 +103,7 @@ class CompanyUserController extends Controller
                 'user_id'    => $user->id,
                 'package_id' => $trialPackage->id,
                 'start_date' => now(),
-                'expire_date' => now()->addYear(), // or addDays(30) if your trial is 1 year
+                'expire_date' => now()->addDays(15), // or addYear() if your trial is 1 year
                 'status'     => 'Active',
             ]);
         }
@@ -113,7 +114,7 @@ class CompanyUserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'required|max:30',
@@ -121,6 +122,14 @@ class CompanyUserController extends Controller
             'branch_id' => 'required|exists:branches,id',
             // 'password' => 'required|min:6'
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('user.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_user_id', $user->id);
+        }
 
         $user->update([
             'name' => $request->name,

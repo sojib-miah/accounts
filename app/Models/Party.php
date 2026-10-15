@@ -23,16 +23,6 @@ class Party extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function accounts()
-    {
-        return $this->hasMany(Account::class, 'party_id');
-    }
-
-    public function receiptItems()
-    {
-        return $this->hasMany(ReceiptItem::class);
-    }
-
     public function receipts()
     {
         return $this->hasMany(Receipt::class);
