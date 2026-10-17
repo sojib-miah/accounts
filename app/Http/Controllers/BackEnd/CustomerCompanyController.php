@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CustomerCompanyController extends Controller
 {
@@ -71,22 +72,26 @@ class CustomerCompanyController extends Controller
 
     public function update(Request $request, CustomerCompany $customerCompany)
     {
-        $request->merge([
-            '_edit_company_id' => $customerCompany->id,
-        ]);
-
-        $validated = $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100'],
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()
+                ->route('customer-company.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_customer_id', $customerCompany->id);
+        }
+
         $customerCompany->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'] ?? null,
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
             'updated_by' => Auth::id(),
         ]);
 

@@ -1,13 +1,13 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Customer List')
+@section('title', 'Manage customer companies')
 
 @section('content')
     <div class="p-5">
         {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h4 class="mb-0">Customer Company</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Customer Company List</h4>
                 <small class="text-muted">Manage customer companies</small>
             </div>
             <div class="d-flex gap-3 align-items-center">
@@ -51,7 +51,7 @@
                     <table class="table table-bordered table-hover align-middle" id="customerCompanyTable">
                         <thead>
                             <tr>
-                                <th width="60">SL</th>
+                                <th width="60">SN</th>
                                 <th>Company</th>
                                 <th>Customer Company</th>
                                 <th>Email</th>
@@ -117,7 +117,7 @@
                             @endforelse
                         </tbody>
                     </table>
-                    <div class="mt-3">
+                    <div class="p-3">
                         {{ $customerCompanies->links() }}
                     </div>
                 </div>
@@ -126,22 +126,23 @@
     </div>
 
     {{-- ADD MODAL --}}
-    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addCustomerModal" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('customer-company.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addCustomerModalLabel">
-                            Add Customer Company
+                            <i class="fa fa-plus me-2"></i> Add Customer Company
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Company Name *</label>
+                            <label class="form-label">Company Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" value="{{ old('name') }}"
-                                class="form-control @error('name', 'add') is-invalid @enderror">
+                                class="form-control @error('name', 'add') is-invalid @enderror"
+                                placeholder="Company Name..." required>
                             @error('name', 'add')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -149,7 +150,7 @@
                         <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}"
-                                class="form-control @error('email', 'add') is-invalid @enderror">
+                                class="form-control @error('email', 'add') is-invalid @enderror" placeholder="Email...">
                             @error('email', 'add')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -157,22 +158,24 @@
                         <div class="mb-3">
                             <label class="form-label">Phone</label>
                             <input type="text" name="phone" value="{{ old('phone') }}"
-                                class="form-control @error('phone', 'add') is-invalid @enderror">
+                                class="form-control @error('phone', 'add') is-invalid @enderror" placeholder="Phone...">
                             @error('phone', 'add')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Address</label>
-                            <textarea name="address" rows="3" class="form-control @error('address', 'add') is-invalid @enderror">{{ old('address') }}</textarea>
+                            <textarea name="address" rows="3" class="form-control @error('address', 'add') is-invalid @enderror"
+                                placeholder="Address...">{{ old('address') }}</textarea>
                             @error('address', 'add')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                class="fa-solid fa-xmark me-1"></i> Close</button>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-save me-1"></i> Save</button>
                     </div>
                 </form>
             </div>
@@ -180,77 +183,70 @@
     </div>
 
     {{-- edit modal  --}}
-    <div class="modal fade" id="editCustomerModal{{ $company->id }}" tabindex="-1"
-        aria-labelledby="editCustomerModalLabel{{ $company->id }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('customer-company.update', $company->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="_edit_company_id" value="{{ $company->id }}">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editCustomerModalLabel{{ $company->id }}">
-                            Edit Customer Company
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Company Name *</label>
-
-                            <input type="text" name="name"
-                                value="{{ old('_edit_company_id') == $company->id ? old('name') : $company->name }}"
-                                class="form-control @error('name', 'edit') is-invalid @enderror" required>
-
-                            @error('name', 'edit')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+    @foreach ($customerCompanies as $company)
+        <div class="modal fade" id="editCustomerModal{{ $company->id }}" tabindex="-1" aria-hidden="true"
+            data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('customer-company.update', $company->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fa fa-edit me-2"></i> Edit Customer Company</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-
-                            <input type="email" name="email"
-                                value="{{ old('_edit_company_id') == $company->id ? old('email') : $company->email }}"
-                                class="form-control @error('email', 'edit') is-invalid @enderror">
-
-                            @error('email', 'edit')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name"
+                                    value="{{ session('edit_customer_id') == $company->id && $errors->getBag('edit')->any() ? old('name', $company->name) : $company->name }}"
+                                    class="form-control @error('name', 'edit') is-invalid @enderror"
+                                    placeholder="Company Name..." required>
+                                @error('name', 'edit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email"
+                                    value="{{ session('edit_customer_id') == $company->id && $errors->getBag('edit')->any() ? old('email', $company->email) : $company->email }}"
+                                    class="form-control @error('email', 'edit') is-invalid @enderror"
+                                    placeholder="Email...">
+                                @error('email', 'edit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone"
+                                    value="{{ session('edit_customer_id') == $company->id && $errors->getBag('edit')->any() ? old('phone', $company->phone) : $company->phone }}"
+                                    class="form-control @error('phone', 'edit') is-invalid @enderror"
+                                    placeholder="Phone...">
+                                @error('phone', 'edit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea name="address" rows="3" class="form-control @error('address', 'edit') is-invalid @enderror"
+                                    placeholder="Address...">{{ session('edit_customer_id') == $company->id && $errors->getBag('edit')->any() ? old('address', $company->address) : $company->address }}</textarea>
+                                @error('address', 'edit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Phone</label>
-
-                            <input type="text" name="phone"
-                                value="{{ old('_edit_company_id') == $company->id ? old('phone') : $company->phone }}"
-                                class="form-control @error('phone', 'edit') is-invalid @enderror">
-
-                            @error('phone', 'edit')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+                                    class="fa-solid fa-xmark me-1"></i> Close</button>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-save me-1"></i>
+                                Update</button>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Address</label>
-
-                            <textarea name="address" rows="3" class="form-control @error('address', 'edit') is-invalid @enderror">{{ old('_edit_company_id') == $company->id ? old('address') : $company->address }}</textarea>
-
-                            @error('address', 'edit')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
-
 
 @push('scripts')
     @if ($errors->getBag('add')->any())
@@ -265,21 +261,16 @@
         </script>
     @endif
 
-    @if ($errors->getBag('edit')->any())
-        @foreach ($companies as $company)
-            @if (old('_edit_company_id') == $company->id)
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const modalElement = document.getElementById(
-                            'editCustomerModal{{ $company->id }}'
-                        );
+    @if ($errors->getBag('edit')->any() && session('edit_customer_id'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const customerId = @json(session('edit_customer_id'));
+                const modal = document.getElementById('editCustomerModal' + customerId);
 
-                        if (modalElement) {
-                            bootstrap.Modal.getOrCreateInstance(modalElement).show();
-                        }
-                    });
-                </script>
-            @endif
-        @endforeach
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
+            });
+        </script>
     @endif
 @endpush

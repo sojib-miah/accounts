@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Customer List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Customer List</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('receiver.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -31,6 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('receiver.index') }}" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left me-1"></i>
                                 Reset
                             </a>
                         @endif
@@ -70,12 +71,8 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $party->party_id ?? '-' }}</td>
-                                        <td>
-                                            {{ $party->company->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ $party->customerCompany->name ?? '-' }}
-                                        </td>
+                                        <td>{{ $party->company->name ?? '-' }}</td>
+                                        <td>{{ $party->customerCompany->name ?? '-' }}</td>
                                         <td>{{ $party->name ?? '-' }}</td>
                                         <td>{{ $party->designation ?? '-' }}</td>
                                         <td>{{ $party->phone ?? '-' }}</td>
@@ -98,14 +95,8 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('receiver-list-edit')
-                                                            <button class="dropdown-item editBtn" data-id="{{ $party->id }}"
-                                                                data-name="{{ $party->name }}"
-                                                                data-phone="{{ $party->phone }}"
-                                                                data-email="{{ $party->email }}"
-                                                                data-address="{{ $party->address }}"
-                                                                data-status="{{ $party->status }}"
-                                                                data-customer_company_id="{{ $party->customer_company_id }}"
-                                                                data-designation="{{ $party->designation }}">
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editReceiverModal{{ $party->id }}">
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
@@ -129,14 +120,12 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="13" class="text-center">
-                                            No Customer Found.
-                                        </td>
+                                        <td colspan="13" class="text-center">No Customer Found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
-                        <div class="mt-3">
+                        <div class="p-3">
                             {{ $parties->links() }}
                         </div>
                     </div>
@@ -149,39 +138,27 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.getElementById('edit_name').value = this.dataset.name;
-                document.getElementById('edit_designation').value = this.dataset.designation;
-                document.getElementById('edit_phone').value = this.dataset.phone;
-                document.getElementById('edit_email').value = this.dataset.email;
-                document.getElementById('edit_address').value = this.dataset.address;
-                $('#edit_customer_company_id')
-                    .val(this.dataset.customer_company_id || '')
-                    .trigger('change');
-                $('#edit_status').val(this.dataset.status).trigger('change');
-                document.getElementById('editReceiverForm').action =
-                    "{{ url('/admin/receiver') }}/" + this.dataset.id;
-                new bootstrap.Modal(
-                    document.getElementById('editReceiverModal')
-                ).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addReceiverModal')).show();
+                const modalElement = document.getElementById('addReceiverModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_receiver_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editReceiverModal')).show();
+                const receiverId = @json(session('edit_receiver_id'));
+                const modal = document.getElementById('editReceiverModal' + receiverId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

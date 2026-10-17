@@ -8,6 +8,7 @@ use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use PackageHelper;
 
 class ReceiverController extends Controller
@@ -66,7 +67,7 @@ class ReceiverController extends Controller
         $companyId = Auth::user()->company_id;
 
         $request->validateWithBag('add', [
-            'customer_company_id' => 'nullable|exists:customer_companies,id',
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'name'               =>  ['required', 'string', 'max:100'],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
@@ -113,8 +114,8 @@ class ReceiverController extends Controller
 
     public function update(Request $request, Party $party)
     {
-        $request->validateWithBag('edit', [
-            'customer_company_id' => 'nullable|exists:customer_companies,id',
+        $validator = Validator::make($request->all(), [
+            'customer_company_id' => 'required|exists:customer_companies,id',
             'name'               => ['required', 'string', 'max:100'],
             'phone'              => 'nullable|max:30',
             'email'              => 'nullable|email|max:255',
@@ -135,12 +136,12 @@ class ReceiverController extends Controller
             }
         }
 
-        $customerCompany = null;
-
-        if ($request->filled('customer_company_id')) {
-            $customerCompany = CustomerCompany::find(
-                $request->customer_company_id
-            );
+        if ($validator->fails()) {
+            return redirect()
+                ->route('receiver.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_receiver_id', $party->id);
         }
 
         $party->update([

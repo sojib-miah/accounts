@@ -211,7 +211,7 @@
             data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <form id="editForm" method="POST" action="{{ route('branch.update', $branch->id) }}">
+                    <form method="POST" action="{{ route('branch.update', $branch->id) }}">
                         @csrf
                         @method('PUT')
                         <div class="modal-header">
