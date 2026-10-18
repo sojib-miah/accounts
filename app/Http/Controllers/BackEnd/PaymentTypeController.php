@@ -8,6 +8,7 @@ use App\Models\PaymentType;
 use App\Models\ReceiptPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PackageHelper;
 
@@ -75,12 +76,7 @@ class PaymentTypeController extends Controller
     {
         $companyId = Auth::user()->company_id;
 
-        abort_unless(
-            (int) $paymentType->company_id === (int) $companyId,
-            404
-        );
-
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name'   => [
                 'required',
                 'string',
@@ -91,6 +87,14 @@ class PaymentTypeController extends Controller
             ],
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('payment-type.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_payment_id', $paymentType->id);
+        }
 
         $paymentType->update([
             'name'   => $request->name,
@@ -103,7 +107,6 @@ class PaymentTypeController extends Controller
     public function destroy(PaymentType $paymentType)
     {
         if (ReceiptPayment::where('payment_type_id', $paymentType->id)->exists()) {
-
             return back()->with('error', 'This payment type has already been used in transactions and cannot be deleted.');
         }
         $paymentType->delete();

@@ -7,7 +7,7 @@
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 class="mb-0 fw-bold">Account Management</h4>
+                    <h4 class="mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2"></i> Account Management List</h4>
                     <small class="text-muted">Cash, Bank, Mobile Banking & Other Accounts</small>
                 </div>
                 <div class="d-flex justify-content-center align-items-center gap-2">
@@ -34,7 +34,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('accounts.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
                     </form>
@@ -53,7 +53,7 @@
                         <table class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th width="60">SN</th>
+                                    <th>SN</th>
                                     <th>Company</th>
                                     <th>Branch</th>
                                     <th>Account Name</th>
@@ -70,7 +70,7 @@
                                         </div>
                                     </th>
                                     <th>Status</th>
-                                    <th width="170">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,18 +115,8 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('account-edit')
-                                                            <button type="button" class="dropdown-item editBtn"
-                                                                data-id="{{ $account->id }}"
-                                                                data-company="{{ $account->company_id }}"
-                                                                data-branch="{{ $account->branch_id }}"
-                                                                data-payment-type="{{ $account->payment_type_id }}"
-                                                                data-account-name="{{ $account->account_name }}"
-                                                                data-address="{{ $account->address }}"
-                                                                data-holder="{{ $account->account_holder_name }}"
-                                                                data-number="{{ $account->account_number }}"
-                                                                data-opening="{{ $account->opening_balance }}"
-                                                                data-status="{{ $account->status }}"
-                                                                data-is_default="{{ $account->is_default }}">
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editAccountModal{{ $account->id }}">
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
@@ -156,7 +146,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3 p-3">
+                    <div class="p-3">
                         {{ $accounts->links() }}
                     </div>
                 </div>
@@ -171,7 +161,7 @@
             <div class="modal-content">
                 <form action="{{ route('accounts.store') }}" method="POST">
                     @csrf
-                    <div class="modal-header text-white">
+                    <div class="modal-header">
                         <h5 class="modal-title">
                             <i class="fa fa-plus-circle me-2"></i>
                             Add New Account
@@ -182,13 +172,13 @@
                         <div class="row">
                             {{-- company  --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Company <span class="text-danger">*</span>
-                                </label>
-                                <select name="company_id" id="add_company_id" class="form-select select2" required>
+                                <label class="form-label">Company <span class="text-danger">*</span></label>
+                                <select name="company_id" id="add_company_id"
+                                    class="form-select select2 @error('company_id', 'add') is-invalid @enderror" required>
                                     <option value="">Select Company</option>
                                     @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
+                                        <option {{ old('company_id') == $company->id ? 'selected' : '' }}
+                                            value="{{ $company->id }}">
                                             {{ $company->name }}
                                         </option>
                                     @endforeach
@@ -199,16 +189,10 @@
                             </div>
                             {{-- branch  --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Branch <span class="text-danger">*</span>
-                                </label>
-                                <select name="branch_id" id="add_branch_id" class="form-select select2" required>
+                                <label class="form-label">Branch <span class="text-danger">*</span></label>
+                                <select name="branch_id" id="add_branch_id"
+                                    class="form-select select2 @error('branch_id', 'add') is-invalid @enderror" required>
                                     <option value="">Select Branch</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">
-                                            {{ $branch->name }}
-                                        </option>
-                                    @endforeach
                                 </select>
                                 @error('branch_id', 'add')
                                     <div class="text-danger">{{ $message }}</div>
@@ -216,13 +200,14 @@
                             </div>
                             {{-- payment type  --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Payment Type <span class="text-danger">*</span>
-                                </label>
-                                <select name="payment_type_id" class="form-select select2" required>
+                                <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                                <select name="payment_type_id"
+                                    class="form-select select2 @error('payment_type_id', 'add') is-invalid @enderror"
+                                    required>
                                     <option value="">Select Payment Type</option>
                                     @foreach ($paymentTypes as $paymentType)
-                                        <option value="{{ $paymentType->id }}">
+                                        <option {{ old('payment_type_id') == $paymentType->id ? 'selected' : '' }}
+                                            value="{{ $paymentType->id }}">
                                             {{ $paymentType->name }}
                                         </option>
                                     @endforeach
@@ -233,65 +218,65 @@
                             </div>
                             {{-- Account Name --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="account_name" class="form-control"
-                                    value="{{ old('account_name') }}" required>
+                                <label class="form-label">Account Name <span class="text-danger">*</span></label>
+                                <input type="text" name="account_name"
+                                    class="form-control @error('account_name', 'add') is-invalid @enderror"
+                                    value="{{ old('account_name') }}" placeholder="Enter Account Name..." required>
                                 @error('account_name', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             {{-- Account address --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Address <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="address" class="form-control" value="{{ old('address') }}">
+                                <label class="form-label">Account Address <span class="text-danger">*</span></label>
+                                <input type="text" name="address"
+                                    class="form-control @error('address', 'add') is-invalid @enderror"
+                                    value="{{ old('address') }}" placeholder="Enter Account Address..." required>
                                 @error('address', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             {{-- Holder Name --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Holder Name
-                                    <span class="text-danger">*</span>
-                                </label>
+                                <label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
                                 <input type="text" value="{{ old('account_holder_name') }}"
-                                    name="account_holder_name" class="form-control" required>
+                                    name="account_holder_name"
+                                    class="form-control @error('account_holder_name', 'add') is-invalid @enderror"
+                                    placeholder="Enter Account Holder Name..." required>
                                 @error('account_holder_name', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             {{-- Account Number --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Number
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="account_number" class="form-control"
-                                    value="{{ old('account_number') }}" required>
+                                <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                <input type="text" name="account_number"
+                                    class="form-control @error('account_number', 'add') is-invalid @enderror"
+                                    value="{{ old('account_number') }}" placeholder="Enter Account Number..." required>
                                 @error('account_number', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             {{-- Opening Balance --}}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Opening Balance <span class="text-danger">*</span></label>
                                 <input type="number" step="1" min="0" name="opening_balance"
-                                    class="form-control">
+                                    value="{{ old('opening_balance') }}"
+                                    class="form-control @error('opening_balance', 'add') is-invalid @enderror"
+                                    placeholder="Enter Opening Balance..." required>
                                 @error('opening_balance', 'add')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             {{-- isdefault --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Is Default</label>
-                                <select name="is_default" class="form-select select2">
-                                    <option value="0">Not Default</option>
-                                    <option value="1">Default</option>
+                                <label class="form-label">Is Default <span class="text-danger">*</span></label>
+                                <select name="is_default"
+                                    class="form-select select2 @error('is_default', 'add') is-invalid @enderror" required>
+                                    <option value="0" {{ old('is_default', 0) == 0 ? 'selected' : '' }}>Not Default
+                                    </option>
+                                    <option value="1" {{ old('is_default', 0) == 1 ? 'selected' : '' }}>Default
+                                    </option>
                                 </select>
                                 @error('is_default', 'add')
                                     <small class="text-danger">{{ $message }}</small>
@@ -299,10 +284,13 @@
                             </div>
                             {{-- Status --}}
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select select2">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select name="status"
+                                    class="form-select select2 @error('status', 'add') is-invalid @enderror" required>
+                                    <option value="Active" {{ old('status', 'Active') == 'Active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="Inactive"
+                                        {{ old('status', 'Active') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                                 @error('status', 'add')
                                     <small class="text-danger">{{ $message }}</small>
@@ -326,272 +314,250 @@
     </div>
 
     {{-- Edit Account Modal --}}
-    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form id="editAccountForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fa fa-edit me-2"></i>
-                            Edit Account
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            {{-- company  --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Company <span class="text-danger">*</span>
-                                </label>
-                                <select name="company_id" id="edit_company_id" class="form-select select2" required>
-                                    <option value="">Select Company</option>
-                                    @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">
-                                            {{ $company->name }}
+    @foreach ($accounts as $account)
+        <div class="modal fade" id="editAccountModal{{ $account->id }}" tabindex="-1" aria-hidden="true"
+            data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="{{ route('accounts.update', $account->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fa fa-edit me-2"></i> Edit Account</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                {{-- company  --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Company <span class="text-danger">*</span></label>
+                                    <select name="company_id" id="edit_company_id_{{ $account->id }}"
+                                        class="form-select select2 @error('company_id', 'edit') is-invalid @enderror"
+                                        required>
+                                        <option value="">Select Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}"
+                                                {{ (string) old('company_id', $account->company_id) === (string) $company->id ? 'selected' : '' }}>
+                                                {{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('company_id', 'edit')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                {{-- branch  --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Branch <span class="text-danger">*</span></label>
+                                    <select name="branch_id" id="edit_branch_id_{{ $account->id }}"
+                                        class="form-select select2" required>
+                                        <option value="">Select Branch</option>
+                                        @foreach ($account->company->branches as $branch)
+                                            <option value="{{ $branch->id }}"
+                                                {{ old('branch_id', $account->branch_id) == $branch->id ? 'selected' : '' }}>
+                                                {{ $branch->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                {{-- payment type  --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                                    <select name="payment_type_id"
+                                        class="form-select select2 @error('payment_type_id', 'edit') is-invalid @enderror"
+                                        required>
+                                        <option value="">Select Payment Type</option>
+                                        @foreach ($paymentTypes as $paymentType)
+                                            <option value="{{ $paymentType->id }}"
+                                                {{ (string) old('payment_type_id', $account->payment_type_id) === (string) $paymentType->id ? 'selected' : '' }}>
+                                                {{ $paymentType->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('payment_type_id', 'edit')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                {{-- Account Name --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Account Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="account_name"
+                                        value="{{ session('edit_account_id') == $account->id && $errors->getBag('edit')->any() ? old('account_name', $account->account_name) : $account->account_name }}"
+                                        class="form-control @error('account_name', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Account Name..." required>
+                                    @error('account_name', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- Account address --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Account Address <span class="text-danger">*</span></label>
+                                    <input type="text" name="address"
+                                        value="{{ session('edit_account_id') == $account->id && $errors->getBag('edit')->any() ? old('address', $account->address) : $account->address }}"
+                                        class="form-control @error('address', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Account Address..." required>
+                                    @error('address', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- Account Holder --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Account Holder Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="account_holder_name"
+                                        value="{{ session('edit_account_id') == $account->id && $errors->getBag('edit')->any() ? old('account_holder_name', $account->account_holder_name) : $account->account_holder_name }}"
+                                        class="form-control @error('account_holder_name', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Account Holder Name..." required>
+                                    @error('account_holder_name', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- Account Number --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="account_number"
+                                        value="{{ session('edit_account_id') == $account->id && $errors->getBag('edit')->any() ? old('account_number', $account->account_number) : $account->account_number }}"
+                                        class="form-control @error('account_number', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Account Number..." required>
+                                    @error('account_number', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- Opening Balance --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Opening Balance <span class="text-danger">*</span></label>
+                                    <input type="number" step="1" min="0" name="opening_balance"
+                                        value="{{ session('edit_account_id') == $account->id && $errors->getBag('edit')->any() ? old('opening_balance', $account->opening_balance) : $account->opening_balance }}"
+                                        class="form-control @error('opening_balance', 'edit') is-invalid @enderror"
+                                        placeholder="Enter Opening Balance..." required>
+                                    @error('opening_balance', 'edit')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- isdefault --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Is Default <span class="text-danger">*</span></label>
+                                    <select name="is_default"
+                                        class="form-select select2 @error('is_default', 'edit') is-invalid @enderror"
+                                        required>
+                                        <option value="0"
+                                            {{ old('is_default', $account->is_default) == 0 ? 'selected' : '' }}>Not
+                                            Default</option>
+                                        <option value="1"
+                                            {{ old('is_default', $account->is_default) == 1 ? 'selected' : '' }}>Default
                                         </option>
-                                    @endforeach
-                                </select>
-                                @error('company_id', 'edit')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            {{-- branch  --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Branch <span class="text-danger">*</span>
-                                </label>
-                                <select name="branch_id" id="edit_branch_id" class="form-select select2" required>
-                                    <option value="">Select Branch</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}">
-                                            {{ $branch->name }}
+                                    </select>
+                                    @error('is_default', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                {{-- Status --}}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select name="status"
+                                        class="form-select select2 @error('status', 'edit') is-invalid @enderror"
+                                        required>
+                                        <option value="Active"
+                                            {{ old('status', $account->status) == 'Active' ? 'selected' : '' }}>Active
                                         </option>
-                                    @endforeach
-                                </select>
-                                @error('branch_id', 'edit')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            {{-- payment type  --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Payment Type <span class="text-danger">*</span>
-                                </label>
-                                <select name="payment_type_id" id="edit_payment_type_id" class="form-select select2"
-                                    required>
-                                    <option value="">Select Payment Type</option>
-                                    @foreach ($paymentTypes as $paymentType)
-                                        <option value="{{ $paymentType->id }}">
-                                            {{ $paymentType->name }}
+                                        <option value="Inactive"
+                                            {{ old('status', $account->status) == 'Inactive' ? 'selected' : '' }}>Inactive
                                         </option>
-                                    @endforeach
-                                </select>
-                                @error('payment_type_id', 'edit')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            {{-- Account Name --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="account_name" id="edit_account_name" class="form-control"
-                                    required>
-                                @error('account_name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- Account address --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Account Address <span class="text-danger">*</span></label>
-                                <input type="text" name="address" id="edit_address" class="form-control">
-                                @error('address', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- Account Holder --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Holder Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="account_holder_name" id="edit_account_holder_name"
-                                    class="form-control" required>
-                                @error('account_holder_name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- Account Number --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Account Number
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="account_number" id="edit_account_number"
-                                    class="form-control" required>
-                                @error('account_number', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- Opening Balance --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Opening Balance <span class="text-danger">*</span></label>
-                                <input type="number" step="1" min="0" name="opening_balance"
-                                    id="edit_opening_balance" class="form-control">
-                                @error('opening_balance', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- isdefault --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Is Default</label>
-                                <select name="is_default" id="edit_default" class="form-select select2">
-                                    <option value="0">Not Default</option>
-                                    <option value="1">Default</option>
-                                </select>
-                                @error('is_default', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                            {{-- Status --}}
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" id="edit_status" class="form-select select2">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                                @error('status', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                                    </select>
+                                    @error('status', 'edit')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fa fa-times me-1"></i>
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fa fa-save me-1"></i>
-                            Update Account
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa fa-times me-1"></i>
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fa fa-save me-1"></i>
+                                Update Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @push('scripts')
     <script>
-        $('#add_company_id').on('change', function() {
-            let companyId = $(this).val();
-            let branchSelect = $('#add_branch_id');
-            branchSelect.html(
-                '<option value="">Select Branch</option>'
-            );
-            if (!companyId) {
-                branchSelect.trigger('change');
-                return;
-            }
-            $.get(
-                '/admin/ajax/company/' + companyId + '/branches',
-                function(res) {
+        $(document).ready(function() {
+            function loadBranches(companyId, selectedBranch = null) {
+                let branchSelect = $('#add_branch_id');
+                branchSelect.html('<option value="">Select Branch</option>');
+                if (!companyId) {
+                    return;
+                }
+                $.get('/admin/ajax/company/' + companyId + '/branches', function(res) {
                     $.each(res.branches, function(index, branch) {
+                        let selected = selectedBranch == branch.id ? 'selected' : '';
                         branchSelect.append(
-                            '<option value="' + branch.id + '">' +
-                            branch.name +
-                            '</option>'
+                            '<option value="' + branch.id + '" ' + selected + '>' + branch
+                            .name + '</option>'
                         );
                     });
                     branchSelect.trigger('change');
-                }
-            );
-        });
-
-        $(document).on('click', '.editBtn', function() {
-
-            let btn = $(this);
-
-            let accountId = btn.data('id');
-            let companyId = btn.data('company');
-            let branchId = btn.data('branch');
-            let paymentTypeId = btn.data('payment-type');
-
-            $('#edit_company_id')
-                .val(companyId)
-                .trigger('change');
-
-            $('#edit_account_name')
-                .val(btn.data('account-name'));
-
-            $('#edit_address')
-                .val(btn.data('address'));
-
-            $('#edit_account_holder_name')
-                .val(btn.data('holder'));
-
-            $('#edit_account_number')
-                .val(btn.data('number'));
-
-            $('#edit_opening_balance')
-                .val(btn.data('opening'));
-
-            $('#edit_payment_type_id').val(paymentTypeId).trigger('change');
-            $('#edit_status').val(btn.data('status')).trigger('change');
-            $('#edit_default').val(btn.data('is_default')).trigger('change');
-            $.get(
-                '/admin/ajax/company/' + companyId + '/branches',
-                function(res) {
-
-                    let branchSelect = $('#edit_branch_id');
-
-                    branchSelect.html(
-                        '<option value="">Select Branch</option>'
-                    );
-
-                    $.each(res.branches, function(index, branch) {
-
-                        branchSelect.append(
-                            '<option value="' + branch.id + '">' +
-                            branch.name +
-                            '</option>'
-                        );
-
-                    });
-
-                    branchSelect
-                        .val(branchId)
-                        .trigger('change');
-                }
-            );
-            $('#editAccountForm').attr(
-                'action',
-                "{{ url('/admin/accounts') }}/" + accountId
-            );
-            new bootstrap.Modal(
-                document.getElementById('editAccountModal')
-            ).show();
+                });
+            }
+            $('#add_company_id').on('change', function() {
+                loadBranches($(this).val());
+            });
+            let oldCompanyId = "{{ old('company_id') }}";
+            let oldBranchId = "{{ old('branch_id') }}";
+            if (oldCompanyId) {
+                loadBranches(oldCompanyId, oldBranchId);
+            }
         });
     </script>
 
-    @if ($errors->add->any())
+    <script>
+        $(document).on('change', '[id^="edit_company_id_"]', function() {
+            let companyId = $(this).val();
+            let accountId = $(this).attr('id').replace('edit_company_id_', '');
+            let branchSelect = $('#edit_branch_id_' + accountId);
+            branchSelect.html('<option value="">Select Branch</option>');
+            if (!companyId) {
+                return;
+            }
+            $.get('/admin/ajax/company/' + companyId + '/branches', function(res) {
+                $.each(res.branches, function(index, branch) {
+                    branchSelect.append(
+                        `<option value="${branch.id}">${branch.name}</option>`
+                    );
+                });
+                branchSelect.trigger('change');
+            });
+        });
+    </script>
+
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addAccountModal')).show();
+                const modalElement = document.getElementById('addAccountModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_account_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editAccountModal')).show();
+                const accountId = @json(session('edit_account_id'));
+                const modal = document.getElementById('editAccountModal' + accountId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

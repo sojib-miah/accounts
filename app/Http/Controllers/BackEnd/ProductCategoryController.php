@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProductCategoryController extends Controller
 {
@@ -45,14 +46,6 @@ class ProductCategoryController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -76,30 +69,22 @@ class ProductCategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $product_category)
-    {
-        return response()->json($product_category);
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Category $product_category)
     {
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100'],
             'status' => 'required'
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('product-category.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_category_id', $product_category->id);
+        }
 
         $product_category->update([
             'name' => $request->name,

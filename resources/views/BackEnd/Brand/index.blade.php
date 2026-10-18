@@ -6,10 +6,7 @@
     <div class="p-5">
         <div class="card shadow-sm mt-3">
             <div class="card-header d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">
-                    <i class="fa fa-tags me-2"></i>
-                    Brand List
-                </h4>
+                <h4 class="mb-0"><i class="fa fa-tags me-2"></i>Brand List</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('brand.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -34,7 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('brand.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
                     </form>
@@ -51,12 +48,12 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">SN</th>
+                                <th>SN</th>
                                 <th>Company Name</th>
                                 <th>Brand Name</th>
                                 <th>Description</th>
-                                <th width="120">Status</th>
-                                <th width="160">Action</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,13 +65,9 @@
                                     <td>{{ $brand->description ?? '-' }}</td>
                                     <td>
                                         @if ($brand->status == 'Active')
-                                            <span class="badge bg-success">
-                                                Active
-                                            </span>
+                                            <span class="badge bg-success">Active</span>
                                         @else
-                                            <span class="badge bg-danger">
-                                                Inactive
-                                            </span>
+                                            <span class="badge bg-danger">Inactive</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -84,11 +77,8 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
-                                                    <button class="dropdown-item editBrand" data-id="{{ $brand->id }}"
-                                                        data-name="{{ $brand->name }}"
-                                                        data-description="{{ $brand->description }}"
-                                                        data-status="{{ $brand->status }}" data-bs-toggle="modal"
-                                                        data-bs-target="#editBrandModal">
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#editBrandModal{{ $brand->id }}">
                                                         <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
@@ -108,15 +98,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-danger">
-                                        No Brand Found
-                                    </td>
+                                    <td colspan="6" class="text-center text-danger">No Brand Found</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 p-3">
+                <div class="p-3">
                     {{ $brands->links() }}
                 </div>
             </div>
@@ -124,39 +112,31 @@
     </div>
 
     @include('BackEnd.Brand.partials.create-modal')
-
     @include('BackEnd.Brand.partials.edit-modal')
 @endsection
 
 @push('scripts')
-    <script>
-        const brandBaseUrl = "{{ url('admin/brand') }}";
-
-        $(document).on('click', '.editBrand', function() {
-
-            let id = $(this).data('id');
-
-            $('#editBrandForm').attr('action', brandBaseUrl + '/' + id);
-
-            $('#edit_name').val($(this).data('name'));
-            $('#edit_description').val($(this).data('description'));
-            $('#edit_status').val($(this).data('status'));
-
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addBrandModal')).show();
+                const modalElement = document.getElementById('addBrandModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_brand_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editBrandModal')).show();
+                const brandId = @json(session('edit_brand_id'));
+                const modal = document.getElementById('editBrandModal' + brandId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

@@ -4,28 +4,18 @@
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fa fa-plus-circle me-2"></i>
-                        Add Brand
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">
-                    </button>
+                    <h5 class="modal-title"><i class="fa fa-plus-circle me-2"></i> Add Brand</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
-
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Brand Name
-                                <span class="text-danger">*</span>
-                            </label>
+                            <label class="form-label">Brand Name <span class="text-danger">*</span></label>
                             <input type="text" name="name"
-                                class="form-control {{ $errors->add->has('name') ? 'is-invalid' : '' }}"
-                                value="{{ old('name') }}" placeholder="Enter Brand Name" required>
+                                class="form-control @error('name', 'add') is-invalid @enderror"
+                                value="{{ old('name') }}" placeholder="Enter Brand Name..." required>
                             @error('name', 'add')
-                                <div class="text-danger small mt-1">
-                                    {{ $message }}
-                                </div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -33,26 +23,24 @@
                             <label class="form-label">
                                 Description
                             </label>
-                            <textarea name="description" rows="4"
-                                class="form-control {{ $errors->add->has('description') ? 'is-invalid' : '' }}" placeholder="Brand Description">{{ old('description') }}</textarea>
+                            <textarea name="description" rows="4" class="form-control @error('description', 'add') is-invalid @enderror"
+                                placeholder="Brand Description...">{{ old('description') }}</textarea>
                             @error('description', 'add')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">
-                                Status
-                            </label>
-                            <select name="status" class="form-select">
-                                <option value="Active" selected>
-                                    Active
-                                </option>
-                                <option value="Inactive">
-                                    Inactive
-                                </option>
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status"
+                                class="form-select select2 @error('status', 'add') is-invalid @enderror">
+                                <option value="Active" {{ old('status', 'Active') == 'Active' ? 'selected' : '' }}>
+                                    Active</option>
+                                <option value="Inactive" {{ old('status', 'Active') == 'Inactive' ? 'selected' : '' }}>
+                                    Inactive</option>
                             </select>
+                            @error('status', 'add')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>

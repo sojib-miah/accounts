@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class BrandController extends Controller
@@ -49,14 +50,6 @@ class BrandController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -85,38 +78,11 @@ class BrandController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Brand $brand)
-    {
-        return response()->json($brand);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Brand $brand)
-    {
-        if (
-            !Auth::user()->hasRole('Super-Admin') &&
-            $brand->created_by != Auth::id()
-        ) {
-            abort(404);
-        }
-
-        return response()->json($brand);
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Brand $brand)
     {
-        if (!Auth::user()->hasRole('Super-Admin') && $brand->created_by != Auth::id()) {
-            abort(404);
-        }
-
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name' => [
                 'required',
                 'string',
@@ -128,6 +94,14 @@ class BrandController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('brand.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_brand_id', $brand->id);
+        }
 
         $brand->update([
             'name' => $request->name,
@@ -144,13 +118,6 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        if (
-            !Auth::user()->hasRole('Super-Admin') &&
-            $brand->created_by != Auth::id()
-        ) {
-            abort(404);
-        }
-
         if ($brand->products()->count() > 0) {
             return redirect()->route('brand.index')->with('error', 'This brand is already used by products.');
         }

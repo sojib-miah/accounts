@@ -7,7 +7,7 @@
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="mb-0">
-                    Payment Type List
+                    <i class="fa-solid fa-list-ul me-2"></i> Payment Type List
                 </h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('payment-type.index') }}" method="GET"
@@ -33,7 +33,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('payment-type.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
                     </form>
@@ -66,13 +66,9 @@
                                     <td>{{ $paymentType->name ?? '-' }}</td>
                                     <td>
                                         @if ($paymentType->status == 'Active')
-                                            <span class="badge bg-success">
-                                                Active
-                                            </span>
+                                            <span class="badge bg-success">Active</span>
                                         @else
-                                            <span class="badge bg-danger">
-                                                Inactive
-                                            </span>
+                                            <span class="badge bg-danger">Inactive</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -83,9 +79,8 @@
                                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                                 <li class="mb-2">
                                                     @can('payment-type-edit')
-                                                        <button class="dropdown-item editBtn" data-id="{{ $paymentType->id }}"
-                                                            data-name="{{ $paymentType->name }}"
-                                                            data-status="{{ $paymentType->status }}">
+                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                            data-bs-target="#editModal{{ $paymentType->id }}">
                                                             <i class="fa fa-edit"></i> Edit
                                                         </button>
                                                     @endcan
@@ -117,7 +112,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 p-3">
+                <div class="p-3">
                     {{ $paymentTypes->links() }}
                 </div>
             </div>
@@ -131,24 +126,27 @@
                 <form action="{{ route('payment-type.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5>Add Payment Type</h5>
+                        <h5><i class="fa fa-plus me-2"></i> Add Payment Type</h5>
                         <button class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Payment Type</label>
-                            <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
+                            <label>Payment Type <span class="text-danger">*</span></label>
+                            <input type="text" name="name" value="{{ old('name') }}"
+                                class="form-control @error('name', 'add') is-invalid @enderror"
+                                placeholder="Payment Type..." required>
                             @error('name', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label>Status</label>
-                            <select name="status" class="form-select select2">
-                                <option value="Active">
+                            <label>Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-select select2 @error('status', 'add') is-invalid @enderror"
+                                required>
+                                <option value="Active" {{ old('status', 'Active') == 'Active' ? 'selected' : '' }}>
                                     Active
                                 </option>
-                                <option value="Inactive">
+                                <option value="Inactive" {{ old('status', 'Active') == 'Inactive' ? 'selected' : '' }}>
                                     Inactive
                                 </option>
                             </select>
@@ -159,10 +157,10 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button class="btn btn-primary">
-                            Save
+                            <i class="fa fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
@@ -171,78 +169,83 @@
     </div>
 
     {{-- edit modal  --}}
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5>Edit Payment Type</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label>Payment Type</label>
-                            <input type="text" name="name" id="edit_name" class="form-control" required>
-                            @error('name', 'edit')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+    @foreach ($paymentTypes as $paymentType)
+        <div class="modal fade" id="editModal{{ $paymentType->id }}" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('payment-type.update', $paymentType->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5><i class="fa fa-edit me-2"></i> Edit Payment Type</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="mb-3">
-                            <label>Status</label>
-                            <select name="status" id="edit_status" class="form-select select2">
-                                <option value="Active">
-                                    Active
-                                </option>
-                                <option value="Inactive">
-                                    Inactive
-                                </option>
-                            </select>
-                            @error('status', 'edit')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label>Payment Type <span class="text-danger">*</span></label>
+                                <input type="text" name="name"
+                                    value="{{ session('edit_payment_id') == $paymentType->id && $errors->getBag('edit')->any() ? old('name', $paymentType->name) : $paymentType->name }}"
+                                    class="form-control @error('name', 'edit') is-invalid @enderror"
+                                    placeholder="Payment Type..." required>
+                                @error('name', 'edit')
+                                    <small class="invalid-feedback">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label>Status</label>
+                                <select name="status"
+                                    class="form-select select2 @error('status', 'edit') is-invalid @enderror" required>
+                                    <option value="Active"
+                                        {{ old('status', $paymentType->status) == 'Active' ? 'selected' : '' }}>
+                                        Active
+                                    </option>
+                                    <option value="Inactive"
+                                        {{ old('status', $paymentType->status) == 'Inactive' ? 'selected' : '' }}>
+                                        Inactive
+                                    </option>
+                                </select>
+                                @error('status', 'edit')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
-                            Close
-                        </button>
-                        <button class="btn btn-success">
-                            Update
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                <i class="fa-solid fa-xmark me-1"></i> Close
+                            </button>
+                            <button class="btn btn-success">
+                                <i class="fa fa-save me-1"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                document.getElementById('edit_name').value = this.dataset.name;
-                $('#edit_status').val(this.dataset.status).trigger('change');
-                document.getElementById('editForm').action = '/admin/payment-type/update/' + this.dataset
-                    .id;
-                new bootstrap.Modal(document.getElementById('editModal')).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addModal')).show();
+                const modalElement = document.getElementById('addModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_payment_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editModal')).show();
+                const paymentId = @json(session('edit_payment_id'));
+                const modal = document.getElementById('editModal' + paymentId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

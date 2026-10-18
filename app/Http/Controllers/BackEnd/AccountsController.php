@@ -10,6 +10,7 @@ use App\Models\PaymentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PackageHelper;
 
@@ -154,12 +155,7 @@ class AccountsController extends Controller
     {
         $companyId = Auth::user()->company_id;
 
-        abort_unless(
-            (int) $account->company_id === (int) $companyId,
-            404
-        );
-
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'company_id'          => 'required|exists:companies,id',
             'branch_id'           => 'required|exists:branches,id',
             'account_name'        => [
@@ -178,7 +174,17 @@ class AccountsController extends Controller
             'status'              => 'required|in:Active,Inactive',
             'is_default'              => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('accounts.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_account_id', $account->id);
+        }
+
         DB::beginTransaction();
+
         try {
             $difference = $request->opening_balance - $account->opening_balance;
             $currentBalance = $account->current_balance + $difference;

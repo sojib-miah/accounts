@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between">
-                <h4>Product Category</h4>
+                <h4><i class="fa-solid fa-list-ul me-2"></i> Product Category</h4>
                 <div class="d-flex justify-content-center align-items-center gap-2">
                     <form action="{{ route('product-category.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Product Category">
+                                placeholder="Search Product Category...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -31,7 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('product-category.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
                     </form>
@@ -46,11 +46,11 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>SL</th>
+                            <th>SN</th>
                             <th>Company Name</th>
                             <th>Category</th>
                             <th>Status</th>
-                            <th width="150">Action</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,8 +77,8 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow">
                                             <li class="mb-2">
-                                                <button type="button" class="dropdown-item editBtn"
-                                                    data-id="{{ $category->id }}">
+                                                <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                    data-bs-target="#editModal{{ $category->id }}">
                                                     <i class="fa fa-edit"></i> Edit
                                                 </button>
                                             </li>
@@ -99,14 +99,12 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">
-                                    No categories found.
-                                </td>
+                                <td colspan="5" class="text-center">No categories found.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="mt-3">
+                <div class="p-3">
                     {{ $categories->links() }}
                 </div>
             </div>
@@ -120,34 +118,39 @@
                 <form action="{{ route('product-category.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5>Add Category</h5>
+                        <h5><i class="fa fa-plus me-2"></i> Add Category</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Name</label>
-                            <input type="text" name="name"
-                                class="form-control @error('name', 'add') is-invalid @enderror" required>
+                            <label>Category Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" value="{{ old('name') }}"
+                                class="form-control @error('name', 'add') is-invalid @enderror"
+                                placeholder="Enter Category Name..." required>
                             @error('name', 'add')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label>Status</label>
-                            <select name="status" class="form-select">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
+                            <label>Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-select select2 @error('status', 'add') is-invalid @enderror"
+                                required>
+                                <option value="Active" {{ old('status', 'Active') == 'Active' ? 'selected' : '' }}>Active
+                                </option>
+                                <option value="Inactive" {{ old('status', 'Active') == 'Inactive' ? 'selected' : '' }}>
+                                    Inactive</option>
                             </select>
+                            @error('status', 'add')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
+                            <i class="fa-solid fa-xmark me-1"></i> Close
                         </button>
                         <button type="submit" class="btn btn-success">
-                            Save
+                            <i class="fa fa-save me-1"></i> Save
                         </button>
                     </div>
                 </form>
@@ -156,77 +159,81 @@
     </div>
 
     {{-- EDIT MODAL --}}
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="POST" id="editForm">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5>Edit Category</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label>Name</label>
-                            <input type="text" name="name" id="edit_name"
-                                class="form-control @error('name', 'edit') is-invalid @enderror" required>
-                            @error('name', 'edit')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+    @foreach ($categories as $category)
+        <div class="modal fade" id="editModal{{ $category->id }}" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('product-category.update', $category->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5><i class="fa fa-edit me-2"></i> Edit Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="mb-3">
-                            <label>Status</label>
-                            <select name="status" id="edit_status" class="form-select">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label>Category Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name"
+                                    value="{{ session('edit_category_id') == $category->id && $errors->getBag('edit')->any() ? old('name', $category->name) : $category->name }}"
+                                    class="form-control @error('name', 'edit') is-invalid @enderror"
+                                    placeholder="Enter Category Name..." required>
+                                @error('name', 'edit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label>Status <span class="text-danger">*</span></label>
+                                <select name="status"
+                                    class="form-select select2  @error('status', 'edit') is-invalid @enderror" required>
+                                    <option value="Active"
+                                        {{ old('status', $category->status) == 'Active' ? 'selected' : '' }}>Active
+                                    </option>
+                                    <option value="Inactive"
+                                        {{ old('status', $category->status) == 'Inactive' ? 'selected' : '' }}>Inactive
+                                    </option>
+                                </select>
+                                @error('status', 'edit')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            Update
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-1"></i> Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-1"></i> Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endforeach
 @endsection
 
 @section('script')
-    <script>
-        $('.editBtn').click(function() {
-            let id = $(this).data('id');
-            $.get('/admin/product-category/' + id + '/edit', function(data) {
-                $('#edit_name').val(data.name);
-                $('#edit_status').val(data.status);
-                $('#editForm').attr(
-                    'action',
-                    '/admin/product-category/' + id
-                );
-                $('#editModal').modal('show');
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('createModal')).show();
+                const modalElement = document.getElementById('createModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_category_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editModal')).show();
+                const categoryId = @json(session('edit_category_id'));
+                const modal = document.getElementById('editModal' + categoryId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif
