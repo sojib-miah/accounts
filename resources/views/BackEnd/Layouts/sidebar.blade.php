@@ -510,6 +510,14 @@
                 </ul>
             </li>
         @endcan
+
+        {{-- cache clear --}}
+        <li class="menu-item">
+            <a href="{{ route('cache.clear') }}" class="menu-link">
+                <i class="fa-solid fa-arrows-spin me-3"></i>
+                Cache Clear
+            </a>
+        </li>
     </ul>
 
     <div class="m-4">

@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -101,27 +102,22 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('add', [
             'product_code' => 'required|unique:products,product_code',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|max:255',
             'model_no' => 'required|unique:products,model_no|max:255',
-            'minimum_stock' => 'required|numeric|min:0',
-            'unit' => 'required',
+            'barcode' => 'nullable',
             'sku' => 'required|unique:products,sku|max:255',
+            'unit' => 'required',
+            'minimum_stock' => 'required|numeric|min:0',
+            'status' => 'required',
+            'description' => 'nullable',
         ]);
 
         Product::create([
@@ -154,19 +150,11 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        return response()->json($product);
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'product_code' => 'required|unique:products,product_code,' . $product->id,
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
@@ -175,7 +163,18 @@ class ProductController extends Controller
             'minimum_stock' => 'required|numeric|min:0',
             'unit' => 'required',
             'sku' => 'required|max:255|unique:products,sku,' . $product->id,
+            'barcode' => 'nullable',
+            'status' => 'required',
+            'description' => 'nullable',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('product.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_product_id', $product->id);
+        }
 
         $product->update([
             'category_id' => $request->category_id,

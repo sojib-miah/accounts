@@ -1,53 +1,42 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Products')
+@section('title', 'Products List')
 
 @section('content')
-
     <div class="p-5">
-        <div class="mb-4">
-            <h2 class="fw-bold">
-                Product List
-            </h2>
+        <div class="my-4">
+            <h2 class="fw-bold"><i class="fa-solid fa-list-ul me-2"></i> Products List</h2>
         </div>
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="card shadow">
                     <div class="card-body">
                         <h6>Total Products</h6>
-                        <h2>
-                            {{ $statistics['total'] }}
-                        </h2>
+                        <h2>{{ $statistics['total'] }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h6>Active</h6>
-                        <h2 class="text-success">
-                            {{ $statistics['active'] }}
-                        </h2>
+                        <h6>Active Products</h6>
+                        <h2 class="text-success">{{ $statistics['active'] }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h6>Inactive</h6>
-                        <h2 class="text-danger">
-                            {{ $statistics['inactive'] }}
-                        </h2>
+                        <h6>Inactive Products</h6>
+                        <h2 class="text-danger">{{ $statistics['inactive'] }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h6>Low Stock</h6>
-                        <h2 class="text-warning">
-                            {{ $statistics['low_stock'] }}
-                        </h2>
+                        <h6>Low Stock Products</h6>
+                        <h2 class="text-warning">{{ $statistics['low_stock'] }}</h2>
                     </div>
                 </div>
             </div>
@@ -68,14 +57,12 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <input type="text" name="search" class="form-control" placeholder="Search..."
-                                value="{{ request('search') }}">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search Name, Code, Sku..." value="{{ request('search') }}">
                         </div>
                         <div class="col-md-2">
                             <select name="category" class="form-select select2">
-                                <option value="">
-                                    All Category
-                                </option>
+                                <option value="">All Category</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}"
                                         {{ request('category') == $category->id ? 'selected' : '' }}>
@@ -86,26 +73,21 @@
                         </div>
                         <div class="col-md-2">
                             <select name="status" class="form-select">
-                                <option value="">
-                                    All Status
+                                <option value="">All Status</option>
+                                <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active
                                 </option>
-                                <option value="Active">
-                                    Active
-                                </option>
-                                <option value="Inactive">
-                                    Inactive
+                                <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive
                                 </option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <button class="btn btn-primary">
-                                        Search
-                                    </button>
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search me-1"></i>
+                                        Search</button>
                                     @if (request('search') || request('company_id') || request('category') || request('status'))
                                         <a href="{{ route('product.index') }}" class="btn btn-secondary">
-                                            Reset
+                                            <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                         </a>
                                     @endif
                                 </div>
@@ -162,13 +144,9 @@
                                 </td>
                                 <td>
                                     @if ($product->status == 'Active')
-                                        <span class="badge bg-success">
-                                            Active
-                                        </span>
+                                        <span class="badge bg-success">Active</span>
                                     @else
-                                        <span class="badge bg-danger">
-                                            Inactive
-                                        </span>
+                                        <span class="badge bg-danger">Inactive</span>
                                     @endif
                                 </td>
                                 <td>
@@ -184,8 +162,8 @@
                                             </li>
                                             @can('product-edit')
                                                 <li>
-                                                    <button type="button" class="dropdown-item editProduct"
-                                                        data-id="{{ $product->id }}">
+                                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#editProductModal{{ $product->id }}">
                                                         <i class="fa fa-edit"></i> Edit
                                                     </button>
                                                 </li>
@@ -207,9 +185,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center">
-                                    No Product Found
-                                </td>
+                                <td colspan="10" class="text-center">No Product Found</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -226,63 +202,28 @@
 @endsection
 
 @push('scripts')
-    @if ($errors->any())
+    @if ($errors->getBag('add')->any())
         <script>
-            $(function() {
-                $('#createProductModal').modal('show');
+            document.addEventListener('DOMContentLoaded', function() {
+                const modalElement = document.getElementById('createProductModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
-    <script>
-        $('.editProduct').click(function(e) {
-            e.preventDefault();
-            let id = $(this).data('id');
-            $.ajax({
-                url: '/admin/product/' + id + '/edit',
-                type: 'GET',
-                success: function(res) {
-                    $('#edit_product_id').val(res.id);
-                    $('#edit_product_code').val(res.product_code);
-                    $('#edit_category_id').val(res.category_id).trigger('change');
-                    $('#edit_brand_id').val(res.brand_id).trigger('change');
-                    $('#edit_name').val(res.name);
-                    $('#edit_model_no').val(res.model_no);
-                    $('#edit_barcode').val(res.barcode);
-                    $('#edit_sku').val(res.sku);
-                    $('#edit_unit').val(res.unit).trigger('change');
-                    $('#edit_minimum_stock').val(res.minimum_stock);
-                    $('#edit_status').val(res.status).trigger('change');
-                    $('#edit_description').val(res.description);
-                    $('#editForm').attr('action', '/admin/product/' + res.id);
-                    $('#editProductModal').modal('show');
-                }
-            });
-        });
-        $('#createProductModal').on('shown.bs.modal', function() {
-            $(this).find('.select2').select2({
-                dropdownParent: $('#createProductModal')
-            });
-        });
-        $('#editProductModal').on('shown.bs.modal', function() {
-            $(this).find('.select2').select2({
-                dropdownParent: $('#editProductModal')
-            });
-        });
 
-        $('.delete-btn').click(function(e) {
-            e.preventDefault();
-            let form = $(this).closest('form');
-            Swal.fire({
-                title: 'Delete Product?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Delete'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
+    @if ($errors->getBag('edit')->any() && session('edit_product_id'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const productId = @json(session('edit_product_id'));
+                const modal = document.getElementById('editProductModal' + productId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
                 }
             });
-        });
-    </script>
+        </script>
+    @endif
 @endpush

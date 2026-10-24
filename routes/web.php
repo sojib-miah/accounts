@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-
+use Illuminate\Support\Facades\Artisan;
 
 // include route
 require __DIR__ . '/admin.php';
@@ -45,3 +45,14 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('admin.payment.show');
     Route::patch('/payments/{payment}/status', [PaymentController::class, 'updateStatus'])->name('admin.payment.update-status');
 });
+
+
+// cache clear route 
+Route::get('cache-clear', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+    return back()->with('success', 'Cache Cleared Successfull!');
+})->name('cache.clear');
