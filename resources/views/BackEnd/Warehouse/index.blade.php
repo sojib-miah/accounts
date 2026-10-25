@@ -9,10 +9,7 @@
                 <div class="d-flex justify-content-between align-items-center gap-3">
                     {{-- Title --}}
                     <div class="">
-                        <h4 class="mb-0">
-                            <i class="fa fa-warehouse me-2"></i>
-                            Warehouse Receive List
-                        </h4>
+                        <h4 class="mb-0"><i class="fa fa-warehouse me-2"></i> Warehouse Receive List</h4>
                     </div>
                     {{-- Filters --}}
                     <div class="">
@@ -35,9 +32,7 @@
                             </div>
                             <div style="width: 200px;">
                                 <select name="party_id" class="form-select select2 w-100">
-                                    <option value="">
-                                        All Suppliers
-                                    </option>
+                                    <option value="">All Suppliers</option>
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}"
                                             {{ $supplierId == $supplier->id ? 'selected' : '' }}>
@@ -48,17 +43,12 @@
                             </div>
                             <div style="width: 200px;">
                                 <select name="status" class="form-select select2 w-100">
-                                    <option value="">
-                                        All Status
+                                    <option value="">All Status</option>
+                                    <option value="Draft" {{ $status == 'Draft' ? 'selected' : '' }}>Waiting Receive
                                     </option>
-                                    <option value="Draft" {{ $status == 'Draft' ? 'selected' : '' }}>
-                                        Waiting Receive
+                                    <option value="Completed" {{ $status == 'Completed' ? 'selected' : '' }}>Completed
                                     </option>
-                                    <option value="Completed" {{ $status == 'Completed' ? 'selected' : '' }}>
-                                        Completed
-                                    </option>
-                                    <option value="Cancelled" {{ $status == 'Cancelled' ? 'selected' : '' }}>
-                                        Cancelled
+                                    <option value="Cancelled" {{ $status == 'Cancelled' ? 'selected' : '' }}>Cancelled
                                     </option>
                                 </select>
                             </div>
@@ -68,7 +58,7 @@
                             </button>
                             @if (request('search') || request('company_id') || request('party_id') || request('status'))
                                 <a href="{{ route('warehouse.index') }}" class="btn btn-secondary">
-                                    Reset
+                                    <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                 </a>
                             @endif
                         </form>
@@ -76,9 +66,7 @@
                     {{-- Pending --}}
                     <div class="">
                         <div class="d-inline-flex align-items-center gap-2">
-                            <span class="text-muted small">
-                                Pending
-                            </span>
+                            <span class="text-muted small">Pending</span>
                             <span class="badge bg-warning text-dark fs-6">
                                 {{ number_format($pendingCount) }}
                             </span>
@@ -91,7 +79,7 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">SN</th>
+                                <th>SN</th>
                                 <th>Company Name</th>
                                 <th>Date</th>
                                 <th>PO No</th>
@@ -103,7 +91,7 @@
                                 <th class="text-end">Unit Price</th>
                                 <th class="text-end">Total Price</th>
                                 <th>Status</th>
-                                <th width="150">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -206,9 +194,9 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-                <div class="mt-3 p-3">
-                    {{ $purchases->links() }}
+                    <div class="p-3">
+                        {{ $purchases->links() }}
+                    </div>
                 </div>
             </div>
         </div>

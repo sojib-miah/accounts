@@ -463,32 +463,11 @@ class IncomeReceiptController extends Controller
         $userId = $user->id;
 
         $request->validate([
-            'payment_type_id' => [
-                'required',
-                'exists:payment_types,id',
-            ],
-
-            'account_id' => [
-                'required',
-                'exists:accounts,id',
-            ],
-
-            'amount' => [
-                'required',
-                'numeric',
-                'gt:0',
-            ],
-
-            'payment_date' => [
-                'required',
-                'date',
-            ],
-
-            'note' => [
-                'nullable',
-                'string',
-                'max:1000',
-            ],
+            'payment_type_id' => ['required', 'exists:payment_types,id',],
+            'account_id' => ['required', 'exists:accounts,id',],
+            'amount' => ['required', 'numeric', 'gt:0',],
+            'payment_date' => ['required', 'date',],
+            'note' => ['nullable', 'string', 'max:1000',],
         ]);
 
         DB::beginTransaction();
@@ -500,130 +479,75 @@ class IncomeReceiptController extends Controller
                 ->firstOrFail();
 
             if ($receipt->type !== 'Sales-Order') {
-
                 throw new \Exception(
                     'Payment is only allowed for Sales Order.'
                 );
             }
 
             // if ($receipt->status !== 'Completed') {
-
             //     throw new \Exception(
             //         'Payment can only be made for a completed receipt.'
             //     );
             // }
 
             if ($receipt->payment_status === 'Paid') {
-
                 throw new \Exception(
                     'This receipt has already been fully paid.'
                 );
             }
-
-            $amount = round(
-                (float) $request->amount,
-                2
-            );
-
+            $amount = round((float) $request->amount, 2);
             if ($amount <= 0) {
-
                 throw new \Exception(
                     'Payment amount must be greater than zero.'
                 );
             }
-
-            $dueAmount = round(
-                (float) $receipt->due_amount,
-                2
-            );
-
+            $dueAmount = round((float) $receipt->due_amount, 2);
             if ($dueAmount <= 0) {
-
                 throw new \Exception(
                     'This Sales Order has no outstanding due amount.'
                 );
             }
-
             if ($amount > $dueAmount) {
-
                 throw new \Exception(
-                    'Payment amount cannot be greater than due amount. ' .
-                        'Remaining Due: ' .
-                        number_format($dueAmount, 2)
+                    'Payment amount cannot be greater than due amount. ' . 'Remaining Due: ' . number_format($dueAmount, 2)
                 );
             }
-
-            $paymentType = PaymentType::where(
-                'id',
-                $request->payment_type_id
-            )
+            $paymentType = PaymentType::where('id', $request->payment_type_id)
                 ->where('status', 'Active')
                 ->first();
 
             if (!$paymentType) {
-
                 throw new \Exception(
                     'Selected payment type is inactive or invalid.'
                 );
             }
-
-            $account = Account::where(
-                'id',
-                $request->account_id
-            )
+            $account = Account::where('id', $request->account_id)
                 ->where('status', 'Active')
                 ->lockForUpdate()
                 ->first();
 
             if (!$account) {
-
                 throw new \Exception(
                     'Selected account is inactive or invalid.'
                 );
             }
-
-            if (
-                (int) $account->payment_type_id !==
-                (int) $paymentType->id
-            ) {
-
+            if ((int) $account->payment_type_id !== (int) $paymentType->id) {
                 throw new \Exception(
                     'Selected account does not belong to the selected payment type.'
                 );
             }
-
-            if (
-                !$user->hasRole('Super-Admin') &&
-                (int) $account->company_id !==
-                (int) $user->company_id
-            ) {
-
+            if (!$user->hasRole('Super-Admin') && (int) $account->company_id !== (int) $user->company_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
-
-            if (
-                !$user->hasRole('Super-Admin') &&
-                (int) $account->branch_id !==
-                (int) $user->branch_id
-            ) {
-
+            if (!$user->hasRole('Super-Admin') && (int) $account->branch_id !== (int) $user->branch_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
-
-            $currentBalance = round(
-                (float) $account->current_balance,
-                2
-            );
-
-            $newBalance = round(
-                $currentBalance + $amount,
-                2
-            );
-
+            $currentBalance = round((float) $account->current_balance, 2);
+            $newBalance = round($currentBalance + $amount, 2);
             $account->update([
                 'current_balance' => $newBalance,
                 'updated_by'      => $userId,
@@ -632,25 +556,13 @@ class IncomeReceiptController extends Controller
                 'company_id'       => $account->company_id,
                 'account_id'       => $account->id,
                 'transaction_date' => $request->payment_date,
-
-                'voucher_no'       =>
-                $receipt->so_no ??
-                    $receipt->receipt_no,
-
+                'voucher_no'       => $receipt->so_no ?? $receipt->receipt_no,
                 'transaction_type' => 'Sales-Order',
-
-                'purpose'          =>
-                'Sales Payment - ' .
-                    $receipt->receipt_no,
-
+                'purpose'          => 'Sales Payment - ' . $receipt->receipt_no,
                 'credit'           => $amount,
-
                 'debit'            => 0,
-
                 'balance'          => $newBalance,
-
                 'receipt_id'       => $receipt->id,
-
                 'created_by'       => $userId,
             ]);
 
@@ -664,66 +576,32 @@ class IncomeReceiptController extends Controller
                 'created_by'      => $userId,
             ]);
 
-            $oldPaidAmount = round(
-                (float) $receipt->paid_amount,
-                2
-            );
-
-            $newPaidAmount = round(
-                $oldPaidAmount + $amount,
-                2
-            );
-
-            $totalAmount = round(
-                (float) $receipt->total_amount,
-                2
-            );
-
-            $newDueAmount = round(
-                $totalAmount - $newPaidAmount,
-                2
-            );
-
+            $oldPaidAmount = round((float) $receipt->paid_amount, 2);
+            $newPaidAmount = round($oldPaidAmount + $amount, 2);
+            $totalAmount = round((float) $receipt->total_amount, 2);
+            $newDueAmount = round($totalAmount - $newPaidAmount, 2);
             if ($newDueAmount < 0) {
                 $newDueAmount = 0;
             }
-
             if ($newDueAmount <= 0) {
-
                 $newDueAmount = 0;
-
                 $paymentStatus = 'Paid';
             } elseif ($newPaidAmount > 0) {
-
                 $paymentStatus = 'Partial';
             } else {
-
                 $paymentStatus = 'Pending';
             }
-
             $receipt->update([
                 'paid_amount'    => $newPaidAmount,
                 'due_amount'     => $newDueAmount,
                 'payment_status' => $paymentStatus,
                 'updated_by'     => $userId,
             ]);
-
             DB::commit();
-
-            return back()->with(
-                'success',
-                'Sales payment successfully completed.'
-            );
+            return back()->with('success', 'Sales payment successfully completed.');
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 }

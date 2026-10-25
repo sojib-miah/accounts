@@ -195,7 +195,7 @@
                         {{-- Income Item List --}}
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between">
-                                <h4>Products</h4>
+                                <h4><i class="fa-brands fa-product-hunt me-2"></i> Products</h4>
                                 <div>
                                     <button type="button" id="addRow" class="btn btn-primary">
                                         <i class="fa fa-plus me-2"></i>
@@ -208,7 +208,7 @@
                                     <table class="table table-bordered mb-0">
                                         <thead>
                                             <tr>
-                                                <th width="50">SL</th>
+                                                <th width="50">SN</th>
                                                 <th width="300">Product</th>
                                                 <th width="300">Description</th>
                                                 <th>Serial No</th>
@@ -347,7 +347,7 @@
                 {{-- FOOTER --}}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancel
+                        <i class="fa-solid fa-xmark me-1"></i> Cancel
                     </button>
                     <button type="button" class="btn btn-primary" id="saveSerialBtn">
                         <i class="fa fa-check me-1"></i>

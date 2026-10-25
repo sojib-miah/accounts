@@ -7,10 +7,7 @@
         <div class="card shadow-sm mt-5">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
-                        <i class="fa fa-boxes me-2"></i>
-                        Inventory
-                    </h4>
+                    <h4 class="mb-0"><i class="fa fa-boxes me-2"></i> Inventory List</h4>
                     <div>
                         <span class="badge bg-primary me-2">
                             Products: {{ number_format($totalProducts) }}
@@ -46,7 +43,7 @@
                             </button>
                             @if (request('search') || request('company_id'))
                                 <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
-                                    <i class="fa fa-times"></i>
+                                    <i class="fa-solid fa-rotate-left me-1"></i>
                                     Clear
                                 </a>
                             @endif
@@ -83,7 +80,7 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">SN</th>
+                                <th>SN</th>
                                 <th>Company Name</th>
                                 <th>Product Code</th>
                                 <th>Part No</th>
@@ -96,7 +93,7 @@
                                 <th class="text-end">Total Stock</th>
                                 <th class="text-end">Avg. Purchase Price</th>
                                 <th class="text-end">Total Price</th>
-                                <th width="100" class="text-center">Action</th>
+                                <th class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -150,10 +147,10 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-                {{-- Pagination --}}
-                <div class="mt-3">
-                    {{ $products->links() }}
+                    {{-- Pagination --}}
+                    <div class="p">
+                        {{ $products->links() }}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,15 +1,13 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Make Payment')
+@section('title', 'Make Payment List')
 
 @section('content')
     <div class="p-5">
         <div class="mt-3">
             {{-- Header --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">
-                    Make Payment
-                </h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Make Payment List</h4>
                 <form action="{{ route('purchase.payment.index') }}" method="GET" class="d-flex gap-2">
                     <div style="width: 200px;">
                         <select name="company_id" class="form-select select2 w-100">
@@ -24,15 +22,15 @@
                     </div>
                     <div>
                         <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Search PO / Supplier">
+                            placeholder="Search PO / Supplier...">
                     </div>
                     <button class="btn btn-primary">
-                        <i class="fa fa-search"></i>
+                        <i class="fa fa-search me-1"></i>
                         Search
                     </button>
                     @if (request('search') || request('company_id'))
                         <a href="{{ route('purchase.payment.index') }}" class="btn btn-secondary">
-                            Reset
+                            <i class="fa-solid fa-rotate-left me-1"></i> Reset
                         </a>
                     @endif
                 </form>
@@ -120,9 +118,9 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
-                    <div class="mt-3">
-                        {{ $purchases->links() }}
+                        <div class="p-3">
+                            {{ $purchases->links() }}
+                        </div>
                     </div>
                 </div>
             </div>

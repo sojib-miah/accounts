@@ -6,7 +6,7 @@
     <div class="p-5">
         <div class="card shadow-sm mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Purchase List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Purchase List</h4>
                 <div>
                     @can('purchase-create')
                         <a href="{{ route('purchase.create') }}" class="btn btn-primary">
@@ -74,7 +74,7 @@
                             </div>
                             <div class="mt-5">
                                 <button class="btn btn-primary">
-                                    <i class="fa fa-search"></i>
+                                    <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request('search') ||
@@ -84,7 +84,7 @@
                                         request('status') ||
                                         request('company_id'))
                                     <a href="{{ route('purchase.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                             </div>
@@ -97,7 +97,7 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead>
                             <tr>
-                                <th width="60">SN</th>
+                                <th>SN</th>
                                 <th>Company Name</th>
                                 <th>Date</th>
                                 <th>PO No</th>
@@ -109,7 +109,7 @@
                                 <th class="text-end">Unit Price</th>
                                 <th class="text-end">Total Price</th>
                                 <th>Status</th>
-                                <th width="150">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -123,7 +123,8 @@
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
-                                                {{ $item->product->sku }}@if (!$loop->last)
+                                                {{ $item->product->sku }}
+                                                @if (!$loop->last)
                                                     ,
                                                 @endif
                                             </div>
@@ -132,7 +133,8 @@
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
-                                                {{ $item->product->name }}@if (!$loop->last)
+                                                {{ $item->product->name }}
+                                                @if (!$loop->last)
                                                     ,
                                                 @endif
                                             </div>
@@ -141,7 +143,8 @@
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
-                                                {{ $item->product->description }}@if (!$loop->last)
+                                                {{ $item->product->description }}
+                                                @if (!$loop->last)
                                                     ,
                                                 @endif
                                             </div>
@@ -151,7 +154,8 @@
                                     <td>
                                         @foreach ($purchase->items as $item)
                                             <div>
-                                                {{ $item->rate }}@if (!$loop->last)
+                                                {{ $item->rate }}
+                                                @if (!$loop->last)
                                                     ,
                                                 @endif
                                             </div>
@@ -215,20 +219,20 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="13" class="text-center">
-                                            No Purchase Found
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-3">
+                            @empty
+                                <tr>
+                                    <td colspan="13" class="text-center">
+                                        No Purchase Found
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    <div class="p-3">
                         {{ $purchases->links() }}
                     </div>
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+@endsection

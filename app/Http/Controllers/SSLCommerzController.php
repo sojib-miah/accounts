@@ -43,26 +43,34 @@ class SSLCommerzController extends Controller
             return back()->with('error', 'Payment gateway is not configured. Please contact support.');
         }
 
-        $existingPayment = Payment::where('user_id', $user->id)->where('package_id', $package->id)
-            ->where('status', 'Pending')->where('created_at', '>=', now()->subMinutes(30))->latest('id')->first();
+        // $existingPayment = Payment::where('user_id', $user->id)->where('package_id', $package->id)
+        //     ->where('status', 'Pending')->where('created_at', '>=', now()->subMinutes(30))->latest('id')->first();
 
-        if ($existingPayment) {
-            return redirect()->route('payment.result', $existingPayment->id)
-                ->with('info', 'A pending payment already exists. Please check its status before paying again.');
-        }
+        // if ($existingPayment) {
+        //     return redirect()->route('payment.result', $existingPayment->id)
+        //         ->with('info', 'A pending payment already exists. Please check its status before paying again.');
+        // }
 
-        $payment = null;
+        // $payment = null;
+        $payment = Payment::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where('status', 'Pending')
+            ->where('created_at', '>=', now()->subMinutes(30))
+            ->latest('id')
+            ->first();
 
         try {
-            $payment = Payment::create([
-                'user_id' => $user->id,
-                'company_id' => $user->company_id,
-                'package_id' => $package->id,
-                'tran_id' => 'COMITS-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(8)),
-                'amount' => $package->price,
-                'currency' => 'BDT',
-                'status' => 'Pending',
-            ]);
+            if (!$payment) {
+                $payment = Payment::create([
+                    'user_id' => $user->id,
+                    'company_id' => $user->company_id,
+                    'package_id' => $package->id,
+                    'tran_id' => 'COMITS-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(8)),
+                    'amount' => $package->price,
+                    'currency' => 'BDT',
+                    'status' => 'Pending',
+                ]);
+            }
 
             $data = [
                 'store_id' => $storeId,

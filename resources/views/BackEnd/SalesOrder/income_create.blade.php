@@ -120,7 +120,7 @@
                             {{-- Income Item List --}}
                             <div class="card shadow-sm mt-3">
                                 <div class="card-header d-flex justify-content-between">
-                                    <h4>Products</h4>
+                                    <h4><i class="fa-brands fa-product-hunt me-2"></i> Products</h4>
                                     <div>
                                         <button type="button" class="btn btn-primary" id="addRow">
                                             <i class="fa fa-plus me-2"></i>
@@ -154,7 +154,7 @@
                             <div class="row mt-4">
                                 <div class="col-md-8">
                                     <label>Remarks</label>
-                                    <textarea name="remarks" rows="5" class="form-control"></textarea>
+                                    <textarea name="remarks" rows="5" class="form-control">{{ old('remarks') }}</textarea>
                                 </div>
                                 <div class="col-md-4">
                                     <table class="table table-bordered border">
@@ -280,7 +280,7 @@
                 {{-- FOOTER --}}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        <i class="fa-solid fa-xmark me-1"></i> Close
                     </button>
                     <button type="button" class="btn btn-primary" id="saveSerialSelection">
                         <i class="fa fa-check me-1"></i>

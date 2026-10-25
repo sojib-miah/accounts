@@ -7,10 +7,8 @@
         <div class="mt-3">
             {{-- Header --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4>
-                    Purchase Payment
-                </h4>
-                <a href="{{ route('purchase.payment.index') }}" class="btn btn-secondary">
+                <h4><i class="fa-regular fa-credit-card me-2"></i> Purchase Payment</h4>
+                <a href="{{ route('purchase.payment.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fa fa-arrow-left me-2"></i>
                     Back
                 </a>
@@ -18,35 +16,25 @@
             {{-- Purchase Summary --}}
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        Purchase Information
-                    </h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-circle-info me-2"></i> Purchase Information</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <strong>PO No</strong>
-                            <div>
-                                {{ $receipt->po_no ?? $receipt->receipt_no }}
-                            </div>
+                            <div>{{ $receipt->po_no ?? $receipt->receipt_no }}</div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <strong>Purchase Date</strong>
-                            <div>
-                                {{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d-m-Y') }}
-                            </div>
+                            <div>{{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d-m-Y') }}</div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <strong>Supplier Company</strong>
-                            <div>
-                                {{ $receipt->party->customerCompany->name ?? '-' }}
-                            </div>
+                            <div>{{ $receipt->party->customerCompany->name ?? '-' }}</div>
                         </div>
                         <div class="col-md-3 mb-3">
                             <strong>Supplier</strong>
-                            <div>
-                                {{ $receipt->party->name ?? '-' }}
-                            </div>
+                            <div>{{ $receipt->party->name ?? '-' }}</div>
                         </div>
                     </div>
                     <hr>
@@ -84,9 +72,7 @@
             {{-- Products --}}
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        Purchase Items
-                    </h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-tag me-2"></i> Purchase Items</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -103,21 +89,11 @@
                             <tbody>
                                 @foreach ($receipt->items as $item)
                                     <tr>
-                                        <td>
-                                            {{ $loop->iteration }}
-                                        </td>
-                                        <td>
-                                            {{ $item->product->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ number_format($item->qty) }}
-                                        </td>
-                                        <td>
-                                            {{ number_format($item->rate, 2) }}
-                                        </td>
-                                        <td>
-                                            {{ number_format($item->amount, 2) }}
-                                        </td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->product->name ?? '-' }}</td>
+                                        <td>{{ number_format($item->qty) }}</td>
+                                        <td>{{ number_format($item->rate, 2) }}</td>
+                                        <td>{{ number_format($item->amount, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -129,14 +105,8 @@
             @if ($receipt->due_amount > 0)
                 <div class="card shadow-sm mb-4">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="mb-0">
-                            Make Payment
-                        </h5>
-                        <span class="badge bg-danger fs-6">
-                            Due:
-                            ৳
-                            {{ number_format($receipt->due_amount, 2) }}
-                        </span>
+                        <h5 class="mb-0"><i class="fa-regular fa-credit-card me-2"></i> Make Payment</h5>
+                        <span class="badge bg-danger fs-6">Due: ৳ {{ number_format($receipt->due_amount, 2) }}</span>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('purchase.payment.store', $receipt->id) }}" method="POST" id="paymentForm">
@@ -144,70 +114,64 @@
                             <div class="row">
                                 {{-- Payment Type --}}
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        Payment Type
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <select name="payment_type_id" id="payment_type_id" class="form-select select2"
-                                        required>
-                                        <option value="">
-                                            Select Payment Type
-                                        </option>
+                                    <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                                    <select name="payment_type_id" id="payment_type_id"
+                                        class="form-select select2 @error('payment_type_id') is-invalid @enderror" required>
+                                        <option value="">Select Payment Type</option>
                                         @foreach ($paymentTypes as $type)
-                                            <option value="{{ $type->id }}">
-                                                {{ $type->name }}
-                                            </option>
+                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
                                         @endforeach
                                     </select>
+                                    @error('payment_type_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 {{-- Account --}}
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        Account
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <select name="account_id" id="account_id" class="form-select select2" required>
-                                        <option value="">
-                                            Select Account
-                                        </option>
+                                    <label class="form-label">Account <span class="text-danger">*</span></label>
+                                    <select name="account_id" id="account_id"
+                                        class="form-select select2 @error('account_id') is-invalid @enderror" required>
+                                        <option value="">Select Account</option>
                                     </select>
+                                    @error('account_id')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
                                     <div id="accountBalance" class="mt-2"></div>
                                 </div>
                                 {{-- Payment Date --}}
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        Payment Date
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date" name="payment_date" class="form-control"
+                                    <label class="form-label">Payment Date <span class="text-danger">*</span></label>
+                                    <input type="date" name="payment_date"
+                                        class="form-control @error('payment_date') is-invalid @enderror"
                                         value="{{ date('Y-m-d') }}" required>
+                                    @error('payment_date')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 {{-- Amount --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">
-                                        Payment Amount
-                                        <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label">Payment Amount <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text">
-                                            ৳
-                                        </span>
-                                        <input type="number" name="amount" id="payment_amount" class="form-control"
-                                            min="0.01" max="{{ $receipt->due_amount }}" step="0.01"
+                                        <span class="input-group-text">৳</span>
+                                        <input type="number" name="amount" id="payment_amount"
+                                            class="form-control @error('amount') is-invalid @enderror" min="1"
+                                            max="{{ $receipt->due_amount }}" step="1"
                                             value="{{ $receipt->due_amount }}" required>
+                                        @error('amount')
+                                            <small class="invalid-feedback">{{ $message }}</small>
+                                        @enderror
                                     </div>
-                                    <small class="text-muted">
-                                        Maximum:
-                                        ৳
-                                        {{ number_format($receipt->due_amount, 2) }}
-                                    </small>
+                                    <small class="text-muted">Maximum: ৳
+                                        {{ number_format($receipt->due_amount, 2) }}</small>
                                 </div>
                                 {{-- Note --}}
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">
-                                        Note
-                                    </label>
-                                    <textarea name="note" class="form-control" rows="1" placeholder="Payment note"></textarea>
+                                    <label class="form-label">Note</label>
+                                    <textarea name="note" class="form-control @error('note') is-invalid @enderror" rows="1"
+                                        placeholder="Payment note">{{ old('note') }}</textarea>
+                                    @error('note')
+                                        <small class="invalid-feedback">{{ $message }}</small>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="text-end">
@@ -223,16 +187,14 @@
             {{-- Payment History --}}
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-0">
-                        Payment History
-                    </h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i> Payment History</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>SL</th>
+                                    <th>SN</th>
                                     <th>Date</th>
                                     <th>Payment Type</th>
                                     <th>Account</th>
@@ -243,31 +205,16 @@
                             <tbody>
                                 @forelse($receipt->payments as $payment)
                                     <tr>
-                                        <td>
-                                            {{ $loop->iteration }}
-                                        </td>
-                                        <td>
-                                            {{ $payment->payment_date->format('d-m-Y') }}
-                                        </td>
-                                        <td>
-                                            {{ $payment->paymentType->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ $payment->account->account_name ?? '-' }}
-                                        </td>
-                                        <td class="text-danger fw-bold">
-                                            ৳
-                                            {{ number_format($payment->amount, 2) }}
-                                        </td>
-                                        <td>
-                                            {{ $payment->note ?? '-' }}
-                                        </td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $payment->payment_date->format('d-m-Y') }}</td>
+                                        <td>{{ $payment->paymentType->name ?? '-' }}</td>
+                                        <td>{{ $payment->account->account_name ?? '-' }}</td>
+                                        <td class="text-danger fw-bold">৳ {{ number_format($payment->amount, 2) }}</td>
+                                        <td>{{ $payment->note ?? '-' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">
-                                            No payment history.
-                                        </td>
+                                        <td colspan="6" class="text-center">No payment history.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

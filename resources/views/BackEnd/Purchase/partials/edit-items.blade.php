@@ -97,7 +97,7 @@
         </select>
     </td>
     <td>
-        <input type="text" name="description[]" class="form-control description" readonly disabled>
+        <input type="text" name="description[]" class="form-control description" readonly>
     </td>
     <td>
         <button type="button" class="btn btn-info serialBtn">

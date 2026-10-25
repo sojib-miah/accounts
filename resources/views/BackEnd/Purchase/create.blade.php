@@ -9,7 +9,7 @@
             @include('BackEnd.Purchase.partials.form')
             <div class="card mt-3">
                 <div class="card-header d-flex justify-content-between">
-                    <h5 class="mb-0">Purchase Items</h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-tag me-2"></i> Purchase Items</h5>
                     <button type="button" class="btn btn-primary btn-sm" id="addRow">
                         <i class="fa fa-plus me-2"></i>
                         Add Product

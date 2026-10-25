@@ -7,7 +7,7 @@
         <div class="mt-3">
             {{-- Page Header --}}
             <div class="mb-3">
-                <h2 class="fw-bold mb-0">Sales Order List</h2>
+                <h2 class="fw-bold mb-0"><i class="fa-solid fa-list-ul me-2"></i> Sales Order List</h2>
             </div>
             {{-- Card --}}
             <div class="card border-0 shadow-sm">
@@ -61,12 +61,12 @@
                                     </select>
                                 </div>
                                 <button class="btn btn-primary">
-                                    <i class="fa fa-search me-2"></i>
+                                    <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request('search') || request('status') || request('company_id') || request('per_page'))
                                     <a href="{{ route('sales.order.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                                 @can('income-receipt-create')
@@ -96,7 +96,7 @@
                                     <th class="text-center">DATE & TIME</th>
                                     <th class="text-center">Payment STATUS</th>
                                     <th class="text-center">STATUS</th>
-                                    <th class="text-center" width="90">ACTION</th>
+                                    <th class="text-center">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,7 +172,7 @@
                                                             View
                                                         </a>
                                                     </li>
-                                                    <li>
+                                                    {{-- <li>
                                                         <form action="{{ route('receipt.toggle-status', $receipt->id) }}"
                                                             method="POST">
                                                             @csrf
@@ -188,7 +188,7 @@
                                                                 @endif
                                                             </button>
                                                         </form>
-                                                    </li>
+                                                    </li> --}}
                                                     @if ($receipt->status != 'Cancelled')
                                                         <li>
                                                             <form action="{{ route('sales.order.cancel', $receipt->id) }}"
@@ -231,9 +231,9 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
-                    <div class="p-3">
-                        {{ $receipts->links() }}
+                        <div class="p-3">
+                            {{ $receipts->links() }}
+                        </div>
                     </div>
                 </div>
             </div>

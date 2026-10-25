@@ -9,18 +9,13 @@
     }
 
     function normalizeSerial(serial) {
-        return String(serial || '')
-            .trim()
-            .toUpperCase();
+        return String(serial || '').trim().toUpperCase();
     }
 
     function getOtherRowsSerials() {
         let allSerials = [];
         $('.serial_json').each(function() {
-            if (
-                currentRow &&
-                $(this).closest('tr')[0] === currentRow[0]
-            ) {
+            if (currentRow && $(this).closest('tr')[0] === currentRow[0]) {
                 return;
             }
             let json = $(this).val();
@@ -39,10 +34,7 @@
                     });
                 }
             } catch (e) {
-                console.error(
-                    'Invalid serial JSON:',
-                    e
-                );
+                console.error('Invalid serial JSON:', e);
             }
         });
         return allSerials;
@@ -52,12 +44,8 @@
         let totalQty = 0;
         let subTotal = 0;
         $('#purchaseBody tr').each(function() {
-            let qty = parseFloat(
-                $(this).find('.qty').val()
-            ) || 0;
-            let amount = parseFloat(
-                $(this).find('.amount').val()
-            ) || 0;
+            let qty = parseFloat($(this).find('.qty').val()) || 0;
+            let amount = parseFloat($(this).find('.amount').val()) || 0;
             totalQty += qty;
             subTotal += amount;
         });
@@ -77,9 +65,7 @@
         if (due < 0) {
             due = 0;
         }
-        $('#dueAmount').val(
-            due.toFixed(2)
-        );
+        $('#dueAmount').val(due.toFixed(2));
     }
 
     function calculateRow(row) {
@@ -96,13 +82,7 @@
     function renderSerialList() {
         let html = '';
         if (serialArray.length === 0) {
-            $('#serialStatus')
-                .removeClass(
-                    'text-success text-danger'
-                )
-                .addClass('text-warning')
-                .text('No Serial');
-
+            $('#serialStatus').removeClass('text-success text-danger').addClass('text-warning').text('No Serial');
             return;
         } else {
             $.each(serialArray,
@@ -110,12 +90,8 @@
                     let safeSerial = $('<div>').text(serial).html();
                     html += `
                         <tr>
-                            <td>
-                                ${index + 1}
-                            </td>
-                            <td class="text-uppercase">
-                                ${safeSerial}
-                            </td>
+                            <td>${index + 1}</td>
+                            <td class="text-uppercase">${safeSerial}</td>
                             <td class="text-center">
                                 <button
                                     type="button"
@@ -133,43 +109,20 @@
         $('#serialCount').text(serialArray.length);
         $('#requiredQty').text(serialArray.length);
         if (!currentRow) {
-            $('#serialStatus')
-                .removeClass(
-                    'text-success text-danger text-warning'
-                )
-                .text('Waiting...');
+            $('#serialStatus').removeClass('text-success text-danger text-warning').text('Waiting...');
             return;
         }
         let qty = parseFloat(currentRow.find('.qty').val()) || 0;
         if (serialArray.length === 0) {
-            $('#serialStatus')
-                .removeClass(
-                    'text-success text-danger'
-                )
-                .addClass('text-warning')
-                .text('No Serial');
+            $('#serialStatus').removeClass('text-success text-danger').addClass('text-warning').text('No Serial');
             return;
         }
         if (serialArray.length == qty) {
-            $('#serialStatus')
-                .removeClass(
-                    'text-warning text-danger'
-                )
-                .addClass('text-success')
-                .text('Serial Complete');
+            $('#serialStatus').removeClass('text-warning text-danger').addClass('text-success').text('Serial Complete');
             return;
         }
-        $('#serialStatus')
-            .removeClass(
-                'text-warning text-success'
-            )
-            .addClass('text-danger')
-            .text(
-                'Serial ' +
-                serialArray.length +
-                ' / Qty ' +
-                qty
-            );
+        $('#serialStatus').removeClass('text-warning text-success').addClass('text-danger').text('Serial ' + serialArray
+            .length + ' / Qty ' + qty);
     }
     $(document).on('click', '.serialBtn', function() {
         currentRow = $(this).closest('tr');
@@ -192,10 +145,7 @@
             }
         }
         $('#serialInput').val('');
-        let productName = currentRow
-            .find('.product option:selected')
-            .text()
-            .trim();
+        let productName = currentRow.find('.product option:selected').text().trim();
         $('#serialProductName').val(productName);
         renderSerialList();
         $('#serialModal').modal('show');
@@ -211,10 +161,7 @@
                 title: 'Serial Required',
                 text: 'Please enter a serial number.'
             });
-            $('#serialInput')
-                .val('')
-                .focus();
-
+            $('#serialInput').val('').focus();
             return;
         }
         let normalizedSerial = normalizeSerial(serial);
@@ -259,7 +206,6 @@
                         text: response.message ||
                             'This serial number already exists in the system.'
                     });
-
                     $('#serialInput').val('').focus();
                     return;
                 }
@@ -268,50 +214,30 @@
                 $('#serialInput').val('').focus();
             },
             error: function(xhr) {
-                let message =
-                    'Unable to check serial number. Please try again.';
-                if (
-                    xhr.responseJSON &&
-                    xhr.responseJSON.message
-                ) {
-                    message =
-                        xhr.responseJSON.message;
-
+                let message = 'Unable to check serial number. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
                 }
                 Swal.fire({
                     icon: 'error',
                     title: 'Serial Check Failed',
                     text: message
                 });
-
             },
             complete: function() {
-                addButton.prop(
-                    'disabled',
-                    false
-                );
+                addButton.prop('disabled', false);
             }
         });
     });
-    $('#serialInput').on(
-        'keypress',
-        function(e) {
-            if (e.which === 13) {
-                e.preventDefault();
-                $('#addSerial').click();
-            }
+    $('#serialInput').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#addSerial').click();
         }
-    );
+    });
     $(document).on('click', '.removeSerial', function() {
-        let index =
-            parseInt(
-                $(this).data('index')
-            );
-        if (
-            isNaN(index) ||
-            index < 0 ||
-            index >= serialArray.length
-        ) {
+        let index = parseInt($(this).data('index'));
+        if (isNaN(index) || index < 0 || index >= serialArray.length) {
             return;
         }
         Swal.fire({
@@ -321,41 +247,31 @@
             showCancelButton: true,
             confirmButtonText: 'Yes, Remove',
             cancelButtonText: 'Cancel'
-        }).then(
-            function(result) {
-                if (
-                    result.isConfirmed
-                ) {
-                    serialArray.splice(index, 1);
-                    renderSerialList();
-                }
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                serialArray.splice(index, 1);
+                renderSerialList();
             }
-        );
+        });
     });
-    $('#saveSerial').on(
-        'click',
-        function() {
-            if (!currentRow) {
-                return;
-            }
-            let currentQty = parseFloat(currentRow.find('.qty').val()) || 0;
-            if (serialArray.length > 0) {
-                currentRow.find('.qty').val(serialArray.length);
-                currentRow.find('.serial_json').val(JSON.stringify(serialArray));
-            } else {
-                currentRow.find('.serial_json').val('[]');
-            }
-            calculateRow(currentRow);
-            calculateSummary();
-            $('#serialModal').modal('hide');
+    $('#saveSerial').on('click', function() {
+        if (!currentRow) {
+            return;
         }
-    );
-    $('#serialModal').on(
-        'hidden.bs.modal',
-        function() {
-            $('#serialInput').val('');
+        let currentQty = parseFloat(currentRow.find('.qty').val()) || 0;
+        if (serialArray.length > 0) {
+            currentRow.find('.qty').val(serialArray.length);
+            currentRow.find('.serial_json').val(JSON.stringify(serialArray));
+        } else {
+            currentRow.find('.serial_json').val('[]');
         }
-    );
+        calculateRow(currentRow);
+        calculateSummary();
+        $('#serialModal').modal('hide');
+    });
+    $('#serialModal').on('hidden.bs.modal', function() {
+        $('#serialInput').val('');
+    });
     $(document).on('change', '.product', function() {
         let current = $(this);
         let value = current.val();
@@ -372,19 +288,12 @@
             return;
         }
         let duplicate = false;
-        $('.product')
-            .not(current)
-            .each(
-                function() {
-                    if (
-                        $(this).val() ===
-                        value
-                    ) {
-                        duplicate = true;
-                        return false;
-                    }
-                }
-            );
+        $('.product').not(current).each(function() {
+            if ($(this).val() === value) {
+                duplicate = true;
+                return false;
+            }
+        });
         if (duplicate) {
             Swal.fire({
                 icon: 'warning',
@@ -392,9 +301,7 @@
                 text: 'This product has already been added.'
             });
             current.val('');
-            if (
-                current.hasClass('select2-hidden-accessible')
-            ) {
+            if (current.hasClass('select2-hidden-accessible')) {
                 current.trigger('change.select2');
             }
             row.find('.unit').val('');
@@ -414,18 +321,10 @@
         row.find('.unit').val(unit || '');
         row.find('.stock').val(stock ?? '');
         row.find('.description').val(description || '');
-        if (
-            rate !== undefined &&
-            rate !== null
-        ) {
+        if (rate !== undefined && rate !== null) {
             row.find('.rate').val(rate);
         }
-        if (
-            !row.find('.qty').val() ||
-            parseFloat(
-                row.find('.qty').val()
-            ) < 1
-        ) {
+        if (!row.find('.qty').val() || parseFloat(row.find('.qty').val()) < 1) {
             row.find('.qty').val(1);
         }
         calculateRow(row);
@@ -443,14 +342,8 @@
                 serials = [];
             }
         }
-        if (
-            Array.isArray(serials) &&
-            serials.length > 0 &&
-            serials.length !== qty
-        ) {
-            row.addClass(
-                'table-warning'
-            );
+        if (Array.isArray(serials) && serials.length > 0 && serials.length !== qty) {
+            row.addClass('table-warning');
         } else {
             row.removeClass(
                 'table-warning'
@@ -459,9 +352,7 @@
         calculateRow(row);
     });
     $(document).on('input change', '.rate', function() {
-        calculateRow(
-            $(this).closest('tr')
-        );
+        calculateRow($(this).closest('tr'));
     });
     $(document).on('input change', '#discount, #vat, #paidAmount', function() {
         calculateSummary();
@@ -510,16 +401,12 @@
             showCancelButton: true,
             confirmButtonText: 'Yes, Remove',
             cancelButtonText: 'Cancel'
-        }).then(
-            function(result) {
-                if (
-                    result.isConfirmed
-                ) {
-                    $(this).closest('tr').remove();
-                    calculateSummary();
-                }
-            }.bind(this)
-        );
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                $(this).closest('tr').remove();
+                calculateSummary();
+            }
+        }.bind(this));
     });
     $(document).on('keypress', '.qty', function(e) {
         if (e.which === 13) {
@@ -546,122 +433,101 @@
             return false;
         }
         $('#purchaseBody tr')
-            .each(
-                function() {
-                    let row = $(this);
-                    let product = row.find('.product').val();
-                    let qty = parseFloat(row.find('.qty').val()) || 0;
-                    let rate = parseFloat(row.find('.rate').val());
-                    if (!product) {
-                        valid = false;
-                        row.addClass(
-                            'table-danger'
-                        );
-                        return;
-                    }
-                    if (qty < 1) {
-                        valid = false;
-                        row.addClass('table-danger');
-                        return;
-                    }
-                    if (
-                        isNaN(rate) ||
-                        rate < 0
-                    ) {
-                        valid = false;
-                        row.addClass('table-danger');
-                        return;
-                    }
-                    let json = row.find('.serial_json').val();
-                    let serials = [];
-                    if (json) {
-                        try {
-                            serials = JSON.parse(json);
-                        } catch (error) {
-                            serials = [];
-                        }
-                    }
-                    if (
-                        Array.isArray(serials) &&
-                        serials.length > 0
-                    ) {
-                        if (
-                            serials.length !== qty
-                        ) {
-                            valid = false;
-                            row.addClass('table-danger');
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Serial Quantity Mismatch',
-                                text: 'Product Qty is ' + qty + ' but Serial count is ' + serials
-                                    .length + '.'
-                            });
-                            return false;
-                        }
-                        let normalized =
-                            serials.map(
-                                function(serial) {
-                                    return normalizeSerial(
-                                        serial
-                                    );
-                                }
-                            );
-                        let unique = [...new Set(normalized)];
-                        if (unique.length !== normalized.length) {
-                            valid = false;
-                            row.addClass('table-danger');
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Duplicate Serial',
-                                text: 'Duplicate serial found for this product.'
-                            });
-                            return false;
-                        }
-                    }
-                    row.removeClass('table-danger');
+            .each(function() {
+                let row = $(this);
+                let product = row.find('.product').val();
+                let qty = parseFloat(row.find('.qty').val()) || 0;
+                let rate = parseFloat(row.find('.rate').val());
+                if (!product) {
+                    valid = false;
+                    row.addClass('table-danger');
+                    return;
                 }
-            );
+                if (qty < 1) {
+                    valid = false;
+                    row.addClass('table-danger');
+                    return;
+                }
+                if (isNaN(rate) || rate < 0) {
+                    valid = false;
+                    row.addClass('table-danger');
+                    return;
+                }
+                let json = row.find('.serial_json').val();
+                let serials = [];
+                if (json) {
+                    try {
+                        serials = JSON.parse(json);
+                    } catch (error) {
+                        serials = [];
+                    }
+                }
+                if (Array.isArray(serials) && serials.length > 0) {
+                    if (serials.length !== qty) {
+                        valid = false;
+                        row.addClass('table-danger');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Serial Quantity Mismatch',
+                            text: 'Product Qty is ' + qty + ' but Serial count is ' + serials
+                                .length + '.'
+                        });
+                        return false;
+                    }
+                    let normalized = serials.map(function(serial) {
+                        return normalizeSerial(
+                            serial
+                        );
+                    });
+                    let unique = [...new Set(normalized)];
+                    if (unique.length !== normalized.length) {
+                        valid = false;
+                        row.addClass('table-danger');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Duplicate Serial',
+                            text: 'Duplicate serial found for this product.'
+                        });
+                        return false;
+                    }
+                }
+                row.removeClass('table-danger');
+            });
         if (!valid) {
             e.preventDefault();
             return false;
         }
         let allSerials = {};
         let duplicateSerial = null;
-        $('.serial_json').each(
-            function() {
-                let json = $(this).val();
-                if (!json) {
-                    return;
-                }
-                let serials = [];
-                try {
-                    serials = JSON.parse(json);
-                } catch (e) {
-                    serials = [];
-                }
-                if (!Array.isArray(serials)) {
-                    return;
-                }
-                serials.forEach(
-                    function(serial) {
-                        let normalized =
-                            normalizeSerial(
-                                serial
-                            );
-                        if (!normalized) {
-                            return;
-                        }
-                        if (
-                            allSerials[normalized]
-                        ) {
-                            duplicateSerial = serial;
-                        } else {
-                            allSerials[normalized] = true;
-                        }
-                    }
-                );
+        $('.serial_json').each(function() {
+            let json = $(this).val();
+            if (!json) {
+                return;
             }
-        );
+            let serials = [];
+            try {
+                serials = JSON.parse(json);
+            } catch (e) {
+                serials = [];
+            }
+            if (!Array.isArray(serials)) {
+                return;
+            }
+            serials.forEach(
+                function(serial) {
+                    let normalized =
+                        normalizeSerial(serial);
+                    if (!normalized) {
+                        return;
+                    }
+                    if (allSerials[normalized]) {
+                        duplicateSerial = serial;
+                    } else {
+                        allSerials[normalized] = true;
+                    }
+                }
+            );
+        });
         if (duplicateSerial) {
             e.preventDefault();
             Swal.fire({
@@ -677,93 +543,53 @@
     $(function() {
         initSelect2();
         $('#purchaseBody tr')
-            .each(
-                function() {
-                    calculateRow(
-                        $(this)
-                    );
-                }
-            );
+            .each(function() {
+                calculateRow($(this));
+            });
         calculateSummary();
     });
     $('#customer_company_id').on('change', function() {
-
         let customerCompanyId = $(this).val();
-
         let partySelect = $('#party_id');
-
         partySelect.empty();
-
         partySelect.append(
             '<option value="">Select Supplier</option>'
         );
-
         if (!customerCompanyId) {
-
-            partySelect
-                .val('')
-                .trigger('change');
-
+            partySelect.val('').trigger('change');
             return;
         }
-
         $.ajax({
-
-            url: '/admin/ajax/supplier-company/' +
-                customerCompanyId +
-                '/parties',
-
+            url: '/admin/ajax/supplier-company/' + customerCompanyId + '/parties',
             type: 'GET',
-
             beforeSend: function() {
-
                 partySelect.prop('disabled', true);
-
             },
-
             success: function(res) {
-
                 if (res.success) {
-
                     $.each(res.parties, function(index, party) {
-
                         partySelect.append(
                             $('<option>', {
                                 value: party.id,
-                                text: party.name +
-                                    (party.designation ?
-                                        ' - ' + party.designation :
-                                        '')
+                                text: party.name + (party.designation ? ' - ' +
+                                    party.designation : '')
                             })
                         );
-
                     });
-
                 }
-
             },
-
             error: function(xhr) {
-
                 console.log(xhr.responseText);
-
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Unable to load suppliers.'
                 });
-
             },
-
             complete: function() {
-
                 partySelect.prop('disabled', false);
-
                 partySelect.trigger('change');
-
             }
-
         });
-
     });
 </script>

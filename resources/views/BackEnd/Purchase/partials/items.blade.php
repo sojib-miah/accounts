@@ -72,11 +72,14 @@
 <select name="product_id[]" class="form-select product select2" required>
     <option value="">Select Product</option>
     @foreach($products as $product)
-        <option value="{{ $product->id }}" data-unit="{{ $product->unit }}" data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}">
+        <option value="{{ $product->id }}" data-unit="{{ $product->unit }}" data-stock="{{ $product->current_stock }}" data-rate="{{ $product->purchase_price }}" data-description="{{ $product->description }}">
            {{ $product->sku }} - {{ $product->name }}
         </option>
     @endforeach
 </select>
+</td>
+<td>
+    <input type="text" name="description[]" class="form-control description" readonly>
 </td>
 <td>
    <button type="button" class="btn btn-info serialBtn">
