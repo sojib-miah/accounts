@@ -356,11 +356,18 @@
                             <i class="fa fa-print me-2"></i>
                             Print
                         </a>
-                        <a href="{{ route('sales.order.pdf', $receipt->id) }}" target="_blank"
-                            class="btn btn-danger btn-lg">
-                            <i class="fa fa-file-pdf me-2"></i>
-                            PDF
+                        <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                            target="_blank" class="btn btn-dark btn-lg">
+                            <i class="fa-regular fa-file-pdf me-2"></i> PDF
                         </a>
+                        {{-- <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'modern']) }}"
+                            target="_blank" class="btn btn-primary">
+                            Modern Invoice PDF
+                        </a>
+                        <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'compact']) }}"
+                            target="_blank" class="btn btn-secondary">
+                            Compact Invoice PDF
+                        </a> --}}
                         <a href="{{ route('income.receipt.index') }}" class="btn btn-secondary btn-lg d-block">
                             <i class="fa-solid fa-arrow-left me-2"></i>
                             Back

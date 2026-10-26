@@ -33,7 +33,7 @@ class RoleController extends Controller
                 });
             })
             ->latest()
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
         $groupPermissions = [];
         foreach ($permissions as $permission) {

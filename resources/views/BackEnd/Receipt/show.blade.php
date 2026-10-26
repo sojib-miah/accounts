@@ -302,10 +302,22 @@
                         <i class="fa fa-print me-2"></i>
                         Print
                     </a>
-                    <a href="{{ route('receipt.pdf', $receipt->id) }}" target="_blank" class="btn btn-danger btn-lg">
-                        <i class="fa fa-file-pdf me-2"></i>
-                        PDF
+                    <a href="{{ route('receipt.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                        target="_blank" class="btn btn-dark btn-lg">
+                        <i class="fa fa-file-pdf me-2"></i> PDF
                     </a>
+                    {{-- <a href="{{ route('receipt.pdf', ['receipt' => $receipt->id, 'design' => 'modern']) }}"
+                        target="_blank" class="btn btn-primary">
+                        Modern PDF
+                    </a>
+                    <a href="{{ route('receipt.pdf', ['receipt' => $receipt->id, 'design' => 'compact']) }}"
+                        target="_blank" class="btn btn-secondary">
+                        Compact PDF
+                    </a>
+                    <a href="{{ route('receipt.pdf', ['receipt' => $receipt->id, 'design' => 'voucher']) }}"
+                        target="_blank" class="btn btn-warning">
+                        Payment Voucher
+                    </a> --}}
                     <a href="{{ route('receipt.expense.index') }}" class="btn d-block btn-lg btn-secondary">
                         <i class="fa-solid fa-arrow-left me-2"></i>
                         Back

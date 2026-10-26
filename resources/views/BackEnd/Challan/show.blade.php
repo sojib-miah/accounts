@@ -236,11 +236,22 @@
                         <i class="fa fa-print me-2"></i>
                         Print
                     </a>
-                    <a href="{{ route('challan.pdf', $receipt->id) }}" target="_blank"
-                        class="btn btn-danger d-block mb-2 btn-lg">
-                        <i class="fa fa-file-pdf me-2"></i>
-                        PDF
+                    <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                        target="_blank" class="btn btn-dark btn-lg d-block mb-2">
+                        <i class="fa fa-file-pdf me-2"></i> PDF
                     </a>
+                    {{-- <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'modern']) }}"
+                            target="_blank" class="btn btn-danger">
+                            <i class="fa fa-file-pdf me-1"></i> Modern PDF
+                        </a>
+                        <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'compact']) }}"
+                            target="_blank" class="btn btn-secondary">
+                            <i class="fa fa-file-pdf me-1"></i> Compact PDF
+                        </a>
+                        <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'delivery']) }}"
+                            target="_blank" class="btn btn-primary">
+                            <i class="fa fa-file-pdf me-1"></i> Delivery PDF
+                        </a> --}}
                     <a href="{{ route('challan.index') }}" class="btn btn-secondary btn-lg d-block">
                         <i class="fa-solid fa-arrow-left me-2"></i>
                         Back

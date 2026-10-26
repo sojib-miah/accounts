@@ -3,289 +3,207 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>
-            Invoice - {{ $receipt->inv_no }}
-        </title>
+
+        <title>Sales Invoice - {{ $receipt->inv_no ?? $receipt->so_no }}</title>
+
         <style>
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 25px 30px;
             }
 
             * {
                 box-sizing: border-box;
             }
 
-            html,
             body {
                 margin: 0;
-                padding: 0;
-                width: 210mm;
-                min-height: 297mm;
+                font-family: DejaVu Sans, sans-serif;
+                font-size: 10px;
+                line-height: 1.55;
+                color: #263244;
             }
 
-            body {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 12px;
-                color: #222;
-                background: #fff;
+            .invoice {
+                width: 100%;
             }
 
-            .page {
-                width: 194mm;
-                min-height: 281mm;
-                margin-left: 8mm;
-                margin-right: 8mm;
-                padding-top: 8mm;
-                padding-bottom: 8mm;
-                position: relative;
+            .clearfix:after {
+                content: "";
+                display: table;
+                clear: both;
             }
 
-            table {
-                border-collapse: collapse;
-                border-spacing: 0;
+            .muted {
+                color: #6b7280;
             }
 
-            td,
-            th,
-            div,
-            span {
-                word-wrap: break-word;
-                overflow-wrap: break-word;
+            .small {
+                font-size: 9px;
             }
 
-            .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            /* .header {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-            }
-
-            .header td {
-                border: none;
-                padding: 0;
-                vertical-align: top;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                word-break: break-word;
-            } */
-
-            .logo-area {
-                width: 27mm;
-                text-align: left;
-            }
-
-            .company-area {
-                width: 129mm;
-                text-align: left;
-            }
-
-            .contact-area {
-                width: 38mm;
+            .text-right {
                 text-align: right;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .bold {
+                font-weight: bold;
+            }
+
+            .top-line {
+                height: 5px;
+                margin-bottom: 23px;
+                background: #185abc;
+            }
+
+            .company {
+                float: left;
+                width: 58%;
+            }
+
+            .brand-name {
+                margin: 0 0 7px;
+                font-size: 23px;
+                font-weight: bold;
+                color: #185abc;
             }
 
             .logo {
-                width: 60px;
-                max-width: 60px;
-                height: auto;
-            }
-
-            .company-name {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 20px;
-                line-height: 19px;
-                font-weight: bold;
-                color: #4d4d4d;
-                width: 129mm;
-                max-width: 129mm;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .company-info {
-                font-size: 12px;
-                line-height: 10px;
-                color: #555;
-                width: 129mm;
-                max-width: 129mm;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .contact-info {
-                width: 38mm;
-                max-width: 38mm;
-                font-size: 12px;
-                line-height: 10px;
-                color: #555;
-                text-align: right;
-                word-break: break-all;
-                overflow-wrap: anywhere;
-            }
-
-            .invoice-title {
-                width: 194mm;
-                text-align: center;
-                font-size: 20px;
-                font-weight: bold;
-                margin-top: 10px;
-            }
-
-            .page-number {
-                width: 194mm;
-                text-align: right;
-                font-size: 12px;
-                margin-top: -10px;
+                max-width: 90px;
+                max-height: 58px;
                 margin-bottom: 8px;
             }
 
-            .info-table,
-            .customer-table {
-                border-collapse: collapse;
-                table-layout: auto;
-                width: auto;
-                max-width: 194mm;
+            .invoice-heading {
+                float: right;
+                width: 40%;
+                text-align: right;
             }
 
-            .info-table td,
-            .customer-table td {
-                border: none;
-
-                padding-top: 1.5px;
-                padding-bottom: 1.5px;
-
-                padding-left: 0;
-                padding-right: 0;
-
-                vertical-align: top;
-
-                word-break: break-word;
-                overflow-wrap: break-word;
+            .invoice-heading h1 {
+                margin: 0;
+                font-size: 29px;
+                letter-spacing: 2px;
+                color: #185abc;
             }
 
-            .info-label,
-            .customer-label {
-                font-weight: bold;
-                white-space: nowrap;
-                padding-right: 6px !important;
-            }
-
-            .info-table .colon,
-            .customer-table .colon {
-                width: 5px;
-
-                min-width: 5px;
-
-                padding-left: 0 !important;
-
-                /* Same gap after colon */
-                padding-right: 6px !important;
-
-                text-align: left;
-
-                white-space: nowrap;
-            }
-
-            .info-value,
-            .customer-value {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .info-value .break,
-            .customer-value .break,
-            .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            .items {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
+            .invoice-number {
                 margin-top: 8px;
-            }
-
-            .items th {
-                border: 1px solid #666;
-                padding: 3px 2px;
-                height: 22px;
                 font-size: 12px;
                 font-weight: bold;
-                text-align: center;
-                vertical-align: middle;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .items td {
-                border: 1px solid #666;
-                padding: 3px 2px;
-                font-size: 12px;
-                vertical-align: top;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .sl-col {
-                width: 10mm;
-                text-align: center;
-            }
-
-            .item-col {
-                width: 23mm;
-            }
-
-            .description-col {
-                width: 65mm;
-            }
-
-            .qty-col {
-                width: 14mm;
-                text-align: center;
-            }
-
-            .uom-col {
-                width: 16mm;
-                text-align: center;
-            }
-
-            .price-col {
-                width: 27mm;
-                text-align: right;
-            }
-
-            .disc-col {
-                width: 15mm;
-                text-align: center;
-            }
-
-            .amount-col {
-                width: 24mm;
-                text-align: right;
-            }
-
-            .description {
-                width: 65mm;
-                line-height: 10px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .item-number {
-                width: 23mm;
-                word-break: break-all;
                 overflow-wrap: anywhere;
+            }
+
+            .status {
+                display: inline-block;
+                margin-top: 7px;
+                padding: 4px 9px;
+                border-radius: 10px;
+                background: #e6f6ed;
+                color: #16804a;
+                font-size: 8px;
+                font-weight: bold;
+            }
+
+            .status-draft {
+                background: #fff0ce;
+                color: #946200;
+            }
+
+            .status-cancelled {
+                background: #fde8e7;
+                color: #b42318;
+            }
+
+            .divider {
+                border: 0;
+                border-top: 2px solid #185abc;
+                margin: 18px 0;
+            }
+
+            .section-title {
+                margin: 0 0 10px;
+                color: #185abc;
+                font-size: 10px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .details-table,
+            .items-table,
+            .payments-table,
+            .summary-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .details-table {
+                margin-top: 20px;
+            }
+
+            .details-table td {
+                width: 50%;
+                padding: 13px;
+                vertical-align: top;
+                border: 1px solid #dfe5ee;
+            }
+
+            .detail-heading {
+                margin-bottom: 7px;
+                color: #185abc;
+                font-size: 9px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .customer-name {
+                margin-bottom: 5px;
+                font-size: 13px;
+                font-weight: bold;
+            }
+
+            .meta-table {
+                width: 100%;
+                margin-top: 12px;
+                border-collapse: collapse;
+            }
+
+            .meta-table td {
+                width: 50%;
+                padding: 7px 9px;
+                border: 1px solid #e0e5ed;
+            }
+
+            .items-table {
+                margin-top: 10px;
+            }
+
+            .items-table thead {
+                display: table-header-group;
+            }
+
+            .items-table th {
+                padding: 10px 7px;
+                background: #185abc;
+                color: #fff;
+                font-size: 8px;
+                text-align: left;
+                text-transform: uppercase;
+            }
+
+            .items-table td {
+                padding: 9px 7px;
+                border-bottom: 1px solid #dfe5ee;
+                vertical-align: top;
+            }
+
+            .items-table tbody tr:nth-child(even) {
+                background: #f7f9fc;
             }
 
             .number {
@@ -293,458 +211,492 @@
                 white-space: nowrap;
             }
 
-            .center {
-                text-align: center;
-            }
-
-            .total-row td {
+            .item-name {
                 font-weight: bold;
             }
 
-            .total-title {
-                text-align: right;
+            .item-description {
+                margin-top: 3px;
                 font-size: 8px;
+                color: #6b7280;
             }
 
-            .total-value {
-                width: 24mm;
-                text-align: right;
-                font-size: 8px;
-                white-space: nowrap;
+            .totals-wrap {
+                margin-top: 18px;
             }
 
-            .amount-words {
-                width: 194mm;
-                margin-top: 7px;
-                font-size: 12px;
-                line-height: 12px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+            .totals-spacer {
+                float: left;
+                width: 49%;
+            }
+
+            .totals {
+                float: right;
+                width: 49%;
+            }
+
+            .summary-table td {
+                padding: 7px 8px;
+                border-bottom: 1px solid #e1e6ed;
+            }
+
+            .summary-table .grand-total td {
+                padding: 11px 9px;
+                background: #185abc;
+                color: #fff;
+                font-size: 13px;
+                font-weight: bold;
+            }
+
+            .summary-table .paid td {
+                color: #16804a;
+            }
+
+            .summary-table .due td {
+                color: #b42318;
+                font-weight: bold;
+            }
+
+            .payments-section {
+                margin-top: 25px;
+            }
+
+            .payments-table {
+                margin-top: 9px;
+            }
+
+            .payments-table th,
+            .payments-table td {
+                padding: 7px;
+                border: 1px solid #dfe5ee;
+                text-align: left;
+            }
+
+            .payments-table th {
+                background: #f0f3f8;
+                font-size: 8px;
             }
 
             .remarks {
-                width: 194mm;
-                margin-top: 6px;
-                font-size: 8px;
-                line-height: 11px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                margin-top: 22px;
+                padding: 11px 13px;
+                border-left: 3px solid #185abc;
+                background: #f5f7fb;
             }
 
-            .bottom-area {
-                width: 194mm;
-                margin-top: 30px;
+            .footer {
+                margin-top: 45px;
             }
 
-            .signature-table {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                margin-top: 8px;
+            .footer-left {
+                float: left;
+                width: 58%;
+                color: #6b7280;
+                font-size: 9px;
             }
 
-            .signature-table td {
-                border: none;
-                vertical-align: bottom;
-                word-break: break-word;
-                overflow-wrap: break-word;
+            .signature {
+                float: right;
+                width: 35%;
+                padding-top: 9px;
+                border-top: 1px solid #687386;
+                text-align: center;
+                font-size: 9px;
             }
 
-            .signature-left {
-                width: 126mm;
-            }
-
-            .signature-right {
-                width: 68mm;
-                text-align: right;
-            }
-
-            .signature-line {
-                font-size: 12px;
-                margin-top: 3px;
-                white-space: nowrap;
-            }
-
-            .authorized {
-                font-size: 12px;
+            .thank-you {
+                margin-top: 25px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e5ed;
+                text-align: center;
+                font-size: 10px;
                 font-weight: bold;
-                margin-top: 3px;
-                white-space: nowrap;
+                color: #185abc;
             }
 
-            .system-note {
-                width: 194mm;
-                text-align: center;
-                font-size: 12px;
-                margin-top: 8px;
+            /* Classic design */
+            .design-classic .top-line {
+                height: 2px;
+                background: #333;
             }
 
-            .footer-line {
-                width: 194mm;
-                border-top: 1px solid #777;
-                margin-top: 6px;
+            .design-classic .brand-name,
+            .design-classic .invoice-heading h1,
+            .design-classic .section-title,
+            .design-classic .detail-heading,
+            .design-classic .thank-you {
+                color: #222;
             }
 
-            .footer-text {
-                width: 194mm;
-                text-align: center;
-                font-size: 12px;
-                color: #777;
-                margin-top: 4px;
-                line-height: 10px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+            .design-classic .divider {
+                border-top: 1px solid #444;
             }
 
+            .design-classic .items-table th {
+                background: #eeeeee;
+                color: #222;
+                border-bottom: 1px solid #444;
+            }
+
+            .design-classic .items-table tbody tr:nth-child(even) {
+                background: #fff;
+            }
+
+            .design-classic .summary-table .grand-total td {
+                background: #eeeeee;
+                color: #222;
+                border-top: 1px solid #444;
+                border-bottom: 1px solid #444;
+            }
+
+            .design-classic .details-table td {
+                border-color: #999;
+            }
+
+            /* Compact design */
+            .design-compact .top-line {
+                margin-bottom: 12px;
+            }
+
+            .design-compact .brand-name {
+                font-size: 18px;
+            }
+
+            .design-compact .invoice-heading h1 {
+                font-size: 24px;
+            }
+
+            .design-compact .details-table {
+                margin-top: 12px;
+            }
+
+            .design-compact .details-table td {
+                padding: 8px;
+            }
+
+            .design-compact .meta-table {
+                margin-top: 7px;
+            }
+
+            .design-compact .meta-table td {
+                padding: 5px 7px;
+            }
+
+            .design-compact .items-table th {
+                padding: 7px 5px;
+            }
+
+            .design-compact .items-table td {
+                padding: 6px 5px;
+            }
+
+            .design-compact .totals-wrap {
+                margin-top: 10px;
+            }
+
+            .design-compact .payments-section {
+                margin-top: 15px;
+            }
+
+            .design-compact .footer {
+                margin-top: 25px;
+            }
+
+            .design-compact .thank-you {
+                margin-top: 15px;
+            }
+
+            /* Keep important rows together where supported */
             tr {
                 page-break-inside: avoid;
             }
 
-            td,
-            th {
-                max-width: 100%;
+            .details-table,
+            .meta-table,
+            .summary-table {
+                page-break-inside: avoid;
             }
         </style>
     </head>
 
     <body>
-        <div class="page">
-            <table class="header">
+        @php
+            $company = $receipt->company;
+            $branch = $receipt->branch;
+            $party = $receipt->party;
+
+            $companyName = $company->name ?? ($company->company_name ?? config('app.name'));
+
+            $customerName = $party->name ?? ($party->company_name ?? 'Customer');
+
+            $orderNumber = $receipt->inv_no ?? ($receipt->so_no ?? 'SO-' . $receipt->id);
+
+            $receiptDate = $receipt->receipt_date
+                ? \Illuminate\Support\Carbon::parse($receipt->receipt_date)->format('d M Y')
+                : '—';
+
+            $items = $receipt->items ?? collect();
+            $payments = $receipt->payments ?? collect();
+
+            $subtotal = (float) ($receipt->sub_total ?? $items->sum('amount'));
+            $discount = (float) ($receipt->discount ?? 0);
+            $vatPercent = (float) ($receipt->vat ?? 0);
+
+            $vatAmount = (float) ($receipt->vat_amount ?? (($subtotal - $discount) * $vatPercent) / 100);
+
+            $grandTotal = (float) ($receipt->total_amount ?? 0);
+            $paidAmount = (float) ($receipt->paid_amount ?? $payments->sum('amount'));
+            $dueAmount = (float) ($receipt->due_amount ?? max(0, $grandTotal - $paidAmount));
+
+            $currency = $receipt->currency ?? 'BDT';
+
+            $money = function ($amount) use ($currency) {
+                return $currency . ' ' . number_format((float) $amount, 2);
+            };
+
+            $status = $receipt->status ?? 'Completed';
+
+            $design = in_array($design ?? 'modern', ['modern', 'classic', 'compact'], true) ? $design : 'modern';
+        @endphp
+
+        <div class="invoice design-{{ $design }}">
+            <div class="top-line"></div>
+            <div class="clearfix">
+                <div class="company">
+                    @if (optional(setting())->logo)
+                        <img class="logo" src="{{ public_path('uploads/settings/' . setting()->logo) }}" alt="Logo">
+                    @endif
+                    <h2 class="brand-name">{{ $companyName }}</h2>
+                    @if ($branch && $branch->name)
+                        <div class="bold">{{ $branch->name }}</div>
+                    @endif
+                    @if ($branch && $branch->address)
+                        <div>{{ $branch->address }}</div>
+                    @endif
+                </div>
+                <div class="invoice-heading">
+                    <h1>INVOICE</h1>
+                    <div class="invoice-number">{{ $orderNumber }}</div>
+                    <div class="muted">Date: {{ $receiptDate }}</div>
+                    <div>
+                        <span
+                            class="status
+                    {{ strtolower($status) === 'draft' ? 'status-draft' : '' }}
+                    {{ strtolower($status) === 'cancelled' ? 'status-cancelled' : '' }}">
+                            {{ $status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <table class="details-table">
                 <tr>
-                    {{-- LOGO --}}
-                    <td class="logo-area">
-                        @if (function_exists('setting') && setting() && setting()->logo)
-                            @php
-                                $logoPath = public_path('uploads/settings/' . setting()->logo);
-                            @endphp
-                            @if (file_exists($logoPath))
-                                <img src="{{ $logoPath }}" class="logo">
-                            @endif
+                    <td>
+                        <div class="detail-heading">Bill To</div>
+
+                        <div class="customer-name">{{ $customerName }}</div>
+
+                        @if ($party && $party->address)
+                            <div>Address: {{ $party->address }}</div>
+                        @endif
+
+                        @if ($party && ($party->phone ?? ($party->phone_one ?? null)))
+                            <div>Phone: {{ $party->phone ?? $party->phone_one }}</div>
+                        @endif
+
+                        @if ($party && $party->email)
+                            <div>Email: {{ $party->email }}</div>
                         @endif
                     </td>
-                    {{-- COMPANY --}}
-                    <td class="company-area">
-                        <div class="company-name">
-                            {{ $receipt->company->name ??
-                                ($receipt->branch->name ??
-                                    ((function_exists('setting') && setting() ? setting()->company_name : null) ?? config('app.name'))) }}
+
+                    <td>
+                        <div class="detail-heading">Invoice Details</div>
+
+                        <div>
+                            <span class="muted">Invoice No:</span>
+                            <strong>{{ $orderNumber }}</strong>
                         </div>
-                        <div class="company-info">
-                            @if ($receipt->company->address ?? null)
-                                {{ $receipt->company->address }}
-                            @elseif ($receipt->branch->address ?? null)
-                                {{ $receipt->branch->address }}
-                            @endif
-                            @if ($receipt->branch->phone_one ?? null)
-                                <br>
-                                Telephone :
-                                {{ $receipt->branch->phone_one }}
-                            @endif
-                            @if ($receipt->branch->phone_two ?? null)
-                                ,
-                                {{ $receipt->branch->phone_two }}
-                            @endif
-                            @if ($receipt->branch->email ?? null)
-                                <br>
-                                Email :
-                                {{ $receipt->branch->email }}
-                            @endif
+
+                        <div>
+                            <span class="muted">Sales Order:</span>
+                            <strong>{{ $receipt->so_no ?? $orderNumber }}</strong>
+                        </div>
+
+                        <div>
+                            <span class="muted">Invoice Date:</span>
+                            <strong>{{ $receiptDate }}</strong>
+                        </div>
+
+                        <div>
+                            <span class="muted">Prepared By:</span>
+                            <strong>{{ $receipt->creator->name ?? '—' }}</strong>
                         </div>
                     </td>
                 </tr>
             </table>
-            <div class="invoice-title">
-                INVOICE
-            </div>
-            <div class="page-number">
-                Page No.: 1/1
-            </div>
-            <table class="info-table">
+
+            <table class="meta-table">
                 <tr>
-                    <td class="info-label">
-                        Date
+                    <td>
+                        <span class="muted">Branch</span><br>
+                        <strong>{{ $branch->name ?? '—' }}</strong>
                     </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        {{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d/m/Y') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Invoice No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->inv_no }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Delivery Note No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->challan_no ?? ($receipt->delivery_no ?? '') }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->so_no ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. Date
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        @if ($receipt->ref_date ?? null)
-                            {{ \Carbon\Carbon::parse($receipt->ref_date)->format('d/m/Y') }}
-                        @endif
+                    <td>
+                        <span class="muted">Payment Status</span><br>
+                        <strong>{{ $receipt->payment_status ?? ($dueAmount <= 0 ? 'Paid' : 'Due') }}</strong>
                     </td>
                 </tr>
             </table>
-            <table class="customer-table">
-                <tr>
-                    <td class="customer-label">
-                        Customer Code
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->customer_code ??
-                                ($receipt->party->code ?? 'CUST-' . str_pad($receipt->party->id ?? 0, 8, '0', STR_PAD_LEFT)) }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->name ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Address
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->address ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Contact Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->contact_name ?? ($receipt->party->name ?? '') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Phone No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->phone ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Payment Terms
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->payment_terms ?? ($receipt->payment_terms ?? '') }}
-                    </td>
-                </tr>
-            </table>
-            <table class="items">
+
+            <h3 class="section-title" style="margin-top:22px;">Invoice Items</h3>
+
+            <table class="items-table">
                 <thead>
                     <tr>
-                        <th class="sl-col">
-                            Sl. No.
-                        </th>
-                        <th class="item-col">
-                            Item No
-                        </th>
-                        <th class="description-col">
-                            Description
-                        </th>
-                        <th class="qty-col">
-                            Qty
-                        </th>
-                        <th class="uom-col">
-                            UOM
-                        </th>
-                        <th class="price-col">
-                            Unit price
-                        </th>
-                        <th class="disc-col">
-                            Disc %
-                        </th>
-                        <th class="amount-col">
-                            Amount
-                        </th>
+                        <th style="width:5%;">#</th>
+                        <th style="width:43%;">Product / Description</th>
+                        <th class="number" style="width:12%;">Qty</th>
+                        <th class="number" style="width:19%;">Unit Price</th>
+                        <th class="number" style="width:21%;">Amount</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    @forelse ($receipt->items as $item)
-                        @php
-                            $product = $item->product;
-                            $itemCode = $product->sku ?? '';
-                            $description = $product->name ?? '';
-                            $uom = $product->unit ?? 'Number';
-                            $qty = (float) $item->qty;
-                            $rate = (float) $item->rate;
-                            $amount = (float) $item->amount;
-                        @endphp
+                    @forelse($items as $index => $item)
                         <tr>
-                            {{-- SL --}}
-                            <td class="sl-col center">
-                                {{ $loop->iteration }}
-                            </td>
-                            {{-- ITEM NO --}}
-                            <td class="item-col">
-                                <span class="break">
-                                    {{ $itemCode }}
-                                </span>
-                            </td>
-                            {{-- DESCRIPTION --}}
-                            <td class="description-col description">
-                                {{ $description }}
-                                @if ($item->details ?? null)
-                                    <br>
-                                    {{ $item->details }}
+                            <td>{{ $index + 1 }}</td>
+
+                            <td>
+                                <div class="item-name">
+                                    {{ $item->product->name ?? ($item->category->name ?? ($item->accountHead->name ?? 'Item')) }}
+                                </div>
+
+                                @if ($item->details)
+                                    <div class="item-description">{{ $item->details }}</div>
                                 @endif
                             </td>
-                            {{-- QTY --}}
-                            <td class="qty-col center">
-                                {{ rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.') }}
+
+                            <td class="number">
+                                {{ rtrim(rtrim(number_format((float) $item->qty, 2, '.', ''), '0'), '.') }}
                             </td>
-                            {{-- UOM --}}
-                            <td class="uom-col center">
-                                {{ $uom }}
-                            </td>
-                            {{-- UNIT PRICE --}}
-                            <td class="price-col number">
-                                {{ number_format($rate, 2) }}
-                            </td>
-                            {{-- DISCOUNT --}}
-                            <td class="disc-col center">
-                                0
-                            </td>
-                            {{-- AMOUNT --}}
-                            <td class="amount-col number">
-                                {{ number_format($amount, 2) }}
-                            </td>
+
+                            <td class="number">{{ $money($item->rate) }}</td>
+
+                            <td class="number">{{ $money($item->amount) }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="center">
-                                No Item Found
-                            </td>
+                            <td colspan="5" class="text-center">No items found.</td>
                         </tr>
                     @endforelse
-                    {{-- TOTAL --}}
-                    <tr class="total-row">
-                        <td colspan="7" class="total-title">
-                            Total BDT
-                        </td>
-                        <td class="amount-col total-value">
-                            {{ number_format($receipt->total_amount, 2) }}
-                        </td>
-                    </tr>
                 </tbody>
             </table>
-            <div class="amount-words">
-                <strong>
-                    Amount BDT (In Words)
-                </strong>
-                :
-                {{ numberToWords($receipt->total_amount) }}
-                ONLY
+
+            <div class="totals-wrap clearfix">
+                <div class="totals-spacer"></div>
+
+                <div class="totals">
+                    <table class="summary-table">
+                        <tr>
+                            <td>Subtotal</td>
+                            <td class="number">{{ $money($subtotal) }}</td>
+                        </tr>
+
+                        @if ($discount > 0)
+                            <tr>
+                                <td>Discount</td>
+                                <td class="number">- {{ $money($discount) }}</td>
+                            </tr>
+                        @endif
+
+                        @if ($vatPercent > 0 || $vatAmount > 0)
+                            <tr>
+                                <td>VAT ({{ number_format($vatPercent, 2) }}%)</td>
+                                <td class="number">{{ $money($vatAmount) }}</td>
+                            </tr>
+                        @endif
+
+                        <tr class="grand-total">
+                            <td>Grand Total</td>
+                            <td class="number">{{ $money($grandTotal) }}</td>
+                        </tr>
+
+                        <tr class="paid">
+                            <td>Paid Amount</td>
+                            <td class="number">{{ $money($paidAmount) }}</td>
+                        </tr>
+
+                        <tr class="due">
+                            <td>Due Amount</td>
+                            <td class="number">{{ $money($dueAmount) }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
+
+            @if ($payments->isNotEmpty())
+                <div class="payments-section">
+                    <h3 class="section-title">Payment History</h3>
+
+                    <table class="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Account</th>
+                                <th>Received By</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($payments as $payment)
+                                <tr>
+                                    <td>
+                                        {{ $payment->payment_date ? \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') : '—' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $payment->paymentType->name ?? ($payment->payment_type ?? '—') }}
+                                    </td>
+
+                                    <td>{{ $payment->account->name ?? '—' }}</td>
+
+                                    <td>{{ $payment->user->name ?? '—' }}</td>
+
+                                    <td class="number">{{ $money($payment->amount ?? 0) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
             @if ($receipt->remarks)
                 <div class="remarks">
-                    <strong>
-                        Remarks :
-                    </strong>
+                    <strong>Remarks / Notes</strong><br>
                     {{ $receipt->remarks }}
                 </div>
             @endif
-            <div class="bottom-area">
-                <table class="signature-table">
-                    <tr>
-                        <td class="signature-left">
-                        </td>
-                        <td class="signature-right">
-                            <br>
-                            <br>
-                            <br>
-                            <div class="signature-line">
-                                _________________________
-                            </div>
-                            <div class="authorized">
-                                Authorized Signature
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <div class="system-note">
-                    This is a System Generated Invoice.
+
+            <div class="footer clearfix">
+                <div class="footer-left">
+                    <strong>Terms &amp; Conditions</strong>
+                    <p>Please verify the invoice details and contact us if you have any questions.</p>
+                    <p>Thank you for your business.</p>
                 </div>
-                <div class="footer-line">
-                </div>
-                <div class="footer-text">
-                    <div>
-                        Printed On :
-                        {{ now()->format('d/m/Y h:i A') }}
-                    </div>
-                    <div>
-                        Generated By :
-                        {{ auth()->user()->name ?? '' }}
-                    </div>
+
+                <div class="signature">
+                    Authorized Signature
                 </div>
             </div>
+
+            <div class="thank-you">
+                Thank you for choosing {{ $companyName }}!
+            </div>
+
         </div>
     </body>
 

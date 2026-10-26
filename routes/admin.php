@@ -245,6 +245,7 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         // purchase route 
         Route::resource('purchase', PurchaseController::class);
         Route::patch('purchase/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchase.cancel');
+        Route::delete('purchase/{purchase}/delete', [PurchaseController::class, 'destroy'])->name('purchase.delete');
         Route::get('/ajax/supplier-company/{customerCompany}/parties', [PurchaseController::class, 'supplierCompanyParties'])->name('ajax.supplier-company.parties');
         Route::get('/ajax/check-serial', [PurchaseController::class, 'checkSerial'])->name('purchase.check.serial');
         Route::get('/ajax/editcheck-serial', [PurchaseController::class, 'editCheckSerial'])->name('ajax.check.serial');

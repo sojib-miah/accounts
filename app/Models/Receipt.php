@@ -68,7 +68,7 @@ class Receipt extends Model
         static::saving(function ($model) {
             if (
                 in_array($model->type, ['Expense', 'Sales-Order', 'Direct-Income'])
-                && $model->payment_status === 'Paid'
+                && $model->payment_status !== 'Pending'
             ) {
                 $model->status = 'Completed';
             }

@@ -1004,6 +1004,7 @@ class SalesOrderController extends Controller
             'branch',
             'party',
             'creator',
+            'items.product',
             'items.category',
             'items.accountHead',
             'payments.paymentType',
@@ -1014,22 +1015,36 @@ class SalesOrderController extends Controller
         return view('BackEnd.SalesOrder.print', compact('receipt'));
     }
 
-    public function pdf(Receipt $receipt)
+    public function pdf(Request $request, Receipt $receipt)
     {
+        $request->validate([
+            'design' => 'nullable|in:modern,classic,compact',
+        ]);
+
         $receipt->load([
             'company',
             'branch',
             'party',
             'creator',
             'items.product',
+            'items.category',
+            'items.accountHead',
             'payments.paymentType',
             'payments.account',
             'payments.user',
         ]);
-        $pdf = Pdf::loadView('BackEnd.SalesOrder.pdf', compact('receipt'));
+
+        $design = $request->query('design', 'modern');
+
+        $pdf = Pdf::loadView('BackEnd.SalesOrder.pdf', [
+            'receipt' => $receipt,
+            'design' => $design,
+        ]);
+
         $pdf->setPaper('a4', 'portrait');
+
         return $pdf->stream(
-            $receipt->receipt_no . '.pdf'
+            ($receipt->receipt_no ?? 'invoice-' . $receipt->id) . '.pdf'
         );
     }
 

@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Payments')
+@section('title', 'Payments List')
 
 @section('content')
     <div class="mt-5">
@@ -8,7 +8,7 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h4 class="mb-1">Payments</h4>
+                    <h4 class="mb-1"><i class="fa-solid fa-list-ul me-2"></i> Payments List</h4>
                     <p class="text-muted mb-0">Manage package subscription payments</p>
                 </div>
             </div>
@@ -22,7 +22,7 @@
                                     placeholder="Search transaction/user/package...">
                             </div>
                             <div class="col-md-2">
-                                <select name="status" class="form-select">
+                                <select name="status" class="form-select select2">
                                     <option value="">All Status</option>
                                     <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>
                                         Pending
@@ -47,7 +47,7 @@
                             </div>
                             <div class="col-md-1">
                                 <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-search"></i>
+                                    <i class="fas fa-search me-1"></i>
                                     Search
                                 </button>
                             </div>
@@ -76,7 +76,7 @@
                         <table class="table table-hover table-bordered align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th width="60">#</th>
+                                    <th width="60">SN</th>
                                     <th>User</th>
                                     <th>Package</th>
                                     <th>Company</th>

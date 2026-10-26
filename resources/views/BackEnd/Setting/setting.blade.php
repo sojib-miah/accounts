@@ -38,7 +38,7 @@
                         </div>
                         <div class="mb-3">
                             <label>Currency</label>
-                            <select name="currency" class="form-select">
+                            <select name="currency" class="form-select select2">
                                 <option value="BDT" @selected($setting?->currency === 'BDT')>
                                     BDT
                                 </option>
@@ -52,7 +52,7 @@
                         </div>
                         <div class="mb-3">
                             <label>Footer Text</label>
-                            <textarea name="footer_text" class="form-control" rows="4">{{ $setting?->footer_text }}</textarea>
+                            <textarea name="footer_text" class="form-control" rows="4" placeholder="Enter Footer Text...">{{ $setting?->footer_text }}</textarea>
                             @error('footer_text')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror

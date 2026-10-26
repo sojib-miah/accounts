@@ -2,800 +2,825 @@
 <html lang="en">
 
     <head>
-
         <meta charset="UTF-8">
-
-        <title>
-            Challan - {{ $receipt->dm_no }}
-        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Delivery Challan - {{ $receipt->dm_no }}</title>
 
         <style>
-            @page {
-                size: A4 portrait;
-                margin: 0;
+            :root {
+                --primary: #185abc;
+                --primary-light: #edf3ff;
+                --text: #263244;
+                --muted: #687386;
+                --border: #dce3ec;
+                --light: #f5f7fb;
             }
 
             * {
                 box-sizing: border-box;
             }
 
-            /* html,
             body {
                 margin: 0;
-                padding: 0;
-                width: 210mm;
-                min-height: 297mm;
+                padding: 25px;
+                background: #edf1f6;
+                color: var(--text);
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 13px;
+                line-height: 1.5;
             }
 
-            body {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 15px;
-                color: #222;
+            .toolbar {
+                max-width: 1000px;
+                margin: 0 auto 18px;
+                padding: 14px 18px;
                 background: #fff;
-            } */
-
-            .page {
-                width: 194mm;
-                min-height: 281mm;
-                margin: 20px auto;
-                padding-top: 7mm;
-                padding-bottom: 7mm;
+                border: 1px solid var(--border);
+                border-radius: 9px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 12px;
             }
 
-            table {
-                border-collapse: collapse;
-                border-spacing: 0;
+            .toolbar-group {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
-            td,
-            th {
-                vertical-align: top;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
+            .toolbar label {
+                font-weight: 700;
             }
 
-            .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            .header {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                border-collapse: collapse;
-            }
-
-            .header td {
-                border: none;
-                padding: 0;
-                vertical-align: top;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .logo-area {
-                width: 27mm;
-                text-align: left;
-                vertical-align: top;
-            }
-
-            .company-area {
-                width: 129mm;
-                text-align: left;
-                vertical-align: top;
-            }
-
-            .contact-area {
-                width: 38mm;
-                text-align: right;
-                vertical-align: top;
-            }
-
-            .logo {
-                width: 60px;
-                max-width: 60px;
-                height: auto;
-                display: block;
-            }
-
-            .company-name {
-                width: 129mm;
-                max-width: 129mm;
-                font-size: 25px;
-                line-height: 20px;
-                font-weight: bold;
-                color: #4d4d4d;
-                text-align: left;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .company-info {
-                width: 129mm;
-                max-width: 129mm;
-                margin-top: 2px;
-                font-size: 14px;
-                line-height: 13px;
-                color: #555;
-                text-align: left;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .invoice-title {
-                width: 194mm;
-                text-align: center;
-                font-size: 20px;
-                font-weight: bold;
-                margin-top: 8px;
-            }
-
-            .page-number {
-                width: 194mm;
-                text-align: right;
-                font-size: 12px;
-                margin-top: -8px;
-                margin-bottom: 7px;
-            }
-
-            .info-table,
-            .customer-table {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                border-collapse: collapse;
-                border-spacing: 0;
-                margin: 0;
-                padding: 0;
-            }
-
-            .info-table td,
-            .customer-table td {
-                border: none;
-                padding-top: 1.5px;
-                padding-bottom: 1.5px;
-                padding-left: 0;
-                padding-right: 0;
-                vertical-align: top;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .info-label,
-            .customer-label {
-                width: 42mm;
-                font-weight: bold;
-                padding-right: 6px !important;
-                text-align: left;
-                white-space: nowrap;
-            }
-
-            .info-table .colon,
-            .customer-table .colon {
-                width: 6mm;
-                min-width: 6mm;
-                max-width: 6mm;
-                padding-left: 0 !important;
-                padding-right: 6px !important;
-                text-align: left;
-                white-space: nowrap;
-            }
-
-            .info-value,
-            .customer-value {
-                width: 146mm;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                text-align: left;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .info-value .break,
-            .customer-value .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            .customer-table {
-                margin-top: 2px;
-            }
-
-            .items {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                margin-top: 8px;
-                border-collapse: collapse;
-            }
-
-            .items th {
-                border: 1px solid #666;
-                padding: 4px 2px;
-                height: 22px;
-                font-size: 13px;
-                font-weight: bold;
-                text-align: center;
-                vertical-align: middle;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .items td {
-                border: 1px solid #666;
-                padding: 4px 2px;
-                font-size: 13px;
-                line-height: 12px;
-                vertical-align: top;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .sl-col {
-                width: 10mm;
-                text-align: center;
-            }
-
-            .item-col {
-                width: 23mm;
-            }
-
-            .description-col {
-                width: 65mm;
-            }
-
-            .qty-col {
-                width: 14mm;
-                text-align: center;
-            }
-
-            .uom-col {
-                width: 16mm;
-                text-align: center;
-            }
-
-            .price-col {
-                width: 27mm;
-                text-align: right;
-            }
-
-            .disc-col {
-                width: 15mm;
-                text-align: center;
-            }
-
-            .amount-col {
-                width: 24mm;
-                text-align: right;
-            }
-
-            .description {
-                width: 65mm;
-                line-height: 12px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .item-number {
-                width: 23mm;
-                word-break: break-all;
-                overflow-wrap: anywhere;
-            }
-
-            .center {
-                text-align: center;
-            }
-
-            .number {
-                text-align: right;
-                white-space: nowrap;
-            }
-
-            .total-row td {
-                font-weight: bold;
-                font-size: 15px;
-            }
-
-            .total-title {
-                text-align: right;
-                padding-right: 5px !important;
-            }
-
-            .total-value {
-                width: 24mm;
-                text-align: right;
-                white-space: nowrap;
-            }
-
-            .amount-words {
-                width: 194mm;
-                max-width: 194mm;
-                margin-top: 7px;
-                font-size: 15px;
-                line-height: 13px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .remarks {
-                width: 194mm;
-                max-width: 194mm;
-                margin-top: 6px;
-                font-size: 14px;
-                line-height: 12px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .bottom-area {
-                width: 194mm;
-                max-width: 194mm;
-                margin-top: 25px;
-            }
-
-            .signature-table {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                border-collapse: collapse;
-            }
-
-            .signature-table td {
-                border: none;
-                vertical-align: bottom;
-            }
-
-            .signature-left {
-                width: 126mm;
-            }
-
-            .signature-right {
-                width: 68mm;
-                text-align: right;
-            }
-
-            .signature-line {
-                font-size: 15px;
-                margin-top: 3px;
-                white-space: nowrap;
-            }
-
-            .authorized {
-                font-size: 15px;
-                font-weight: bold;
-                margin-top: 3px;
-                white-space: nowrap;
-            }
-
-            .system-note {
-                width: 194mm;
-                max-width: 194mm;
-                text-align: center;
-                font-size: 14px;
-                margin-top: 8px;
-            }
-
-            .footer-line {
-                width: 194mm;
-                max-width: 194mm;
-                border-top: 1px solid #777;
-                margin-top: 6px;
-            }
-
-            .footer-text {
-                width: 194mm;
-                max-width: 194mm;
-                text-align: center;
-                font-size: 13px;
-                color: #777;
-                margin-top: 4px;
-                line-height: 11px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            tr {
-
-                page-break-inside: avoid;
-            }
-
-            .print-btn {
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                z-index: 99999;
-                padding: 8px 15px;
-                border: none;
-                border-radius: 4px;
-                background: #0d6efd;
-                color: #fff;
+            .toolbar select,
+            .toolbar button {
+                min-height: 38px;
+                padding: 8px 13px;
+                border-radius: 6px;
                 font-size: 13px;
                 cursor: pointer;
             }
 
-            @media print {
-                @page {
-                    size: A4 portrait;
-                    margin: 0;
-                }
+            .toolbar select {
+                border: 1px solid #cbd3df;
+                background: #fff;
+            }
 
-                html,
+            .toolbar button {
+                border: 0;
+                background: var(--primary);
+                color: #fff;
+                font-weight: 700;
+            }
+
+            .toolbar .secondary {
+                background: #e8edf5;
+                color: #273449;
+            }
+
+            .challan {
+                --challan-primary: #185abc;
+                max-width: 1000px;
+                min-height: 850px;
+                margin: 0 auto;
+                padding: 40px;
+                background: #fff;
+                box-shadow: 0 5px 28px rgba(22, 34, 51, .09);
+            }
+
+            .challan-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 25px;
+                padding-bottom: 22px;
+                border-bottom: 3px solid var(--challan-primary);
+            }
+
+            .company-block {
+                display: flex;
+                align-items: flex-start;
+                gap: 15px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .company-logo {
+                max-width: 95px;
+                max-height: 75px;
+                object-fit: contain;
+            }
+
+            .company-name {
+                margin: 0 0 7px;
+                font-size: 23px;
+                font-weight: 800;
+                color: var(--challan-primary);
+                overflow-wrap: anywhere;
+            }
+
+            .company-info {
+                color: var(--muted);
+                font-size: 11px;
+                overflow-wrap: anywhere;
+            }
+
+            .company-info div {
+                margin: 2px 0;
+            }
+
+            .challan-heading {
+                flex: 0 0 auto;
+                text-align: right;
+            }
+
+            .challan-heading h1 {
+                margin: 0;
+                font-size: 30px;
+                line-height: 1.2;
+                letter-spacing: 1.5px;
+                color: var(--challan-primary);
+            }
+
+            .challan-number {
+                margin-top: 8px;
+                font-size: 14px;
+                font-weight: 700;
+                overflow-wrap: anywhere;
+            }
+
+            .status {
+                display: inline-block;
+                margin-top: 8px;
+                padding: 4px 10px;
+                border-radius: 20px;
+                background: #e7f7ee;
+                color: #16804a;
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            .status.draft {
+                background: #fff0cf;
+                color: #946200;
+            }
+
+            .status.cancelled {
+                background: #fde8e7;
+                color: #b42318;
+            }
+
+            .section {
+                margin-top: 25px;
+            }
+
+            .section-title {
+                margin: 0 0 10px;
+                color: var(--challan-primary);
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .party-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+            }
+
+            .party-card {
+                padding: 16px;
+                border: 1px solid var(--border);
+                border-radius: 7px;
+            }
+
+            .party-label {
+                margin-bottom: 8px;
+                color: var(--challan-primary);
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .8px;
+            }
+
+            .party-name {
+                margin-bottom: 5px;
+                font-size: 15px;
+                font-weight: 800;
+                overflow-wrap: anywhere;
+            }
+
+            .muted {
+                color: var(--muted);
+            }
+
+            .meta-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-top: 17px;
+            }
+
+            .meta-item {
+                padding: 11px 12px;
+                background: var(--light);
+                border-radius: 6px;
+                min-width: 0;
+            }
+
+            .meta-label {
+                display: block;
+                margin-bottom: 4px;
+                color: var(--muted);
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+
+            .meta-value {
+                font-weight: 700;
+                overflow-wrap: anywhere;
+            }
+
+            .items-table {
+                width: 100%;
+                margin-top: 12px;
+                border-collapse: collapse;
+            }
+
+            .items-table thead {
+                display: table-header-group;
+            }
+
+            .items-table th {
+                padding: 12px 9px;
+                background: var(--challan-primary);
+                color: #fff;
+                text-align: left;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: .4px;
+            }
+
+            .items-table td {
+                padding: 12px 9px;
+                border-bottom: 1px solid var(--border);
+                vertical-align: top;
+            }
+
+            .items-table tbody tr:nth-child(even) {
+                background: #f8faff;
+            }
+
+            .items-table .number {
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .product-name {
+                font-weight: 700;
+                overflow-wrap: anywhere;
+            }
+
+            .product-description {
+                margin-top: 4px;
+                font-size: 11px;
+                color: var(--muted);
+                overflow-wrap: anywhere;
+            }
+
+            .quantity-summary {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 15px;
+            }
+
+            .quantity-box {
+                min-width: 230px;
+                padding: 12px 15px;
+                background: var(--primary-light);
+                border: 1px solid #d7e4ff;
+                border-radius: 7px;
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+            }
+
+            .quantity-box strong {
+                color: var(--challan-primary);
+            }
+
+            .remarks {
+                margin-top: 25px;
+                padding: 14px 16px;
+                border-left: 3px solid var(--challan-primary);
+                background: var(--light);
+                overflow-wrap: anywhere;
+            }
+
+            .remarks-title {
+                margin-bottom: 5px;
+                font-weight: 800;
+            }
+
+            .declaration {
+                margin-top: 24px;
+                padding: 12px 14px;
+                border: 1px dashed #c5ceda;
+                color: #4b5563;
+                font-size: 11px;
+            }
+
+            .signature-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 25px;
+                margin-top: 75px;
+            }
+
+            .signature {
+                padding-top: 9px;
+                border-top: 1px solid #657184;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .signature small {
+                display: block;
+                margin-top: 4px;
+                font-weight: 400;
+                color: var(--muted);
+            }
+
+            .footer {
+                margin-top: 30px;
+                padding-top: 12px;
+                border-top: 1px solid var(--border);
+                text-align: center;
+                font-size: 10px;
+                color: var(--muted);
+            }
+
+            /* Classic design */
+            .design-classic {
+                --challan-primary: #252525;
+            }
+
+            .design-classic .challan-header {
+                border-bottom-width: 1px;
+            }
+
+            .design-classic .party-card {
+                border-radius: 0;
+                border-color: #aaa;
+            }
+
+            .design-classic .meta-item {
+                border-radius: 0;
+                background: #fff;
+                border: 1px solid #ddd;
+            }
+
+            .design-classic .items-table th {
+                background: #eee;
+                color: #222;
+                border-bottom: 1px solid #555;
+            }
+
+            .design-classic .items-table tbody tr:nth-child(even) {
+                background: #fff;
+            }
+
+            .design-classic .quantity-box {
+                background: #fff;
+                border: 1px solid #777;
+                border-radius: 0;
+            }
+
+            .design-classic .declaration {
+                border-style: solid;
+            }
+
+            /* Compact design */
+            .design-compact {
+                min-height: auto;
+                padding: 25px;
+            }
+
+            .design-compact .challan-header {
+                padding-bottom: 14px;
+            }
+
+            .design-compact .company-name {
+                font-size: 19px;
+            }
+
+            .design-compact .challan-heading h1 {
+                font-size: 25px;
+            }
+
+            .design-compact .section {
+                margin-top: 16px;
+            }
+
+            .design-compact .party-card {
+                padding: 10px;
+            }
+
+            .design-compact .meta-grid {
+                margin-top: 10px;
+            }
+
+            .design-compact .meta-item {
+                padding: 7px;
+            }
+
+            .design-compact .items-table th,
+            .design-compact .items-table td {
+                padding: 7px 6px;
+            }
+
+            .design-compact .signature-grid {
+                margin-top: 55px;
+            }
+
+            /* Delivery-focused design */
+            .design-delivery .challan-header {
+                border-bottom: 5px solid var(--challan-primary);
+            }
+
+            .design-delivery .challan-heading h1 {
+                font-size: 25px;
+                letter-spacing: 1px;
+            }
+
+            .design-delivery .challan-heading h1:after {
+                content: "DELIVERY";
+                display: block;
+                margin-top: 5px;
+                font-size: 11px;
+                letter-spacing: 3px;
+            }
+
+            .design-delivery .declaration {
+                background: #fafafa;
+                border: 1px solid #b9c2cf;
+                padding: 17px;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 12mm;
+            }
+
+            @media print {
                 body {
-                    width: 210mm;
-                    min-height: 297mm;
                     margin: 0;
                     padding: 0;
-                }
-
-                body {
                     background: #fff;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
                 }
 
-                .page {
-                    width: 194mm;
-                    min-height: 281mm;
-                    margin-left: 8mm;
-                    margin-right: 8mm;
-                    padding-top: 7mm;
-                    padding-bottom: 7mm;
-                    overflow: visible;
-                }
-
-                .print-btn {
+                .toolbar {
                     display: none !important;
+                }
+
+                .challan {
+                    width: 100%;
+                    max-width: none;
+                    min-height: 0;
+                    margin: 0;
+                    padding: 0;
+                    box-shadow: none;
+                }
+
+                .party-card,
+                .meta-item,
+                .quantity-box,
+                .remarks,
+                .declaration,
+                .signature-grid {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                }
+
+                .items-table tr {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                }
+            }
+
+            @media screen and (max-width: 650px) {
+                body {
+                    padding: 10px;
+                }
+
+                .challan {
+                    padding: 20px;
+                }
+
+                .challan-header {
+                    flex-direction: column;
+                }
+
+                .challan-heading {
+                    text-align: left;
+                }
+
+                .party-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .meta-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+
+                .signature-grid {
+                    grid-template-columns: 1fr;
+                    gap: 40px;
+                }
+
+                .items-table th,
+                .items-table td {
+                    padding: 6px 4px;
+                    font-size: 10px;
                 }
             }
         </style>
     </head>
 
     <body>
-        <button type="button" class="print-btn" onclick="window.print()">
-            Print
-        </button>
-        <div class="page">
-            <table class="header">
-                <tr>
-                    <td class="logo-area">
-                        @if (setting() && setting()->logo)
-                            <img src="{{ asset('uploads/settings/' . setting()->logo) }}" class="logo">
-                        @endif
-                    </td>
-                    <td class="company-area">
-                        <div class="company-name">
-                            {{ $receipt->company->name ?? config('app.name') }}
-                        </div>
-                        <div class="company-info">
-                            @if ($receipt->company->address ?? null)
-                                {{ $receipt->company->address }}
-                            @elseif ($receipt->branch->address ?? null)
-                                {{ $receipt->branch->address }}
-                            @endif
-                            @if ($receipt->branch->phone_one ?? null)
-                                <br>
-                                Telephone :
-                                {{ $receipt->branch->phone_one }}
-                            @endif
-                            @if ($receipt->branch->phone_two ?? null)
-                                ,
-                                {{ $receipt->branch->phone_two }}
-                            @endif
-                            @if ($receipt->branch->email ?? null)
-                                <br>
-                                Email :
-                                {{ $receipt->branch->email }}
-                            @endif
-                        </div>
-                    </td>
-                    <td class="contact-area">
-                    </td>
-                </tr>
-            </table>
-            <div class="invoice-title">
-                CHALLAN
+
+        @php
+            $company = $receipt->company;
+            $branch = $receipt->branch;
+            $party = $receipt->party;
+            $items = $receipt->items ?? collect();
+
+            $companyName = $company->name ?? ($company->company_name ?? config('app.name'));
+
+            $partyName = $party->name ?? ($party->company_name ?? 'Customer');
+
+            $challanNo = $receipt->dm_no ?? ($receipt->receipt_no ?? 'CH-' . $receipt->id);
+
+            $challanDate = $receipt->receipt_date
+                ? \Illuminate\Support\Carbon::parse($receipt->receipt_date)->format('d M Y')
+                : '—';
+
+            $totalQty = (float) ($receipt->total_qty ?? $items->sum('qty'));
+
+            $status = $receipt->status ?? 'Completed';
+            $design = in_array(request()->query('design', 'modern'), ['modern', 'classic', 'compact', 'delivery'], true)
+                ? request()->query('design', 'modern')
+                : 'modern';
+            $branchAddress = $branch->address ?? null;
+            $partyPhone = $party->phone ?? ($party->phone_one ?? null);
+            $formatQty = function ($qty) {
+                return rtrim(rtrim(number_format((float) $qty, 2, '.', ''), '0'), '.');
+            };
+        @endphp
+
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <label for="designSelect">Challan Design</label>
+
+                <select id="designSelect" onchange="changeDesign(this.value)">
+                    <option value="modern" {{ $design === 'modern' ? 'selected' : '' }}>
+                        Modern Challan
+                    </option>
+                    <option value="classic" {{ $design === 'classic' ? 'selected' : '' }}>
+                        Classic Challan
+                    </option>
+                    <option value="compact" {{ $design === 'compact' ? 'selected' : '' }}>
+                        Compact Challan
+                    </option>
+                    <option value="delivery" {{ $design === 'delivery' ? 'selected' : '' }}>
+                        Delivery Challan
+                    </option>
+                </select>
             </div>
-            <div class="page-number">
-                Page No.: 1/1
-            </div>
-            <table class="info-table">
-                <tr>
-                    <td class="info-label">
-                        Date
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        {{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d/m/Y') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Challan No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->dm_no }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Delivery Note No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->challan_no ?? ($receipt->delivery_no ?? '') }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->so_no ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. Date
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        @if ($receipt->ref_date ?? null)
-                            {{ \Carbon\Carbon::parse($receipt->ref_date)->format('d/m/Y') }}
-                        @endif
-                    </td>
-                </tr>
-            </table>
-            <table class="customer-table">
-                <tr>
-                    <td class="customer-label">
-                        Customer Code
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->customer_code ??
-                                ($receipt->party->code ?? 'CUST-' . str_pad($receipt->party->id ?? 0, 8, '0', STR_PAD_LEFT)) }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->name ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Address
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->address ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Contact Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->contact_name ?? ($receipt->party->name ?? '') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Phone No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->phone ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Payment Terms
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->payment_terms ?? ($receipt->payment_terms ?? '') }}
-                    </td>
-                </tr>
-            </table>
-            <table class="items">
-                <thead>
-                    <tr>
-                        <th class="sl-col">
-                            Sl. No.
-                        </th>
-                        <th class="item-col">
-                            Item No
-                        </th>
-                        <th class="description-col">
-                            Description
-                        </th>
-                        <th class="qty-col">
-                            Qty
-                        </th>
-                        <th class="uom-col">
-                            UOM
-                        </th>
-                        {{-- <th class="price-col">
-                            Unit price
-                        </th>
-                        <th class="disc-col">
-                            Disc %
-                        </th>
-                        <th class="amount-col">
-                            Amount
-                        </th> --}}
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($receipt->items as $item)
-                        @php
-                            $product = $item->product;
-                            $itemCode = $product->sku ?? ($product->product_code ?? '');
-                            $description = $product->name ?? '';
-                            $uom = $product->unit ?? 'Number';
-                            $qty = (float) $item->qty;
-                            $rate = (float) $item->rate;
-                            $amount = (float) $item->amount;
-                        @endphp
-                        <tr>
-                            {{-- SL --}}
-                            <td class="sl-col center">
-                                {{ $loop->iteration }}
-                            </td>
-                            {{-- ITEM CODE --}}
-                            <td class="item-col">
-                                <span class="break">
-                                    {{ $itemCode }}
-                                </span>
-                            </td>
-                            {{-- DESCRIPTION --}}
-                            <td class="description-col description">
-                                {{ $description }}
-                                @if ($item->details ?? null)
-                                    <br>
-                                    {{ $item->details }}
-                                @endif
-                            </td>
-                            {{-- QTY --}}
-                            <td class="qty-col center">
-                                {{ rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.') }}
-                            </td>
-                            {{-- UOM --}}
-                            <td class="uom-col center">
-                                {{ $uom }}
-                            </td>
-                            {{-- RATE --}}
-                            {{-- <td class="price-col number">
-                                {{ number_format($rate, 2) }}
-                            </td> --}}
-                            {{-- DISCOUNT --}}
-                            {{-- <td class="disc-col center">
-                                0
-                            </td> --}}
-                            {{-- AMOUNT --}}
-                            {{-- <td class="amount-col number">
-                                {{ number_format($amount, 2) }}
-                            </td> --}}
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="center">
-                                No Item Found
-                            </td>
-                        </tr>
-                    @endforelse
-                    {{-- <tr class="total-row">
-                        <td colspan="7" class="total-title">
-                            Total BDT
-                        </td>
-                        <td class="amount-col total-value">
-                            {{ number_format($receipt->total_amount, 2) }}
-                        </td>
-                    </tr> --}}
-                </tbody>
-            </table>
-            {{-- <div class="amount-words">
-                <strong>
-                    Amount BDT (In Words)
-                </strong>
-                :
-                @if (function_exists('numberToWords'))
-                    {{ numberToWords($receipt->total_amount) }}
-                @else
-                    {{ number_format($receipt->total_amount, 2) }}
-                @endif
-                ONLY
-            </div> --}}
-            @if ($receipt->remarks)
-                <div class="remarks">
-                    <strong>
-                        Remarks :
-                    </strong>
-                    {{ $receipt->remarks }}
-                </div>
-            @endif
-            <div class="bottom-area">
-                <table class="signature-table">
-                    <tr>
-                        <td class="signature-left">
-                        </td>
-                        <td class="signature-right">
-                            <br>
-                            <br>
-                            <br>
-                            <div class="signature-line">
-                                _________________________
-                            </div>
-                            <div class="authorized">
-                                Authorized Signature
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                {{-- SYSTEM NOTE --}}
-                <div class="system-note">
-                    This is a System Generated Invoice.
-                </div>
-                {{-- FOOTER LINE --}}
-                <div class="footer-line">
-                </div>
-                {{-- FOOTER --}}
-                <div class="footer-text">
-                    Printed On :
-                    {{ now()->format('d/m/Y h:i A') }}
-                    &nbsp;&nbsp;&nbsp;
-                    Generated By :
-                    {{ $receipt->creator->name ?? '' }}
-                </div>
+
+            <div class="toolbar-group">
+                <button type="button" onclick="window.print()">
+                    <span>Print Challan</span>
+                </button>
             </div>
         </div>
+
+        <main id="challan" class="challan design-{{ $design }}">
+            <header class="challan-header">
+                <div class="company-block">
+                    @if (optional(setting())->logo)
+                        <div class="company-logo">
+                            <img src="{{ asset('uploads/settings/' . setting()->logo) }}" alt="Logo">
+                        </div>
+                    @endif
+                    <div>
+                        <h2 class="company-name">{{ $companyName }}</h2>
+                        <div class="company-info">
+                            @if ($branch && $branch->name)
+                                <div><strong>{{ $branch->name }}</strong></div>
+                            @endif
+                            @if ($branchAddress)
+                                <div>{{ $branchAddress }}</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="challan-heading">
+                    <h1>CHALLAN</h1>
+                    <div class="challan-number">{{ $challanNo }}</div>
+                    <div class="muted">Date: {{ $challanDate }}</div>
+                    <span
+                        class="status
+                {{ strtolower($status) === 'draft' ? 'draft' : '' }}
+                {{ strtolower($status) === 'cancelled' ? 'cancelled' : '' }}">
+                        {{ $status }}
+                    </span>
+                </div>
+            </header>
+
+            <section class="section party-grid">
+                <div class="party-card">
+                    <div class="party-label">Delivery To / Receiver</div>
+                    <div class="party-name">{{ $partyName }}</div>
+                    @if ($party && $party->address)
+                        <div class="muted">Address: {{ $party->address }}</div>
+                    @endif
+                    @if ($partyPhone)
+                        <div class="muted">Phone: {{ $partyPhone }}</div>
+                    @endif
+                    @if ($party && $party->email)
+                        <div class="muted">Email: {{ $party->email }}</div>
+                    @endif
+                </div>
+                <div class="party-card">
+                    <div class="party-label">Challan Information</div>
+                    <div>
+                        <span class="muted">Challan No:</span>
+                        <strong>{{ $challanNo }}</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Date:</span>
+                        <strong>{{ $challanDate }}</strong>
+                    </div>
+
+                    <div>
+                        <span class="muted">Branch:</span>
+                        <strong>{{ $branch->name ?? '—' }}</strong>
+                    </div>
+
+                    <div>
+                        <span class="muted">Prepared By:</span>
+                        <strong>{{ $receipt->creator->name ?? '—' }}</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">Reference No.</span>
+                        <div class="meta-value">
+                            {{ $receipt->so_no ?? ($receipt->receipt_no ?? '—') }}
+                        </div>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Delivery Date</span>
+                        <div class="meta-value">{{ $challanDate }}</div>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Total Items</span>
+                        <div class="meta-value">{{ $items->count() }}</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">Goods / Product Details</h3>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 6%;">SL</th>
+                            <th style="width: 48%;">Product Description</th>
+                            <th style="width: 16%;">Reference</th>
+                            <th class="number" style="width: 12%;">Qty</th>
+                            <th style="width: 18%;">Remarks</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($items as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+
+                                <td>
+                                    <div class="product-name">
+                                        {{ $item->product->name ?? ($item->category->name ?? ($item->accountHead->name ?? 'Item')) }}
+                                    </div>
+
+                                    @if (!empty($item->details))
+                                        <div class="product-description">
+                                            {{ $item->details }}
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    {{ $item->product->sku ?? ($item->product->product_code ?? '—') }}
+                                </td>
+
+                                <td class="number">
+                                    {{ $formatQty($item->qty) }}
+                                </td>
+
+                                <td></td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" style="text-align:center;">
+                                    No items found for this challan.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
+                <div class="quantity-summary">
+                    <div class="quantity-box">
+                        <span>Total Quantity</span>
+                        <strong>{{ $formatQty($totalQty) }}</strong>
+                    </div>
+                </div>
+            </section>
+
+            @if (!empty($receipt->remarks))
+                <section class="section remarks">
+                    <div class="remarks-title">Remarks / Delivery Instructions</div>
+                    {{ $receipt->remarks }}
+                </section>
+            @endif
+
+            <section class="section declaration">
+                <strong>Receiver's Declaration</strong>
+
+                <p>
+                    I acknowledge receipt of the goods listed above in the stated
+                    quantities. Any discrepancy or damage should be recorded at the
+                    time of delivery.
+                </p>
+            </section>
+
+            <section class="signature-grid">
+                <div class="signature">
+                    Prepared By
+                    <small>{{ $receipt->creator->name ?? '' }}</small>
+                </div>
+
+                <div class="signature">
+                    Delivered By
+                    <small>Name &amp; Signature</small>
+                </div>
+
+                <div class="signature">
+                    Received By
+                    <small>Name, Signature &amp; Seal</small>
+                </div>
+            </section>
+
+            <footer class="footer">
+                This is a goods delivery challan. It is not a tax invoice.
+                <br>
+                Generated by {{ $companyName }}
+            </footer>
+
+        </main>
+
         <script>
-            window.onload = function() {
-                setTimeout(function() {
-                    window.print();
-                }, 300);
-            };
+            function changeDesign(design) {
+                const allowed = ['modern', 'classic', 'compact', 'delivery'];
+
+                if (!allowed.includes(design)) {
+                    design = 'modern';
+                }
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('design', design);
+
+                window.location.href = url.toString();
+            }
         </script>
+
     </body>
 
 </html>

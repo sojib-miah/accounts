@@ -344,13 +344,15 @@
                             </form>
                         @endcan
                     @endif
-                    <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank" class="btn btn-primary btn-lg">
-                        <i class="fa fa-print me-2"></i>
-                        Print
-                    </a>
-                    <a href="{{ route('receipt.pdf', $receipt->id) }}" target="_blank" class="btn btn-danger btn-lg">
+                    <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                        target="_blank" class="btn btn-primary btn-lg">
                         <i class="fa fa-file-pdf me-2"></i>
-                        PDF
+                        PDF Challan
+                    </a>
+                    <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                        target="_blank" class="btn btn-danger btn-lg">
+                        <i class="fa fa-file-pdf me-2"></i>
+                        PDF Invoice
                     </a>
                 </div>
                 {{-- Payment Summary --}}

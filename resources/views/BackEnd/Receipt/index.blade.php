@@ -90,6 +90,7 @@
                                     <th class="text-center">Category</th>
                                     <th class="text-center">Description</th>
                                     <th class="text-center">Quantity</th>
+                                    <th class="text-center">Total Amount</th>
                                     <th class="text-center">Created BY</th>
                                     <th class="text-center">DATE & TIME</th>
                                     <th class="text-center">Payment STATUS</th>
@@ -125,6 +126,7 @@
                                             @endforeach
                                         </td>
                                         <td class="text-center">{{ $receipt->total_qty ?? '-' }}</td>
+                                        <td class="text-center">{{ $receipt->total_amount ?? '-' }}</td>
                                         <td class="text-center">{{ $receipt->creator->name ?? '-' }}</td>
                                         <td class="text-center">{{ $receipt->created_at->format('d-m-Y h:i A') }}</td>
                                         <td class="text-center">
@@ -220,7 +222,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="text-center py-5">
+                                        <td colspan="13" class="text-center py-5">
                                             <i class="fa fa-folder-open fa-4x text-secondary mb-3"></i>
                                             <br>
                                             No Expense Receipt Found

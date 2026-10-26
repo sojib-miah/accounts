@@ -7,13 +7,13 @@
         <div class="container-p-y">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">Permissions List</h4>
+                    <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Permissions List</h4>
                     <div class="d-flex align-items-center gap-2">
                         <form action="{{ route('permissions.index') }}" method="GET"
                             class="d-flex justify-content-center align-items-center gap-2">
 
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Permission">
+                                placeholder="Search Permission...">
 
                             <button type="submit" class="btn btn-primary">
                                 <i class="fa fa-search me-1"></i>
@@ -22,7 +22,7 @@
 
                             @if (request('search'))
                                 <a href="{{ route('permissions.index') }}" class="btn btn-secondary">
-                                    Reset
+                                    <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                 </a>
                             @endif
 
@@ -39,7 +39,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>SN</th>
                                     <th>Name</th>
                                     <th>Assigned Roles</th>
                                     <th>Created Date</th>
@@ -119,7 +119,7 @@
                             <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal">
                             </button>
                             <div class="text-center mb-4">
-                                <h3>Add New Permission</h3>
+                                <h3><i class="fa fa-plus me-2"></i> Add New Permission</h3>
                                 <p class="text-body-secondary">
                                     Permissions you may use and assign to your users.
                                 </p>
@@ -127,11 +127,10 @@
                             <form action="{{ route('permissions.store') }}" method="POST">
                                 @csrf
                                 <div class="mb-4">
-                                    <label class="form-label">
-                                        Permission Name
-                                    </label>
-                                    <input type="text" name="name" class="form-control" placeholder="Permission Name"
-                                        value="{{ old('name') }}">
+                                    <label class="form-label">Permission Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name"
+                                        class="form-control @error('name', 'add') is-invalid @enderror"
+                                        placeholder="Permission Name..." value="{{ old('name') }}" required>
                                     @error('name', 'add')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
@@ -168,12 +167,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-primary me-2">
-                                        Create Permission
+                                <div class="text-center pt-5">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                        <i class="fa-solid fa-xmark me-1"></i> Cancel
                                     </button>
-                                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
-                                        Cancel
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-save me-1"></i> Create Permission
                                     </button>
                                 </div>
                             </form>
@@ -192,7 +191,7 @@
                                 <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal">
                                 </button>
                                 <div class="text-center mb-4">
-                                    <h3>Edit Permission</h3>
+                                    <h3><i class="fa fa-edit me-2"></i> Edit Permission</h3>
                                     <p class="text-body-secondary">
                                         Edit permission as per your requirements.
                                     </p>
@@ -218,9 +217,12 @@
                                             <small class="text-danger">{{ $message }}</small>
                                         @enderror
                                     </div>
-                                    <div class="text-end">
+                                    <div class="text-center pt-5">
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            <i class="fa-solid fa-xmark me-1"></i> Close
+                                        </button>
                                         <button type="submit" class="btn btn-primary">
-                                            Update Permission
+                                            <i class="fa fa-save me-1"></i> Update Permission
                                         </button>
                                     </div>
                                 </form>

@@ -5,7 +5,7 @@
 @section('content')
     <div class="p-5">
         <div class="container-p-y">
-            <h4 class="mb-1">Roles List</h4>
+            <h4 class="mb-1"><i class="fa-solid fa-list-ul me-2"></i> Roles List</h4>
             <p class="mb-6">
                 A role provided access to predefined menus and features so that depending on
                 assigned role an administrator can have access to what user needs.
@@ -23,8 +23,13 @@
                                     <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
                                         @foreach ($role->users->take(4) as $user)
                                             <li class="avatar pull-up">
-                                                <img class="rounded-circle" src="{{ asset('assets/img/avatars/1.png') }}"
-                                                    alt="Avatar">
+                                                @if ($user->image)
+                                                    <img class="rounded-circle"
+                                                        src="{{ asset('/uploads/users/' . $user->image) }}" alt="Avatar">
+                                                @else
+                                                    <img class="rounded-circle"
+                                                        src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar">
+                                                @endif
                                             </li>
                                         @endforeach
                                     </ul>
@@ -87,28 +92,24 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center gap-2">
                             <div>
-                                <h4 class="mb-1">Total users with their roles</h4>
+                                <h4 class="mb-1"><i class="fa fa-users"></i> Total users with their roles</h4>
                                 <p class="mb-0">
                                     Find all of your company’s administrator accounts and their associate roles.
                                 </p>
                             </div>
                             <form action="{{ route('roles.index') }}" method="GET"
                                 class="d-flex justify-content-center align-items-center gap-2">
-
                                 <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                    placeholder="Search User">
-
+                                    placeholder="Search User...">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
-
                                 @if (request('search'))
                                     <a href="{{ route('roles.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
-
                             </form>
                         </div>
                         <div class="card-body">
@@ -116,7 +117,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>SN</th>
                                             <th>User</th>
                                             <th>Email</th>
                                             <th>Role</th>
@@ -139,6 +140,9 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                                <div class="p-3">
+                                    {{ $users->links() }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -155,18 +159,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal">
                     </button>
                     <div class="text-center mb-4">
-                        <h4>Add New Role</h4>
+                        <h4><i class="fa fa-plus me-2"></i> Add New Role</h4>
                         <p class="text-muted">Set role permissions</p>
                     </div>
                     <form action="{{ route('roles.store') }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label class="form-label">
-                                Role Name
-                            </label>
-                            <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
+                            <label class="form-label">Role Name</label>
+                            <input type="text" name="name"
+                                class="form-control @error('name', 'add') is-invalid @enderror" required
+                                value="{{ old('name') }}" placeholder="Enter Role Name...">
                             @error('name', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <h5 class="mb-3">Role Permissions</h5>
@@ -213,11 +217,11 @@
                         </div>
                         <hr>
                         <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-primary me-2">
-                                Save Role
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-1"></i> Cancel
                             </button>
-                            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
-                                Cancel
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-1"></i> Save Role
                             </button>
                         </div>
                     </form>
@@ -236,16 +240,18 @@
                         @csrf
                         @method('PUT')
                         <div class="modal-header">
-                            <h4>Edit Role</h4>
+                            <h4><i class="fa fa-edit me-2"></i> Edit Role</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal">
                             </button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-4">
                                 <label>Role Name</label>
-                                <input type="text" name="name" value="{{ $role->name }}" class="form-control">
+                                <input type="text" name="name" value="{{ $role->name }}"
+                                    class="form-control @error('name', 'edit') is-invalid @enderror"
+                                    placeholder="Enter Role Name...">
                                 @error('name', 'edit')
-                                    <small class="text-danger">{{ $message }}</small>
+                                    <small class="invalid-feedback">{{ $message }}</small>
                                 @enderror
                             </div>
                             <h5 class="mb-3">Role Permissions</h5>
@@ -299,11 +305,11 @@
                         </div>
                         <hr>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                Cancel
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-xmark me-1"></i> Cancel
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                Update Role
+                                <i class="fa fa-save me-1"></i> Update Role
                             </button>
                         </div>
                     </form>

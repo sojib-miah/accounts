@@ -60,13 +60,13 @@ class DashboardController extends Controller
             ->sum('receipt_payments.amount');
 
         $todaySalesRevenue = Receipt::where('type', 'Sales-Order')
-            // ->where('status', 'Completed')
+            ->where('status', 'Completed')
             ->whereDate('receipt_date', $today)
             ->tap($receiptScope)
             ->sum('total_amount');
 
         $todayDirectIncome = Receipt::where('type', 'Direct-Income')
-            // ->where('status', 'Completed')
+            ->where('status', 'Completed')
             ->whereDate('receipt_date', $today)
             ->tap($receiptScope)
             ->sum('total_amount');
@@ -75,7 +75,7 @@ class DashboardController extends Controller
             ->join('receipts', 'receipts.id', '=', 'receipt_items.receipt_id')
             ->whereDate('receipts.receipt_date', $today)
             ->where('receipts.type', 'Sales-Order')
-            // ->where('receipts.status', 'Completed')
+            ->where('receipts.status', 'Completed')
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('receipts.company_id', $user->company_id)
                     ->where('receipts.branch_id', $user->branch_id);
@@ -91,6 +91,7 @@ class DashboardController extends Controller
 
         $todaySales = Receipt::whereDate('receipt_date', $today)
             ->whereIn('type', ['Sales-Order', 'Direct-Income'])
+            ->where('status', 'Completed')
             ->tap($receiptScope)
             ->sum('total_amount');
 
@@ -105,6 +106,7 @@ class DashboardController extends Controller
 
         $todayPurchases = Receipt::whereDate('receipt_date', $today)
             ->where('type', 'Purchase-Order')
+            ->where('status', 'Completed')
             ->tap($receiptScope)
             ->sum('total_amount');
 
@@ -137,6 +139,7 @@ class DashboardController extends Controller
 
         $todayExpenses = Receipt::whereDate('receipt_date', $today)
             ->where('type', 'Expense')
+            ->where('status', 'Completed')
             ->tap($receiptScope)
             ->sum('total_amount');
 
@@ -144,12 +147,12 @@ class DashboardController extends Controller
             'Sales-Order',
             'Direct-Income',
             'Income',
-        ])->tap($receiptScope)->sum('due_amount');
+        ])->where('status', 'Completed')->tap($receiptScope)->sum('due_amount');
 
         $payable = Receipt::whereIn('type', [
             'Purchase-Order',
             'Expense',
-        ])->tap($receiptScope)->sum('due_amount');
+        ])->where('status', 'Completed')->tap($receiptScope)->sum('due_amount');
 
         $customers = Party::where('type', 'Customer')
             ->where('status', 'Active')

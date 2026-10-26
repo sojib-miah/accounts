@@ -323,7 +323,19 @@ class ChallanController extends Controller
 
     public function print(Receipt $receipt)
     {
-        $receipt->load(['company', 'branch', 'party', 'creator', 'items.category', 'items.accountHead', 'payments.paymentType', 'payments.account', 'payments.user',]);
+        $receipt->load([
+            'company',
+            'branch',
+            'party',
+            'creator',
+            'items.product',
+            'items.category',
+            'items.accountHead',
+            'payments.paymentType',
+            'payments.account',
+            'payments.user',
+        ]);
+
         return view('BackEnd.Challan.print', compact('receipt'));
     }
 
@@ -334,16 +346,29 @@ class ChallanController extends Controller
             'branch',
             'party',
             'creator',
+            'items.product',
             'items.category',
             'items.accountHead',
             'payments.paymentType',
             'payments.account',
             'payments.user',
         ]);
-        $pdf = Pdf::loadView('BackEnd.Challan.pdf', compact('receipt'));
+
+        $design = request()->query('design', 'modern');
+
+        if (!in_array($design, ['modern', 'classic', 'compact', 'delivery'], true)) {
+            $design = 'modern';
+        }
+
+        $pdf = Pdf::loadView('BackEnd.Challan.pdf', [
+            'receipt' => $receipt,
+            'design' => $design,
+        ]);
+
         $pdf->setPaper('a4', 'portrait');
+
         return $pdf->stream(
-            $receipt->receipt_no . '.pdf'
+            ($receipt->receipt_no ?? 'challan-' . $receipt->id) . '.pdf'
         );
     }
 }

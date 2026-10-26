@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Contact')
+@section('title', 'Contact List')
 
 @section('content')
     <div class="mt-5">
@@ -8,7 +8,7 @@
             {{-- Page Header --}}
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
                 <div>
-                    <h4 class="mb-1">Contact Requests</h4>
+                    <h4 class="mb-1"><i class="fa-solid fa-list-ul me-2"></i> Contact Requests List</h4>
                     <p class="text-muted mb-0">
                         Manage all contact and demo requests.
                     </p>
@@ -38,7 +38,7 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="px-4">#</th>
+                                        <th class="px-4">SN</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
@@ -52,7 +52,7 @@
                                             {{-- ID --}}
                                             <td class="px-4">
                                                 <span class="text-muted">
-                                                    #{{ $contact->id }}
+                                                    {{ $contact->id }}
                                                 </span>
                                             </td>
                                             {{-- Name --}}
@@ -238,12 +238,13 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">
-                                                            Close
+                                                            <i class="fa-solid fa-xmark me-1"></i> Close
                                                         </button>
-                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                        <button type="button" class="btn btn-danger"
+                                                            data-bs-toggle="modal"
                                                             data-bs-target="#deleteModal{{ $contact->id }}"
                                                             data-bs-dismiss="modal">
-                                                            <i class="bi bi-trash me-1"></i>
+                                                            <i class="fa fa-trash me-1"></i>
                                                             Delete Contact
                                                         </button>
                                                     </div>
@@ -285,7 +286,7 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">
-                                                            Cancel
+                                                            <i class="fa-solid fa-xmark me-1"></i> Cancel
                                                         </button>
                                                         {{-- Delete Form --}}
                                                         <form action="{{ route('contact.destroy', $contact->id) }}"
@@ -293,7 +294,7 @@
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-danger">
-                                                                <i class="bi bi-trash me-1"></i>
+                                                                <i class="fa fa-trash me-1"></i>
                                                                 Yes, Delete
                                                             </button>
                                                         </form>
@@ -313,7 +314,7 @@
                         <div class="text-center py-5">
                             <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
                                 style="width: 70px; height: 70px;">
-                                <i class="bi bi-inbox fs-2 text-muted"></i>
+                                <i class="fa-solid fa-envelope-open-text fs-2"></i>
                             </div>
                             <h5 class="mb-2">
                                 No Contact Requests

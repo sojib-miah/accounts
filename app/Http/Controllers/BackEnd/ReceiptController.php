@@ -762,22 +762,36 @@ class ReceiptController extends Controller
         return view('BackEnd.Receipt.print', compact('receipt'));
     }
 
-    public function pdf(Receipt $receipt)
+    public function pdf(Request $request, Receipt $receipt)
     {
+        $request->validate([
+            'design' => 'nullable|in:modern,classic,compact,voucher',
+        ]);
+
         $receipt->load([
             'company',
             'branch',
             'party',
             'creator',
             'items.product',
+            'items.category',
+            'items.accountHead',
             'payments.paymentType',
             'payments.account',
             'payments.user',
         ]);
-        $pdf = Pdf::loadView('BackEnd.Receipt.pdf', compact('receipt'));
+
+        $design = $request->query('design', 'modern');
+
+        $pdf = Pdf::loadView('BackEnd.Receipt.pdf', [
+            'receipt' => $receipt,
+            'design' => $design,
+        ]);
+
         $pdf->setPaper('a4', 'portrait');
+
         return $pdf->stream(
-            $receipt->receipt_no . '.pdf'
+            ($receipt->receipt_no ?? 'expense-receipt-' . $receipt->id) . '.pdf'
         );
     }
 

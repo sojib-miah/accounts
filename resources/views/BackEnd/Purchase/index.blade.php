@@ -206,10 +206,26 @@
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('PATCH')
-                                                                <button class="dropdown-item text-danger" type="submit"
-                                                                    onclick="return confirm('Cancel this Purchase?')"
-                                                                    title="Cancel Purchase">
+
+                                                                <button class="dropdown-item text-warning" type="submit"
+                                                                    onclick="return confirm('Cancel this Purchase? Related records will be removed and stock will be reduced.')">
                                                                     <i class="fa fa-ban"></i> Cancel
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </li>
+                                                @endcan
+                                                @can('purchase-delete')
+                                                    <li>
+                                                        @if ($purchase->status === 'Cancelled' || $purchase->status === 'Draft')
+                                                            <form action="{{ route('purchase.delete', $purchase->id) }}"
+                                                                method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+
+                                                                <button class="dropdown-item text-danger" type="submit"
+                                                                    onclick="return confirm('Permanently delete this Purchase? All related records will be removed and stock will be reduced.')">
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         @endif

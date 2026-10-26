@@ -3,289 +3,232 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>
-            Invoice - {{ $receipt->receipt_no }}
-        </title>
+        <title>Expense Receipt - {{ $receipt->receipt_no }}</title>
+
         <style>
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 28px 30px;
             }
 
             * {
                 box-sizing: border-box;
             }
 
-            html,
             body {
                 margin: 0;
-                padding: 0;
-                width: 210mm;
-                min-height: 297mm;
+                font-family: DejaVu Sans, sans-serif;
+                font-size: 10px;
+                line-height: 1.55;
+                color: #273244;
             }
 
-            body {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 12px;
-                color: #222;
-                background: #fff;
+            .receipt {
+                --primary: #b54708;
+                --light: #fff4e5;
+                --border: #dce3ec;
+                --muted: #687386;
+                width: 100%;
             }
 
-            .page {
-                width: 194mm;
-                min-height: 281mm;
-                margin-left: 8mm;
-                margin-right: 8mm;
-                padding-top: 8mm;
-                padding-bottom: 8mm;
-                position: relative;
+            .clearfix:after {
+                content: "";
+                display: table;
+                clear: both;
             }
 
-            table {
-                border-collapse: collapse;
-                border-spacing: 0;
+            .muted {
+                color: var(--muted);
             }
 
-            td,
-            th,
-            div,
-            span {
-                word-wrap: break-word;
-                overflow-wrap: break-word;
+            .top-line {
+                height: 5px;
+                margin-bottom: 22px;
+                background: var(--primary);
             }
 
-            .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            /* .header {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-            }
-
-            .header td {
-                border: none;
-                padding: 0;
-                vertical-align: top;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                word-break: break-word;
-            } */
-
-            .logo-area {
-                width: 27mm;
-                text-align: left;
-            }
-
-            .company-area {
-                width: 129mm;
-                text-align: left;
-            }
-
-            .contact-area {
-                width: 38mm;
-                text-align: right;
+            .company {
+                float: left;
+                width: 59%;
             }
 
             .logo {
-                width: 60px;
-                max-width: 60px;
-                height: auto;
+                max-width: 85px;
+                max-height: 55px;
+                margin-bottom: 7px;
             }
 
             .company-name {
-                font-family: DejaVu Sans, Arial, sans-serif;
-                font-size: 20px;
-                line-height: 19px;
+                margin: 0 0 7px;
+                color: var(--primary);
+                font-size: 21px;
                 font-weight: bold;
-                color: #4d4d4d;
-                width: 129mm;
-                max-width: 129mm;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                overflow-wrap: anywhere;
             }
 
             .company-info {
-                font-size: 12px;
-                line-height: 10px;
-                color: #555;
-                width: 129mm;
-                max-width: 129mm;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .contact-info {
-                width: 38mm;
-                max-width: 38mm;
-                font-size: 12px;
-                line-height: 10px;
-                color: #555;
-                text-align: right;
-                word-break: break-all;
+                color: var(--muted);
+                font-size: 9px;
                 overflow-wrap: anywhere;
             }
 
-            .invoice-title {
-                width: 194mm;
-                text-align: center;
-                font-size: 20px;
+            .company-info div {
+                margin: 2px 0;
+            }
+
+            .receipt-heading {
+                float: right;
+                width: 39%;
+                text-align: right;
+            }
+
+            .receipt-heading h1 {
+                margin: 0;
+                color: var(--primary);
+                font-size: 25px;
+                line-height: 1.3;
+            }
+
+            .receipt-number {
+                margin-top: 7px;
+                font-size: 12px;
                 font-weight: bold;
+                overflow-wrap: anywhere;
+            }
+
+            .status {
+                display: inline-block;
+                margin-top: 7px;
+                padding: 4px 9px;
+                background: #e7f7ee;
+                color: #16804a;
+                font-size: 8px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .status-draft {
+                background: #fff0cf;
+                color: #946200;
+            }
+
+            .status-cancelled {
+                background: #fde8e7;
+                color: #b42318;
+            }
+
+            .divider {
+                margin: 17px 0;
+                border: 0;
+                border-top: 2px solid var(--primary);
+            }
+
+            .section {
+                margin-top: 22px;
+            }
+
+            .section-title {
+                margin: 0 0 9px;
+                color: var(--primary);
+                font-size: 10px;
+                font-weight: bold;
+                letter-spacing: .8px;
+                text-transform: uppercase;
+            }
+
+            .details-table,
+            .meta-table,
+            .items-table,
+            .payments-table,
+            .totals-table,
+            .signatures {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .details-table {
+                margin-top: 19px;
+            }
+
+            .details-table td {
+                width: 50%;
+                padding: 12px;
+                vertical-align: top;
+                border: 1px solid var(--border);
+            }
+
+            .details-label {
+                margin-bottom: 7px;
+                color: var(--primary);
+                font-size: 9px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .party-name {
+                margin-bottom: 5px;
+                font-size: 12px;
+                font-weight: bold;
+                overflow-wrap: anywhere;
+            }
+
+            .meta-table {
+                margin-top: 12px;
+            }
+
+            .meta-table td {
+                width: 33.33%;
+                padding: 8px;
+                border: 1px solid var(--border);
+                background: #f6f8fb;
+                vertical-align: top;
+            }
+
+            .meta-label {
+                display: block;
+                margin-bottom: 3px;
+                color: var(--muted);
+                font-size: 8px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .meta-value {
+                font-weight: bold;
+                overflow-wrap: anywhere;
+            }
+
+            .items-table {
                 margin-top: 10px;
             }
 
-            .page-number {
-                width: 194mm;
-                text-align: right;
-                font-size: 12px;
-                margin-top: -10px;
-                margin-bottom: 8px;
+            .items-table thead {
+                display: table-header-group;
             }
 
-            .info-table,
-            .customer-table {
-                border-collapse: collapse;
-                table-layout: auto;
-                width: auto;
-                max-width: 194mm;
-            }
-
-            .info-table td,
-            .customer-table td {
-                border: none;
-
-                padding-top: 1.5px;
-                padding-bottom: 1.5px;
-
-                padding-left: 0;
-                padding-right: 0;
-
-                vertical-align: top;
-
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .info-label,
-            .customer-label {
-                font-weight: bold;
-                white-space: nowrap;
-                padding-right: 6px !important;
-            }
-
-            .info-table .colon,
-            .customer-table .colon {
-                width: 5px;
-
-                min-width: 5px;
-
-                padding-left: 0 !important;
-
-                /* Same gap after colon */
-                padding-right: 6px !important;
-
+            .items-table th {
+                padding: 10px 7px;
+                background: var(--primary);
+                color: #fff;
+                font-size: 8px;
                 text-align: left;
-
-                white-space: nowrap;
+                text-transform: uppercase;
             }
 
-            .info-value,
-            .customer-value {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .info-value .break,
-            .customer-value .break,
-            .break {
-                word-break: break-all;
-                overflow-wrap: anywhere;
-                word-wrap: break-word;
-            }
-
-            .items {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                margin-top: 8px;
-            }
-
-            .items th {
-                border: 1px solid #666;
-                padding: 3px 2px;
-                height: 22px;
-                font-size: 12px;
-                font-weight: bold;
-                text-align: center;
-                vertical-align: middle;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .items td {
-                border: 1px solid #666;
-                padding: 3px 2px;
-                font-size: 12px;
+            .items-table td {
+                padding: 9px 7px;
+                border-bottom: 1px solid var(--border);
                 vertical-align: top;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .sl-col {
-                width: 10mm;
-                text-align: center;
-            }
-
-            .item-col {
-                width: 23mm;
-            }
-
-            .description-col {
-                width: 65mm;
-            }
-
-            .qty-col {
-                width: 14mm;
-                text-align: center;
-            }
-
-            .uom-col {
-                width: 16mm;
-                text-align: center;
-            }
-
-            .price-col {
-                width: 27mm;
-                text-align: right;
-            }
-
-            .disc-col {
-                width: 15mm;
-                text-align: center;
-            }
-
-            .amount-col {
-                width: 24mm;
-                text-align: right;
-            }
-
-            .description {
-                width: 65mm;
-                line-height: 10px;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .item-number {
-                width: 23mm;
-                word-break: break-all;
                 overflow-wrap: anywhere;
+            }
+
+            .items-table tbody tr:nth-child(even) {
+                background: #fafbfd;
+            }
+
+            .items-table tr,
+            .payments-table tr {
+                page-break-inside: avoid;
             }
 
             .number {
@@ -293,472 +236,556 @@
                 white-space: nowrap;
             }
 
-            .center {
-                text-align: center;
-            }
-
-            .total-row td {
+            .item-name {
                 font-weight: bold;
             }
 
-            .total-title {
-                text-align: right;
+            .item-details {
+                margin-top: 3px;
+                color: var(--muted);
                 font-size: 8px;
+                overflow-wrap: anywhere;
             }
 
-            .total-value {
-                width: 24mm;
-                text-align: right;
-                font-size: 8px;
-                white-space: nowrap;
+            .totals-wrap {
+                margin-top: 18px;
             }
 
-            .amount-words {
-                width: 194mm;
-                margin-top: 7px;
+            .totals-spacer {
+                float: left;
+                width: 45%;
+            }
+
+            .totals {
+                float: right;
+                width: 55%;
+            }
+
+            .totals-table td {
+                padding: 7px 8px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .totals-table .grand-total td {
+                padding: 11px 9px;
+                background: var(--primary);
+                color: #fff;
                 font-size: 12px;
-                line-height: 12px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                font-weight: bold;
+            }
+
+            .totals-table .paid td {
+                color: #16804a;
+            }
+
+            .totals-table .due td {
+                color: #b42318;
+                font-weight: bold;
+            }
+
+            .payments-table {
+                margin-top: 9px;
+            }
+
+            .payments-table th,
+            .payments-table td {
+                padding: 7px;
+                border: 1px solid var(--border);
+                text-align: left;
+                vertical-align: top;
+                overflow-wrap: anywhere;
+            }
+
+            .payments-table th {
+                background: #f2f4f8;
+                font-size: 8px;
             }
 
             .remarks {
-                width: 194mm;
-                margin-top: 6px;
-                font-size: 8px;
-                line-height: 11px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                margin-top: 21px;
+                padding: 11px 13px;
+                border-left: 3px solid var(--primary);
+                background: #f6f8fb;
+                overflow-wrap: anywhere;
             }
 
-            .bottom-area {
-                width: 194mm;
-                margin-top: 30px;
-            }
-
-            .signature-table {
-                width: 194mm;
-                max-width: 194mm;
-                table-layout: fixed;
-                margin-top: 8px;
-            }
-
-            .signature-table td {
-                border: none;
-                vertical-align: bottom;
-                word-break: break-word;
-                overflow-wrap: break-word;
-            }
-
-            .signature-left {
-                width: 126mm;
-            }
-
-            .signature-right {
-                width: 68mm;
-                text-align: right;
-            }
-
-            .signature-line {
-                font-size: 12px;
-                margin-top: 3px;
-                white-space: nowrap;
-            }
-
-            .authorized {
-                font-size: 12px;
+            .remarks-title {
+                margin-bottom: 4px;
                 font-weight: bold;
-                margin-top: 3px;
-                white-space: nowrap;
             }
 
-            .system-note {
-                width: 194mm;
+            .approval-note {
+                margin-top: 18px;
+                padding: 12px;
+                border: 1px dashed #c5ceda;
+                font-size: 9px;
+            }
+
+            .signature-grid {
+                width: 100%;
+                margin-top: 65px;
+                border-collapse: separate;
+                border-spacing: 14px 0;
+            }
+
+            .signature-grid td {
+                width: 33.33%;
+                padding-top: 8px;
+                border-top: 1px solid #687386;
                 text-align: center;
-                font-size: 12px;
-                margin-top: 8px;
+                vertical-align: top;
+                font-size: 9px;
+                font-weight: bold;
             }
 
-            .footer-line {
-                width: 194mm;
-                border-top: 1px solid #777;
-                margin-top: 6px;
-            }
-
-            .footer-text {
-                width: 194mm;
-                text-align: center;
-                font-size: 12px;
-                color: #777;
+            .signature-grid small {
+                display: block;
                 margin-top: 4px;
-                line-height: 10px;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                color: var(--muted);
+                font-size: 8px;
+                font-weight: normal;
             }
 
-            tr {
-                page-break-inside: avoid;
+            .footer {
+                margin-top: 24px;
+                padding-top: 10px;
+                border-top: 1px solid var(--border);
+                color: var(--muted);
+                font-size: 8px;
+                text-align: center;
             }
 
-            td,
-            th {
-                max-width: 100%;
+            /* CLASSIC */
+            .design-classic {
+                --primary: #292929;
+                --light: #f3f3f3;
+            }
+
+            .design-classic .top-line {
+                height: 2px;
+            }
+
+            .design-classic .details-table td {
+                border-color: #999;
+            }
+
+            .design-classic .meta-table td {
+                background: #fff;
+            }
+
+            .design-classic .items-table th {
+                background: #eee;
+                color: #222;
+                border-bottom: 1px solid #555;
+            }
+
+            .design-classic .items-table tbody tr:nth-child(even) {
+                background: #fff;
+            }
+
+            .design-classic .totals-table .grand-total td {
+                background: #eee;
+                color: #222;
+                border-top: 1px solid #555;
+            }
+
+            .design-classic .remarks {
+                background: #fff;
+                border: 1px solid #aaa;
+                border-left: 3px solid #444;
+            }
+
+            /* COMPACT */
+            .design-compact .top-line {
+                margin-bottom: 12px;
+            }
+
+            .design-compact .company-name {
+                font-size: 17px;
+            }
+
+            .design-compact .receipt-heading h1 {
+                font-size: 21px;
+            }
+
+            .design-compact .details-table {
+                margin-top: 12px;
+            }
+
+            .design-compact .details-table td {
+                padding: 8px;
+            }
+
+            .design-compact .section {
+                margin-top: 15px;
+            }
+
+            .design-compact .meta-table td {
+                padding: 6px;
+            }
+
+            .design-compact .items-table th,
+            .design-compact .items-table td {
+                padding: 6px 5px;
+            }
+
+            .design-compact .totals-wrap {
+                margin-top: 10px;
+            }
+
+            .design-compact .signature-grid {
+                margin-top: 45px;
+            }
+
+            /* PAYMENT VOUCHER */
+            .design-voucher .receipt-heading h1 {
+                font-size: 22px;
+            }
+
+            .design-voucher .receipt-header {
+                border-bottom: 5px double var(--primary);
+            }
+
+            .design-voucher .receipt-heading h1:after {
+                content: "PAYMENT VOUCHER";
+                display: block;
+                margin-top: 4px;
+                font-size: 8px;
+                letter-spacing: 2px;
+            }
+
+            .design-voucher .approval-note {
+                padding: 15px;
+                border: 1px solid #aaa;
+                background: #fcfcfc;
+            }
+
+            .design-voucher .totals-table .grand-total td {
+                background: #7c3e16;
+            }
+
+            @media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
             }
         </style>
     </head>
 
     <body>
-        <div class="page">
-            <table class="header">
+
+        @php
+            $company = $receipt->company;
+            $branch = $receipt->branch;
+            $party = $receipt->party;
+            $items = $receipt->items ?? collect();
+            $payments = $receipt->payments ?? collect();
+
+            $companyName = $company->name ?? ($company->company_name ?? config('app.name'));
+
+            $partyName = $party->name ?? ($party->company_name ?? 'Payee');
+
+            $receiptNo = $receipt->receipt_no ?? 'EXP-' . $receipt->id;
+
+            $receiptDate = $receipt->receipt_date
+                ? \Illuminate\Support\Carbon::parse($receipt->receipt_date)->format('d M Y')
+                : '—';
+
+            $status = $receipt->status ?? 'Completed';
+
+            $design = in_array($design ?? 'modern', ['modern', 'classic', 'compact', 'voucher'], true)
+                ? $design
+                : 'modern';
+
+            $subtotal = (float) ($receipt->sub_total ?? $items->sum('amount'));
+            $discount = (float) ($receipt->discount ?? 0);
+            $vatPercent = (float) ($receipt->vat ?? 0);
+
+            $vatAmount = (float) ($receipt->vat_amount ?? (($subtotal - $discount) * $vatPercent) / 100);
+
+            $grandTotal = (float) ($receipt->total_amount ?? $items->sum('amount'));
+
+            $paidAmount = (float) ($receipt->paid_amount ?? $payments->sum('amount'));
+
+            $dueAmount = (float) ($receipt->due_amount ?? max(0, $grandTotal - $paidAmount));
+
+            $currency = $receipt->currency ?? 'BDT';
+
+            $money = function ($amount) use ($currency) {
+                return $currency . ' ' . number_format((float) $amount, 2);
+            };
+            $formatQty = function ($qty) {
+                return rtrim(rtrim(number_format((float) $qty, 2, '.', ''), '0'), '.');
+            };
+            $partyPhone = $party->phone ?? ($party->phone_one ?? null);
+        @endphp
+
+        <div class="receipt design-{{ $design }}">
+
+            <div class="top-line"></div>
+
+            <div class="clearfix">
+                <div class="company">
+                    @if (optional(setting())->logo)
+                        <img class="logo" src="{{ public_path('uploads/settings/' . setting()->logo) }}" alt="Logo">
+                    @endif
+                    <h2 class="company-name">{{ $companyName }}</h2>
+                    <div class="company-info">
+                        @if ($branch && $branch->name)
+                            <div><strong>{{ $branch->name }}</strong></div>
+                        @endif
+                        @if ($branch && $branch->address)
+                            <div>{{ $branch->address }}</div>
+                        @endif
+                    </div>
+                </div>
+                <div class="receipt-heading">
+                    <h1>EXPENSE RECEIPT</h1>
+                    <div class="receipt-number">{{ $receiptNo }}</div>
+                    <div class="muted">Date: {{ $receiptDate }}</div>
+                    <span
+                        class="status
+                {{ strtolower($status) === 'draft' ? 'status-draft' : '' }}
+                {{ strtolower($status) === 'cancelled' ? 'status-cancelled' : '' }}">
+                        {{ $status }}
+                    </span>
+                </div>
+            </div>
+            <hr class="divider">
+            <table class="details-table">
                 <tr>
-                    {{-- LOGO --}}
-                    <td class="logo-area">
-                        @if (function_exists('setting') && setting() && setting()->logo)
-                            @php
-                                $logoPath = public_path('uploads/settings/' . setting()->logo);
-                            @endphp
-                            @if (file_exists($logoPath))
-                                <img src="{{ $logoPath }}" class="logo">
-                            @endif
+                    <td>
+                        <div class="details-label">Paid To / Payee</div>
+                        <div class="party-name">{{ $partyName }}</div>
+                        @if ($party && $party->address)
+                            <div>Address: {{ $party->address }}</div>
+                        @endif
+                        @if ($partyPhone)
+                            <div>Phone: {{ $partyPhone }}</div>
+                        @endif
+                        @if ($party && $party->email)
+                            <div>Email: {{ $party->email }}</div>
                         @endif
                     </td>
-                    {{-- COMPANY --}}
-                    <td class="company-area">
-                        <div class="company-name">
-                            {{ $receipt->company->name ??
-                                ($receipt->branch->name ??
-                                    ((function_exists('setting') && setting() ? setting()->company_name : null) ?? config('app.name'))) }}
+
+                    <td>
+                        <div class="details-label">Receipt Information</div>
+                        <div>
+                            <span class="muted">Receipt No:</span>
+                            <strong>{{ $receiptNo }}</strong>
                         </div>
-                        <div class="company-info">
-                            @if ($receipt->company->address ?? null)
-                                {{ $receipt->company->address }}
-                            @elseif ($receipt->branch->address ?? null)
-                                {{ $receipt->branch->address }}
-                            @endif
-                            @if ($receipt->branch->phone_one ?? null)
-                                <br>
-                                Telephone :
-                                {{ $receipt->branch->phone_one }}
-                            @endif
-                            @if ($receipt->branch->phone_two ?? null)
-                                ,
-                                {{ $receipt->branch->phone_two }}
-                            @endif
-                            @if ($receipt->branch->email ?? null)
-                                <br>
-                                Email :
-                                {{ $receipt->branch->email }}
-                            @endif
+                        <div>
+                            <span class="muted">Expense Date:</span>
+                            <strong>{{ $receiptDate }}</strong>
+                        </div>
+
+                        <div>
+                            <span class="muted">Branch:</span>
+                            <strong>{{ $branch->name ?? '—' }}</strong>
+                        </div>
+
+                        <div>
+                            <span class="muted">Prepared By:</span>
+                            <strong>{{ $receipt->creator->name ?? '—' }}</strong>
                         </div>
                     </td>
                 </tr>
             </table>
-            <div class="invoice-title">
-                INVOICE
-            </div>
-            <div class="page-number">
-                Page No.: 1/1
-            </div>
-            <table class="info-table">
+
+            <table class="meta-table">
                 <tr>
-                    <td class="info-label">
-                        Date
+                    <td>
+                        <span class="meta-label">Expense Category</span>
+                        <div class="meta-value">
+                            @if ($items->isNotEmpty())
+                                {{ $items->first()->category->name ?? ($items->first()->accountHead->name ?? 'General Expense') }}
+                            @else
+                                General Expense
+                            @endif
+                        </div>
                     </td>
-                    <td class="colon">
-                        :
+
+                    <td>
+                        <span class="meta-label">Payment Status</span>
+                        <div class="meta-value">
+                            {{ $receipt->payment_status ?? ($dueAmount <= 0 ? 'Paid' : 'Pending') }}
+                        </div>
                     </td>
-                    <td class="info-value">
-                        {{ \Carbon\Carbon::parse($receipt->receipt_date)->format('d/m/Y') }}
+
+                    <td>
+                        <span class="meta-label">Total Lines</span>
+                        <div class="meta-value">{{ $items->count() }}</div>
                     </td>
                 </tr>
-                <tr>
-                    <td class="info-label">
-                        Invoice No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->receipt_no }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Delivery Note No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->challan_no ?? ($receipt->delivery_no ?? '') }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->so_no ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        Ref. Date
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        @if ($receipt->ref_date ?? null)
-                            {{ \Carbon\Carbon::parse($receipt->ref_date)->format('d/m/Y') }}
+            </table>
+
+            <section class="section">
+                <h3 class="section-title">Expense Details</h3>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 6%;">SN</th>
+                            <th style="width: 39%;">Description</th>
+                            <th style="width: 21%;">Category / Head</th>
+                            <th class="number" style="width: 11%;">Qty</th>
+                            <th class="number" style="width: 23%;">Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($items as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+
+                                <td>
+                                    <div class="item-name">
+                                        {{ $item->details ?: $item->category->name ?? ($item->accountHead->name ?? ($item->product->name ?? 'Expense')) }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ $item->category->name ?? ($item->accountHead->name ?? 'General') }}
+                                </td>
+
+                                <td class="number">{{ $formatQty($item->qty) }}</td>
+
+                                <td class="number">{{ $money($item->amount) }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" style="text-align:center;">
+                                    No expense items found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="totals-wrap clearfix">
+                <div class="totals-spacer"></div>
+
+                <div class="totals">
+                    <table class="totals-table">
+                        <tr>
+                            <td>Subtotal</td>
+                            <td class="number">{{ $money($subtotal) }}</td>
+                        </tr>
+
+                        @if ($discount > 0)
+                            <tr>
+                                <td>Discount</td>
+                                <td class="number">- {{ $money($discount) }}</td>
+                            </tr>
                         @endif
-                    </td>
-                </tr>
-                <tr>
-                    <td class="info-label">
-                        External Doc. No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="info-value">
-                        <span class="break">
-                            {{ $receipt->external_doc_no ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-            </table>
-            <table class="customer-table">
-                <tr>
-                    <td class="customer-label">
-                        Customer Code
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->customer_code ??
-                                ($receipt->party->code ?? 'CUST-' . str_pad($receipt->party->id ?? 0, 8, '0', STR_PAD_LEFT)) }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->name ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Customer Address
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->address ?? '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Contact Name
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->contact_name ?? ($receipt->party->name ?? '') }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Phone No.
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        <span class="break">
-                            {{ $receipt->party->phone ?? '' }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="customer-label">
-                        Payment Terms
-                    </td>
-                    <td class="colon">
-                        :
-                    </td>
-                    <td class="customer-value">
-                        {{ $receipt->party->payment_terms ?? ($receipt->payment_terms ?? '') }}
-                    </td>
-                </tr>
-            </table>
-            <table class="items">
-                <thead>
-                    <tr>
-                        <th class="sl-col">
-                            Sl. No.
-                        </th>
-                        <th class="item-col">
-                            Item No
-                        </th>
-                        <th class="description-col">
-                            Description
-                        </th>
-                        <th class="qty-col">
-                            Qty
-                        </th>
-                        <th class="uom-col">
-                            UOM
-                        </th>
-                        <th class="price-col">
-                            Unit price
-                        </th>
-                        <th class="disc-col">
-                            Disc %
-                        </th>
-                        <th class="amount-col">
-                            Amount
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($receipt->items as $item)
-                        @php
-                            $product = $item->product;
-                            $itemCode = $product->sku ?? '';
-                            $description = $product->name ?? '';
-                            $uom = $product->unit ?? 'Number';
-                            $qty = (float) $item->qty;
-                            $rate = (float) $item->rate;
-                            $amount = (float) $item->amount;
-                        @endphp
-                        <tr>
-                            {{-- SL --}}
-                            <td class="sl-col center">
-                                {{ $loop->iteration }}
-                            </td>
-                            {{-- ITEM NO --}}
-                            <td class="item-col">
-                                <span class="break">
-                                    {{ $itemCode }}
-                                </span>
-                            </td>
-                            {{-- DESCRIPTION --}}
-                            <td class="description-col description">
-                                {{ $description }}
-                                @if ($item->details ?? null)
-                                    <br>
-                                    {{ $item->details }}
-                                @endif
-                            </td>
-                            {{-- QTY --}}
-                            <td class="qty-col center">
-                                {{ rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.') }}
-                            </td>
-                            {{-- UOM --}}
-                            <td class="uom-col center">
-                                {{ $uom }}
-                            </td>
-                            {{-- UNIT PRICE --}}
-                            <td class="price-col number">
-                                {{ number_format($rate, 2) }}
-                            </td>
-                            {{-- DISCOUNT --}}
-                            <td class="disc-col center">
-                                0
-                            </td>
-                            {{-- AMOUNT --}}
-                            <td class="amount-col number">
-                                {{ number_format($amount, 2) }}
-                            </td>
+
+                        @if ($vatPercent > 0 || $vatAmount > 0)
+                            <tr>
+                                <td>VAT ({{ number_format($vatPercent, 2) }}%)</td>
+                                <td class="number">{{ $money($vatAmount) }}</td>
+                            </tr>
+                        @endif
+
+                        <tr class="grand-total">
+                            <td>Total Expense</td>
+                            <td class="number">{{ $money($grandTotal) }}</td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="center">
-                                No Item Found
-                            </td>
+
+                        <tr class="paid">
+                            <td>Paid Amount</td>
+                            <td class="number">{{ $money($paidAmount) }}</td>
                         </tr>
-                    @endforelse
-                    {{-- TOTAL --}}
-                    <tr class="total-row">
-                        <td colspan="7" class="total-title">
-                            Total BDT
-                        </td>
-                        <td class="amount-col total-value">
-                            {{ number_format($receipt->total_amount, 2) }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="amount-words">
-                <strong>
-                    Amount BDT (In Words)
-                </strong>
-                :
-                {{ numberToWords($receipt->total_amount) }}
-                ONLY
+
+                        <tr class="due">
+                            <td>Due Amount</td>
+                            <td class="number">{{ $money($dueAmount) }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-            @if ($receipt->remarks)
+
+            @if ($payments->isNotEmpty())
+                <section class="section">
+                    <h3 class="section-title">Payment History</h3>
+
+                    <table class="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Payment Method</th>
+                                <th>Account</th>
+                                <th>Processed By</th>
+                                <th class="number">Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($payments as $payment)
+                                <tr>
+                                    <td>
+                                        {{ $payment->payment_date ? \Illuminate\Support\Carbon::parse($payment->payment_date)->format('d M Y') : '—' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $payment->paymentType->name ?? ($payment->payment_type ?? '—') }}
+                                    </td>
+
+                                    <td>{{ $payment->account->name ?? '—' }}</td>
+
+                                    <td>{{ $payment->user->name ?? '—' }}</td>
+
+                                    <td class="number">
+                                        {{ $money($payment->amount ?? 0) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </section>
+            @endif
+
+            @if (!empty($receipt->remarks))
                 <div class="remarks">
-                    <strong>
-                        Remarks :
-                    </strong>
+                    <div class="remarks-title">Remarks / Expense Purpose</div>
                     {{ $receipt->remarks }}
                 </div>
             @endif
-            <div class="bottom-area">
-                <table class="signature-table">
-                    <tr>
-                        <td class="signature-left">
-                        </td>
-                        <td class="signature-right">
-                            <br>
-                            <br>
-                            <br>
-                            <div class="signature-line">
-                                _________________________
-                            </div>
-                            <div class="authorized">
-                                Authorized Signature
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <div class="system-note">
-                    This is a System Generated Invoice.
-                </div>
-                <div class="footer-line">
-                </div>
-                <div class="footer-text">
-                    <div>
-                        Printed On :
-                        {{ now()->format('d/m/Y h:i A') }}
-                    </div>
-                    <div>
-                        Generated By :
-                        {{ auth()->user()->name ?? '' }}
-                    </div>
-                </div>
+
+            <div class="approval-note">
+                <strong>Approval / Verification</strong>
+                <p>
+                    This receipt documents the expense transaction listed above.
+                    Please retain it for accounting, verification and audit purposes.
+                </p>
             </div>
+
+            <table class="signature-grid">
+                <tr>
+                    <td>
+                        Prepared By
+                        <small>{{ $receipt->creator->name ?? 'Name & Signature' }}</small>
+                    </td>
+
+                    <td>
+                        Checked / Approved By
+                        <small>Name, Signature &amp; Date</small>
+                    </td>
+
+                    <td>
+                        Received By
+                        <small>Name, Signature &amp; Date</small>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="footer">
+                {{ $companyName }} · Expense Receipt · {{ $receiptNo }}
+            </div>
+
         </div>
+
     </body>
 
 </html>
