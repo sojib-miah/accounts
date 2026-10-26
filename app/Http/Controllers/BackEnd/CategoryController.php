@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\ReceiptItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use PackageHelper;
 
 class CategoryController extends Controller
@@ -72,10 +73,18 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $category)
     {
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'name'   => ['required', 'string', 'max:100'],
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('category.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_category_id', $category->id);
+        }
 
         $category->update([
             'name'       => $request->name,

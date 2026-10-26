@@ -3,16 +3,16 @@
 @section('title', 'Soft Delete Users List')
 
 @section('content')
-    <div class="py-5 px-5">
-        <div class="card">
+    <div class="p-5">
+        <div class="card mt-5">
             <div class="card-header">
-                <h4>Deleted Users</h4>
+                <h4><i class="fa-solid fa-list-ul me-2"></i> Deleted Users List</h4>
             </div>
             <div class="card-body table-responsive">
                 <table class="table table-bordered table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Sn</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Company</th>
@@ -71,7 +71,9 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $users->links() }}
+                <div class="p-3">
+                    {{ $users->links() }}
+                </div>
             </div>
         </div>
     </div>

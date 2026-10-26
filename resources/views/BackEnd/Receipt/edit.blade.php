@@ -196,7 +196,7 @@
                         {{-- EXPENSE ITEMS --}}
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Expense Items</h4>
+                                <h4 class="mb-0"><i class="fa-solid fa-tag me-2"></i> Expense Items</h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus me-2"></i>
                                     Add Row
@@ -228,7 +228,7 @@
                             <div class="col-md-8">
                                 <div>
                                     <label class="form-label">Receipt Notes</label>
-                                    <textarea name="remarks" rows="6" class="form-control">{{ $receipt->remarks }}</textarea>
+                                    <textarea name="remarks" rows="6" class="form-control" placeholder="Enter Receipt Notes...">{{ $receipt->remarks }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">

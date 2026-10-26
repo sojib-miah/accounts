@@ -6,22 +6,21 @@
             <form action="{{ route('account-head.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addAccountHeadModalLabel">
-                        Add Expense
-                    </h5>
+                    <h5 class="modal-title" id="addAccountHeadModalLabel"><i class="fa fa-plus me-2"></i> Add Expense
+                        Description</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <!-- Category -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Category <span class="text-danger">*</span>
-                            </label>
-                            <select name="category_id" class="form-select select2" required>
+                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                            <select name="category_id"
+                                class="form-select select2 @error('category_id', 'add') is-invalid @enderror" required>
                                 <option value="">Select Category</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">
+                                    <option {{ old('category_id') == $category->id ? 'selected' : '' }}
+                                        value="{{ $category->id }}">
                                         {{ $category->name }}
                                         ({{ $category->type }})
                                     </option>
@@ -33,27 +32,23 @@
                         </div>
                         <!-- Expense Name -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Expense Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" name="name" class="form-control" placeholder="Enter Expense Name"
-                                required value="{{ old('name') }}">
+                            <label class="form-label">Expense Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name"
+                                class="form-control @error('name', 'add') is-invalid @enderror"
+                                placeholder="Enter Expense Name..." required value="{{ old('name') }}">
                             @error('name', 'add')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="invalid-feedback">{{ $message }}</small>
                             @enderror
                         </div>
                         <!-- Status -->
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">
-                                Status
-                            </label>
-                            <select name="status" class="form-select select2">
-                                <option value="Active" selected>
-                                    Active
-                                </option>
-                                <option value="Inactive">
-                                    Inactive
-                                </option>
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status"
+                                class="form-select select2 @error('status', 'add') is-invalid @enderror" required>
+                                <option value="Active" {{ old('status', 'Active') == 'Active' ? 'selected' : '' }}>
+                                    Active</option>
+                                <option value="Inactive" {{ old('status', 'Active') == 'Inactive' ? 'selected' : '' }}>
+                                    Inactive</option>
                             </select>
                             @error('status', 'add')
                                 <small class="text-danger">{{ $message }}</small>
@@ -63,7 +58,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        <i class="fa-solid fa-xmark me-1"></i> Close
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save me-1"></i>

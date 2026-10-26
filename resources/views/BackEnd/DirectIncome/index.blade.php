@@ -1,13 +1,13 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'direct Income List')
+@section('title', 'Direct Sales List')
 
 @section('content')
     <div class="p-5">
         <div class="mt-3">
             {{-- Page Header --}}
             <div class="mb-3">
-                <h2 class="fw-bold mb-0">Direct Sales List</h2>
+                <h2 class="fw-bold mb-0"><i class="fa-solid fa-list-ul me-2"></i> Direct Sales List</h2>
             </div>
             {{-- Card --}}
             <div class="card border-0 shadow-sm">
@@ -61,12 +61,12 @@
                                     </select>
                                 </div>
                                 <button class="btn btn-primary">
-                                    <i class="fa fa-search me-2"></i>
+                                    <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request('search') || request('company_id') || request('status') || request('per_page'))
                                     <a href="{{ route('direct.income.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                                 @can('income-receipt-create')

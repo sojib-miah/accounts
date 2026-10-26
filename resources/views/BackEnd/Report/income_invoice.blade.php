@@ -16,12 +16,12 @@
                         Daily, Monthly & Yearly Invoice Summary
                     </small>
                 </div>
-                <div>
+                {{-- <div>
                     <a href="{{ route('income.receipt.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus-circle me-2"></i>
                         New Invoice
                     </a>
-                </div>
+                </div> --}}
             </div>
             <!-- Summary Cards -->
             <div class="row mb-4">
@@ -30,9 +30,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h6 class="text-white-50">
-                                        Today's Invoice
-                                    </h6>
+                                    <h6 class="text-white-50">Today's Invoice</h6>
                                     <h3 class="fw-bold">
                                         {{ number_format($todayIncome, 2) }}
                                     </h3>
@@ -172,7 +170,7 @@
                             </div>
                             <div class="col-lg-2 d-flex align-items-end gap-3">
                                 <button class="btn btn-primary">
-                                    <i class="fas fa-search"></i>
+                                    <i class="fas fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request('company_id') ||
@@ -181,7 +179,7 @@
                                         request('from_date') ||
                                         request('to_date'))
                                     <a href="{{ route('income.invoice') }}" class="btn btn-secondary">
-                                        <i class="fas fa-rotate-left"></i>
+                                        <i class="fas fa-rotate-left me-1"></i>
                                         Reset
                                     </a>
                                 @endif
@@ -210,7 +208,7 @@
                         <table class="table table-hover table-bordered align-middle mb-0">
                             <thead class="text-center">
                                 <tr>
-                                    <th width="60">SL</th>
+                                    <th width="60">SN</th>
                                     <th>Company Name</th>
                                     <th width="110">Date</th>
                                     <th width="120">Receipt No</th>

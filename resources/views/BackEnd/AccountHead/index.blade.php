@@ -6,9 +6,7 @@
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">
-                    Expense Description (Item Creation)
-                </h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Expense Description List (Item Creation)</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('account-head.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -25,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Expense List">
+                                placeholder="Search Expense List...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -33,7 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('account-head.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
 
@@ -73,32 +71,20 @@
                                         <td>{{ $head->name ?? '-' }}</td>
                                         <td>
                                             @if ($head->type == 'Income')
-                                                <span class="badge bg-success">
-                                                    Income
-                                                </span>
+                                                <span class="badge bg-success">Income</span>
                                             @else
-                                                <span class="badge bg-danger">
-                                                    Expense
-                                                </span>
+                                                <span class="badge bg-danger">Expense</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($head->status == 'Active')
-                                                <span class="badge bg-success">
-                                                    Active
-                                                </span>
+                                                <span class="badge bg-success">Active</span>
                                             @else
-                                                <span class="badge bg-secondary">
-                                                    Inactive
-                                                </span>
+                                                <span class="badge bg-secondary">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            {{ $head->creator->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ date('d-m-Y', strtotime($head->created_at)) ?? '-' }}
-                                        </td>
+                                        <td>{{ $head->creator->name ?? '-' }}</td>
+                                        <td>{{ date('d-m-Y', strtotime($head->created_at)) ?? '-' }}</td>
                                         <td class="text-center">
                                             <div class="dropdown">
                                                 <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
@@ -107,10 +93,8 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('expense-list-edit')
-                                                            <button class="dropdown-item editBtn" data-id="{{ $head->id }}"
-                                                                data-category="{{ $head->category_id }}"
-                                                                data-name="{{ $head->name }}"
-                                                                data-status="{{ $head->status }}">
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editAccountHeadModal{{ $head->id }}">
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
@@ -154,33 +138,27 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                $('#edit_category_id').val(this.dataset.category).trigger('change');
-                document.getElementById('edit_name').value = this.dataset.name;
-                $('#edit_status').val(this.dataset.status).trigger('change');
-                document.getElementById('editAccountHeadForm').action =
-                    "{{ url('/admin/account-head') }}/" + this.dataset.id;
-                new bootstrap.Modal(
-                    document.getElementById('editAccountHeadModal')
-                ).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addAccountHeadModal')).show();
+                const modalElement = document.getElementById('addAccountHeadModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_accountHead_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editAccountHeadModal')).show();
+                const accountHeadId = @json(session('edit_accountHead_id'));
+                const modal = document.getElementById('editAccountHeadModal' + accountHeadId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif

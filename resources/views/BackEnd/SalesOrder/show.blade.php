@@ -153,9 +153,7 @@
                 {{-- Income Receipt List --}}
                 <div class="card shadow-sm border-0 mt-3">
                     <div class="card-header" style="padding:8px!important;">
-                        <h3 class="mb-0 fw-bold">
-                            Sales Order Product List
-                        </h3>
+                        <h3 class="mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2"></i> Sales Order Product List</h3>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -486,50 +484,52 @@
                                             Payment Type
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <select id="payment_type_id" name="payment_type_id" class="form-select select2"
+                                        <select id="payment_type_id" name="payment_type_id"
+                                            class="form-select select2 @error('payment_type_id') is-invalid @enderror"
                                             required>
-                                            <option value="">
-                                                Select Payment Type
-                                            </option>
+                                            <option value="">Select Payment Type</option>
                                             @foreach ($paymentTypes as $type)
                                                 <option value="{{ $type->id }}">
                                                     {{ $type->name }}
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('payment_type_id')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
                                     </div>
                                     {{-- Account --}}
                                     <div class="col-md-6">
-                                        <label class="form-label fw-semibold">
-                                            Account
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <select id="account_id" name="account_id" class="form-select select2" required>
+                                        <label class="form-label fw-semibold">Account <span
+                                                class="text-danger">*</span></label>
+                                        <select id="account_id" name="account_id"
+                                            class="form-select select2 @error('account_id') is-invalid @enderror" required>
                                             <option value="">
                                                 Select Payment Type First
                                             </option>
                                         </select>
+                                        @error('account_id')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
                                         <div id="account_balance" class="mt-2"></div>
                                     </div>
                                     <!-- Paid Amount -->
                                     <div class="col-md-6">
-                                        <label class="form-label fw-semibold">
-                                            Payment Amount
-                                            <span class="text-danger">*</span>
-                                        </label>
+                                        <label class="form-label fw-semibold">Payment Amount <span
+                                                class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text">
-                                                TK
-                                            </span>
+                                            <span class="input-group-text">TK</span>
                                             <input type="number" min="1" max="{{ $receipt->due_amount }}"
-                                                id="payment_amount" name="amount" class="form-control fw-bold"
+                                                id="payment_amount" name="amount"
+                                                class="form-control fw-bold @error('amount') is-invalid @enderror"
                                                 value="{{ $receipt->due_amount }}" required>
+                                            @error('amount')
+                                                <small class="invalid-feedback">{{ $message }}</small>
+                                            @enderror
                                         </div>
                                         <small class="text-muted">
-                                            Maximum payable:
-                                            <strong>
-                                                {{ number_format($receipt->due_amount, 2) }} TK
-                                            </strong>
+                                            Maximum payable: <strong>{{ number_format($receipt->due_amount, 2) }}
+                                                TK</strong>
                                         </small>
                                     </div>
                                     <!-- Payment Date -->
@@ -538,15 +538,23 @@
                                             Payment Date
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <input type="date" name="payment_date" class="form-control"
+                                        <input type="date" name="payment_date"
+                                            class="form-control @error('payment_date') is-invalid @enderror"
                                             value="{{ date('Y-m-d') }}" required>
+                                        @error('payment_date')
+                                            <small class="invalid-feedback">{{ $message }}</small>
+                                        @enderror
                                     </div>
                                     <!-- Note -->
                                     <div class="col-12">
                                         <label class="form-label fw-semibold">
                                             Payment Note
                                         </label>
-                                        <textarea name="note" rows="3" class="form-control" placeholder="Write a payment note..."></textarea>
+                                        <textarea name="note" rows="3" class="form-control @error('note') is-invalid @enderror"
+                                            placeholder="Write a payment note...">{{ old('note') }}</textarea>
+                                        @error('note')
+                                            <small class="invalid-feedback">{{ $message }}</small>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>

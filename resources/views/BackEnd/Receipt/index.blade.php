@@ -1,15 +1,13 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Expense Receipt')
+@section('title', 'Expense Receipt List')
 
 @section('content')
     <div class="p-5">
         <div class="mt-3">
             {{-- Page Header --}}
             <div class="mb-3">
-                <h2 class="fw-bold mb-0">
-                    Expense Receipt
-                </h2>
+                <h2 class="fw-bold mb-0"><i class="fa-solid fa-list-ul me-2"></i> Expense Receipt List</h2>
             </div>
             {{-- Card --}}
             <div class="card border-0 shadow-sm">
@@ -31,7 +29,7 @@
                                 </div>
                                 <div>
                                     <input type="text" name="search" class="form-control"
-                                        placeholder="Search Receipt / Party" value="{{ request('search') }}">
+                                        placeholder="Search Receipt / Party..." value="{{ request('search') }}">
                                 </div>
                                 <div style="width: 120px;">
                                     <select name="per_page" class="form-select select2 w-100">
@@ -68,7 +66,7 @@
                                 </button>
                                 @if (request('search') || request('company_id') || request('status') || request('per_page'))
                                     <a href="{{ route('receipt.expense.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                                 @can('expense-receipt-create')

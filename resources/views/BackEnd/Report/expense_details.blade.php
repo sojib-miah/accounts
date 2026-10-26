@@ -172,7 +172,7 @@
                             </div>
                             <div class="col-lg-2 d-flex align-items-end gap-2">
                                 <button class="btn btn-primary" type="submit">
-                                    <i class="fas fa-search"></i>
+                                    <i class="fas fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request()->has('search') ||
@@ -181,7 +181,7 @@
                                         request()->has('company_id') ||
                                         request()->has('payment_status'))
                                     <a href="{{ route('expense.details') }}" class="btn btn-secondary">
-                                        <i class="fas fa-rotate-left"></i>
+                                        <i class="fas fa-rotate-left me-1"></i>
                                         Reset
                                     </a>
                                 @endif

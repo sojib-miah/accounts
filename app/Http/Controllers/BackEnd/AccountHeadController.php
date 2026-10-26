@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class AccountHeadController extends Controller
@@ -79,12 +80,7 @@ class AccountHeadController extends Controller
     {
         $companyId = Auth::user()->company_id;
 
-        abort_unless(
-            (int) $accountHead->company_id === (int) $companyId,
-            404
-        );
-
-        $request->validateWithBag('edit', [
+        $validator = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'name' => [
                 'required',
@@ -96,6 +92,14 @@ class AccountHeadController extends Controller
             ],
             'status' => 'required|in:Active,Inactive',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->route('account-head.index')
+                ->withErrors($validator, 'edit')
+                ->withInput()
+                ->with('edit_accountHead_id', $accountHead->id);
+        }
 
         $accountHead->update([
             'category_id' => $request->category_id,

@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
+                {{-- <div class="col-sm-6 col-xl-3">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-start justify-content-between">
@@ -45,13 +45,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
             <!-- Users List Table -->
             <div class="card">
-                <div class="card-header border-bottom" style="padding: 8px;">
+                <div class="card-header border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">All Users</h4>
+                        <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> All Users List</h4>
                         <div class="d-flex align-items-center gap-2">
                             <form action="{{ route('users.index') }}" method="GET"
                                 class="d-flex justify-content-center align-items-center gap-2">
@@ -76,7 +76,7 @@
                                 </button>
                                 @if (request('search') || request('company_id'))
                                     <a href="{{ route('users.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                             </form>

@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Receipt Details')
+@section('title', 'Items Details')
 
 @section('content')
     <div class="mt-3">
@@ -157,9 +157,7 @@
                     {{-- Income Receipt List --}}
                     <div class="card shadow-sm border-0 mt-3">
                         <div class="card-header" style="padding: 8px !important;">
-                            <h3 class="mb-0 fw-bold">
-                                Delivery Items
-                            </h3>
+                            <h3 class="mb-0 fw-bold"><i class="fa-solid fa-tag me-2"></i> Delivery Items</h3>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">

@@ -1,14 +1,12 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Challan')
+@section('title', 'Challan List')
 
 @section('content')
     <div class="p-5">
         <div class="mt-3">
             <div class="mb-3">
-                <h2 class="fw-bold mb-0">
-                    Challan List
-                </h2>
+                <h2 class="fw-bold mb-0"><i class="fa-solid fa-list-ul me-2"></i> Challan List</h2>
             </div>
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
@@ -28,7 +26,7 @@
                                 </div>
                                 <div>
                                     <input type="text" name="search" class="form-control"
-                                        placeholder="Search Receipt / Party" value="{{ request('search') }}">
+                                        placeholder="Search Receipt / Party..." value="{{ request('search') }}">
                                 </div>
                                 <div style="width: 100px;">
                                     <select name="per_page" class="form-select select2 w-100">
@@ -58,12 +56,12 @@
                                     </select>
                                 </div>
                                 <button class="btn btn-primary">
-                                    <i class="fa fa-search"></i>
+                                    <i class="fa fa-search me-1"></i>
                                     Search
                                 </button>
                                 @if (request('search') || request('company_id') || request('status') || request('per_page'))
                                     <a href="{{ route('challan.index') }}" class="btn btn-secondary">
-                                        Reset
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                     </a>
                                 @endif
                                 {{-- @can('income-challan-create')

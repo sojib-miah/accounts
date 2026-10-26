@@ -7,7 +7,6 @@
         <form action="{{ route('receipt.store') }}" method="POST" id="receiptForm">
             @csrf
             <input type="hidden" name="type" value="Expense">
-            {{-- <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}"> --}}
             <input type="hidden" name="items" id="items_json">
             <div>
                 <div class="row">
@@ -167,9 +166,7 @@
                         {{-- Expense Item List --}}
                         <div class="card shadow-sm mt-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">
-                                    Expense Items
-                                </h4>
+                                <h4 class="mb-0"><i class="fa-solid fa-tag me-2"></i> Expense Items</h4>
                                 <button type="button" id="addRow" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus me-2"></i>
                                     Add Row
@@ -200,7 +197,7 @@
                             <div class="col-md-8">
                                 <div>
                                     <label class="form-label">Receipt Notes</label>
-                                    <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Notes"></textarea>
+                                    <textarea name="remarks" rows="5" class="form-control" placeholder="Enter Receipt Notes...">{{ old('remarks') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -292,7 +289,7 @@
                 <input type="text" class="form-control total text-end" value="0.00" readonly disabled>
             </td>
             <td>
-                <input type="text" name="details[]" class="form-control details" placeholder="Remarks">
+                <input type="text" name="details[]" class="form-control details" placeholder="Enter Remarks...">
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-danger btn-sm removeRow">

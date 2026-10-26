@@ -1,6 +1,6 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Create Direct Income')
+@section('title', 'Create Direct Sales')
 
 @section('content')
     <div class="p-5">
@@ -141,7 +141,7 @@
                             {{-- Income Item List --}}
                             <div class="card mt-3">
                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Direct Income Items</h5>
+                                    <h4 class="mb-0"><i class="fa-solid fa-tag me-2"></i> Direct Income Items</h4>
                                     <button type="button" class="btn btn-primary btn-sm" id="addRow">
                                         <i class="fa fa-plus"></i>
                                         Add Product
@@ -202,7 +202,7 @@
                             <div class="row mt-4">
                                 <div class="col-md-8">
                                     <label>Remarks</label>
-                                    <textarea name="remarks" rows="5" class="form-control"></textarea>
+                                    <textarea name="remarks" rows="5" class="form-control" placeholder="Enter the items remarks...">{{ old('remarks') }}</textarea>
                                 </div>
                                 <div class="col-md-4">
                                     <table class="table table-bordered border">

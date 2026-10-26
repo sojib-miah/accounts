@@ -1,12 +1,12 @@
 @extends('BackEnd.Layouts.layout')
 
-@section('title', 'Category Management')
+@section('title', 'Expense Category Management')
 
 @section('content')
     <div class="p-5">
         <div class="container-p-y">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Expense Category List</h4>
+                <h4 class="mb-0"><i class="fa-solid fa-list-ul me-2"></i> Expense Category List</h4>
                 <div class="d-flex align-items-center gap-2">
                     <form action="{{ route('category.index') }}" method="GET"
                         class="d-flex justify-content-center align-items-center gap-2">
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                placeholder="Search Expense Category List">
+                                placeholder="Search Expense Category List...">
                         </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-search me-1"></i>
@@ -31,7 +31,7 @@
                         </button>
                         @if (request('search') || request('company_id'))
                             <a href="{{ route('category.index') }}" class="btn btn-secondary">
-                                Reset
+                                <i class="fa-solid fa-rotate-left me-1"></i> Reset
                             </a>
                         @endif
                     </form>
@@ -104,10 +104,8 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li class="mb-2">
                                                         @can('expense-category-list-edit')
-                                                            <button type="button" class="dropdown-item editBtn"
-                                                                data-id="{{ $category->id }}"
-                                                                data-name="{{ $category->name }}"
-                                                                data-status="{{ $category->status }}">
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#editCategoryModal{{ $category->id }}">
                                                                 <i class="fa fa-edit"></i> Edit
                                                             </button>
                                                         @endcan
@@ -153,32 +151,27 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.querySelectorAll('.editBtn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.getElementById('edit_name').value = this.dataset.name;
-                $('#edit_status').val(this.dataset.status).trigger('change');
-                document.getElementById('editCategoryForm').action =
-                    "{{ url('/admin/category') }}/" + this.dataset.id;
-                new bootstrap.Modal(
-                    document.getElementById('editCategoryModal')
-                ).show();
-            });
-        });
-    </script>
-
-    @if ($errors->add->any())
+    @if ($errors->getBag('add')->any())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+                const modalElement = document.getElementById('addCategoryModal');
+
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+                }
             });
         </script>
     @endif
 
-    @if ($errors->edit->any())
+    @if ($errors->getBag('edit')->any() && session('edit_category_id'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+                const categoryId = @json(session('edit_category_id'));
+                const modal = document.getElementById('editCategoryModal' + categoryId);
+
+                if (modal) {
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                }
             });
         </script>
     @endif
