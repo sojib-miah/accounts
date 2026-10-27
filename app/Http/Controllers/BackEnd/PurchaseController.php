@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BackEnd;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\AccountTransaction;
 use App\Models\Company;
 use App\Models\CustomerCompany;
@@ -481,54 +482,43 @@ class PurchaseController extends Controller
      */
     public function cancel(Receipt $purchase)
     {
-        if ($purchase->type !== 'Purchase-Order') {
-            abort(404, 'Purchase order not found.');
-        }
-
         if ($purchase->status === 'Cancelled') {
             return back()->with('error', 'Purchase is already cancelled.');
         }
-
         try {
             DB::transaction(function () use ($purchase) {
-                $items = ReceiptItem::where('receipt_id', $purchase->id)
-                    ->lockForUpdate()
-                    ->get();
-
-                $stockTransactions = StockTransaction::where(
-                    'receipt_id',
-                    $purchase->id
-                )->lockForUpdate()->get();
-
+                $items = ReceiptItem::where('receipt_id', $purchase->id)->lockForUpdate()->get();
+                $stockTransactions = StockTransaction::where('receipt_id', $purchase->id)->lockForUpdate()->get();
                 $stockToReverse = [];
-
                 foreach ($stockTransactions as $transaction) {
                     $productId = $transaction->product_id;
-
-                    $stockToReverse[$productId] =
-                        ($stockToReverse[$productId] ?? 0)
-                        + (float) $transaction->stock_in
-                        - (float) $transaction->stock_out;
+                    $stockToReverse[$productId] = ($stockToReverse[$productId] ?? 0) + (float) $transaction->stock_in - (float) $transaction->stock_out;
                 }
-
                 foreach ($items as $item) {
                     if (!$item->product_id) {
                         continue;
                     }
-
                     if (!array_key_exists($item->product_id, $stockToReverse)) {
                         $stockToReverse[$item->product_id] = (float) $item->qty;
                     }
                 }
-
                 foreach ($stockToReverse as $productId => $quantity) {
-                    $product = Product::where('id', $productId)
-                        ->lockForUpdate()
-                        ->first();
-
+                    $product = Product::where('id', $productId)->lockForUpdate()->first();
                     if ($product) {
                         $product->decrement('current_stock', $quantity);
                     }
+                }
+                $accountTransactions = AccountTransaction::where('receipt_id', $purchase->id)->lockForUpdate()->get();
+                foreach ($accountTransactions as $transaction) {
+                    if (!$transaction->account_id) {
+                        continue;
+                    }
+                    $account = Account::where('id', $transaction->account_id)->lockForUpdate()->first();
+                    if (!$account) {
+                        continue;
+                    }
+                    $reverseAmount = (float) $transaction->credit - (float) $transaction->debit;
+                    $account->decrement('current_balance', $reverseAmount);
                 }
                 // SerialNumber::where('receipt_id', $purchase->id)->delete();
                 StockTransaction::where('receipt_id', $purchase->id)->delete();
@@ -548,64 +538,64 @@ class PurchaseController extends Controller
                     'payment_status' => 'Pending',
                 ]);
             });
-
-            return back()->with('success', 'Purchase cancelled. Related records removed and stock reversed.');
+            $type = $purchase->type;
+            if ($type == 'Expense') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Expense Receipt Deleted Successfully.');
+            } elseif ($type == 'Income') {
+                return redirect()->route('income.receipt.index')->with('success', 'Income Receipt Deleted Successfully.');
+            } elseif ($type == 'Challan') {
+                return redirect()->route('challan.index')->with('success', 'Challan Deleted Successfully.');
+            } elseif ($type == 'Sales-Order') {
+                return redirect()->route('sales.order.index')->with('success', 'Sales Order Deleted Successfully.');
+            } elseif ($type == 'Purchase-Order') {
+                return redirect()->route('purchase.index')->with('success', 'Purchase Order Deleted Successfully.');
+            } elseif ($type == 'Direct-Income') {
+                return redirect()->route('direct.income.index')->with('success', 'Direct Income Deleted Successfully.');
+            }
         } catch (\Throwable $e) {
-            Log::error('Purchase cancellation failed', [
-                'purchase_id' => $purchase->id,
+            Log::error('Cancellation failed', [
                 'error' => $e->getMessage(),
             ]);
-
-            return back()->with('error', 'Purchase cancellation failed. Please check the stock and related records.');
+            return back()->with('error', 'Cancellation failed. Please check the stock and related records.');
         }
     }
 
     public function destroy(Receipt $purchase)
     {
-        if ($purchase->type !== 'Purchase-Order') {
-            abort(404, 'Purchase order not found.');
-        }
-
         try {
             DB::transaction(function () use ($purchase) {
-                $items = ReceiptItem::where('receipt_id', $purchase->id)
-                    ->lockForUpdate()
-                    ->get();
-
-                $stockTransactions = StockTransaction::where(
-                    'receipt_id',
-                    $purchase->id
-                )->lockForUpdate()->get();
-
+                $items = ReceiptItem::where('receipt_id', $purchase->id)->lockForUpdate()->get();
+                $stockTransactions = StockTransaction::where('receipt_id', $purchase->id)->lockForUpdate()->get();
                 $stockToReverse = [];
-
                 foreach ($stockTransactions as $transaction) {
                     $productId = $transaction->product_id;
-
-                    $stockToReverse[$productId] =
-                        ($stockToReverse[$productId] ?? 0)
-                        + (float) $transaction->stock_in
-                        - (float) $transaction->stock_out;
+                    $stockToReverse[$productId] = ($stockToReverse[$productId] ?? 0) + (float) $transaction->stock_in - (float) $transaction->stock_out;
                 }
-
                 foreach ($items as $item) {
                     if (!$item->product_id) {
                         continue;
                     }
-
                     if (!array_key_exists($item->product_id, $stockToReverse)) {
                         $stockToReverse[$item->product_id] = (float) $item->qty;
                     }
                 }
-
                 foreach ($stockToReverse as $productId => $quantity) {
-                    $product = Product::where('id', $productId)
-                        ->lockForUpdate()
-                        ->first();
-
+                    $product = Product::where('id', $productId)->lockForUpdate()->first();
                     if ($product) {
                         $product->decrement('current_stock', $quantity);
                     }
+                }
+                $accountTransactions = AccountTransaction::where('receipt_id', $purchase->id)->lockForUpdate()->get();
+                foreach ($accountTransactions as $transaction) {
+                    if (!$transaction->account_id) {
+                        continue;
+                    }
+                    $account = Account::where('id', $transaction->account_id)->lockForUpdate()->first();
+                    if (!$account) {
+                        continue;
+                    }
+                    $reverseAmount = (float) $transaction->credit - (float) $transaction->debit;
+                    $account->decrement('current_balance', $reverseAmount);
                 }
                 SerialNumber::where('receipt_id', $purchase->id)->delete();
                 StockTransaction::where('receipt_id', $purchase->id)->delete();
@@ -614,15 +604,25 @@ class PurchaseController extends Controller
                 ReceiptItem::where('receipt_id', $purchase->id)->delete();
                 $purchase->delete();
             });
-
-            return back()->with('success', 'Purchase permanently deleted and stock reversed.');
+            $type = $purchase->type;
+            if ($type == 'Expense') {
+                return redirect()->route('receipt.expense.index')->with('success', 'Expense Receipt Deleted Successfully.');
+            } elseif ($type == 'Income') {
+                return redirect()->route('income.receipt.index')->with('success', 'Income Receipt Deleted Successfully.');
+            } elseif ($type == 'Challan') {
+                return redirect()->route('challan.index')->with('success', 'Challan Deleted Successfully.');
+            } elseif ($type == 'Sales-Order') {
+                return redirect()->route('sales.order.index')->with('success', 'Sales Order Deleted Successfully.');
+            } elseif ($type == 'Purchase-Order') {
+                return redirect()->route('purchase.index')->with('success', 'Purchase Order Deleted Successfully.');
+            } elseif ($type == 'Direct-Income') {
+                return redirect()->route('direct.income.index')->with('success', 'Direct Income Deleted Successfully.');
+            }
         } catch (\Throwable $e) {
-            Log::error('Purchase deletion failed', [
-                'purchase_id' => $purchase->id,
+            Log::error('Deletion failed', [
                 'error' => $e->getMessage(),
             ]);
-
-            return back()->with('error', 'Purchase deletion failed. Please check related records and database constraints.');
+            return back()->with('error', 'Deletion failed. Please check related records and database constraints.');
         }
     }
 

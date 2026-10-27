@@ -176,6 +176,34 @@
                                                             </button>
                                                         </form>
                                                     </li> --}}
+                                                    @if ($receipt->status != 'Cancelled')
+                                                        <li>
+                                                            <form action="{{ route('purchase.cancel', $receipt->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('PATCH')
+
+                                                                <button class="dropdown-item text-warning" type="submit"
+                                                                    onclick="return confirm('Cancel this Receipt? Related records will be removed and stock will be reduced.')">
+                                                                    <i class="fa fa-ban"></i> Cancel
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    @if ($receipt->payment_status === 'Pending' || $receipt->status === 'Cancelled' || $receipt->status === 'Draft')
+                                                        <li>
+                                                            <form action="{{ route('purchase.delete', $receipt->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+
+                                                                <button class="dropdown-item text-danger" type="submit"
+                                                                    onclick="return confirm('Permanently delete this Receipt? All related records will be removed and stock will be reduced.')">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
                                                 </ul>
                                             </div>
                                         </td>

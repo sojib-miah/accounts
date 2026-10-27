@@ -166,34 +166,6 @@
                                                             View
                                                         </a>
                                                     </li>
-                                                    {{-- @if ($receipt->status != 'Cancelled')
-                                                        <li>
-                                                            <form
-                                                                action="{{ route('income.receipt.cancel', $receipt->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                <button onclick="return confirm('Cancel this receipt?')"
-                                                                    class="dropdown-item">
-                                                                    <i class="fa fa-ban text-secondary me-2"></i>
-                                                                    Cancel
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    @endif --}}
-                                                    {{-- @if ($receipt->payment_status == 'Pending')
-                                                        <li>
-                                                            <form action="{{ route('receipt.destroy', $receipt->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button onclick="return confirm('Delete this receipt?')"
-                                                                    class="dropdown-item text-danger">
-                                                                    <i class="fa fa-trash me-2"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    @endif --}}
                                                 </ul>
                                             </div>
                                         </td>

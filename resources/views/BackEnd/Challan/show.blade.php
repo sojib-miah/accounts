@@ -219,18 +219,6 @@
                         </a>
                     @endcan
                 @endif --}}
-                    {{-- @if ($receipt->payment_status == 'Pending')
-                    @can('income-challan-delete')
-                        <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button onclick="return confirm('Delete this receipt?')" class="btn btn-danger mb-2 btn-lg w-100">
-                                <i class="fa fa-trash me-2"></i>
-                                Delete
-                            </button>
-                        </form>
-                    @endcan
-                @endif --}}
                     <a href="{{ route('challan.print', $receipt->id) }}" target="_blank"
                         class="btn d-block mb-2 btn-primary btn-lg">
                         <i class="fa fa-print me-2"></i>

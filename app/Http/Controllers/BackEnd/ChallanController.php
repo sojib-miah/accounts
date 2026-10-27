@@ -286,41 +286,6 @@ class ChallanController extends Controller
         }
     }
 
-    public function cancel(Receipt $receipt)
-    {
-        if ($receipt->status == 'Cancelled') {
-            return back()->with('error', 'Receipt already cancelled.');
-        }
-        DB::beginTransaction();
-        try {
-            foreach ($receipt->payments as $payment) {
-                $account = Account::find($payment->account_id);
-                if ($account) {
-                    if ($receipt->type == 'Challan') {
-                        $account->current_balance -= $payment->amount;
-                    } else {
-                        $account->current_balance += $payment->amount;
-                    }
-                    $account->save();
-                }
-                AccountTransaction::where('receipt_id', $receipt->id)->delete();
-            }
-            $receipt->payments()->delete();
-            $receipt->update([
-                'paid_amount' => 0,
-                'due_amount' => $receipt->total_amount,
-                'payment_status' => 'Pending',
-                'status' => 'Cancelled',
-                'updated_by' => auth()->id(),
-            ]);
-            DB::commit();
-            return redirect()->route('challan.show', $receipt->id);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', $e->getMessage());
-        }
-    }
-
     public function print(Receipt $receipt)
     {
         $receipt->load([

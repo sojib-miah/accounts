@@ -191,27 +191,28 @@
                                                     </li> --}}
                                                     @if ($receipt->status != 'Cancelled')
                                                         <li>
-                                                            <form action="{{ route('sales.order.cancel', $receipt->id) }}"
+                                                            <form action="{{ route('purchase.cancel', $receipt->id) }}"
                                                                 method="POST">
                                                                 @csrf
-                                                                <button onclick="return confirm('Cancel this receipt?')"
-                                                                    class="dropdown-item">
-                                                                    <i class="fa fa-ban text-secondary me-2"></i>
-                                                                    Cancel
+                                                                @method('PATCH')
+
+                                                                <button class="dropdown-item text-warning" type="submit"
+                                                                    onclick="return confirm('Cancel this Receipt? Related records will be removed and stock will be reduced.')">
+                                                                    <i class="fa fa-ban"></i> Cancel
                                                                 </button>
                                                             </form>
                                                         </li>
                                                     @endif
-                                                    @if ($receipt->payment_status == 'Pending')
+                                                    @if ($receipt->payment_status === 'Pending' || $receipt->status === 'Cancelled' || $receipt->status === 'Draft')
                                                         <li>
-                                                            <form action="{{ route('receipt.destroy', $receipt->id) }}"
+                                                            <form action="{{ route('purchase.delete', $receipt->id) }}"
                                                                 method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button onclick="return confirm('Delete this receipt?')"
-                                                                    class="dropdown-item text-danger">
-                                                                    <i class="fa fa-trash me-2"></i>
-                                                                    Delete
+
+                                                                <button class="dropdown-item text-danger" type="submit"
+                                                                    onclick="return confirm('Permanently delete this Receipt? All related records will be removed and stock will be reduced.')">
+                                                                    <i class="fa fa-trash"></i> Delete
                                                                 </button>
                                                             </form>
                                                         </li>

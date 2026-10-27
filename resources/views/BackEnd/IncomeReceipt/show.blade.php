@@ -338,19 +338,6 @@
                                 Modify
                             </a>
                         @endcan
-                    @endif --}}
-                        {{-- @if ($receipt->payment_status == 'Pending')
-                        @can('income-receipt-delete')
-                            <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button onclick="return confirm('Delete this receipt?')" class="btn btn-danger btn-lg w-100">
-                                    <i class="fa fa-trash me-2"></i>
-                                    Delete
-                                </button>
-                            </form>
-                        @endcan
-                    @endif --}}
                         <a href="{{ route('sales.order.print', $receipt->id) }}" target="_blank"
                             class="btn btn-primary btn-lg">
                             <i class="fa fa-print me-2"></i>

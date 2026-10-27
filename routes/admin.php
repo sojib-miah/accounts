@@ -144,8 +144,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/receipt/{receipt}', [ReceiptController::class, 'show'])->name('receipt.show');
         Route::get('/receipt/{receipt}/edit', [ReceiptController::class, 'edit'])->name('receipt.edit');
         Route::put('/receipt/{receipt}', [ReceiptController::class, 'update'])->name('receipt.update');
-        Route::delete('/receipt/{receipt}', [ReceiptController::class, 'destroy'])->name('receipt.destroy');
-        Route::post('/receipt/{receipt}/cancel', [ReceiptController::class, 'cancel'])->name('receipt.cancel');
         Route::post('/expense/{receipt}/payment', [ReceiptController::class, 'expensePaymentStore'])->name('expense.payment.store');
         Route::get('/expense/payment/accounts/{paymentType}', [ReceiptController::class, 'paymentAccounts'])->name('expense.payment.accounts');
         Route::get('/receipt/{receipt}/payments', [ReceiptController::class, 'paymentHistory'])->name('receipt.payment.history');
@@ -187,7 +185,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/sales/order/{receipt}', [SalesOrderController::class, 'show'])->name('sales.order.show');
         Route::get('/sales/order/{receipt}/edit', [SalesOrderController::class, 'edit'])->name('sales.order.edit');
         Route::put('/sales/order/{receipt}', [SalesOrderController::class, 'update'])->name('sales.order.update');
-        Route::post('/sales/order/{receipt}/cancel', [SalesOrderController::class, 'cancel'])->name('sales.order.cancel');
         Route::get('/sales/order/{party}/profile', [SalesOrderController::class, 'profile'])->name('sales.order.profile');
         Route::post('/sales/order/{party}/due-payment', [SalesOrderController::class, 'duePayment'])->name('sales.order.due.payment');
         Route::get('/sales/order/{receipt}/print', [SalesOrderController::class, 'print'])->name('sales.order.print');
@@ -206,7 +203,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/income/receipt/{receipt}', [IncomeReceiptController::class, 'show'])->name('income.receipt.show');
         Route::get('/income/receipt/{receipt}/edit', [IncomeReceiptController::class, 'edit'])->name('income.receipt.edit');
         Route::put('/income/receipt/{receipt}', [IncomeReceiptController::class, 'update'])->name('income.receipt.update');
-        Route::post('/income/receipt/{receipt}/cancel', [IncomeReceiptController::class, 'cancel'])->name('income.receipt.cancel');
         Route::get('/income/party/{party}/profile', [IncomeReceiptController::class, 'profile'])->name('income.party.profile');
         Route::post('/income/{receipt}/payment', [IncomeReceiptController::class, 'paymentStore'])->name('income.receipt.payment.store');
 
@@ -222,7 +218,6 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/challan/{receipt}', [ChallanController::class, 'show'])->name('challan.show');
         Route::get('/challan/{receipt}/edit', [ChallanController::class, 'edit'])->name('challan.edit');
         Route::put('/challan/{receipt}', [ChallanController::class, 'update'])->name('challan.update');
-        Route::post('/challan/{receipt}/cancel', [ChallanController::class, 'cancel'])->name('challan.cancel');
         Route::get('/challan/{receipt}/print', [ChallanController::class, 'print'])->name('challan.print');
         Route::get('/challan/{receipt}/pdf', [ChallanController::class, 'pdf'])->name('challan.pdf');
 

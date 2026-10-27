@@ -280,25 +280,26 @@
                     @endif
                     @if ($receipt->status != 'Cancelled' && $receipt->payment_status == 'Pending')
                         @can('expense-receipt-edit')
-                            <a href="{{ route('receipt.edit', $receipt->id) }}" class="btn btn-warning btn-lg text-white">
+                            <a href="{{ route('receipt.edit', $receipt->id) }}" class="btn btn-success btn-lg text-white">
                                 <i class="fa fa-edit me-2"></i>
                                 Modify
                             </a>
                         @endcan
                     @endif
-                    @if ($receipt->payment_status == 'Pending')
+                    @if ($receipt->payment_status === 'Pending' || $receipt->status === 'Cancelled' || $receipt->status === 'Draft')
                         @can('expense-receipt-delete')
-                            <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
+                            <form action="{{ route('purchase.delete', $receipt->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Delete this receipt?')" class="btn btn-danger btn-lg w-100">
-                                    <i class="fa fa-trash me-2"></i>
-                                    Delete
+
+                                <button class="btn btn-danger btn-lg w-100" type="submit"
+                                    onclick="return confirm('Permanently delete this Receipt? All related records will be removed and stock will be reduced.')">
+                                    <i class="fa fa-trash me-2"></i> Delete
                                 </button>
                             </form>
                         @endcan
                     @endif
-                    <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank" class="btn btn-primary btn-lg">
+                    <a href="{{ route('receipt.print', $receipt->id) }}" target="_blank" class="btn btn-info btn-lg">
                         <i class="fa fa-print me-2"></i>
                         Print
                     </a>

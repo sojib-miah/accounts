@@ -331,16 +331,16 @@
                     </div>
                     {{-- ACTION BUTTONS --}}
                     <div class="d-grid gap-2">
-                        @if ($receipt->payment_status !== 'Paid')
+                        @if ($receipt->payment_status !== 'Paid' && $receipt->status !== 'Cancelled')
                             <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
                                 data-bs-target="#paymentModal">
                                 <i class="fa fa-money-bill-wave me-2"></i>
                                 Receive Payment
                             </button>
                         @endif
-                        @if ($receipt->payment_status == 'Pending')
+                        @if ($receipt->payment_status == 'Pending' && $receipt->status !== 'Cancelled')
                             <a href="{{ route('direct.income.edit', $receipt->id) }}"
-                                class="btn btn-warning btn-lg text-white">
+                                class="btn btn-dark btn-lg text-white">
                                 <i class="fa fa-edit me-2"></i>
                                 Modify
                             </a>
@@ -351,10 +351,21 @@
                             Print
                         </a>
                         <a href="{{ route('direct.income.pdf', $receipt->id) }}" target="_blank"
-                            class="btn btn-danger btn-lg">
+                            class="btn btn-secondary btn-lg">
                             <i class="fa fa-file-pdf me-2"></i>
                             PDF
                         </a>
+                        @if ($receipt->payment_status === 'Pending' || $receipt->status === 'Cancelled' || $receipt->status === 'Draft')
+                            <form action="{{ route('purchase.delete', $receipt->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+
+                                <button class="btn btn-danger btn-lg w-100" type="submit"
+                                    onclick="return confirm('Permanently delete this Receipt? All related records will be removed and stock will be reduced.')">
+                                    <i class="fa fa-trash me-2"></i> Delete
+                                </button>
+                            </form>
+                        @endif
                     </div>
                     {{-- PAYMENT SUMMARY --}}
                     <div class="card shadow-sm border-0 mt-3">

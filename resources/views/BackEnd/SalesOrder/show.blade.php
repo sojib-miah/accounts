@@ -295,20 +295,20 @@
                         <form action="{{ route('sales.order.convert.income', $receipt->id) }}" method="POST"
                             class="d-inline">
                             @csrf
-                            <button class="btn btn-danger btn-lg w-100" onclick="return confirm('Create to Invoice?')">
+                            <button class="btn btn-secondary btn-lg w-100" onclick="return confirm('Create to Invoice?')">
                                 <i class="fa-solid fa-arrows-to-circle me-2"></i>
                                 Create Invoice
                             </button>
                         </form>
                     @else
                         <a href="{{ route('sales.order.print', $receipt->id) }}" target="_blank"
-                            class="btn btn-danger btn-lg">
+                            class="btn btn-secondary btn-lg">
                             <i class="fa fa-print me-2"></i>
                             Print Invoice
                         </a>
                     @endif
 
-                    @if ($receipt->payment_status != 'Paid')
+                    @if ($receipt->payment_status != 'Paid' && $receipt->status != 'Cancelled')
                         @if ($receipt->is_challan && $receipt->is_invoice)
                             <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
                                 <i class="fa fa-money-bill-wave me-2"></i>
@@ -323,7 +323,7 @@
                         @endif
                     @endif
 
-                    @if ($receipt->status != 'Cancelled' && $receipt->status != 'Paid' && !$receipt->is_invoice)
+                    @if ($receipt->status != 'Cancelled' && $receipt->payment_status != 'Paid' && !$receipt->is_invoice)
                         @can('income-receipt-edit')
                             <a href="{{ route('sales.order.edit', $receipt->id) }}"
                                 class="btn btn-warning btn-lg text-white">
@@ -332,28 +332,33 @@
                             </a>
                         @endcan
                     @endif
-                    @if ($receipt->payment_status == 'Pending' && !$receipt->is_invoice)
+                    @if ($receipt->payment_status === 'Pending' || $receipt->status === 'Cancelled' || $receipt->status === 'Draft')
                         @can('income-receipt-delete')
-                            <form action="{{ route('receipt.destroy', $receipt->id) }}" method="POST">
+                            <form action="{{ route('purchase.delete', $receipt->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Delete this receipt?')" class="btn btn-danger btn-lg w-100">
-                                    <i class="fa fa-trash me-2"></i>
-                                    Delete
+
+                                <button class="dropdown-item text-danger" type="submit"
+                                    onclick="return confirm('Permanently delete this Receipt? All related records will be removed and stock will be reduced.')">
+                                    <i class="fa fa-trash"></i> Delete
                                 </button>
                             </form>
                         @endcan
                     @endif
-                    <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
-                        target="_blank" class="btn btn-primary btn-lg">
-                        <i class="fa fa-file-pdf me-2"></i>
-                        PDF Challan
-                    </a>
-                    <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
-                        target="_blank" class="btn btn-danger btn-lg">
-                        <i class="fa fa-file-pdf me-2"></i>
-                        PDF Invoice
-                    </a>
+                    @if ($receipt->is_challan)
+                        <a href="{{ route('challan.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                            target="_blank" class="btn btn-dark btn-lg">
+                            <i class="fa fa-file-pdf me-2"></i>
+                            PDF Challan
+                        </a>
+                    @endif
+                    @if ($receipt->is_invoice)
+                        <a href="{{ route('sales.order.pdf', ['receipt' => $receipt->id, 'design' => 'classic']) }}"
+                            target="_blank" class="btn btn-info btn-lg">
+                            <i class="fa fa-file-pdf me-2"></i>
+                            PDF Invoice
+                        </a>
+                    @endif
                 </div>
                 {{-- Payment Summary --}}
                 <div class="card shadow-sm border-0 mt-3">

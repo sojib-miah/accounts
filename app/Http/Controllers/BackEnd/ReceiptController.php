@@ -409,74 +409,6 @@ class ReceiptController extends Controller
         }
     }
 
-    public function destroy(Receipt $receipt)
-    {
-        if ($receipt->payments()->exists()) {
-            return redirect()->route('receipt.show', $receipt->id)
-                ->with('error', 'This receipt has payment history. It cannot be deleted.');
-        }
-        DB::beginTransaction();
-        try {
-            $type = $receipt->type;
-            $receipt->items()->delete();
-            $receipt->delete();
-            DB::commit();
-            if ($type == 'Expense') {
-                return redirect()->route('receipt.expense.index')->with('success', 'Receipt Deleted Successfully.');
-            } elseif ($type == 'Income') {
-                return redirect()->route('income.receipt.index')->with('success', 'Receipt Deleted Successfully.');
-            } elseif ($type == 'Challan') {
-                return redirect()->route('challan.index')->with('success', 'Challan Deleted Successfully.');
-            } elseif ($type == 'Sales-Order') {
-                return redirect()->route('sales.order.index')->with('success', 'Sales Order Deleted Successfully.');
-            }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', $e->getMessage());
-        }
-    }
-
-    public function cancel(Receipt $receipt)
-    {
-        if ($receipt->status == 'Cancelled') {
-            return back()->with('error', 'Receipt already cancelled.');
-        }
-        DB::beginTransaction();
-        try {
-            foreach ($receipt->payments as $payment) {
-                $account = Account::find($payment->account_id);
-                if ($account) {
-                    if ($receipt->type == 'Income') {
-                        $account->current_balance -= $payment->amount;
-                    } else {
-                        $account->current_balance += $payment->amount;
-                    }
-                    $account->save();
-                }
-                AccountTransaction::where('receipt_id', $receipt->id)->delete();
-            }
-            $receipt->payments()->delete();
-            $receipt->update([
-                'paid_amount' => 0,
-                'due_amount' => $receipt->total_amount,
-                'payment_status' => 'Pending',
-                'status' => 'Cancelled',
-                'updated_by' => auth()->id(),
-            ]);
-            DB::commit();
-            if ($receipt->is_invoice) {
-                return redirect()->route('sales.order.show', $receipt->id);
-            } elseif ($receipt->type == 'Expense') {
-                return redirect()->route('receipt.show', $receipt->id);
-            } elseif ($receipt->is_challan) {
-                return redirect()->route('challan.show', $receipt->id);
-            }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', $e->getMessage());
-        }
-    }
-
     /**
      * Store Expense Payment
      */
@@ -486,32 +418,11 @@ class ReceiptController extends Controller
         $userId = $user->id;
 
         $request->validate([
-            'payment_type_id' => [
-                'required',
-                'exists:payment_types,id',
-            ],
-
-            'account_id' => [
-                'required',
-                'exists:accounts,id',
-            ],
-
-            'amount' => [
-                'required',
-                'numeric',
-                'gt:0',
-            ],
-
-            'payment_date' => [
-                'required',
-                'date',
-            ],
-
-            'note' => [
-                'nullable',
-                'string',
-                'max:1000',
-            ],
+            'payment_type_id' => ['required', 'exists:payment_types,id',],
+            'account_id' => ['required', 'exists:accounts,id',],
+            'amount' => ['required', 'numeric', 'gt:0',],
+            'payment_date' => ['required', 'date',],
+            'note' => ['nullable', 'string', 'max:1000',],
         ]);
 
         DB::beginTransaction();
@@ -555,18 +466,10 @@ class ReceiptController extends Controller
 
             if ($paymentAmount > $dueAmount) {
                 throw new \Exception(
-                    'Payment amount cannot be greater than the remaining due amount. ' .
-                        'Due: ' .
-                        number_format($dueAmount, 2) .
-                        ' TK'
+                    'Payment amount cannot be greater than the remaining due amount. ' . 'Due: ' . number_format($dueAmount, 2) . ' TK'
                 );
             }
-            $paymentType = PaymentType::where(
-                'id',
-                $request->payment_type_id
-            )
-                ->where('status', 'Active')
-                ->first();
+            $paymentType = PaymentType::where('id', $request->payment_type_id)->where('status', 'Active')->first();
 
             if (!$paymentType) {
                 throw new \Exception(
@@ -574,42 +477,24 @@ class ReceiptController extends Controller
                 );
             }
 
-            $account = Account::where(
-                'id',
-                $request->account_id
-            )
-                ->where('status', 'Active')
-                ->lockForUpdate()
-                ->first();
+            $account = Account::where('id', $request->account_id)->where('status', 'Active')->lockForUpdate()->first();
 
             if (!$account) {
                 throw new \Exception(
                     'Selected account is inactive or not found.'
                 );
             }
-            if (
-                !$user->hasRole('Super-Admin') &&
-                (int) $account->company_id !==
-                (int) $user->company_id
-            ) {
+            if (!$user->hasRole('Super-Admin') && (int) $account->company_id !== (int) $user->company_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
-            if (
-                !$user->hasRole('Super-Admin') &&
-                $account->branch_id &&
-                (int) $account->branch_id !==
-                (int) $user->branch_id
-            ) {
+            if (!$user->hasRole('Super-Admin') && $account->branch_id && (int) $account->branch_id !== (int) $user->branch_id) {
                 throw new \Exception(
                     'You are not allowed to use this account.'
                 );
             }
-            if (
-                (int) $account->payment_type_id !==
-                (int) $paymentType->id
-            ) {
+            if ((int) $account->payment_type_id !== (int) $paymentType->id) {
                 throw new \Exception(
                     'Selected account does not belong to the selected payment type.'
                 );
@@ -621,16 +506,10 @@ class ReceiptController extends Controller
 
             if ($currentBalance < $paymentAmount) {
                 throw new \Exception(
-                    'Insufficient account balance. ' .
-                        'Available Balance: ' .
-                        number_format($currentBalance, 2) .
-                        ' TK'
+                    'Insufficient account balance. ' . 'Available Balance: ' . number_format($currentBalance, 2) . ' TK'
                 );
             }
-            $newBalance = round(
-                $currentBalance - $paymentAmount,
-                2
-            );
+            $newBalance = round($currentBalance - $paymentAmount, 2);
             ReceiptPayment::create([
                 'receipt_id'      => $receipt->id,
                 'payment_type_id' => $paymentType->id,
@@ -658,32 +537,20 @@ class ReceiptController extends Controller
                 'created_by'       => $userId,
             ]);
 
-            $newPaidAmount = round(
-                (float) $receipt->paid_amount +
-                    $paymentAmount,
-                2
-            );
+            $newPaidAmount = round((float) $receipt->paid_amount + $paymentAmount, 2);
 
-            $newDueAmount = round(
-                (float) $receipt->total_amount -
-                    $newPaidAmount,
-                2
-            );
+            $newDueAmount = round((float) $receipt->total_amount - $newPaidAmount, 2);
 
             if ($newDueAmount < 0) {
                 $newDueAmount = 0;
             }
 
             if ($newDueAmount <= 0) {
-
                 $newDueAmount = 0;
-
                 $paymentStatus = 'Paid';
             } elseif ($newPaidAmount > 0) {
-
                 $paymentStatus = 'Partial';
             } else {
-
                 $paymentStatus = 'Pending';
             }
 
@@ -693,24 +560,11 @@ class ReceiptController extends Controller
                 'payment_status' => $paymentStatus,
                 'updated_by'     => $userId,
             ]);
-
-
             DB::commit();
-
-            return back()->with(
-                'success',
-                'Expense payment completed successfully.'
-            );
+            return back()->with('success', 'Expense payment completed successfully.');
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 

@@ -201,9 +201,9 @@
                                                 @endcan
                                                 @can('purchase-delete')
                                                     <li>
-                                                        @if ($purchase->status != 'Cancelled' && $purchase->status !== 'Completed')
+                                                        @if ($purchase->status != 'Cancelled')
                                                             <form action="{{ route('purchase.cancel', $purchase->id) }}"
-                                                                method="POST" class="d-inline">
+                                                                method="POST">
                                                                 @csrf
                                                                 @method('PATCH')
 
@@ -219,7 +219,7 @@
                                                     <li>
                                                         @if ($purchase->status === 'Cancelled' || $purchase->status === 'Draft')
                                                             <form action="{{ route('purchase.delete', $purchase->id) }}"
-                                                                method="POST" class="d-inline">
+                                                                method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
 
