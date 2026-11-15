@@ -27,4 +27,9 @@ class StockTransaction extends Model
     {
         return $this->belongsTo(Receipt::class);
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

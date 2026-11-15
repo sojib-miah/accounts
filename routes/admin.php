@@ -308,5 +308,12 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
                 'update' => 'admin.company-package.update',
                 'destroy' => 'admin.company-package.destroy',
             ]);
+
+        //    all report
+        Route::get('/report/balance', [ReportController::class, 'balance'])->name('report.balance');
+        Route::get('/report/sales', [ReportController::class, 'sales'])->name('report.sales');
+        Route::get('/report/purchase', [ReportController::class, 'purchase'])->name('report.purchase');
+        Route::get('/report/expense', [ReportController::class, 'expense'])->name('report.expense');
+        Route::get('/report/profit', [ReportController::class, 'profit'])->name('report.profit');
     });
 });

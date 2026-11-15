@@ -458,10 +458,11 @@
                             Smart Company Management System
                         </span>
                         <h1 class="mt-6 text-4xl font-extrabold leading-tight text-slate-900 lg:text-4xl">
-                            Manage Your Business Smarter with COMITS
+                            Manage Your Business Smarter with BIMS
                         </h1>
                         <p class="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-                            COMITS brings Purchase, Inventory, Sales, Accounting, and Reporting together in one
+                            BIMS (Business Integration Management System) brings Purchase, Inventory, Sales, Accounting,
+                            and Reporting together in one
                             platform—so you can streamline operations, stay in control, and turn everyday business data
                             into smarter decisions.
                         </p>
@@ -1096,7 +1097,7 @@
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
                         <p>
                             Copyright &copy; {{ date('Y') }} <a href="https://comitsbd.com" target="_blank"
-                                class="text-cyan-400 font-medium hover:underline">ComitsBD</a>. All
+                                class="text-cyan-400 font-medium hover:underline">Comits Soft</a>. All
                             rights reserved.
                         </p>
                     </div>

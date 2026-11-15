@@ -382,6 +382,36 @@
             </li>
         @endcan
 
+        {{-- report --}}
+        <li class="menu-item {{ request()->routeIs('report.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="fa-solid fa-chart-simple me-3"></i>
+                Report
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('report.balance') ? 'active' : '' }}">
+                    <a href="{{ route('report.balance') }}" class="menu-link">
+                        Balance Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.sales') ? 'active' : '' }}">
+                    <a href="{{ route('report.sales') }}" class="menu-link">
+                        Sales Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.purchase') ? 'active' : '' }}">
+                    <a href="{{ route('report.purchase') }}" class="menu-link">
+                        Purchase Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.profit') ? 'active' : '' }}">
+                    <a href="{{ route('report.profit') }}" class="menu-link">
+                        Profit Report
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- users -->
         @can('menu-comits-user-list')
             <li class="menu-item {{ request()->routeIs('users.*') ? 'active open' : '' }}">
