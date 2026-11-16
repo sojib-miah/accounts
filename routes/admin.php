@@ -315,5 +315,9 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/report/purchase', [ReportController::class, 'purchase'])->name('report.purchase');
         Route::get('/report/expense', [ReportController::class, 'expense'])->name('report.expense');
         Route::get('/report/profit', [ReportController::class, 'profit'])->name('report.profit');
+        Route::get('/report/receivable', [ReportController::class, 'receivable'])->name('report.receivable');
+        Route::get('/report/payable', [ReportController::class, 'payable'])->name('report.payable');
+        Route::get('/report/received', [ReportController::class, 'received'])->name('report.received');
+        Route::get('/report/paid', [ReportController::class, 'paid'])->name('report.paid');
     });
 });

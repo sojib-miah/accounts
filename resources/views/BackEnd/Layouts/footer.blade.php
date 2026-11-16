@@ -6,7 +6,7 @@
                 <script>
                     document.write(new Date().getFullYear());
                 </script>
-                , Made by <a href="https://comitsbd.com" target="_blank" class="footer-link">ComitsBD</a>
+                , Made by <a href="https://comitsbd.com" target="_blank" class="footer-link">Comits Soft</a>
             </div>
         </div>
     </div>

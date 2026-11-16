@@ -404,9 +404,34 @@
                         Purchase Report
                     </a>
                 </li>
+                <li class="menu-item {{ request()->routeIs('report.expense') ? 'active' : '' }}">
+                    <a href="{{ route('report.expense') }}" class="menu-link">
+                        Expense Report
+                    </a>
+                </li>
                 <li class="menu-item {{ request()->routeIs('report.profit') ? 'active' : '' }}">
                     <a href="{{ route('report.profit') }}" class="menu-link">
                         Profit Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.receivable') ? 'active' : '' }}">
+                    <a href="{{ route('report.receivable') }}" class="menu-link">
+                        Receivable Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.payable') ? 'active' : '' }}">
+                    <a href="{{ route('report.payable') }}" class="menu-link">
+                        Payable Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.received') ? 'active' : '' }}">
+                    <a href="{{ route('report.received') }}" class="menu-link">
+                        Money Received Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('report.paid') ? 'active' : '' }}">
+                    <a href="{{ route('report.paid') }}" class="menu-link">
+                        Money Paid Report
                     </a>
                 </li>
             </ul>

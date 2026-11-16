@@ -33,7 +33,7 @@
 
                         <div class="col-md-3">
                             <label class="form-label">Date Range</label>
-                            <select name="period" id="period" class="form-select">
+                            <select name="period" id="period" class="form-select select2">
                                 <option value="today" @selected($period == 'today')>Today</option>
                                 <option value="yesterday" @selected($period == 'yesterday')>Yesterday</option>
                                 <option value="last_7_days" @selected($period == 'last_7_days')>Last 7 Days</option>
@@ -59,7 +59,7 @@
 
                         <div class="col-md-3">
                             <label class="form-label">Company</label>
-                            <select name="company_id" class="form-select">
+                            <select name="company_id" class="form-select select2">
                                 <option value="">All Companies</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}" @selected($companyId == $company->id)>
@@ -71,7 +71,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">Payment Status</label>
-                            <select name="payment_status" class="form-select">
+                            <select name="payment_status" class="form-select select2">
                                 <option value="">All</option>
                                 <option value="Pending" @selected($paymentStatus == 'Pending')>Pending</option>
                                 <option value="Partial" @selected($paymentStatus == 'Partial')>Partial</option>
@@ -93,7 +93,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label">Order Status</label>
-                            <select name="status" class="form-select">
+                            <select name="status" class="form-select select2">
                                 <option value="">All</option>
                                 <option value="Draft" @selected($status == 'Draft')>Draft</option>
                                 <option value="Completed" @selected($status == 'Completed')>Completed</option>

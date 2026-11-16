@@ -31,9 +31,9 @@
 
                     <div class="row g-3">
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Date Range</label>
-                            <select name="period" id="period" class="form-select">
+                            <select name="period" id="period" class="form-select select2">
                                 <option value="today" @selected($period == 'today')>Today</option>
                                 <option value="yesterday" @selected($period == 'yesterday')>Yesterday</option>
                                 <option value="last_7_days" @selected($period == 'last_7_days')>Last 7 Days</option>
@@ -57,9 +57,9 @@
                             <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Company</label>
-                            <select name="company_id" class="form-select">
+                            <select name="company_id" class="form-select select2">
                                 <option value="">All Companies</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}" @selected($companyId == $company->id)>
@@ -69,13 +69,13 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Customer Name</label>
                             <input type="text" name="customer_name" value="{{ $customerName }}" class="form-control"
                                 placeholder="Search customer name">
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Search Invoice / Order / Product</label>
                             <input type="text" name="search" value="{{ $search }}" class="form-control"
                                 placeholder="Invoice, SO, product...">

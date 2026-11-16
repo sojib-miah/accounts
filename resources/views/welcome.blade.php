@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Comits BD</title>
+        <title>Comits Soft</title>
 
         <link rel="icon" type="image/x-icon"
             href="{{ optional(setting())->favaicon ? asset('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
@@ -512,7 +512,7 @@
                             Everything Your Business Needs
                         </h2>
                         <p class="mt-6 text-lg text-slate-600 leading-8">
-                            COMITS brings all your essential business operations into
+                            BIMS brings all your essential business operations into
                             one secure and easy-to-use platform, helping your team
                             save time, improve productivity, and make better decisions.
                         </p>
@@ -648,7 +648,7 @@
                             Our Partners
                         </h2>
                         <p class="mt-4 text-slate-600 text-lg max-w-2xl mx-auto">
-                            Trusted by leading companies across different industries who rely on COMITS
+                            Trusted by leading companies across different industries who rely on BIMS
                             to manage their business efficiently.
                         </p>
                     </div>
@@ -926,7 +926,8 @@
                                 <div class="h-1 w-12 bg-cyan-600 rounded-sm mt-1"></div>
                             </div>
                             <p class="text-slate-600 text-sm leading-relaxed text-justify">
-                                Innovative IT solutions, web & mobile apps, and digital growth — ComitsBD empowers your
+                                Innovative IT solutions, web & mobile apps, and digital growth — Comits Soft empowers
+                                your
                                 business for the future.
                             </p>
                             <form onsubmit="event.preventDefault();" class="mt-4">
