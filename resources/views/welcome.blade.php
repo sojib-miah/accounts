@@ -1099,7 +1099,8 @@
                         <p>
                             Copyright &copy; {{ date('Y') }} <a href="https://comitsbd.com" target="_blank"
                                 class="text-cyan-400 font-medium hover:underline">Comits Soft</a>. All
-                            rights reserved.
+                            rights reserved. <small>({{ $totalVisitors }} unique visitors, {{ $todayVisitors }}
+                                today)</small>
                         </p>
                     </div>
                 </div>

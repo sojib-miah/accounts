@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CheckUserPackage;
+use App\Http\Middleware\CountUniqueVisitor;
 use App\Http\Middleware\HasRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('web', CountUniqueVisitor::class);
         $middleware->alias([
             'auth' => Authenticate::class,
             'role' => RoleMiddleware::class,
