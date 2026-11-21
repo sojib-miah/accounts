@@ -27,7 +27,7 @@ class SalesOrderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Receipt::with(['party', 'branch', 'creator', 'items', 'customerCompany'])
+        $query = Receipt::with(['party', 'branch', 'creator', 'items', 'items.product', 'customerCompany'])
             ->whereIn('type', ['Sales-Order', 'Income', 'Challan'])
             ->when(!$user->hasRole('Super-Admin'), function ($query) use ($user) {
                 $query->where('created_by', $user->id);

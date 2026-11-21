@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('so_no')->unique()->nullable();
             $table->string('dm_no')->unique()->nullable();
             $table->string('inv_no')->unique()->nullable();
-            $table->enum('type', ['Income', 'Expense', 'Challan', 'Sales-Order', 'Purchase-Order', 'Direct-Income']);
+            $table->enum('type', ['Income', 'Expense', 'Challan', 'Sales-Order', 'Purchase-Order', 'Direct-Income', 'Sales-Return', 'Purchase-Return']);
+            $table->foreignId('original_receipt_id')->nullable()->constrained('receipts')->nullOnDelete();
             $table->boolean('is_challan')->default(false);
             $table->boolean('is_invoice')->default(false);
             $table->boolean('is_receive')->default(false);

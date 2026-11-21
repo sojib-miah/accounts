@@ -383,7 +383,8 @@
         @endcan
 
         {{-- report --}}
-        <li class="menu-item {{ request()->routeIs('report.*') ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ request()->routeIs('report.*') || request()->routeIs('receipt.return.index') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="fa-solid fa-chart-simple me-3"></i>
                 Report
@@ -432,6 +433,11 @@
                 <li class="menu-item {{ request()->routeIs('report.paid') ? 'active' : '' }}">
                     <a href="{{ route('report.paid') }}" class="menu-link">
                         Money Paid Report
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('receipt.return.index') ? 'active' : '' }}">
+                    <a href="{{ route('receipt.return.index') }}" class="menu-link">
+                        Return Report
                     </a>
                 </li>
             </ul>

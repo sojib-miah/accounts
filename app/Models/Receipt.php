@@ -74,4 +74,14 @@ class Receipt extends Model
             }
         });
     }
+
+    public function originalReceipt()
+    {
+        return $this->belongsTo(Receipt::class, 'original_receipt_id');
+    }
+
+    public function returns()
+    {
+        return $this->hasMany(Receipt::class, 'original_receipt_id');
+    }
 }

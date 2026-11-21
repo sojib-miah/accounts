@@ -1,7 +1,6 @@
-CREATE TABLE `visitors` (
-    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `visitor_key` VARCHAR(64) NOT NULL UNIQUE,
-    `first_visited_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL
-);
+ALTER TABLE `receipts`
+ADD COLUMN `original_receipt_id` BIGINT UNSIGNED NULL AFTER `type`,
+ADD CONSTRAINT `receipts_original_receipt_id_foreign`
+FOREIGN KEY (`original_receipt_id`)
+REFERENCES `receipts` (`id`)
+ON DELETE SET NULL;

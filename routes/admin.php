@@ -30,6 +30,7 @@ use App\Http\Controllers\BackEnd\PurchasePaymentController;
 use App\Http\Controllers\BackEnd\ReceiptController;
 use App\Http\Controllers\BackEnd\ReceiverController;
 use App\Http\Controllers\BackEnd\ReportController;
+use App\Http\Controllers\BackEnd\ReturnController;
 use App\Http\Controllers\BackEnd\RoleController;
 use App\Http\Controllers\BackEnd\SalesOrderController;
 use App\Http\Controllers\BackEnd\SettingController;
@@ -319,5 +320,9 @@ Route::middleware(['auth', 'hasrole'])->prefix('admin')->group(function () {
         Route::get('/report/payable', [ReportController::class, 'payable'])->name('report.payable');
         Route::get('/report/received', [ReportController::class, 'received'])->name('report.received');
         Route::get('/report/paid', [ReportController::class, 'paid'])->name('report.paid');
+
+        // return route 
+        Route::get('/return/receipts', [ReturnController::class, 'returnIndex'])->name('receipt.return.index');
+        Route::post('/receipt/return', [ReturnController::class, 'storeReturn'])->name('receipt.return.store');
     });
 });

@@ -217,6 +217,23 @@
                                                             </form>
                                                         </li>
                                                     @endif
+                                                    @if ($receipt->status === 'Completed')
+                                                        <li>
+                                                            <form action="{{ route('receipt.return.store') }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to return all returnable items from this Sales Order?')">
+                                                                @csrf
+
+                                                                <input type="hidden" name="original_receipt_id"
+                                                                    value="{{ $receipt->id }}">
+
+                                                                <button class="dropdown-item text-danger" type="submit">
+                                                                    <i class="fa fa-undo me-2"></i>
+                                                                    Return Item
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
                                                 </ul>
                                             </div>
                                         </td>

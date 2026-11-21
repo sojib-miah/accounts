@@ -17,13 +17,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->nullable()->constrained('branches')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('receipt_id')->nullable()->constrained('receipts')->cascadeOnUpdate()->nullOnDelete();
-            $table->enum('transaction_type', [
-                'Purchase',
-                'Sale',
-                'Purchase Return',
-                'Sales Return',
-                'Adjustment'
-            ]);
+            $table->enum('transaction_type', ['Purchase', 'Sale', 'Purchase Return', 'Sales Return', 'Adjustment']);
             $table->decimal('stock_in', 15, 2)->default(0);
             $table->decimal('stock_out', 15, 2)->default(0);
             $table->decimal('balance', 15, 2)->default(0);
