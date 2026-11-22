@@ -93,12 +93,19 @@ class AccountsController extends Controller
             'status'              => 'required|in:Active,Inactive',
             'is_default'              => 'required',
         ]);
+
+        // package limit check
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Account::where('created_by', Auth::id())->count();
-            if ($message = PackageHelper::checkLimit('account_limit', $current)) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('account_limit', $totalCompany)) {
                 return back()->with('error', $message);
             }
         }
+
         DB::beginTransaction();
         try {
             Account::create([

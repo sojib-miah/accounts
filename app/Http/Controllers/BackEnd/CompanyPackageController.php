@@ -66,13 +66,6 @@ class CompanyPackageController extends Controller
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | STORE
-    |--------------------------------------------------------------------------
-    */
-
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -112,15 +105,6 @@ class CompanyPackageController extends Controller
         return back()->with('success', 'Package assigned successfully.');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE
-    |--------------------------------------------------------------------------
-    | Only expire_date and status can be updated
-    |--------------------------------------------------------------------------
-    */
-
     public function update(Request $request, CompanyPackage $companyPackage)
     {
         $user = Auth::user();
@@ -149,13 +133,6 @@ class CompanyPackageController extends Controller
 
         return back()->with('success', 'Package updated successfully.');
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DESTROY
-    |--------------------------------------------------------------------------
-    */
 
     public function destroy(CompanyPackage $companyPackage)
     {

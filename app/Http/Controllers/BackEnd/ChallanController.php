@@ -16,7 +16,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PackageHelper;
 
 class ChallanController extends Controller
 {
@@ -95,13 +94,7 @@ class ChallanController extends Controller
             'receipt_date' => 'required|date',
             'items' => 'required',
         ]);
-        if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Receipt::where('company_id', Auth::user()->company_id)->where('type', 'Challan')->count();
 
-            if ($message = PackageHelper::checkLimit('challan_limit', $current)) {
-                return back()->with('error', $message);
-            }
-        }
         DB::beginTransaction();
         try {
             $items = json_decode($request->items, true);

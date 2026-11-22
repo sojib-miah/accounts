@@ -79,10 +79,14 @@ class CompanyUserController extends Controller
             'password' => 'required|min:6'
         ]);
 
+        // package limit check
         if (!Auth::user()->hasRole('Super-Admin')) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
 
-            $current = User::where('company_id', Auth::user()->company_id)->count();
-            if ($message = PackageHelper::checkLimit('user_limit', $current)) {
+            if ($message = PackageHelper::checkLimit('user_limit', $totalCompany)) {
                 return back()->with('error', $message);
             }
         }

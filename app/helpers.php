@@ -41,29 +41,41 @@ if (!class_exists('PackageHelper')) {
                         ->orWhere('user_id', $user->id);
                 })
                 ->where('status', 'Active')
-                ->whereHas('package', function ($q) {
-                    $q->where('is_active', 1);
+                ->where(function ($query) {
+                    $query->whereNull('expire_date')
+                        ->orWhereDate('expire_date', '>=', now()->toDateString());
                 })
-                ->first();
+                ->whereHas('package', function ($query) {
+                    $query->where('is_active', true);
+                })->latest()->first();
         }
 
+        /**
+         * Check package limit
+         */
         public static function checkLimit($field, $currentCount)
         {
             $companyPackage = self::package();
 
-            if (!$companyPackage) {
+            if (!$companyPackage || !$companyPackage->package) {
                 return 'No active package assigned.';
-            }
-
-            if (!$companyPackage->package->is_active) {
-                return 'Your package is inactive.';
             }
 
             $limit = $companyPackage->package->{$field};
 
-            if ($limit != -1 && $currentCount >= $limit) {
-                return ucfirst(str_replace('_', ' ', $field))
-                    . ' exceeded.';
+            // Unlimited support
+            if ($limit === null || strtolower(trim((string) $limit)) === 'unlimited' || (string) $limit === '-1') {
+                return null;
+            }
+
+            $limit = (int) $limit;
+
+            if ($limit <= 0) {
+                return ucfirst(str_replace('_', ' ', $field)) . ' limit is not configured.';
+            }
+
+            if ($currentCount >= $limit) {
+                return ucfirst(str_replace('_', ' ', $field)) . ' limit exceeded. Your package allows maximum ' . $limit . '.';
             }
 
             return null;

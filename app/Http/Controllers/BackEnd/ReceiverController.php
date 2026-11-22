@@ -9,7 +9,6 @@ use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use PackageHelper;
 
 class ReceiverController extends Controller
 {
@@ -77,10 +76,6 @@ class ReceiverController extends Controller
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Party::where('created_by', Auth::id())->where('type', 'Customer')->count();
-            if ($message = PackageHelper::checkLimit('party_limit', $current)) {
-                return back()->with('error', $message);
-            }
             if ($request->filled('customer_company_id')) {
                 $customerCompany = CustomerCompany::where('id', $request->customer_company_id)->where('created_by', Auth::id())->first();
                 if (!$customerCompany) {

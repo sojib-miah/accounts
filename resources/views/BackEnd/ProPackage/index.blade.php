@@ -19,7 +19,6 @@
                 </p>
             </div>
         </div>
-
         <div class="row g-4 justify-content-center">
             @forelse ($packages as $index => $package)
                 @php
@@ -47,35 +46,38 @@
                     ];
                     $style = $styles[$index % count($styles)];
                     $isPopular = $index === 1;
+                    // Actual database fields
                     $features = [
-                        'Users' => $package->user_limit,
                         'Companies' => $package->company_limit,
-                        'Income Records' => $package->income_limit,
-                        'Expense Records' => $package->expense_limit,
-                        'Challans' => $package->challan_limit,
                         'Branches' => $package->branch_limit,
-                        'Parties' => $package->party_limit,
-                        'Accounts' => $package->account_limit,
-                        'Storage' => $package->storage_limit,
+                        'Users' => $package->user_limit,
+                        'Suppliers' => $package->supplier_limit,
+                        'Customers' => $package->customer_limit,
                         'Payment Types' => $package->payment_type_limit,
-                        'Categories' => $package->category_limit,
-                        'Item List' => $package->item_list_limit,
+                        'Accounts' => $package->account_limit,
+                        'Products' => $package->product_limit,
                         'Sales Orders' => $package->sales_order_limit,
+                        'Storage' => $package->storage_limit,
                     ];
+                    // Format package limits
                     $formatLimit = function ($name, $value) {
-                        if ((int) $value === 0) {
+                        if (
+                            $value === null ||
+                            strtolower(trim((string) $value)) === 'unlimited' ||
+                            (string) $value === '-1'
+                        ) {
                             return 'Unlimited';
                         }
                         if ($name === 'Storage') {
-                            return number_format($value) . ' MB';
+                            return number_format((float) $value) . ' MB';
                         }
-                        return number_format($value);
+                        return number_format((float) $value);
                     };
                 @endphp
                 <div class="col-12 col-sm-6 col-lg-6 col-xl-3">
                     <div
                         class="card package-card h-100 border shadow-sm
-                        {{ $isPopular ? 'popular-package' : '' }}">
+            {{ $isPopular ? 'popular-package' : '' }}">
                         {{-- Popular Badge --}}
                         @if ($isPopular)
                             <div class="popular-badge">
@@ -86,26 +88,26 @@
                             </div>
                         @endif
                         <div class="card-body d-flex flex-column p-4">
+                            {{-- Package Icon --}}
                             <div class="text-center mb-3">
-                                <div class="package-icon
-                                    icon-{{ $style['class'] }}">
+                                <div class="package-icon icon-{{ $style['class'] }}">
                                     <i class="fas {{ $style['icon'] }}"></i>
                                 </div>
                             </div>
+                            {{-- Package Name --}}
                             <h4 class="text-center fw-bold text-dark mb-2">
                                 {{ $package->name }}
                             </h4>
+                            {{-- Description --}}
                             <p class="text-center text-muted small mb-3 package-description">
                                 {{ $package->remarks ?: $style['description'] }}
                             </p>
+                            {{-- Price --}}
                             <div
-                                class="price-box
-                                price-{{ $style['class'] }}
-                                text-center rounded-3 py-3 mb-3">
+                                class="price-box price-{{ $style['class'] }}
+                    text-center rounded-3 py-3 mb-3">
                                 <div class="fw-bold">
-                                    <span class="currency">
-                                        ৳
-                                    </span>
+                                    <span class="currency">৳</span>
                                     <span class="price-number">
                                         {{ number_format($package->price, 0) }}
                                     </span>
@@ -114,16 +116,16 @@
                                     / month
                                 </small>
                             </div>
+                            {{-- Package Features --}}
                             <div class="package-features flex-grow-1">
                                 @foreach ($features as $feature => $value)
                                     <div
                                         class="d-flex justify-content-between
-                                        align-items-center feature-row">
+                            align-items-center feature-row">
                                         <div class="text-muted">
                                             <i
                                                 class="fas fa-check-circle
-                                                text-success me-2">
-                                            </i>
+                                    text-success me-2"></i>
                                             {{ $feature }}
                                         </div>
                                         <span class="fw-semibold text-dark small">
@@ -132,15 +134,19 @@
                                     </div>
                                 @endforeach
                             </div>
+                            {{-- Purchase Button --}}
                             <div class="mt-3">
                                 <form action="{{ route('payment.sslcommerz.initiate', $package->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-{{ $style['class'] }} package-button w-100 py-2">
+                                    <button type="submit"
+                                        class="btn btn-{{ $style['class'] }}
+                            package-button w-100 py-2">
                                         Get Started
                                         <i class="fas fa-arrow-right ms-2"></i>
                                     </button>
                                 </form>
                             </div>
+                            {{-- Footer --}}
                             <div class="text-center mt-2">
                                 <small class="text-muted">
                                     @if ($index === 0)

@@ -17,6 +17,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PackageHelper;
 
 class DirectIncomeController extends Controller
 {
@@ -110,6 +111,19 @@ class DirectIncomeController extends Controller
             'customer_phone' => ['nullable', 'string'],
             'status' => ['required', 'in:Draft,Completed'],
         ]);
+
+        // package limit check
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('sales_order_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $companyId = $user->hasRole('Super-Admin') ? ($request->company_id ?? $user->company_id) : $user->company_id;

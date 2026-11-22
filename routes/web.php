@@ -36,9 +36,9 @@ Route::withoutMiddleware([StartSession::class, ShareErrorsFromSession::class, Pr
 // 2 Payment shuru: wildcard route, tai sobar niche
 Route::middleware('auth')->group(function () {
     Route::post('/payment/sslcommerz/{package}', [SSLCommerzController::class, 'initiate'])->name('payment.sslcommerz.initiate');
+    Route::get('/payment/result/{payment}', [SSLCommerzController::class, 'result'])->name('payment.result');
 });
 
-Route::get('/payment/result/{payment}', [SSLCommerzController::class, 'result'])->name('payment.result');
 
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/payments', [PaymentController::class, 'index'])->name('admin.payment.index');

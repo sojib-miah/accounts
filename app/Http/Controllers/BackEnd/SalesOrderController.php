@@ -21,6 +21,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PackageHelper;
 
 class SalesOrderController extends Controller
 {
@@ -134,6 +135,19 @@ class SalesOrderController extends Controller
             'vat'              => 'nullable|numeric|min:0',
             'status' => ['required', 'in:Draft,Completed'],
         ]);
+
+        // package limit check
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('sales_order_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $user = Auth::user();

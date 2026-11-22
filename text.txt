@@ -1,6 +1,24 @@
-ALTER TABLE `receipts`
-ADD COLUMN `original_receipt_id` BIGINT UNSIGNED NULL AFTER `type`,
-ADD CONSTRAINT `receipts_original_receipt_id_foreign`
-FOREIGN KEY (`original_receipt_id`)
-REFERENCES `receipts` (`id`)
-ON DELETE SET NULL;
+CREATE TABLE `packages` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `price` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `company_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `branch_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `user_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `supplier_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `customer_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `payment_type_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `account_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `product_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `sales_order_limit` VARCHAR(255) NOT NULL DEFAULT 'Unlimited',
+    `storage_limit` INT NOT NULL DEFAULT 0,
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `remarks` TEXT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;

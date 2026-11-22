@@ -709,57 +709,155 @@
                     </div>
                 </div>
             </section>
-            <section id="pricing" class="py-5 bg-slate-50">
+
+            <section id="pricing" class="py-20 bg-slate-50">
                 <div class="max-w-7xl mx-auto px-6 lg:px-8">
 
-                    <!-- Section Header -->
-                    <div class="text-center max-w-2xl mx-auto">
+                    {{-- Section Header --}}
+                    <div class="text-center max-w-2xl mx-auto mb-14">
                         <span
-                            class="inline-flex px-4 py-1.5 rounded-full bg-cyan-100 text-cyan-600 text-sm font-semibold tracking-wide uppercase">
-                            Pricing
+                            class="inline-flex items-center px-4 py-1.5 rounded-full bg-cyan-100 text-cyan-700 text-sm font-semibold tracking-wide uppercase">
+                            Our Pricing
                         </span>
-                        <h2 class="mt-3 text-3xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+
+                        <h2 class="mt-4 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                             Packages & Pricing
                         </h2>
+
                         <p class="mt-4 text-slate-600 text-base sm:text-lg">
-                            Subscribe to the suitable package for your business.
+                            Choose the perfect plan to manage and grow your business.
+                            Simple pricing, powerful features.
                         </p>
                     </div>
 
-                    <!-- Duration Switcher -->
-                    <div class="flex justify-center mt-10">
+                    {{-- Packages --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                        <div class="inline-flex rounded-sm bg-white p-1.5 border border-slate-200 shadow-lg">
+                        @forelse($packages as $package)
 
-                            <button data-duration="1"
-                                class="billing-btn cursor-pointer active rounded-xl px-8 py-3 font-semibold transition-all duration-300">
-                                1 Month
-                            </button>
+                            @php
+                                $popular = $loop->iteration === 2;
+                            @endphp
 
-                            <button data-duration="3"
-                                class="billing-btn cursor-pointer rounded-xl px-8 py-3 font-semibold text-slate-600 transition-all duration-300 hover:text-blue-600">
-                                3 Months
-                            </button>
+                            <div
+                                class="relative flex flex-col bg-white rounded-2xl border
+                    {{ $popular ? 'border-cyan-500 shadow-xl shadow-cyan-100 lg:scale-105 z-10' : 'border-slate-200 shadow-sm' }}
+                    transition duration-300 hover:-translate-y-2 hover:shadow-xl">
 
-                            <button data-duration="6"
-                                class="billing-btn cursor-pointer rounded-xl px-8 py-3 font-semibold text-slate-600 transition-all duration-300 hover:text-blue-600">
-                                6 Months
-                            </button>
+                                {{-- Popular Badge --}}
+                                @if ($popular)
+                                    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                                        <span
+                                            class="inline-flex items-center gap-1 px-5 py-2 rounded-full bg-cyan-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg">
+                                            <i class="fas fa-star"></i>
+                                            Most Popular
+                                        </span>
+                                    </div>
+                                @endif
 
-                        </div>
+                                <div class="p-8 flex-1">
 
+                                    {{-- Package Name --}}
+                                    <h3 class="text-xl font-bold text-slate-900">
+                                        {{ $package->name }}
+                                    </h3>
+
+                                    <p class="mt-2 text-sm text-slate-500">
+                                        {{ $package->remarks ?: 'Everything you need to manage your business.' }}
+                                    </p>
+
+                                    {{-- Price --}}
+                                    <div class="mt-7 pb-7 border-b border-slate-100">
+                                        <div class="flex items-end gap-1">
+                                            <span class="text-4xl font-extrabold text-slate-900">
+                                                ৳{{ number_format($package->price, 0) }}
+                                            </span>
+                                            <span class="text-sm text-slate-500 mb-1">
+                                                / package
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Features --}}
+                                    <div class="mt-7">
+                                        <h4 class="text-sm font-bold text-slate-900 mb-5">
+                                            What's included:
+                                        </h4>
+                                        <ul class="space-y-4 text-sm text-slate-600">
+                                            @php
+                                                $features = [
+                                                    'Companies' => $package->company_limit,
+                                                    'Branches' => $package->branch_limit,
+                                                    'Users' => $package->user_limit,
+                                                    'Suppliers' => $package->supplier_limit,
+                                                    'Customers' => $package->customer_limit,
+                                                    'Payment Types' => $package->payment_type_limit,
+                                                    'Accounts' => $package->account_limit,
+                                                    'Products' => $package->product_limit,
+                                                    'Sales Orders' => $package->sales_order_limit,
+                                                    'Storage' => $package->storage_limit . ' MB',
+                                                ];
+                                            @endphp
+                                            @foreach ($features as $label => $value)
+                                                <li class="flex items-center justify-between gap-3">
+                                                    <span class="flex items-center gap-3">
+                                                        <span
+                                                            class="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600">
+                                                            <i class="fas fa-check text-[10px]"></i>
+                                                        </span>
+                                                        {{ $label }}
+                                                    </span>
+                                                    <span class="font-semibold text-slate-800 text-right">
+                                                        @if ($value === 'Unlimited' || $value === '-1')
+                                                            Unlimited
+                                                        @else
+                                                            {{ $value }}
+                                                        @endif
+                                                    </span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                {{-- Button --}}
+                                <div class="p-8 pt-0">
+                                    <form action="{{ route('payment.sslcommerz.initiate', $package->id) }}"
+                                        method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="flex items-center cursor-pointer justify-center gap-2 w-full py-3.5 px-6 rounded-xl font-bold text-sm transition duration-300
+                                            {{ $popular
+                                                ? 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg shadow-cyan-200'
+                                                : 'bg-slate-900 text-white hover:bg-cyan-600' }}">
+                                            Get Started
+                                            <i class="fas fa-arrow-right ms-2"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-span-full text-center py-12">
+                                <p class="text-slate-500 text-lg">
+                                    No packages available at the moment.
+                                </p>
+                            </div>
+                        @endforelse
                     </div>
 
-                    <!-- Cards Slider -->
-                    <div class="swiper pricingSlider mt-10">
-                        <div id="pricingCards" class="swiper-wrapper py-4">
-                            <!-- Javascript dynamic cards render here -->
-                        </div>
-                        <div class="swiper-pagination !relative !bottom-0 mt-8"></div>
+                    {{-- Bottom Note --}}
+                    <div class="text-center mt-14">
+                        <p class="text-slate-500 text-sm">
+                            Need a customized solution for your business?
+                            <a href="#contact" class="font-semibold text-cyan-600 hover:text-cyan-700">
+                                Contact our team
+                            </a>
+                        </p>
                     </div>
 
                 </div>
             </section>
+
             <!-- ================= CONTACT SECTION ================= -->
             <section id="contact" class="pb-16 pt-8 bg-gradient-to-br from-cyan-50 via-white to-cyan-50">
                 <div class="max-w-7xl mx-auto px-5 lg:px-8">
@@ -1133,236 +1231,6 @@
     </body>
 
     <script>
-        const pricingData = [{
-                name: "FREE 14 DAYS TRIAL",
-                fixed: true,
-                header: "header-free",
-                button: "Take Free Trial",
-                prices: {
-                    1: {
-                        old: "",
-                        new: "0",
-                        duration: "14 Days Trial"
-                    },
-                },
-                features: [{
-                        text: "Sale, Purchase Management",
-                        available: true
-                    },
-                    {
-                        text: "Accounts Management",
-                        available: true
-                    },
-                    {
-                        text: "Inventory Management",
-                        available: true
-                    },
-                    {
-                        text: "Order Management",
-                        available: true
-                    },
-                    {
-                        text: "E-Commerce Website Integration",
-                        available: false
-                    },
-                    {
-                        text: "30 Invoices (1 Month)",
-                        available: true
-                    },
-                    {
-                        text: "No. Of User - 1",
-                        available: true
-                    },
-                    {
-                        text: "No. Of Branch - 1",
-                        available: true
-                    },
-                    {
-                        text: "Online Training & Support",
-                        available: true
-                    }
-                ]
-            },
-            {
-                name: "BASIC",
-                header: "header-basic",
-                button: "Subscribe Now",
-                prices: {
-                    1: {
-                        old: "7200",
-                        new: "6200",
-                        duration: "Year"
-                    },
-                    3: {
-                        old: "18000",
-                        new: "15500",
-                        duration: "3 Months"
-                    },
-                    6: {
-                        old: "36000",
-                        new: "30000",
-                        duration: "6 Months"
-                    }
-                },
-                features: [{
-                        text: "Sale, Purchase Management",
-                        available: true
-                    },
-                    {
-                        text: "Accounts Management",
-                        available: true
-                    },
-                    {
-                        text: "Inventory Management",
-                        available: true
-                    },
-                    {
-                        text: "Order Management",
-                        available: true
-                    },
-                    {
-                        text: "E-Commerce Website Integration",
-                        available: false
-                    },
-                    {
-                        text: "200 Invoices (1 Month)",
-                        available: true
-                    },
-                    {
-                        text: "No. Of User - 1",
-                        available: true
-                    },
-                    {
-                        text: "Branch",
-                        available: false
-                    },
-                    {
-                        text: "Online Training & Support",
-                        available: true
-                    }
-                ]
-            },
-            {
-                name: "STANDARD",
-                header: "header-standard",
-                popular: true,
-                button: "Subscribe Now",
-                prices: {
-                    1: {
-                        old: "13200",
-                        new: "11220",
-                        duration: "Year"
-                    },
-                    3: {
-                        old: "33000",
-                        new: "28000",
-                        duration: "3 Months"
-                    },
-                    6: {
-                        old: "66000",
-                        new: "55000",
-                        duration: "6 Months"
-                    }
-                },
-                features: [{
-                        text: "Sale, Purchase Management",
-                        available: true
-                    },
-                    {
-                        text: "Accounts Management",
-                        available: true
-                    },
-                    {
-                        text: "Inventory Management",
-                        available: true
-                    },
-                    {
-                        text: "Order Management",
-                        available: true
-                    },
-                    {
-                        text: "E-Commerce Website Integration",
-                        available: true
-                    },
-                    {
-                        text: "1000 Invoices (1 Month)",
-                        available: true
-                    },
-                    {
-                        text: "No. Of User - 5",
-                        available: true
-                    },
-                    {
-                        text: "No. Of Branch - 1",
-                        available: true
-                    },
-                    {
-                        text: "Online Training & Support",
-                        available: true
-                    }
-                ]
-            },
-            {
-                name: "ENTERPRISE",
-                header: "header-enterprise",
-                button: "Subscribe Now",
-                prices: {
-                    1: {
-                        old: "30000",
-                        new: "25500",
-                        duration: "Year"
-                    },
-                    3: {
-                        old: "72000",
-                        new: "62000",
-                        duration: "3 Months"
-                    },
-                    6: {
-                        old: "140000",
-                        new: "120000",
-                        duration: "6 Months"
-                    }
-                },
-                features: [{
-                        text: "Sale, Purchase Management",
-                        available: true
-                    },
-                    {
-                        text: "Accounts Management",
-                        available: true
-                    },
-                    {
-                        text: "Inventory Management",
-                        available: true
-                    },
-                    {
-                        text: "Order Management",
-                        available: true
-                    },
-                    {
-                        text: "E-Commerce Website Integration",
-                        available: true
-                    },
-                    {
-                        text: "5000 Invoices (1 Month)",
-                        available: true
-                    },
-                    {
-                        text: "No. Of User - 10",
-                        available: true
-                    },
-                    {
-                        text: "No. Of Branch - 2",
-                        available: true
-                    },
-                    {
-                        text: "Online Training & Support",
-                        available: true
-                    }
-                ]
-            }
-        ];
-
         // Language Switcher Event Listener
         const languageSelect = document.getElementById("languageSelect");
         if (languageSelect) {
@@ -1408,151 +1276,6 @@
             }
 
         });
-
-        // Swiper Initialization
-        let pricingSwiper;
-
-        function initPricingSlider() {
-            if (window.innerWidth >= 1280) {
-                if (pricingSwiper) {
-                    pricingSwiper.destroy(true, true);
-                    pricingSwiper = null;
-                }
-                return;
-            }
-
-            if (pricingSwiper) return;
-
-            pricingSwiper = new Swiper(".pricingSlider", {
-                slidesPerView: 1,
-                spaceBetween: 24,
-                breakpoints: {
-                    640: {
-                        slidesPerView: 2
-                    },
-                    1024: {
-                        slidesPerView: 3
-                    }
-                },
-                pagination: {
-                    el: ".pricingSlider .swiper-pagination",
-                    clickable: true
-                }
-            });
-        }
-
-        let selectedDuration = 1;
-
-        // Render Pricing Cards Function
-        function renderPricingCards() {
-            const container = document.getElementById("pricingCards");
-            if (!container) return;
-
-            container.innerHTML = ""; // Clear existing content
-
-            pricingData.forEach(plan => {
-                const price = plan.fixed ?
-                    plan.prices[1] :
-                    plan.prices[selectedDuration];
-
-                let features = "";
-                plan.features.forEach(feature => {
-                    features += `
-                <div class="feature ${feature.available ? "active" : "inactive"}">
-                    <span>${feature.text}</span>
-                </div>
-            `;
-                });
-
-                container.innerHTML += `
-        <div class="swiper-slide">
-            <div class="pricing-card">
-
-                ${plan.popular ? `<div class="ribbon">POPULAR</div>` : ""}
-
-                <div class="pricing-header ${plan.header}">
-                    <h3 class="text-xl font-bold uppercase mb-2 text-slate-800">
-                        ${plan.name}
-                    </h3>
-
-                    <div class="old-price-wrapper">
-                        ${price.old
-                ? `<span class="old-price">৳ ${Number(price.old).toLocaleString()}</span>`
-                : `<span class="old-price opacity-0">৳ 0</span>`
-            }
-                    </div>
-
-                    <div class="price-wrapper">
-                        <span class="new-price">
-                            <span class="currency">৳</span>${Number(price.new).toLocaleString()}
-                        </span>
-                        <span class="duration">/ ${price.duration}</span>
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="space-y-3 mb-6">
-                        ${features}
-                    </div>
-                    
-                    <button class="plan-btn">
-                        ${plan.button}
-                    </button>
-                </div>
-
-            </div>
-        </div>
-        `;
-            });
-
-            initPricingSlider();
-        }
-
-        // Initial Render and Resize Handler
-        renderPricingCards();
-        window.addEventListener("resize", () => {
-            initPricingSlider();
-        });
-
-        const billingButtons = document.querySelectorAll(".billing-btn");
-
-        billingButtons.forEach(button => {
-
-            button.addEventListener("click", function() {
-
-                selectedDuration = Number(this.dataset.duration);
-
-                billingButtons.forEach(btn =>
-                    btn.classList.remove("active")
-                );
-
-                this.classList.add("active");
-
-                renderPricingCards();
-
-            });
-
-        });
-        const backToTop = document.getElementById("backToTop");
-
-        if (backToTop) {
-            window.addEventListener("scroll", () => {
-                if (window.scrollY >= window.innerHeight) {
-                    backToTop.classList.add("show");
-                    backToTop.classList.remove("hidden");
-                } else {
-                    backToTop.classList.remove("show");
-                    backToTop.classList.add("hidden");
-                }
-            });
-
-            backToTop.addEventListener("click", () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-            });
-        }
 
         // Mobile Menu Toggle
         const menuBtn = document.getElementById("menuBtn");

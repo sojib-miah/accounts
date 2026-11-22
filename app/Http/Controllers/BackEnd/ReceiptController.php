@@ -19,7 +19,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PackageHelper;
 
 class ReceiptController extends Controller
 {
@@ -143,12 +142,7 @@ class ReceiptController extends Controller
                 return back()->withInput()->with('error', 'You are not allowed to create expense for this company.');
             }
         }
-        if (!$user->hasRole('Super-Admin')) {
-            $current = Receipt::where('company_id', $user->company_id)->where('type', 'Expense')->count();
-            if ($message = PackageHelper::checkLimit('expense_limit', $current)) {
-                return back()->withInput()->with('error', $message);
-            }
-        }
+
         DB::beginTransaction();
         try {
             $items = json_decode($request->items, true);

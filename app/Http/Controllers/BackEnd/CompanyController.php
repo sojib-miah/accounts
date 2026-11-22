@@ -50,6 +50,7 @@ class CompanyController extends Controller
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
+        // package limit check
         if (!Auth::user()->hasRole('Super-Admin')) {
             $totalCompany = Company::where(function ($q) {
                 $q->where('created_by', Auth::id())

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\CustomerCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PackageHelper;
 
 class SupplierCompanyCustomer extends Controller
 {
@@ -55,6 +56,18 @@ class SupplierCompanyCustomer extends Controller
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
         ]);
+
+        // package limit check
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('supplier_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
 
         CustomerCompany::create([
             'company_id' => $companyId,

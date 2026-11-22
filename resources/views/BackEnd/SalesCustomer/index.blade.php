@@ -3,7 +3,7 @@
 @section('title', 'Manage customer companies')
 
 @section('content')
-    <div class="p-5">
+    <div class="p-5 mt-5">
         {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>

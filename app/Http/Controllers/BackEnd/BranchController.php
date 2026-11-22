@@ -69,9 +69,14 @@ class BranchController extends Controller
             'address' => 'nullable'
         ]);
 
+        // package limit check
         if (!Auth::user()->hasRole('Super-Admin')) {
-            $totalBranch = Branch::where('company_id', Auth::user()->company_id)->count();
-            if ($message = PackageHelper::checkLimit('branch_limit', $totalBranch)) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('branch_limit', $totalCompany)) {
                 return back()->with('error', $message);
             }
         }

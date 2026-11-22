@@ -4,8 +4,8 @@
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-white">
-                        <i class="fa fa-package"></i>
+                    <h5 class="modal-title">
+                        <i class="fa fa-plus me-2"></i>
                         Add Package
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -17,7 +17,7 @@
                                 Package Name
                             </label>
                             <input type="text" name="name" class="form-control" required
-                                value="{{ old('name') }}">
+                                value="{{ old('name') }}" placeholder="Enter Package Name...">
                             @error('name', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -26,120 +26,105 @@
                             <label class="form-label">
                                 Price
                             </label>
-                            <input type="number" step="0.01" min="0" name="price" class="form-control"
-                                value="0">
+                            <input type="number" step="1" min="0" name="price" class="form-control"
+                                value="0" placeholder="Enter Price..." required>
                             @error('price', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>User Limit</label>
-                            <input type="number" name="user_limit" class="form-control" value="0">
-                            @error('user_limit', 'add')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-md-3 mb-3">
                             <label>Company Limit</label>
-                            <input type="number" name="company_limit" class="form-control" value="0">
+                            <input type="text" name="company_limit" class="form-control"
+                                placeholder="Enter Company Limit..." required>
                             @error('company_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Branch Limit</label>
-                            <input type="number" name="branch_limit" class="form-control" value="0">
+                            <input type="text" name="branch_limit" class="form-control"
+                                placeholder="Enter Branch Limit..." required>
                             @error('branch_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Income Limit</label>
-                            <input type="number" name="income_limit" class="form-control" value="0">
-                            @error('income_limit', 'add')
+                            <label>User Limit</label>
+                            <input type="text" name="user_limit" class="form-control"
+                                placeholder="Enter User Limit..." required>
+                            @error('user_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Expense Limit</label>
-                            <input type="number" name="expense_limit" class="form-control" value="0">
-                            @error('expense_limit', 'add')
+                            <label>Supplier Limit</label>
+                            <input type="text" name="supplier_limit" class="form-control"
+                                placeholder="Enter Supplier Limit..." required>
+                            @error('supplier_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Challan Limit</label>
-                            <input type="number" name="challan_limit" class="form-control" value="0">
-                            @error('challan_limit', 'add')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label>Party Limit</label>
-                            <input type="number" name="party_limit" class="form-control" value="0">
-                            @error('party_limit', 'add')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label>Account Limit</label>
-                            <input type="number" name="account_limit" class="form-control" value="0">
-                            @error('account_limit', 'add')
+                            <label>Customer Limit</label>
+                            <input type="text" name="customer_limit" class="form-control"
+                                placeholder="Enter Customer Limit..." required>
+                            @error('customer_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Payment Type Limit</label>
-                            <input type="number" name="payment_type_limit" class="form-control" value="0">
+                            <input type="text" name="payment_type_limit" class="form-control"
+                                placeholder="Enter Payment Type Limit..." required>
                             @error('payment_type_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Category Limit</label>
-                            <input type="number" name="category_limit" class="form-control" value="0">
-                            @error('category_limit', 'add')
+                            <label>Account Limit</label>
+                            <input type="text" name="account_limit" class="form-control"
+                                placeholder="Enter Account Limit..." required>
+                            @error('account_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label>Item List Limit</label>
-                            <input type="number" name="item_list_limit" class="form-control" value="0">
-                            @error('item_list_limit', 'add')
+                            <label>Product Limit</label>
+                            <input type="text" name="product_limit" class="form-control"
+                                placeholder="Enter Product Limit..." required>
+                            @error('product_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Sales Order Limit</label>
-                            <input type="number" name="sales_order_limit" class="form-control" value="0">
+                            <input type="text" name="sales_order_limit" class="form-control"
+                                placeholder="Enter Sales Order Limit..." required>
                             @error('sales_order_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Storage Limit (MB)</label>
-                            <input type="number" name="storage_limit" class="form-control" value="0">
+                            <input type="number" name="storage_limit" class="form-control" value="0"
+                                placeholder="Enter Storage Limit..." required>
                             @error('storage_limit', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Status</label>
-                            <select name="is_active" class="form-select">
-                                <option value="1">
-                                    Active
-                                </option>
-                                <option value="0">
-                                    Inactive
-                                </option>
+                            <select name="is_active" class="form-select select2">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
                             </select>
-                            @error('status', 'add')
+                            @error('is_active', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="col-md-12">
                             <label>Remarks</label>
-                            <textarea name="remarks" rows="4" class="form-control">{{ old('remarks') }}</textarea>
+                            <textarea name="remarks" rows="4" class="form-control" placeholder="Enter Remarks...">{{ old('remarks') }}</textarea>
                             @error('remarks', 'add')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -152,7 +137,7 @@
                         Save Package
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
+                        <i class="fa fa-close me-2"></i> Close
                     </button>
                 </div>
             </div>

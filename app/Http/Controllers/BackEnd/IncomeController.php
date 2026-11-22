@@ -7,7 +7,6 @@ use App\Models\AccountHead;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PackageHelper;
 
 class IncomeController extends Controller
 {
@@ -41,17 +40,6 @@ class IncomeController extends Controller
             'name' => 'required|max:255',
             'status' => 'required|in:Active,Inactive',
         ]);
-
-        if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $totalCompany = AccountHead::where(function ($q) {
-                $q->where('created_by', Auth::id());
-            })->count();
-
-            if ($message = PackageHelper::checkLimit('item_list_limit', $totalCompany)) {
-                return back()->with('error', $message);
-            }
-        }
 
         AccountHead::create([
             'category_id' => $request->category_id,

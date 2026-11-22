@@ -16,7 +16,6 @@ use App\Models\ReceiptPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PackageHelper;
 
 class IncomeReceiptController extends Controller
 {
@@ -95,14 +94,7 @@ class IncomeReceiptController extends Controller
             'receipt_date' => 'required|date',
             'items' => 'required',
         ]);
-        if (!Auth::user()->hasRole('Super-Admin')) {
-            $current = Receipt::where('company_id', Auth::user()->company_id)
-                ->where('type', 'Income')
-                ->count();
-            if ($message = PackageHelper::checkLimit('income_limit', $current)) {
-                return back()->with('error', $message);
-            }
-        }
+
         DB::beginTransaction();
         try {
             $items = json_decode($request->items, true);

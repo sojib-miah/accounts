@@ -9,7 +9,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <h4 class="mb-0">
-                            <i class="bx bx-package"></i>
+                            <i class="fa-solid fa-list-ul me-2"></i>
                             Package List
                         </h4>
                     </div>
@@ -54,17 +54,14 @@
                                 <th>SL</th>
                                 <th>Package</th>
                                 <th>Price</th>
-                                <th>User</th>
                                 <th>Company</th>
                                 <th>Branch</th>
-                                <th>Income</th>
-                                <th>Expense</th>
-                                <th>Challan</th>
-                                <th>Party</th>
-                                <th>Account</th>
+                                <th>User</th>
+                                <th>Supplier</th>
+                                <th>Customer</th>
                                 <th>Payment Type</th>
-                                <th>Category</th>
-                                <th>Item list</th>
+                                <th>Account</th>
+                                <th>Product</th>
                                 <th>Sales Order</th>
                                 <th>Storage</th>
                                 <th>Status</th>
@@ -86,31 +83,23 @@
                                         {{ number_format($package->price, 2) }}
                                     </td>
                                     <td>
-                                        {{ $package->user_limit }}
-                                    </td>
-                                    <td>
                                         {{ $package->company_limit }}
-
                                     </td>
                                     <td>
                                         {{ $package->branch_limit }}
                                     </td>
                                     <td>
-                                        {{ $package->income_limit }}
+                                        {{ $package->user_limit }}
                                     </td>
                                     <td>
-                                        {{ $package->expense_limit }}
+                                        {{ $package->supplier_limit }}
                                     </td>
                                     <td>
-                                        {{ $package->challan_limit }}
+                                        {{ $package->customer_limit }}
                                     </td>
-                                    <td>
-                                        {{ $package->party_limit }}
-                                    </td>
-                                    <td>{{ $package->account_limit }}</td>
                                     <td>{{ $package->payment_type_limit }}</td>
-                                    <td>{{ $package->category_limit }}</td>
-                                    <td>{{ $package->item_list_limit }}</td>
+                                    <td>{{ $package->account_limit }}</td>
+                                    <td>{{ $package->product_limit }}</td>
                                     <td>{{ $package->sales_order_limit }}</td>
                                     <td>
                                         {{ $package->storage_limit }}
@@ -142,19 +131,15 @@
                                                     <button class="dropdown-item editBtn" data-id="{{ $package->id }}"
                                                         data-name="{{ $package->name }}"
                                                         data-price="{{ $package->price }}"
-                                                        data-user="{{ $package->user_limit }}"
                                                         data-company="{{ $package->company_limit }}"
                                                         data-branch="{{ $package->branch_limit }}"
-                                                        data-income="{{ $package->income_limit }}"
-                                                        data-expense="{{ $package->expense_limit }}"
-                                                        data-challan="{{ $package->challan_limit }}"
-                                                        data-party="{{ $package->party_limit }}"
-                                                        data-account="{{ $package->account_limit }}"
+                                                        data-user="{{ $package->user_limit }}"
+                                                        data-supplier="{{ $package->supplier_limit }}"
+                                                        data-customer="{{ $package->customer_limit }}"
                                                         data-payment="{{ $package->payment_type_limit }}"
-                                                        data-category="{{ $package->category_limit }}"
-                                                        data-item="{{ $package->item_list_limit }}"
+                                                        data-account="{{ $package->account_limit }}"
+                                                        data-product="{{ $package->product_limit }}"
                                                         data-sales="{{ $package->sales_order_limit }}"
-                                                        data-end_date="{{ $package->end_date?->format('Y-m-d') }}"
                                                         data-storage="{{ $package->storage_limit }}"
                                                         data-status="{{ $package->is_active }}"
                                                         data-remarks="{{ $package->remarks }}">
@@ -213,19 +198,15 @@
             );
             $('#edit_name').val($(this).data('name'));
             $('#edit_price').val($(this).data('price'));
-            $('#edit_user_limit').val($(this).data('user'));
             $('#edit_company_limit').val($(this).data('company'));
             $('#edit_branch_limit').val($(this).data('branch'));
-            $('#edit_income_limit').val($(this).data('income'));
-            $('#edit_expense_limit').val($(this).data('expense'));
-            $('#edit_challan_limit').val($(this).data('challan'));
-            $('#edit_party_limit').val($(this).data('party'));
-            $('#edit_account_limit').val($(this).data('account'));
+            $('#edit_user_limit').val($(this).data('user'));
+            $('#edit_supplier_limit').val($(this).data('supplier'));
+            $('#edit_customer_limit').val($(this).data('customer'));
             $('#edit_payment_type_limit').val($(this).data('payment'));
-            $('#edit_category_limit').val($(this).data('category'));
-            $('#edit_item_list_limit').val($(this).data('item'));
+            $('#edit_account_limit').val($(this).data('account'));
+            $('#edit_product_limit').val($(this).data('product'));
             $('#edit_sales_order_limit').val($(this).data('sales'));
-            $('#edit_end_date').val($(this).data('end_date'));
             $('#edit_storage_limit').val($(this).data('storage'));
             $('#edit_status').val($(this).data('status'));
             $('#edit_remarks').val($(this).data('remarks'));

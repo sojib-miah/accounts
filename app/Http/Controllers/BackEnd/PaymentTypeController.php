@@ -51,10 +51,11 @@ class PaymentTypeController extends Controller
             'status' => 'required|in:Active,Inactive',
         ]);
 
+        // package limit check
         if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $totalCompany = PaymentType::where(function ($q) {
-                $q->where('created_by', Auth::id());
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
             })->count();
 
             if ($message = PackageHelper::checkLimit('payment_type_limit', $totalCompany)) {

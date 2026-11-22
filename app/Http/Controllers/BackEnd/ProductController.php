@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use PackageHelper;
 
 class ProductController extends Controller
 {
@@ -119,6 +120,18 @@ class ProductController extends Controller
             'status' => 'required',
             'description' => 'nullable',
         ]);
+
+        // package limit check
+        if (!Auth::user()->hasRole('Super-Admin')) {
+            $totalCompany = Company::where(function ($q) {
+                $q->where('created_by', Auth::id())
+                    ->orWhere('id', Auth::user()->company_id);
+            })->count();
+
+            if ($message = PackageHelper::checkLimit('product_limit', $totalCompany)) {
+                return back()->with('error', $message);
+            }
+        }
 
         Product::create([
             'company_id' => Auth::user()->company_id,

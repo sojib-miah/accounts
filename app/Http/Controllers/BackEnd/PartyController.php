@@ -7,7 +7,6 @@ use App\Models\CustomerCompany;
 use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PackageHelper;
 
 class PartyController extends Controller
 {
@@ -67,15 +66,6 @@ class PartyController extends Controller
         ]);
 
         if (!Auth::user()->hasRole('Super-Admin')) {
-
-            $current = Party::where('created_by', Auth::id())
-                ->where('type', 'Customer')
-                ->count();
-
-            if ($message = PackageHelper::checkLimit('party_limit', $current)) {
-                return back()->with('error', $message);
-            }
-
             // Check selected customer company belongs to current user
             if ($request->filled('customer_company_id')) {
 
