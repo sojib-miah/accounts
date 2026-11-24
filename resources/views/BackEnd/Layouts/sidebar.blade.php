@@ -555,7 +555,8 @@
 
         {{-- Settings  --}}
         @can('menu-setting-list')
-            <li class="menu-item {{ request()->routeIs('settings*') ? 'active open' : '' }}">
+            <li
+                class="menu-item {{ request()->routeIs('settings*') || request()->routeIs('admin.login-as-user') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-gear me-3"></i>
                     Settings
@@ -568,6 +569,13 @@
                             </a>
                         </li>
                     @endcan
+                    @hasrole('Super-Admin')
+                        <li class="menu-item {{ request()->routeIs('admin.login-as-user') ? 'active' : '' }}">
+                            <a href="{{ route('admin.login-as-user') }}" class="menu-link">
+                                <span>Login As User</span>
+                            </a>
+                        </li>
+                    @endhasrole
                 </ul>
             </li>
         @endcan

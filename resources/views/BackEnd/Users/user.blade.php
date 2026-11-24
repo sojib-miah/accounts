@@ -98,6 +98,7 @@
                         <thead>
                             <tr>
                                 <th>SN</th>
+                                <th>ID</th>
                                 <th>Company Name</th>
                                 <th>User Name</th>
                                 <th>Phone No</th>
@@ -112,6 +113,7 @@
                             @foreach ($users as $user)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $user->id }}</td>
                                     <td>{{ $user->company->name ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">

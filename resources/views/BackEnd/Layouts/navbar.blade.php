@@ -371,3 +371,23 @@
         </ul>
     </div>
 </nav>
+
+@if (session()->has('impersonator_id'))
+    <div class="alert alert-danger mt-5 rounded-0 mb-0 d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fa fa-user-secret me-2"></i>
+            You are currently logged in as:
+            <strong>{{ auth()->user()->name }}</strong>
+            <span class="ms-2">
+                (ID: {{ auth()->id() }})
+            </span>
+        </div>
+        <form action="{{ route('admin.stop-impersonation') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-dark">
+                <i class="fa fa-sign-out-alt me-1"></i>
+                Back to Super Admin
+            </button>
+        </form>
+    </div>
+@endif

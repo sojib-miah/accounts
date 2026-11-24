@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackEnd\UserImpersonationController;
 use App\Http\Controllers\FrontEnd\ContactController;
 use App\Http\Controllers\FrontEnd\HomeController;
 use App\Http\Controllers\PaymentController;
@@ -46,7 +47,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::patch('/payments/{payment}/status', [PaymentController::class, 'updateStatus'])->name('admin.payment.update-status');
 });
 
-
 // cache clear route 
 Route::get('cache-clear', function () {
     Artisan::call('cache:clear');
@@ -56,3 +56,10 @@ Route::get('cache-clear', function () {
     Artisan::call('optimize:clear');
     return back()->with('success', 'Cache Cleared Successfull!');
 })->name('cache.clear');
+
+// admin login as user route
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/login-as-user', [UserImpersonationController::class, 'index'])->name('admin.login-as-user');
+    Route::post('/login-as-user', [UserImpersonationController::class, 'login'])->name('admin.login-as-user.login');
+    Route::post('/stop-impersonation', [UserImpersonationController::class, 'stop'])->name('admin.stop-impersonation');
+});
