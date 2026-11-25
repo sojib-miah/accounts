@@ -91,208 +91,363 @@
                                     <th width="150">Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                @forelse($companyPackages as $index => $companyPackage)
+                                @forelse ($companyPackageGroups as $index => $group)
                                     @php
-                                        $displayStatus = $companyPackage->display_status;
+                                        $companyPackage = $group['latest'];
+                                        $historyId = 'packageHistory' . $companyPackage->id;
                                     @endphp
+
+                                    {{-- LATEST ASSIGNMENT --}}
                                     <tr>
-                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $companyPackageGroups->firstItem() + $index }}</td>
+
                                         <td>
                                             <div class="fw-semibold">
                                                 {{ $companyPackage->company?->name ?? 'N/A' }}
                                             </div>
                                         </td>
+
                                         <td>
                                             @if ($companyPackage->user)
                                                 <div class="fw-semibold">
                                                     {{ $companyPackage->user->name }}
                                                 </div>
-                                                @if ($companyPackage->user->email)
-                                                    <small class="text-muted">
-                                                        {{ $companyPackage->user->email }}
-                                                    </small>
-                                                @endif
+                                                <small class="text-muted">
+                                                    {{ $companyPackage->user->email }}
+                                                </small>
                                             @else
-                                                <span class="text-muted">
-                                                    All Users
-                                                </span>
+                                                <span class="text-muted">All Users</span>
                                             @endif
                                         </td>
+
                                         <td>
-                                            @if ($companyPackage->package)
-                                                <span class="fw-semibold">
-                                                    {{ $companyPackage->package->name }}
-                                                </span>
+                                            <span class="fw-semibold">
+                                                {{ $companyPackage->package?->name ?? 'N/A' }}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            {{ $companyPackage->start_date?->format('d M Y') ?? 'N/A' }}
+                                        </td>
+
+                                        <td>
+                                            {{ $companyPackage->expire_date?->format('d M Y') ?? 'No Expiry' }}
+                                        </td>
+
+                                        <td>
+                                            @if ($companyPackage->display_status === 'Active')
+                                                <span class="badge bg-success">Active</span>
+                                            @elseif ($companyPackage->display_status === 'Expired')
+                                                <span class="badge bg-danger">Expired</span>
                                             @else
-                                                <span class="text-muted">N/A</span>
+                                                <span class="badge bg-secondary">Cancelled</span>
                                             @endif
+
+                                            <div class="small text-muted mt-1">
+                                                Latest Assignment
+                                            </div>
                                         </td>
-                                        <td>
-                                            {{ optional($companyPackage->start_date)->format('d M Y') }}
-                                        </td>
-                                        <td>
-                                            @if ($companyPackage->expire_date)
-                                                {{ $companyPackage->expire_date->format('d M Y') }}
-                                            @else
-                                                <span class="text-muted">No Expiry</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($displayStatus === 'Active')
-                                                <span class="badge bg-success">
-                                                    Active
-                                                </span>
-                                            @elseif($displayStatus === 'Expired')
-                                                <span class="badge bg-danger">
-                                                    Expired
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary">
-                                                    Cancelled
-                                                </span>
-                                            @endif
-                                        </td>
+
                                         <td class="text-center">
                                             <div class="dropdown">
-                                                <button class="btn btn-sm btn-light border-0" data-bs-toggle="dropdown">
+                                                <button type="button" class="btn btn-sm btn-light border-0"
+                                                    data-bs-toggle="dropdown">
                                                     <i class="fa fa-ellipsis-v"></i>
                                                 </button>
+
                                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                                     <li>
                                                         <button type="button" class="dropdown-item" data-bs-toggle="modal"
-                                                            data-bs-target="#editPackageModal{{ $companyPackage->id }}"
-                                                            title="Edit Package Assignment">
-                                                            <i class="fa fa-pencil"></i> Edit
+                                                            data-bs-target="#editPackageModal{{ $companyPackage->id }}">
+                                                            <i class="fa fa-pencil me-2"></i>
+                                                            Edit Latest
                                                         </button>
                                                     </li>
+
                                                     <li>
                                                         <form
                                                             action="{{ route('admin.company-package.destroy', $companyPackage->id) }}"
-                                                            method="POST" class="delete-form">
+                                                            method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this assignment?')">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger"
-                                                                onclick="return confirm('Are you sure you want to delete this package assignment?')"
-                                                                title="Delete Package Assignment">
-                                                                <i class="fa fa-trash"></i> Delete
+
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                <i class="fa fa-trash me-2"></i>
+                                                                Delete Latest
                                                             </button>
                                                         </form>
                                                     </li>
+
+                                                    @if ($group['total'] > 1)
+                                                        <li>
+                                                            <hr class="dropdown-divider">
+                                                        </li>
+
+                                                        <li>
+                                                            <button type="button" class="dropdown-item text-primary"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target="#{{ $historyId }}" aria-expanded="false"
+                                                                aria-controls="{{ $historyId }}">
+                                                                <i class="fa fa-history me-2"></i>
+                                                                Previous Assignments
+                                                                <span class="badge bg-primary ms-1">
+                                                                    {{ $group['previous']->count() }}
+                                                                </span>
+                                                            </button>
+                                                        </li>
+                                                    @endif
                                                 </ul>
                                             </div>
                                         </td>
                                     </tr>
 
-                                    {{--  EDIT MODAL --}}
-                                    <div class="modal fade" id="editPackageModal{{ $companyPackage->id }}" tabindex="-1"
-                                        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">
-                                                        Update Package
-                                                    </h5>
-                                                    <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <form
-                                                    action="{{ route('admin.company-package.update', $companyPackage->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="modal-body">
-                                                        <div class="bg-light rounded p-3 mb-3">
-                                                            <div class="row">
-                                                                <div class="col-md-6">
-                                                                    <small class="text-muted">
-                                                                        Company
-                                                                    </small>
-                                                                    <div class="fw-semibold">
-                                                                        {{ $companyPackage->company?->name ?? 'N/A' }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <small class="text-muted">
-                                                                        Package
-                                                                    </small>
-                                                                    <div class="fw-semibold">
-                                                                        {{ $companyPackage->package?->name ?? 'N/A' }}
-                                                                    </div>
-                                                                </div>
+                                    {{-- HISTORY ROW --}}
+                                    @if ($group['previous']->isNotEmpty())
+                                        <tr>
+                                            <td colspan="8" class="p-0 border-0">
+                                                <div class="collapse" id="{{ $historyId }}">
+                                                    <div class="bg-light p-3">
+                                                        <div class="border rounded bg-white p-3">
+
+                                                            <div
+                                                                class="d-flex justify-content-between align-items-center mb-3">
+                                                                <h6 class="mb-0">
+                                                                    <i class="fa fa-history me-2 text-primary"></i>
+                                                                    Previous Package Assignments
+                                                                </h6>
+
+                                                                <span class="badge bg-secondary">
+                                                                    {{ $group['previous']->count() }} Records
+                                                                </span>
                                                             </div>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">
-                                                                Start Date
-                                                            </label>
-                                                            <input type="text" class="form-control"
-                                                                value="{{ optional($companyPackage->start_date)->format('d M Y') }}"
-                                                                readonly>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">
-                                                                Expire Date
-                                                            </label>
-                                                            <input type="date" name="expire_date" class="form-control"
-                                                                value="{{ optional($companyPackage->expire_date)->format('Y-m-d') }}">
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label">
-                                                                Status
-                                                            </label>
-                                                            <select name="status" class="form-select" required>
-                                                                <option value="Active"
-                                                                    {{ $companyPackage->status === 'Active' ? 'selected' : '' }}>
-                                                                    Active
-                                                                </option>
-                                                                <option value="Expired"
-                                                                    {{ $companyPackage->status === 'Expired' ? 'selected' : '' }}>
-                                                                    Expired
-                                                                </option>
-                                                                <option value="Cancelled"
-                                                                    {{ $companyPackage->status === 'Cancelled' ? 'selected' : '' }}>
-                                                                    Cancelled
-                                                                </option>
-                                                            </select>
+
+                                                            <div class="table-responsive">
+                                                                <table
+                                                                    class="table table-sm table-bordered align-middle mb-0">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th>ID</th>
+                                                                            <th>Package</th>
+                                                                            <th>Start Date</th>
+                                                                            <th>Expire Date</th>
+                                                                            <th>Status</th>
+                                                                            <th>Created At</th>
+                                                                            <th class="text-center">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                        @foreach ($group['previous'] as $previous)
+                                                                            <tr>
+                                                                                <td>{{ $previous->id }}</td>
+
+                                                                                <td>
+                                                                                    {{ $previous->package?->name ?? 'N/A' }}
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    {{ $previous->start_date?->format('d M Y') ?? 'N/A' }}
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    {{ $previous->expire_date?->format('d M Y') ?? 'No Expiry' }}
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    @if ($previous->display_status === 'Active')
+                                                                                        <span
+                                                                                            class="badge bg-success">Active</span>
+                                                                                    @endif
+                                                                                    @if ($previous->display_status === 'Expired')
+                                                                                        <span
+                                                                                            class="badge bg-danger">Expired</span>
+                                                                                    @endif
+                                                                                    @if ($previous->display_status === 'Cancelled')
+                                                                                        <span
+                                                                                            class="badge bg-secondary">Cancelled</span>
+                                                                                    @endif
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    {{ $previous->created_at?->format('d M Y h:i A') }}
+                                                                                </td>
+
+                                                                                <td class="text-center">
+                                                                                    <div class="dropdown">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-sm btn-light border"
+                                                                                            data-bs-toggle="dropdown">
+                                                                                            <i class="fa fa-ellipsis-v"></i>
+                                                                                        </button>
+
+                                                                                        <ul
+                                                                                            class="dropdown-menu dropdown-menu-end shadow">
+                                                                                            <li>
+                                                                                                <button type="button"
+                                                                                                    class="dropdown-item"
+                                                                                                    data-bs-toggle="modal"
+                                                                                                    data-bs-target="#editPackageModal{{ $previous->id }}">
+                                                                                                    <i
+                                                                                                        class="fa fa-pencil me-2"></i>
+                                                                                                    Edit
+                                                                                                </button>
+                                                                                            </li>
+
+                                                                                            <li>
+                                                                                                <form
+                                                                                                    action="{{ route('admin.company-package.destroy', $previous->id) }}"
+                                                                                                    method="POST"
+                                                                                                    onsubmit="return confirm('Delete this previous assignment?')">
+                                                                                                    @csrf
+                                                                                                    @method('DELETE')
+
+                                                                                                    <button type="submit"
+                                                                                                        class="dropdown-item text-danger">
+                                                                                                        <i
+                                                                                                            class="fa fa-trash me-2"></i>
+                                                                                                        Delete
+                                                                                                    </button>
+                                                                                                </form>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-light"
-                                                            data-bs-dismiss="modal">
-                                                            Close
-                                                        </button>
-                                                        <button type="submit" class="btn btn-primary">
-                                                            <i class="bi bi-check-circle me-1"></i>
-                                                            Update Package
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
+
                                 @empty
                                     <tr>
                                         <td colspan="8" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fa-solid fa-boxes-stacked" style="font-size: 40px;"></i>
-                                                <div class="mt-2">
-                                                    No packages assigned yet.
-                                                </div>
+                                                <div class="mt-2">No packages assigned yet.</div>
                                             </div>
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
+
                         </table>
                     </div>
                     <div class="p-3">
-                        {{ $companyPackages->links() }}
+                        {{ $companyPackageGroups->links() }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- EDIT MODALS FOR ALL ASSIGNMENTS --}}
+    @foreach ($companyPackageGroups as $group)
+        @foreach (collect([$group['latest']])->concat($group['previous']) as $companyPackage)
+            <div class="modal fade" id="editPackageModal{{ $companyPackage->id }}" tabindex="-1" aria-hidden="true"
+                data-bs-backdrop="static" data-bs-keyboard="false">
+
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fa fa-pencil me-2"></i>
+                                Update Package Assignment
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <form action="{{ route('admin.company-package.update', $companyPackage->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="modal-body">
+
+                                <div class="bg-light rounded p-3 mb-3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Company</small>
+                                            <div class="fw-semibold">
+                                                {{ $companyPackage->company?->name ?? 'N/A' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <small class="text-muted">User</small>
+                                            <div class="fw-semibold">
+                                                {{ $companyPackage->user?->name ?? 'All Users' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Package</small>
+                                            <div class="fw-semibold">
+                                                {{ $companyPackage->package?->name ?? 'N/A' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Assignment ID</small>
+                                            <div class="fw-semibold">
+                                                #{{ $companyPackage->id }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ $companyPackage->start_date?->format('d M Y') }}" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Expire Date</label>
+                                    <input type="date" name="expire_date" class="form-control"
+                                        value="{{ $companyPackage->expire_date?->format('Y-m-d') }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select select2" required>
+                                        <option value="Active" @selected($companyPackage->status === 'Active')>
+                                            Active
+                                        </option>
+                                        <option value="Expired" @selected($companyPackage->status === 'Expired')>
+                                            Expired
+                                        </option>
+                                        <option value="Cancelled" @selected($companyPackage->status === 'Cancelled')>
+                                            Cancelled
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save me-1"></i>
+                                    Update Package
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endforeach
 
     {{-- CREATE PACKAGE MODAL --}}
     <div class="modal fade" id="createPackageModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
@@ -385,25 +540,20 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 <select name="status" class="form-select select2" required>
-                                    <option value="Active">
-                                        Active
-                                    </option>
-                                    <option value="Expired">
-                                        Expired
-                                    </option>
-                                    <option value="Cancelled">
-                                        Cancelled
-                                    </option>
+                                    <option value="Active">Active</option>
+                                    <option value="Expired">Expired</option>
+                                    <option value="Cancelled">Cancelled</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            <i class="fa fa-times me-1"></i>
                             Close
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle me-1"></i>
+                            <i class="fa fa-save me-1"></i>
                             Assign Package
                         </button>
                     </div>

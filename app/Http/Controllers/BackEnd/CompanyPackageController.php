@@ -16,30 +16,111 @@ class CompanyPackageController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = CompanyPackage::with(['company', 'user', 'package',])->latest();
+
+        // Base query
+        $query = CompanyPackage::query()
+            ->with(['company', 'user', 'package']);
+
+        // Access control
         if (!$user->hasRole('Super-Admin')) {
             $query->where('company_id', $user->company_id);
         }
+
+        // Company filter
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
         }
+
+        // Search filter
         if ($request->filled('search')) {
             $search = trim($request->search);
+
             $query->where(function ($q) use ($search) {
                 $q->whereHas('company', function ($companyQuery) use ($search) {
-                    $companyQuery->where('name', 'like', '%' . $search . '%');
+                    $companyQuery->where('name', 'like', "%{$search}%");
                 })
                     ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', '%' . $search . '%')
-                            ->orWhere('email', 'like', '%' . $search . '%');
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
                     })
                     ->orWhereHas('package', function ($packageQuery) use ($search) {
-                        $packageQuery->where('name', 'like', '%' . $search . '%');
+                        $packageQuery->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
-        $companyPackages = $query->paginate(10)->withQueryString();
+        $groupKeys = (clone $query)
+            ->selectRaw('company_id, user_id, MAX(id) as latest_id')
+            ->groupBy('company_id', 'user_id')
+            ->orderByDesc('latest_id')
+            ->paginate(10)
+            ->withQueryString();
+
+        // Get all assignment records belonging to the current page's groups
+        $pageGroups = $groupKeys->getCollection();
+
+        $recordsQuery = CompanyPackage::with([
+            'company',
+            'user',
+            'package',
+        ]);
+
+        $recordsQuery->where(function ($outerQuery) use ($pageGroups) {
+            foreach ($pageGroups as $groupKey) {
+                $outerQuery->orWhere(function ($q) use ($groupKey) {
+                    if ($groupKey->company_id === null) {
+                        $q->whereNull('company_id');
+                    } else {
+                        $q->where('company_id', $groupKey->company_id);
+                    }
+
+                    if ($groupKey->user_id === null) {
+                        $q->whereNull('user_id');
+                    } else {
+                        $q->where('user_id', $groupKey->user_id);
+                    }
+                });
+            }
+        });
+
+        // Apply the same access restriction to the records query
+        if (!$user->hasRole('Super-Admin')) {
+            $recordsQuery->where('company_id', $user->company_id);
+        }
+
+        $allRecords = $recordsQuery
+            ->orderByDesc('id')
+            ->get();
+
+        // Build Company + User groups
+        $groupedRecords = $allRecords->groupBy(function ($record) {
+            $companyKey = $record->company_id ?? 'null';
+            $userKey = $record->user_id ?? 'null';
+
+            return "company_{$companyKey}_user_{$userKey}";
+        });
+
+        // Prepare data for Blade
+        $companyPackageGroups = $pageGroups->map(function ($groupKey) use ($groupedRecords) {
+            $companyKey = $groupKey->company_id ?? 'null';
+            $userKey = $groupKey->user_id ?? 'null';
+
+            $key = "company_{$companyKey}_user_{$userKey}";
+
+            $assignments = $groupedRecords->get($key, collect());
+
+            return [
+                'latest' => $assignments->first(),
+                'previous' => $assignments->slice(1)->values(),
+                'total' => $assignments->count(),
+            ];
+        })->filter(function ($group) {
+            return $group['latest'] !== null;
+        })->values();
+
+        $groupKeys->setCollection($companyPackageGroups);
+
+        // Dropdown data
         $companiesQuery = Company::query();
 
         if (!$user->hasRole('Super-Admin')) {
@@ -47,23 +128,25 @@ class CompanyPackageController extends Controller
         }
 
         $companies = $companiesQuery->orderBy('name')->get();
+
         $usersQuery = User::query();
 
         if (!$user->hasRole('Super-Admin')) {
             $usersQuery->where('company_id', $user->company_id);
         }
-        $users = $usersQuery->orderBy('name')->get();
-        $packages = Package::where('is_active', true)->orderBy('name')->get();
 
-        return view(
-            'BackEnd.UserPackage.index',
-            compact(
-                'companyPackages',
-                'companies',
-                'users',
-                'packages'
-            )
-        );
+        $users = $usersQuery->orderBy('name')->get();
+
+        $packages = Package::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('BackEnd.UserPackage.index', [
+            'companyPackageGroups' => $groupKeys,
+            'companies' => $companies,
+            'users' => $users,
+            'packages' => $packages,
+        ]);
     }
 
     public function store(Request $request)
