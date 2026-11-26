@@ -1,7 +1,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu">
     <div class="app-brand demo mt-5 mb-3">
         <a href="{{ route('dashboard.index') }}" class="app-brand-link">
-            <span class="app-brand-text demo menu-text fw-bold ms-3">ComitsBD</span>
+            <span class="app-brand-text demo menu-text fw-bold ms-3">{{ __('common.comits_soft') }}</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -17,8 +17,8 @@
         @can('dashboard-view')
             <li class="menu-item {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                 <a href="{{ route('dashboard.index') }}" class="menu-link">
-                    <i class="menu-icon icon-base ti tabler-smart-home"></i>
-                    <div data-i18n="Dashboard">Dashboard</div>
+                    <i class="fa fa-home me-3"></i>
+                    <span>{{ __('common.dashboard') }}</span>
                 </a>
             </li>
         @endcan
@@ -29,27 +29,27 @@
                 class="menu-item {{ request()->routeIs('company.*') || request()->routeIs('branch.*') || request()->routeIs('user.*') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-brands fa-studiovinari me-3"></i>
-                    Company
+                    {{ __('common.company') }}
                 </a>
                 <ul class="menu-sub">
                     @can('company-list')
                         <li class="menu-item {{ request()->routeIs('company.index') ? 'active' : '' }}">
                             <a href="{{ route('company.index') }}" class="menu-link">
-                                Company
+                                {{ __('common.company') }}
                             </a>
                         </li>
                     @endcan
                     @can('branch-list')
                         <li class="menu-item {{ request()->routeIs('branch.index') ? 'active' : '' }}">
                             <a href="{{ route('branch.index') }}" class="menu-link">
-                                Branch
+                                {{ __('common.branch') }}
                             </a>
                         </li>
                     @endcan
                     @can('company-user-list')
                         <li class="menu-item {{ request()->routeIs('user.index') ? 'active' : '' }}">
                             <a href="{{ route('user.index') }}" class="menu-link">
-                                User
+                                {{ __('common.user') }}
                             </a>
                         </li>
                     @endcan
@@ -62,28 +62,28 @@
             class="menu-item {{ request()->routeIs('supplier-company.index') || request()->routeIs('supplier.index') || request()->routeIs('customer-company.index') || request()->routeIs('receiver.index') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="fa-solid fa-champagne-glasses me-3"></i>
-                Party
+                {{ __('common.party') }}
             </a>
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('supplier-company.index') ? 'active' : '' }}">
                     <a href="{{ route('supplier-company.index') }}" class="menu-link">
-                        Supplier
+                        {{ __('common.suppliers') }}
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('supplier.index') ? 'active' : '' }}">
                     <a href="{{ route('supplier.index') }}" class="menu-link">
-                        Supplier List
+                        {{ __('common.suppliers_list') }}
                     </a>
                 </li>
 
                 <li class="menu-item {{ request()->routeIs('customer-company.index') ? 'active' : '' }}">
                     <a href="{{ route('customer-company.index') }}" class="menu-link">
-                        Customer
+                        {{ __('common.customers') }}
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('receiver.index') ? 'active' : '' }}">
                     <a href="{{ route('receiver.index') }}" class="menu-link">
-                        Customer List
+                        {{ __('common.customers_list') }}
                     </a>
                 </li>
             </ul>
@@ -556,7 +556,7 @@
         {{-- Settings  --}}
         @can('menu-setting-list')
             <li
-                class="menu-item {{ request()->routeIs('settings*') || request()->routeIs('admin.login-as-user') ? 'active open' : '' }}">
+                class="menu-item {{ request()->routeIs('settings*') || request()->routeIs('admin.login-as-user') || request()->routeIs('admin.activity-log.index') ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="fa-solid fa-gear me-3"></i>
                     Settings
@@ -569,13 +569,20 @@
                             </a>
                         </li>
                     @endcan
-                    @hasrole('Super-Admin')
-                        <li class="menu-item {{ request()->routeIs('admin.login-as-user') ? 'active' : '' }}">
-                            <a href="{{ route('admin.login-as-user') }}" class="menu-link">
-                                <span>Login As User</span>
-                            </a>
-                        </li>
-                    @endhasrole
+                    @can('menu-comits-user-list')
+                        @hasrole('Super-Admin')
+                            <li class="menu-item {{ request()->routeIs('admin.login-as-user') ? 'active' : '' }}">
+                                <a href="{{ route('admin.login-as-user') }}" class="menu-link">
+                                    Login As User
+                                </a>
+                            </li>
+                            <li class="menu-item {{ request()->routeIs('admin.activity-log.index') ? 'active' : '' }}">
+                                <a href="{{ route('admin.activity-log.index') }}" class="menu-link">
+                                    Activity Logs
+                                </a>
+                            </li>
+                        @endhasrole
+                    @endcan
                 </ul>
             </li>
         @endcan

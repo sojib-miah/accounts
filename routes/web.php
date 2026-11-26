@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BackEnd\ActivityLogController;
 use App\Http\Controllers\BackEnd\UserImpersonationController;
 use App\Http\Controllers\FrontEnd\ContactController;
 use App\Http\Controllers\FrontEnd\HomeController;
@@ -62,4 +63,16 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/login-as-user', [UserImpersonationController::class, 'index'])->name('admin.login-as-user');
     Route::post('/login-as-user', [UserImpersonationController::class, 'login'])->name('admin.login-as-user.login');
     Route::post('/stop-impersonation', [UserImpersonationController::class, 'stop'])->name('admin.stop-impersonation');
+
+    // activity log route
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity-log.index');
 });
+
+// language route 
+Route::post('/language/{locale}', function ($locale) {
+    if (!in_array($locale, ['en', 'bn'], true)) {
+        abort(404);
+    }
+    Session::put('locale', $locale);
+    return redirect()->back();
+})->name('language.switch');

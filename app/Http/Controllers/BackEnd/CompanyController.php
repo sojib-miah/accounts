@@ -113,7 +113,7 @@ class CompanyController extends Controller
                     ->where('created_by', Auth::id())
                     ->ignore($company->id),
             ],
-            'logo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'hologram' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'seal' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'signature' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

@@ -1,0 +1,31 @@
+CREATE TABLE `activity_log` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    `log_name` VARCHAR(255) NULL,
+    `description` TEXT NOT NULL,
+
+    `subject_type` VARCHAR(255) NULL,
+    `subject_id` BIGINT UNSIGNED NULL,
+
+    `event` VARCHAR(255) NULL,
+
+    `causer_type` VARCHAR(255) NULL,
+    `causer_id` BIGINT UNSIGNED NULL,
+
+    `attribute_changes` JSON NULL,
+    `properties` JSON NULL,
+
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+
+    INDEX `activity_log_log_name_index` (`log_name`),
+    INDEX `activity_log_subject_index` (`subject_type`, `subject_id`),
+    INDEX `activity_log_causer_index` (`causer_type`, `causer_id`)
+
+) ENGINE=InnoDB
+DEFAULT CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+ACTIVITYLOG_ENABLED=true

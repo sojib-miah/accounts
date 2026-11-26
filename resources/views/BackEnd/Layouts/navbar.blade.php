@@ -22,20 +22,33 @@
         <ul class="navbar-nav flex-row align-items-center ms-md-auto">
             <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <i class="icon-base ti tabler-language icon-22px text-heading"></i>
+                    {{-- <i class="icon-base ti tabler-language icon-22px text-heading"></i> --}}
+                    {{ app()->getLocale() === 'bn' ? 'বাংলা' : 'English' }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                        <a class="dropdown-item" href="javascript:void(0);" data-language="en"
-                            data-text-direction="ltr">
-                            <span>English</span>
-                        </a>
+                        <form action="{{ route('language.switch', 'en') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="dropdown-item {{ app()->getLocale() === 'en' ? 'active' : '' }}">
+                                <span>🇬🇧 English</span>
+                                @if (app()->getLocale() === 'en')
+                                    <i class="fa fa-check float-end mt-1"></i>
+                                @endif
+                            </button>
+                        </form>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="javascript:void(0);" data-language="fr"
-                            data-text-direction="ltr">
-                            <span>Bangla</span>
-                        </a>
+                        <form action="{{ route('language.switch', 'bn') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="dropdown-item {{ app()->getLocale() === 'bn' ? 'active' : '' }}">
+                                <span>🇧🇩 বাংলা</span>
+                                @if (app()->getLocale() === 'bn')
+                                    <i class="fa fa-check float-end mt-1"></i>
+                                @endif
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </li>

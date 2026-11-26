@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CompanyPackage;
 use App\Models\Package;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,9 +28,9 @@ class AdminAuthController extends Controller
     public function registerStore(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:users,name',],
-            'email' => ['required', 'email', 'unique:users,email',],
-            'password' => ['required', 'confirmed', 'min:6',],
+            'name' => ['required', 'string', 'max:255', 'unique:users,name'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'confirmed', 'min:6'],
         ]);
 
         DB::beginTransaction();
@@ -53,12 +54,13 @@ class AdminAuthController extends Controller
                     'user_id' => $user->id,
                     'package_id' => $trialPackage->id,
                     'start_date' => now()->toDateString(),
-                    // Change to addDays(30) addYear() if your trial is 30 days
                     'expire_date' => now()->addDays(15)->toDateString(),
                     'status' => 'Active',
                 ]);
             }
             DB::commit();
+            // Fire Laravel Registration Event
+            event(new Registered($user));
             return redirect()->route('admin.login')->with('success', 'Registration successful. Please login.');
         } catch (\Throwable $e) {
             DB::rollBack();
