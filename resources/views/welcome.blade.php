@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Comits Soft</title>
+        <title>BIMS</title>
 
         <link rel="icon" type="image/x-icon"
             href="{{ optional(setting())->favaicon ? asset('uploads/settings/' . setting()->favaicon) : asset('default-favicon.ico') }}" />
@@ -17,435 +17,15 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-        <style type="text/tailwindcss">
-            @theme {
-                --font-display: "Inter", sans-serif;
 
-                --color-primary: #2563EB;
-                --color-secondary: #06B6D4;
-                --color-dark: #0F172A;
-                --color-light: #F8FAFC;
-            }
+        @include('FrontEnd.Home.style')
 
-            html {
-                scroll-behavior: smooth;
-            }
-
-            body {
-                font-family: var(--font-display);
-            }
-
-            .sojib {
-                @apply max-w-7xl mx-auto px-6 lg:px-8;
-            }
-
-            .aporna {
-                @apply bg-transparent text-lg font-medium text-slate-600 border-none focus:outline-none cursor-pointer;
-            }
-
-            .dashboard-wrapper {
-                @apply relative w-fit mx-auto;
-            }
-
-            .dashboard-card {
-                @apply rounded-[32px] bg-white border border-slate-200 shadow-2xl overflow-hidden;
-            }
-
-            .dashboard-growth {
-                @apply absolute -left-12 top-20 bg-white border border-slate-200 rounded-3xl shadow-xl px-6 py-5 z-20;
-            }
-
-            .dashboard-customers {
-                @apply absolute -right-10 bottom-16 bg-white border border-slate-200 rounded-3xl shadow-xl px-6 py-5 z-20;
-            }
-
-            .dashboard-glow {
-                position: absolute;
-                inset: 0;
-                z-index: -1;
-                filter: blur(120px);
-                background: linear-gradient(90deg, rgba(103, 232, 249, .35), rgba(96, 165, 250, .25), rgba(134, 239, 172, .35));
-            }
-
-            .contact-section {
-                scroll-margin-top: 120px;
-            }
-
-            .card1 {
-                @apply rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-500 flex flex-col items-center text-center hover:-translate-y-2 hover:shadow-xl;
-            }
-
-            .card1:hover {
-                background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(6, 182, 212, 0.12));
-                border-color: rgba(37, 99, 235, 0.2);
-            }
-
-            .card2 {
-                @apply w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-500;
-            }
-
-            .card1:hover .card2 {
-                transform: scale(1.1);
-            }
-
-            .billing-btn {
-                color: #64748b;
-                background: transparent;
-                transition: all .3s ease;
-            }
-
-            .billing-btn.active {
-                color: #fff;
-                background: #06b6d4;
-                box-shadow: 0 10px 25px rgba(37, 99, 235, .25);
-            }
-
-            .pricing-card {
-                @apply relative flex flex-col h-full bg-white rounded-xl border border-slate-300 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg;
-            }
-
-            .pricingSlider .swiper-slide {
-                height: auto;
-            }
-
-            .pricing-card:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 20px 45px rgba(37, 99, 235, .15);
-            }
-
-            .pricing-header {
-                @apply bg-slate-50 p-6 text-center border-b border-slate-200 transition-colors duration-300 relative;
-            }
-
-            .price-section {
-                @apply flex flex-col items-center;
-            }
-
-            .old-price-wrapper {
-                @apply h-6 flex items-center justify-center;
-            }
-
-            .old-price {
-                @apply text-sm text-slate-400 line-through font-medium;
-            }
-
-            .price-wrapper {
-                @apply flex justify-center items-baseline gap-1 mt-1 text-slate-900;
-            }
-
-            @media (min-width:1280px) {
-
-                .pricingSlider .swiper-wrapper {
-
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap: 2rem;
-                }
-            }
-
-            .header-free {
-                @apply border-t-4 border-t-slate-400;
-            }
-
-            .header-basic {
-                @apply border-t-4 border-t-cyan-500;
-            }
-
-            .header-standard {
-                @apply border-t-4 border-t-cyan-500 bg-cyan-50/50;
-            }
-
-            .header-enterprise {
-                @apply border-t-4 border-t-indigo-600;
-            }
-
-            .hero-section {
-                @apply relative overflow-hidden bg-gradient-to-br from-cyan-50 pt-32 via-white to-cyan-50;
-            }
-
-            .hero-container {
-                @apply relative max-w-7xl mx-auto px-6 lg:px-8 pt-10 pb-20 lg:pt-14 lg:pb-24 grid lg:grid-cols-2 gap-16 items-center;
-            }
-
-            .hero-blur-left {
-                @apply absolute -top-40 -left-32 w-96 h-96 rounded-full bg-cyan-300 opacity-20 blur-3xl;
-            }
-
-            .hero-blur-right {
-                @apply absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-cyan-300 opacity-20 blur-3xl;
-            }
-
-            .dashboard-card {
-                @apply overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl;
-            }
-
-            .dashboard-header {
-                @apply flex items-center justify-between border-b px-6 py-4;
-            }
-
-            .dashboard-body {
-                @apply space-y-5 p-6;
-            }
-
-            .dashboard-item {
-                @apply flex justify-between rounded-xl bg-slate-50 p-4;
-            }
-
-            .floating-card {
-                @apply absolute bg-white rounded-3xl border border-slate-200 shadow-xl px-6 py-5 z-20;
-                animation: float 4s ease-in-out infinite;
-            }
-
-            .floating-left {
-                top: -60px;
-                left: -120px;
-            }
-
-            .floating-right {
-                bottom: -60px;
-                right: -60px;
-                animation-delay: 2s;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-
-                50% {
-                    transform: translateY(-12px);
-                }
-
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            .ribbon {
-                @apply absolute top-3 -left-8 bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider py-1 w-28 text-center -rotate-45 shadow-sm z-10;
-            }
-
-            /* Body */
-            .card-body {
-                @apply p-6 flex flex-col flex-1 justify-between gap-6 bg-white;
-            }
-
-            .feature {
-                @apply text-center text-sm py-1;
-            }
-
-            .feature.active {
-                @apply text-slate-700 font-medium;
-            }
-
-            .feature.active i {
-                @apply text-cyan-500 text-base;
-            }
-
-            .feature.inactive {
-                @apply text-slate-300 line-through decoration-slate-300;
-            }
-
-            .feature.inactive i {
-                @apply text-slate-200 text-base;
-            }
-
-            /* Action Button */
-            .plan-btn {
-                @apply w-full py-3 px-4 rounded-lg font-bold text-sm tracking-wide text-slate-800 bg-slate-100/90 border border-slate-200/80 transition-all duration-300 ease-in-out cursor-pointer;
-            }
-
-            .plan-btn:hover {
-                @apply bg-cyan-500 text-white border-cyan-500 shadow-md -translate-y-0.5;
-            }
-
-            .plan-btn:active {
-                @apply translate-y-0 shadow-none;
-            }
-
-            /* Highlight standard plan button */
-            .pricing-card:has(.ribbon) .plan-btn {
-                @apply bg-cyan-500 text-white hover:bg-cyan-700;
-            }
-
-            .old-price-wrapper {
-                @apply h-5 flex items-center justify-center mb-1;
-            }
-
-            .old-price {
-                @apply text-sm text-slate-400 line-through font-medium;
-            }
-
-            .price-wrapper {
-                @apply flex items-baseline justify-center gap-1.5 whitespace-nowrap w-full overflow-hidden px-1;
-            }
-
-            .currency {
-                @apply text-2xl font-extrabold mr-0.5;
-            }
-
-            .new-price {
-                @apply text-3xl xl:text-4xl font-extrabold text-slate-900 tracking-tight leading-none;
-            }
-
-            .duration {
-                @apply text-xs xl:text-sm font-semibold text-slate-500 whitespace-nowrap flex-shrink-0;
-            }
-
-            .partner-section {
-                @apply relative py-20 overflow-hidden bg-gradient-to-br from-cyan-100 via-white to-cyan-100;
-            }
-
-            .card-body {
-                @apply p-6 flex flex-col flex-1 justify-between gap-6 bg-white;
-            }
-
-            .partner-container {
-                @apply relative max-w-7xl mx-auto px-6 lg:px-8;
-            }
-
-            .logo-card {
-                @apply w-34 h-34 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm cursor-pointer transition-all duration-500;
-            }
-
-            .logo-card:hover {
-                @apply border-cyan-500 shadow-2xl;
-                transform: translateY(-6px) scale(0.96);
-            }
-
-            .logo-image {
-                @apply w-24 h-24 object-contain transition-all duration-500;
-            }
-
-            .logo-card:hover .logo-image {
-                transform: scale(0.92);
-            }
-
-            .logo-slider {
-                @apply py-6;
-            }
-
-            .logo-slide {
-                @apply flex justify-center items-center;
-            }
-
-            .payment-wrapper {
-                @apply mt-16 py-10 border-y border-cyan-200;
-            }
-
-            .payment-banner {
-                @apply w-full h-auto;
-            }
-
-            #backToTop {
-                @apply fixed bottom-6 right-6 z-50 p-3 rounded-full bg-cyan-500 text-white shadow-lg transition-all duration-300 opacity-0 pointer-events-none translate-y-4;
-            }
-
-            /* Shown state triggered past 100vh */
-            #backToTop.show {
-                @apply opacity-100 pointer-events-auto translate-y-0;
-            }
-
-            .footer {
-                background: #fafbfc;
-                border-top: 1px solid #e5e7eb;
-                padding: 80px 0 0;
-            }
-        </style>
     </head>
 
     <body class="bg-light text-dark">
-        <header id="navbar" class="fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300">
-            <!-- TOP BAR (Will hide on scroll) -->
-            <div id="topBar"
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 overflow-hidden">
-                <div class="flex justify-between sm:justify-end items-center h-10 gap-4 sm:gap-8">
-                    <!-- Phone Number -->
-                    <div class="flex items-center gap-1.5 sm:gap-2">
-                        <i class="fa-solid fa-phone text-cyan-500 text-xs sm:text-sm"></i>
-                        <span class="text-xs sm:text-sm md:text-base font-medium text-slate-600">
-                            +880 1711-257224
-                        </span>
-                    </div>
-                    <!-- Language Selector -->
-                    <div class="flex items-center gap-1.5 sm:gap-2">
-                        <i class="fa-solid fa-globe text-emerald-500 text-xs sm:text-sm"></i>
-                        <select id="languageSelect"
-                            class="bg-transparent border-0 outline-none text-xs sm:text-sm md:text-base text-slate-600 cursor-pointer font-medium">
-                            <option value="en">English</option>
-                            <option value="bn">বাংলা</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
-            <!-- MAIN NAVBAR (Stays visible) -->
-            <div id="mainNav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300">
-                <div class="flex items-center justify-between py-2 sm:py-3">
-                    <!-- Logo -->
-                    <a href="#" class="flex-shrink-0">
-                        @if (optional(setting())->logo)
-                            <img src="{{ optional(setting())->logo ? asset('uploads/settings/' . setting()->logo) : '' }}"
-                                class="h-12 sm:h-11 md:h-12 w-full object-contain" alt="COMITS">
-                        @else
-                            <img src="{{ asset('uploads/logo.png') }}"
-                                class="h-12 sm:h-11 md:h-12 w-full object-contain" alt="COMITS">
-                        @endif
-                    </a>
+        @include('FrontEnd.Home.header')
 
-                    <!-- Desktop Nav Links -->
-                    <nav class="hidden lg:flex items-center gap-8 xl:gap-10">
-                        <a href="{{ route('home') }}"
-                            class="font-medium text-slate-700 hover:text-cyan-600 transition">Home</a>
-                        <a href="#features"
-                            class="font-medium text-slate-700 hover:text-cyan-500 transition">Features</a>
-                        <a href="#pricing"
-                            class="font-medium text-slate-700 hover:text-cyan-500 transition">Packages</a>
-                        <a href="#contact" class="font-medium text-slate-700 hover:text-cyan-500 transition">Contact</a>
-                    </nav>
-
-                    <!-- Desktop Action Buttons -->
-                    <div class="hidden lg:flex items-center gap-3 xl:gap-4">
-                        <a href="{{ route('admin.login') }}"
-                            class="px-5 py-2 border border-cyan-600 rounded-xl text-cyan-600 font-semibold hover:bg-cyan-500 hover:text-white transition-all duration-300">
-                            Login
-                        </a>
-                        <a href="{{ route('admin.register') }}"
-                            class="px-5 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-all duration-300 shadow-sm hover:shadow">
-                            Free Trial
-                        </a>
-                    </div>
-
-                    <!-- Mobile Hamburger Button -->
-                    <button id="menuBtn" class="lg:hidden text-2xl sm:text-3xl text-slate-800 p-1 focus:outline-none"
-                        aria-label="Toggle menu" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- MOBILE MENU DROPDOWN -->
-            <div id="mobileMenu"
-                class="hidden lg:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl">
-                <div class="flex flex-col p-5 gap-3.5 text-slate-700 font-medium">
-                    <a href="#" class="py-1 hover:text-cyan-600 transition">Home</a>
-                    <a href="#features" class="py-1 hover:text-cyan-500 transition">Features</a>
-                    <a href="#pricing" class="py-1 hover:text-cyan-500 transition">Packages</a>
-                    <a href="#contact" class="py-1 hover:text-cyan-500 transition">Contact</a>
-                    <hr class="border-slate-100 my-1">
-                    <div class="flex flex-col gap-2 pt-1">
-                        <a href="{{ route('admin.login') }}"
-                            class="w-full border text-center border-cyan-600 text-cyan-500 font-semibold rounded-lg py-2.5 hover:bg-cyan-50 transition">
-                            Login
-                        </a>
-                        <a href="{{ route('admin.register') }}"
-                            class="w-full bg-emerald-600 text-center text-white font-semibold rounded-lg py-2.5 hover:bg-emerald-700 transition">
-                            Free Trial
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </header>
         <main class="">
             <section class="hero-section">
                 <div class="hero-blur-left"></div>
@@ -466,38 +46,136 @@
                             platform—so you can streamline operations, stay in control, and turn everyday business data
                             into smarter decisions.
                         </p>
-                        <div class="mt-10 flex flex-wrap gap-4">
-                            <a href="{{ route('admin.login') }}"
-                                class="rounded-xl border border-slate-300 bg-cyan-600 px-6 py-2 text-lg text-white transition hover:shadow-lg">
-                                Get Started
-                            </a>
-                            <a href="{{ route('admin.register') }}"
-                                class="rounded-xl border border-slate-300 bg-green-600 px-6 py-2 text-lg text-white transition hover:shadow-lg">
-                                Free Trial
-                            </a>
-                            <a href="{{ route('admin.register') }}"
-                                class="rounded-xl border border-slate-300 bg-white px-6 py-2 text-lg transition hover:shadow-lg">
-                                Demo Request
-                            </a>
-                        </div>
+                        @if (Auth::user())
+                            <div class="mt-10">
+                                <a href="{{ route('dashboard.index') }}"
+                                    class="px-5 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-all duration-300 shadow-sm hover:shadow">
+                                    {{ __('common.go_to_dashboard') }}
+                                </a>
+                            </div>
+                        @else
+                            <div class="mt-10 flex flex-wrap gap-4">
+                                <a href="{{ route('admin.login') }}"
+                                    class="rounded-xl border border-slate-300 bg-cyan-600 px-6 py-2 text-lg text-white transition hover:shadow-lg">
+                                    {{ __('common.get_started') }}
+                                </a>
+                                <a href="{{ route('admin.register') }}"
+                                    class="rounded-xl border border-slate-300 bg-green-600 px-6 py-2 text-lg text-white transition hover:shadow-lg">
+                                    {{ __('common.free_trial') }}
+                                </a>
+                                <a href="{{ route('admin.register') }}"
+                                    class="rounded-xl border border-slate-300 bg-white px-6 py-2 text-lg transition hover:shadow-lg">
+                                    {{ __('common.demo_request') }}
+                                </a>
+                            </div>
+                        @endif
                         <div class="mt-14 flex flex-wrap gap-10">
                             <div>
                                 <h3 class="text-3xl font-bold text-cyan-600">500+</h3>
-                                <p class="text-slate-500">Companies</p>
+                                <p class="text-slate-500">{{ __('common.companies') }}</p>
                             </div>
                             <div>
                                 <h3 class="text-3xl font-bold text-cyan-600">10K+</h3>
-                                <p class="text-slate-500">Users</p>
+                                <p class="text-slate-500">{{ __('common.users') }}</p>
                             </div>
                             <div>
                                 <h3 class="text-3xl font-bold text-cyan-600">99.9%</h3>
-                                <p class="text-slate-500">Uptime</p>
+                                <p class="text-slate-500">{{ __('common.uptime') }}</p>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <img src="{{ asset('assets/img/bg-image.png') }}" alt="bg omage">
+                    {{-- <div>
+                        <img src="{{ asset('assets/img/bg-image.jpeg') }}" alt="bg omage">
+                    </div> --}}
+
+                    <div class="relative group">
+
+                        {{-- Background Glow --}}
+                        <div
+                            class="absolute -inset-5 rounded-[2rem] bg-gradient-to-br from-cyan-200 via-blue-100 to-emerald-100 blur-2xl opacity-70">
+                        </div>
+
+                        {{-- Main Image Container --}}
+                        <div
+                            class="relative rounded-3xl border border-white/80 bg-white/70 p-2 sm:p-3 shadow-2xl shadow-slate-300/50 backdrop-blur-sm">
+
+                            {{-- Image --}}
+                            <div class="relative overflow-hidden rounded-2xl bg-slate-100">
+
+                                <img src="{{ asset('assets/img/bg-image.jpeg') }}"
+                                    alt="BIMS Business Management Dashboard"
+                                    class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.03]">
+
+                                {{-- Image Overlay --}}
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-tr from-slate-950/10 via-transparent to-white/10 pointer-events-none">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Floating Card: Inventory --}}
+                        <div
+                            class="absolute -left-3 sm:-left-8 top-10 sm:top-16 z-10 animate-[float_4s_ease-in-out_infinite]">
+
+                            <div
+                                class="flex items-center gap-3 rounded-xl border border-white bg-white/95 p-3 sm:p-4 shadow-xl shadow-slate-300/30 backdrop-blur-md">
+
+                                <div
+                                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700">
+                                    <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                                </div>
+
+                                <div>
+                                    <p class="text-xs text-slate-500">Inventory</p>
+                                    <p class="text-sm font-bold text-slate-900">Stock Management</p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Floating Card: Reports --}}
+                        <div
+                            class="absolute -right-2 sm:-right-7 bottom-12 sm:bottom-20 z-10 animate-[float_5s_ease-in-out_infinite]">
+
+                            <div
+                                class="flex items-center gap-3 rounded-xl border border-white bg-white/95 p-3 sm:p-4 shadow-xl shadow-slate-300/30 backdrop-blur-md">
+
+                                <div
+                                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                    <i class="fa-solid fa-chart-line text-lg"></i>
+                                </div>
+
+                                <div>
+                                    <p class="text-xs text-slate-500">Business Reports</p>
+                                    <p class="text-sm font-bold text-slate-900">Smart Analytics</p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Bottom Badge --}}
+                        <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 z-10 w-max">
+
+                            <div
+                                class="flex items-center gap-2 rounded-full border border-white bg-slate-900 px-5 py-3 text-white shadow-xl">
+
+                                <span class="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+
+                                <span class="text-xs sm:text-sm font-semibold tracking-wide">
+                                    Powered by BIMS Technology
+                                </span>
+
+                            </div>
+
+                        </div>
+
                     </div>
+
                 </div>
             </section>
 
@@ -506,7 +184,7 @@
                     <div class="max-w-3xl mx-auto text-center">
                         <span
                             class="inline-block px-4 py-2 rounded-full bg-cyan-100 text-cyan-600 text-sm font-semibold">
-                            Features
+                            {{ __('common.features') }}
                         </span>
                         <h2 class="mt-5 text-3xl font-extrabold text-slate-900">
                             Everything Your Business Needs
@@ -638,11 +316,12 @@
                     </div>
                 </div>
             </section>
+
             <section class="partner-section">
                 <div class="partner-container">
                     <div class="text-center mb-12">
                         <span class="inline-flex px-4 py-2 rounded-full bg-cyan-100 text-cyan-600 font-semibold">
-                            Partners
+                            {{ __('common.partners') }}
                         </span>
                         <h2 class="mt-5 text-3xl font-bold text-slate-900">
                             Our Partners
@@ -717,7 +396,7 @@
                     <div class="text-center max-w-2xl mx-auto mb-14">
                         <span
                             class="inline-flex items-center px-4 py-1.5 rounded-full bg-cyan-100 text-cyan-700 text-sm font-semibold tracking-wide uppercase">
-                            Our Pricing
+                            {{ __('common.our_pricing') }}
                         </span>
 
                         <h2 class="mt-4 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -866,7 +545,7 @@
                         <span
                             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-100 text-cyan-600 font-semibold">
                             <i class="fa-solid fa-headset"></i>
-                            Contact Us
+                            {{ __('common.contact_us') }}
                         </span>
                     </div>
                     <!-- Contact Cards -->
@@ -882,7 +561,7 @@
                                 <i class="fa-solid fa-location-dot text-2xl text-red-600"></i>
                             </div>
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
-                                Our Address
+                                {{ __('common.our_address') }}
                             </h3>
                             <p class="mt-3 text-slate-600 leading-7">
                                 3<sup>rd</sup> floor,
@@ -902,12 +581,12 @@
                                 <i class="fa-solid fa-phone text-2xl text-emerald-600"></i>
                             </div>
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
-                                Phone Number
+                                {{ __('common.phone_number') }}
                             </h3>
                             <p class="mt-3 text-slate-600 text-lg font-medium">
-                                +880 1331-995522
+                                {{ __('common.phone_one') }}
                                 <br>
-                                +880 1711-257224
+                                {{ __('common.phone_two') }}
                             </p>
                         </div>
                         <!-- Email -->
@@ -921,12 +600,10 @@
                                 <i class="fa-solid fa-envelope text-2xl text-cyan-600"></i>
                             </div>
                             <h3 class="mt-6 text-xl font-bold text-slate-900">
-                                Email Address
+                                {{ __('common.email_address') }}
                             </h3>
                             <p class="mt-3 text-slate-600 break-all">
-                                info@comitsbd.com
-                                <br>
-                                sales@comitsbd.com
+                                sales@bims.bd
                             </p>
                         </div>
                     </div>
@@ -996,8 +673,8 @@
                                     </p>
                                 @enderror
                                 <button type="submit"
-                                    class="w-50 rounded-sm bg-gradient-to-r from-cyan-600 to-cyan-500 py-3.5 text-base font-semibold text-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
-                                    Request Free Demo
+                                    class="w-100 rounded-sm bg-gradient-to-r from-cyan-600 to-cyan-500 py-3.5 text-base font-semibold text-white hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer">
+                                    {{ __('common.request_free_demo') }}
                                 </button>
                             </form>
 
@@ -1011,324 +688,22 @@
                     </div>
                 </div>
             </section>
-            <!-- FOOTER START -->
-            <footer
-                class="bg-gradient-to-b from-cyan-50 to-white text-slate-700 pt-16 border-t border-slate-200/80 font-sans">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
 
-                        <!-- NEWSLETTER -->
-                        <div class="lg:col-span-4 space-y-4">
-                            <div class="inline-block">
-                                <h3 class="text-lg font-bold uppercase tracking-wider text-slate-900">Newsletter</h3>
-                                <div class="h-1 w-12 bg-cyan-600 rounded-sm mt-1"></div>
-                            </div>
-                            <p class="text-slate-600 text-sm leading-relaxed text-justify">
-                                Innovative IT solutions, web & mobile apps, and digital growth — Comits Soft empowers
-                                your
-                                business for the future.
-                            </p>
-                            <form onsubmit="event.preventDefault();" class="mt-4">
-                                <div
-                                    class="flex items-center rounded-lg border border-slate-300 overflow-hidden bg-white focus-within:border-cyan-600 focus-within:ring-1 focus-within:ring-cyan-600 shadow-sm transition">
-                                    <input type="email" placeholder="Email Address"
-                                        class="w-full py-3 px-4 text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
-                                        required />
-                                    <button type="submit"
-                                        class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-3.5 transition-colors flex items-center justify-center"
-                                        aria-label="Subscribe">
-                                        <i class="fa-solid fa-paper-plane text-sm"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+            @include('FrontEnd.Home.footer')
 
-                        <!-- SERVICES -->
-                        <div class="lg:col-span-2 space-y-4">
-                            <div class="inline-block">
-                                <h3 class="text-lg font-bold uppercase tracking-wider text-slate-900">Services</h3>
-                                <div class="h-1 w-10 bg-cyan-600 rounded-sm mt-1"></div>
-                            </div>
-                            <ul class="space-y-2 text-sm">
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>IT Support</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>CCTV & Security Services</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>Hardware Solutions</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>Software</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- COMPANY -->
-                        <div class="lg:col-span-2 space-y-4">
-                            <div class="inline-block">
-                                <h3 class="text-lg font-bold uppercase tracking-wider text-slate-900">Company</h3>
-                                <div class="h-1 w-10 bg-cyan-600 rounded-sm mt-1"></div>
-                            </div>
-                            <ul class="space-y-2 text-sm">
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>About Us</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>Portfolio</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>FAQ</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>Privacy policy</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="group flex items-center text-slate-600 hover:text-cyan-600 transition-colors">
-                                        <i
-                                            class="fa-solid fa-caret-right text-cyan-600 text-xs w-4 shrink-0 transition-transform group-hover:translate-x-1"></i>
-                                        <span>Terms & Conditions</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- CONTACT DETAILS -->
-                        <div class="lg:col-span-4 space-y-4">
-                            <div class="inline-block">
-                                <h3 class="text-lg font-bold uppercase tracking-wider text-slate-900">Contact Details
-                                </h3>
-                                <div class="h-1 w-12 bg-cyan-600 rounded-full mt-1"></div>
-                            </div>
-
-                            <div class="space-y-4 text-sm text-slate-600">
-                                <!-- Address (Centered) -->
-                                <div class="flex items-center gap-3.5 group">
-                                    <div
-                                        class="w-10 h-10 shrink-0 rounded-xl bg-red-50 border border-red-100/80 flex items-center justify-center text-red-600 shadow-xs group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
-                                        <i class="fa-solid fa-location-dot text-base"></i>
-                                    </div>
-                                    <span class="leading-relaxed text-slate-700">
-                                        3<sup>rd</sup> floor,
-                                        House-375, Road-28
-                                        DOHS Mohakhali
-                                        Dhaka-1212, Bangladesh
-                                    </span>
-                                </div>
-
-                                <!-- Phone (Centered) -->
-                                <div class="flex items-center gap-3.5 group">
-                                    <div
-                                        class="w-10 h-10 shrink-0 rounded-xl bg-green-50 border border-green-100/80 flex items-center justify-center text-green-600 shadow-xs group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
-                                        <i class="fa-solid fa-phone text-sm"></i>
-                                    </div>
-                                    <div class="space-y-1 leading-snug">
-                                        <p><span class="font-semibold text-slate-800">Sales:</span> &nbsp;&nbsp;
-                                            &nbsp; <a href="tel:+8801711257224"
-                                                class="hover:text-cyan-600 transition">+8801711257224</a></p>
-                                        <p><span class="font-semibold text-slate-800">Support: </span> <a
-                                                href="tel:+8801331995522" class="hover:text-cyan-600 transition">
-                                                +8801331995522</a></p>
-                                    </div>
-                                </div>
-
-                                <!-- Email (Centered) -->
-                                <div class="flex items-center gap-3.5 group">
-                                    <div
-                                        class="w-10 h-10 shrink-0 rounded-xl bg-cyan-50 border border-cyan-100/80 flex items-center justify-center text-cyan-600 shadow-xs group-hover:bg-cyan-600 group-hover:text-white transition-all duration-300">
-                                        <i class="fa-solid fa-envelope text-sm"></i>
-                                    </div>
-                                    <div class="space-y-1 leading-snug">
-                                        <p><a href="mailto:info@comitsbd.com"
-                                                class="hover:text-cyan-600 transition">info@comitsbd.com</a></p>
-                                        <p><a href="mailto:support@comitsbd.com"
-                                                class="hover:text-cyan-600 transition">sales@comitsbd.com</a></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- COPYRIGHT BAR -->
-                <div class="bg-slate-900 text-slate-300 py-4 border-t border-slate-800">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-                        <p>
-                            Copyright &copy; {{ date('Y') }} <a href="https://comitsbd.com" target="_blank"
-                                class="text-cyan-400 font-medium hover:underline">Comits Soft</a>. All
-                            rights reserved. <small>({{ $totalVisitors }} unique visitors, {{ $todayVisitors }}
-                                today)</small>
-                        </p>
-                    </div>
-                </div>
-            </footer>
-            <!-- FOOTER END -->
-            <div class="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col space-y-1">
-                <!-- Facebook Icon -->
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
-                    class="bg-[#1877F2] text-white p-3 rounded-r-md flex items-center justify-center shadow-md transition-transform duration-300 -translate-x-2 hover:translate-x-0">
-                    <i class="fa-brands fa-facebook-f text-lg"></i>
-                </a>
-
-                <!-- WhatsApp Icon -->
-                <a href="https://wa.me/8801711257224" target="_blank" rel="noopener noreferrer"
-                    class="bg-[#25D366] text-white p-3 rounded-r-md flex items-center justify-center shadow-md transition-transform duration-300 -translate-x-2 hover:translate-x-0">
-                    <i class="fa-brands fa-whatsapp text-lg"></i>
-                </a>
-
-                <!-- Email Icon -->
-                <a href="mailto:info@comitsbd.com"
-                    class="bg-slate-600 text-white p-3 rounded-r-md flex items-center justify-center shadow-md transition-transform duration-300 -translate-x-2 hover:translate-x-0">
-                    <i class="fa-solid fa-envelope text-lg"></i>
-                </a>
-            </div>
-            <button id="backToTop" class="back-to-top">
-                <i class="fa-solid fa-arrow-up"></i>
-            </button>
+            @include('FrontEnd.Home.Footer.implementation')
+            @include('FrontEnd.Home.Footer.data_migration')
+            @include('FrontEnd.Home.Footer.user_training')
+            @include('FrontEnd.Home.Footer.tecnical_support')
+            @include('FrontEnd.Home.Footer.customization')
+            @include('FrontEnd.Home.Footer.maintenance')
+            @include('FrontEnd.Home.Footer.about_us')
+            @include('FrontEnd.Home.Footer.privacy')
+            @include('FrontEnd.Home.Footer.terms')
 
             <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+            @include('FrontEnd.Home.script')
     </body>
-
-    <script>
-        // Language Switcher Event Listener
-        const languageSelect = document.getElementById("languageSelect");
-        if (languageSelect) {
-            languageSelect.addEventListener("change", function() {
-                if (this.value === "bn") {
-                    console.log("Bangla selected");
-                } else {
-                    console.log("English selected");
-                }
-            });
-        }
-
-        // Navbar Scroll Effect
-        const navbar = document.getElementById("navbar");
-        const topBar = document.getElementById("topBar");
-
-        window.addEventListener("scroll", () => {
-
-            if (window.scrollY > 50) {
-
-                if (topBar) topBar.classList.add("hidden");
-
-                navbar.classList.remove("bg-transparent");
-
-                navbar.classList.add(
-                    "bg-white/40",
-                    "backdrop-blur-2xl",
-                    "shadow-lg",
-                );
-
-            } else {
-
-                if (topBar) topBar.classList.remove("hidden");
-
-                navbar.classList.remove(
-                    "bg-white/40",
-                    "backdrop-blur-2xl",
-                    "shadow-lg",
-                );
-
-                navbar.classList.add("bg-transparent");
-
-            }
-
-        });
-
-        // Mobile Menu Toggle
-        const menuBtn = document.getElementById("menuBtn");
-        const mobileMenu = document.getElementById("mobileMenu");
-
-        if (menuBtn && mobileMenu) {
-            menuBtn.addEventListener("click", () => {
-                const isHidden = mobileMenu.classList.toggle("hidden");
-
-                menuBtn.innerHTML = isHidden ?
-                    '<i class="fa-solid fa-bars"></i>' :
-                    '<i class="fa-solid fa-xmark"></i>';
-
-                menuBtn.setAttribute("aria-expanded", String(!isHidden));
-            });
-
-            // Close menu when clicking a menu link
-            mobileMenu.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", () => {
-                    mobileMenu.classList.add("hidden");
-
-                    menuBtn.innerHTML =
-                        '<i class="fa-solid fa-bars"></i>';
-
-                    menuBtn.setAttribute("aria-expanded", "false");
-                });
-            });
-        }
-
-        // Partner Logo Slider
-        new Swiper(".partnerSlider", {
-            loop: true,
-            speed: 4000,
-            autoplay: {
-                delay: 0,
-                disableOnInteraction: false,
-            },
-            spaceBetween: 3,
-            breakpoints: {
-                320: {
-                    slidesPerView: 2
-                },
-                640: {
-                    slidesPerView: 3
-                },
-                768: {
-                    slidesPerView: 4
-                },
-                1024: {
-                    slidesPerView: 5
-                }
-            }
-        });
-    </script>
 
 </html>
